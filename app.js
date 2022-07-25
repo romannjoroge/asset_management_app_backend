@@ -22,7 +22,6 @@ app.use(auth(config));
 app.use(express.urlencoded({extended: false}))
 app.use(express.json())
 
-
 // Importing routes
 const allocate = require('./routes/allocation')
 const items = require('./routes/items')
@@ -30,7 +29,6 @@ const category = require('./routes/category')
 const tracking = require('./routes/tracking')
 const gatepass = require('./routes/gatepass')
 const reconciliation = require('./routes/reconciliation')
-
 
 // Routers to use for different modules
 app.use('/allocation', allocate)

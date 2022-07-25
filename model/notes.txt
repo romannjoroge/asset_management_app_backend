@@ -1,0 +1,6 @@
+Random test data generated with synth
+
+REVIEW
+- Slight learning curve and it requires a good understanding of your database and database types
+- All in all after getting it right once it is easy to repeat and make large datasets
+- A million times better than doing it manually
