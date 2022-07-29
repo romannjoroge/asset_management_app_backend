@@ -5,10 +5,11 @@ function isAnyEmpty(arr){
     */
    let isEmpty = false
    // Goes through all the items and returns if any is empty
-   for (elem in arr){
-        if (elem == null){
-            isEmpty == true
+   for (let i = 0; i < arr.length; i++){
+        if (arr[i] == null){
+            isEmpty = true
         }
+        console.log(arr[i])
    }
    return isEmpty
 }
