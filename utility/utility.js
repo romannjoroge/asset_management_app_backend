@@ -9,7 +9,6 @@ function isAnyEmpty(arr){
         if (arr[i] == null){
             isEmpty = true
         }
-        console.log(arr[i])
    }
    return isEmpty
 }

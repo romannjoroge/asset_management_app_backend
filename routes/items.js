@@ -13,6 +13,6 @@ router.post('/add', addItem)
 router.put('/update', updateItem)
 router.delete('/remove', removeItem)
 router.get('/view', getItems)
-router.get('/:id', getItem)
+router.get('/view/:id', getItem)
 
 module.exports = router
