@@ -14,5 +14,8 @@ router.put('/update', updateCategory)
 router.delete('/remove', removeCategory)
 router.get('/view', getCategories)
 router.get('/:id', getCategory)
+router.route('*', (req, res)=>{
+    res.status(404).json({"code":404, "message":'Resource not found'})
+})
 
 module.exports = router
