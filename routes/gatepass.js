@@ -9,7 +9,7 @@ const {
 
 router.get('/')
 router.route('/authorize').get().post(authorize)
-router.route('/leave').put(leaveStatus)
+// router.route('/leave').put(leaveStatus)
 router.get('/history', historyAllItems)
 router.get('/history/:id', historyItem)
 router.route('*', (req, res)=>{
