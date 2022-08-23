@@ -8,7 +8,10 @@ const {
     getCategories
 } = require('../logic/category')
 
-router.get('/')
+const {test} = require('../test/routes_test') 
+// Test to see if the route is reachable
+router.get('/', test)
+
 router.post('/add', addCategory)
 router.put('/update', updateCategory)
 router.delete('/remove', removeCategory)

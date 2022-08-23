@@ -36,7 +36,7 @@ app.use('/assets/items', items)
 app.use('/assets/category', category)
 app.use('/tracking', tracking)
 app.use('/gatepass', gatepass)
-app.use('/reconcilition', reconciliation)
+app.use('/reconciliation', reconciliation)
 
 app.get('/', (req, res)=>{
     console.log(req.oidc.isAuthenticated())

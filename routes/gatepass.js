@@ -7,7 +7,10 @@ const {
     historyItem
 } = require('../logic/gatepass')
 
-router.get('/')
+const {test} = require('../test/routes_test') 
+// Test to see if the route is reachable
+router.get('/', test)
+
 router.route('/authorize').get().post(authorize)
 // router.route('/leave').put(leaveStatus)
 router.get('/history', historyAllItems)
