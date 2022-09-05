@@ -31,6 +31,13 @@ CREATE TABLE location(
   	CONSTRAINT loc_fkey FOREIGN KEY (branch_id) REFERENCES branch(branch_id)
 );
 
+CREATE TABLE IF NOT EXISTS users(
+    user_id varchar(255),
+    email varchar(255) NOT NULL UNIQUE,
+    username varchar(255) NOT NULL UNIQUE,
+    CONSTRAINT PK_11 PRIMARY KEY (user_id)
+);
+
 CREATE TABLE item(
     item_id                  serial,
     category_id            int,        -- id of the category the item belongs to
@@ -44,7 +51,8 @@ CREATE TABLE item(
     location_id         serial,
     CONSTRAINT PK_9 PRIMARY KEY (item_id),
     CONSTRAINT categ_item_fkey FOREIGN KEY (category_id) REFERENCES category(category_id),
-    CONSTRAINT loc_item_fkey FOREIGN KEY (location_id) REFERENCES location(location_id)
+    CONSTRAINT loc_item_fkey FOREIGN KEY (location_id) REFERENCES location(location_id),
+    CONSTRAINT user_item_fkey FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 -- gatepass SQL
@@ -63,4 +71,3 @@ CREATE TABLE IF NOT EXISTS gatepass
  CONSTRAINT PK_10 PRIMARY KEY ( gatepass_id ),
  CONSTRAINT gatepass_item_fk FOREIGN KEY ( item_id ) REFERENCES item(item_id)
 );
-
