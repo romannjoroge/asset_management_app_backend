@@ -10,12 +10,15 @@ const getItem = `
                 c.name AS category_name, u.username AS username FROM item i INNER JOIN location l ON l.location_id = i.location_id 
                 INNER JOIN category c ON i.category_id = c.category_id INNER JOIN users u ON i.user_id = u.user_id WHERE item_id = $1
 `
-
+const temporaryItemCateg = `
+                UPDATE item SET category_id = $1 WHERE category_id = $2;
+`
 module.exports = {
     addItem,
     removeItem,
     updateItem,
     getAllItems,
-    getItem
+    getItem,
+    temporaryItemCateg
 }
 

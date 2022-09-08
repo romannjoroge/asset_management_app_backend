@@ -1,6 +1,7 @@
 const category = require('../model/Assets/category')
 const pool = require('../db')
 const utility = require('../utility/utility')
+const item = require('../model/Assets/items')
 
 async function addCategory(req, res){
     // Get details from request body
@@ -15,9 +16,20 @@ async function addCategory(req, res){
     items = [num_dep, name, dep_type, freq_dep]
     isEmpty = utility.isAnyEmpty(items)
     if(isEmpty){
-        return res.status(404).json({"code":404, "message":'One of the items is empty'})
+        return res.status(404).json({data:'One of the items is empty'})
     }
     
+    // Verify that the category does not exist
+    try{
+        const result = await pool.query(category.getCategoryFromName, [name])
+        // If result rowCount is empty then category doesn't exist
+        if (result.rowCount > 0){
+            return res.status(404).json({data: `Category ${name} already exists`})
+        }
+    }catch(err){
+        console.log(err)
+        return res.status(501).json({data: `Server had trouble checking if category ${name} exists`})
+    }
     // Convert items to appropriate types
     num_dep = parseInt(num_dep)
     freq_dep = parseInt(freq_dep)
@@ -26,37 +38,50 @@ async function addCategory(req, res){
     items = [name, dep_type, num_dep, freq_dep]
     try{
         const result = await pool.query(category.addCategory, items)
-        res.status(201).json({"success": true, "message":'Category succesfully added'})
+        res.status(201).json({data:'Category succesfully added'})
     }catch(error){
         console.log(error)
-        res.status(404).send('Problem with your request')
+        res.status(501).json({data:"Server had an issue with adding the category please try again"})
     }
 }
 
 // Check how to redirect users to other path
 async function removeCategory(req, res){
-    // Get category id from request body
-    let {category_id} = req.body
-    // Validate category id
-    // Convert it to an int
-    category_id = parseInt(category_id)
+    // Get category_name from request body
+    let {name} = req.body
+
+    // Validate category name
+
     // Check if null, if null send an error
-    if (!category_id){
-        res.status(404).json({"code":404, "message":'Category does not exist'})
+    if (!name){
+        res.status(404).json({data:'Category name not given'})
     }
     // Check if it exists
     try{
-        const result = await pool.query(category.getCategory, [category_id])
+        const result = await pool.query(category.getCategoryFromName, [name])
         // If the result is empty the id doesn't exist and an error should be returned
         if (result.rows.length == 0){
-            return res.status(404).json({"message":"Category doesn't exist", "code":404})
+            return res.status(404).json({data:`Category ${name} doesn't exist`})
         }
-        // Remove category from the database
-        const result2 = await pool.query(category.removeCategory, [category_id])
-        return res.status(200).json({"success":true, "message":'Category was able to be deleted'})
+        let category_id = result.rows[0]['category_id']
+        
+        // Locate the temporary category
+        const result2 = await pool.query(category.getCategoryFromName, ['Temporary'])
+        if (result2.rowCount == 0){
+            // There is no Temporary category thus item cannot be deleted
+            return res.status(501).json({data:"There is no Temporary category to store items belonging to deleted category"})
+        }
+        const temp_id = result2.rows[0]['category_id']
+
+        // Move items belonging to deleted category to temporary category
+        await pool.query(item.temporaryItemCateg, [temp_id, category_id])
+
+        // Remove category
+        await pool.query(category.removeCategory, [category_id])
+        return res.status(201).json({data:`Category ${name} succesfully deleted. Items belonging to it have been moved to Temporary category`})
     }catch (error){
         console.log(error)
-        return res.status(501).send('Problem with category request')
+        return res.status(501).json({data:"Server had issues removing the category"})
     }
 
 }
@@ -64,35 +89,40 @@ async function removeCategory(req, res){
 async function updateCategory(req, res){
     // Get details from request body
     let{
-        category_id,
+        new_name,
         num_dep,
         name,
         dep_type,
         freq_dep
     } = req.body
 
+    // Initializing category_id
+    let category_id;
+
     // Verify that non are null
-    items = [category_id, num_dep, name, dep_type, freq_dep]
+    items = [new_name,num_dep, name, dep_type, freq_dep]
     isEmpty = utility.isAnyEmpty(items)
     if(isEmpty){
-        return res.status(404).json({"code":404, "message":'One of the items is empty'})
+        return res.status(404).json({data:'One of the items is empty'})
     }
 
-    // Check that category id is valid
-    category_id = parseInt(category_id)
+    // Check that name is valid
     // Check if it exists
     try{
-        const result = await pool.query(category.getCategory, [category_id])
-        // If the result is empty the id doesn't exist and an error should be returned
+        const result = await pool.query(category.getCategoryFromName, [name])
+        // If the result is empty the category doesn't exist and an error should be returned
         if (result.rows.length == 0){
-            return res.status(404).json({"message":"Category doesn't exist", "code":404})
+            return res.status(404).json({data:`Category ${name} doesn't exist`})
         }
-        // // Remove category from the database
-        // const result2 = await pool.query(category.removeCategory, [category_id])
-        // return res.status(200).json({"success":true, "message":'Category was able to be deleted'})
+        const result2 = await pool.query(category.getCategoryFromName, [new_name])
+        // If result2 has rows then category with new name already exists
+        if (result2.rowCount > 0){
+            return res.status(404).json({data: `Category ${new_name} already exists pick a different category name`})
+        }
+        category_id = result.rows[0]['category_id']
     }catch (error){
         console.log(error)
-        return res.status(501).send('Problem with category request')
+        return res.status(501).json({data:`Server had trouble verifying category ${name} please try again`})
     }
 
     // Convert items to appropriate types
@@ -100,13 +130,13 @@ async function updateCategory(req, res){
     freq_dep = parseInt(freq_dep)
  
     // Run query
-    items = [name, dep_type, num_dep, freq_dep, category_id]
+    items = [new_name, dep_type, num_dep, freq_dep, category_id]
     try{
         const result = await pool.query(category.updateCategory, items)
-        res.status(201).json({"success": true, "message":'Item updated'})
+        res.status(201).json({data:'Category updated'})
     }catch(error){
         console.log(error)
-        res.status(404).send('Problem with request')
+        res.status(501).json({data:`Server had trouble updating ${name} category please try again`})
     }
 }
 
