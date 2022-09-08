@@ -7,7 +7,7 @@ dotenv.config()  // Brings varaibles from .env file
 const { auth } = require('express-openid-connect');  // Allows us to communicate with openid compliant services
 // Gives settings for configuring auth0
 const config = {
-    authRequired: true,
+    authRequired: false,
     auth0Logout: true,
     secret: process.env.SECRET,
     baseURL: process.env.BASEURL,

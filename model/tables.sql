@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS users(
 );
 
 CREATE TABLE item(
-    item_id                  serial,
+    item_id                  varchar(255),
     category_id            int,        -- id of the category the item belongs to
     name                varchar(50),
     user_id             varchar(50),        -- id of the owner of an item
@@ -63,9 +63,9 @@ CREATE TABLE item(
 
 CREATE TABLE IF NOT EXISTS gatepass
 (
- gatepass_id  serial,
+ gatepass_id  varchar(255),
  leaving_time timestamp NOT NULL,
- item_id      serial NOT NULL,
+ item_id      varchar(255) NOT NULL,
  reason       varchar(255) NOT NULL,
  days_gone    int NOT NULL,
  CONSTRAINT PK_10 PRIMARY KEY ( gatepass_id ),

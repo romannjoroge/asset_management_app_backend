@@ -11,7 +11,6 @@ const {
 const {test} = require('../test/routes_test') 
 // Test to see if the route is reachable
 router.get('/', test)
-
 router.post('/add', addItem)
 router.put('/update', updateItem)
 router.delete('/remove', removeItem)
