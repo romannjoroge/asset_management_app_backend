@@ -29,6 +29,7 @@ const category = require('./routes/category')
 const tracking = require('./routes/tracking')
 const gatepass = require('./routes/gatepass')
 const reconciliation = require('./routes/reconciliation')
+const users = require('./routes/users')
 
 // Routers to use for different modules
 app.use('/allocation', allocate)
@@ -37,6 +38,7 @@ app.use('/assets/category', category)
 app.use('/tracking', tracking)
 app.use('/gatepass', gatepass)
 app.use('/reconciliation', reconciliation)
+app.use('/users', users)
 
 app.get('/', (req, res)=>{
     console.log(req.oidc.isAuthenticated())
@@ -47,7 +49,7 @@ app.get('/assets', (req, res)=>{
     res.status(200).json({'success':true, 'data':'To Be Determined'})
 })
 
-app.get('*', (req, res)=>{
+app.route('*', (req, res)=>{
     res.status(404).json({'code':404, 'message':'Resource not found'})
 })
 
