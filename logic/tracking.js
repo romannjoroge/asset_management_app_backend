@@ -6,20 +6,24 @@ const item = require('../model/Assets/items')
 async function moveItem(req, res){
     // Get details
     let {
-        location_id,
+        location_name,
+        branch_id,
         item_id
     } = req.body
 
+    // Initializing location_id
+    let location_id;
+
     // Validate them
     // Changing items to appropriate type
-    location_id = parseInt(location_id)
-    item_id = parseInt(item_id)
+    branch_id = parseInt(branch_id)
+
 
     // Checking if any item is empty
-    items = [location_id, item_id]
+    items = [location_name, item_id, branch_id]
     const isEmpty = utility.isAnyEmpty(items)
     if (isEmpty){
-        res.status(404).json({"code":404, "message":'Details cannot be null'})
+        res.status(404).json({data:'One of the items is empty'})
     }
     
     try{
@@ -27,20 +31,27 @@ async function moveItem(req, res){
         const result = await pool.query(item.getItem, [item_id])
         if (result.rows.length == 0){
             // Returns an error if item doesn't exist
-            return res.status(404).json({"code":404, "message":'Item does not exist'})
+            return res.status(404).json({data:`Item ${item_id} does not exist`})
         }
-        // Checking if an entry for location exists
-        const result2 = await pool.query(location.getLocation, [location_id])
+        // Checking if an entry for branch exists
+        const result2 = await pool.query(location.getBranch, [branch_id])
         if (result2.rows.length == 0){
             // Returns an error if location doesn't exist
-            return res.status(404).json({"code":404, "message":'Location does not exist'})
+            return res.status(404).json({data:`Location ${location_name} does not exist`})
         }
+        // Checking if an entry for location exists
+        const result3 = await pool.query(location.getLocationFromName, [branch_id, location_name])
+        if (result3.rows.length == 0){
+            // Returns an error if location doesn't exist
+            return res.status(404).json({data:`Location ${location_name} does not exist`})
+        }
+        location_id = result3.rows[0]['location_id']
         // Changing the location of the item
-        pool.query(location.moveItem, items)
-        res.status(201).json({"success":true, "message":'Item has been moved'})
+        pool.query(location.moveItem, [location_id, item_id])
+        res.status(201).json({data:`Item ${item_id} has been moved to ${location_name}`})
     }catch(error){
         console.log(error)
-        res.status(404).send('Problem with request')
+        res.status(404).json({data:`Server could not move item ${item_id}`})
     }
 }
 
@@ -48,7 +59,7 @@ async function displayItems(req, res){
     // Run query
     try{
         const results = await pool.query(location.displayItems)
-        res.status(200).json({"success":true, "message":'Data sent', "data":results.rows})
+        res.status(200).json({data:results.rows})
     }catch(error){
         console.log(error)
         res.status(404).send('Problem with request')
@@ -60,15 +71,15 @@ async function displayItem(req, res){
     let item_id = req.params.id 
     item_id = parseInt(item_id)
     if (!item_id){
-        res.status(404).json({"code":404, "message":'id can not be null'})
+        res.status(404).json({data:'Item ID can not be null'})
     }
     try{
         const result = await pool.query(item.getItem, [item_id])
         if (result.rows.length == 0){
-            return res.status(404).json({"code":404, "message":'Item does not exist'})
+            return res.status(404).json({data:'Item does not exist'})
         }
         const result2 = await pool.query(location.displayItem, [item_id])
-        return res.status(200).json({"success":true, "message":'Data sent', "data":result2.rows})
+        return res.status(200).json({data:result2.rows})
     }catch(error){
         console.log(error)
         res.status(404).send('Problem with request')
