@@ -17,7 +17,7 @@ router.delete('/remove', removeItem)
 router.get('/view', getItems)
 router.get('/view/:id', getItem)
 router.route('*', (req, res)=>{
-    res.status(404).json({"code":404, "message":'Resource not found'})
+    res.status(404).json({data:'Resource not found'})
 })
 
 module.exports = router

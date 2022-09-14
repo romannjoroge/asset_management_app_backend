@@ -5,7 +5,8 @@ const {
     removeCategory,
     updateCategory,
     getCategory,
-    getCategories
+    getCategories,
+    getCategoryName
 } = require('../logic/category')
 
 const {test} = require('../test/routes_test') 
@@ -17,8 +18,9 @@ router.put('/update', updateCategory)
 router.delete('/remove', removeCategory)
 router.get('/view', getCategories)
 router.get('/view/:id', getCategory)
+router.get('/categoryName', getCategoryName)
 router.route('*', (req, res)=>{
-    res.status(404).json({"code":404, "message":'Resource not found'})
+    res.status(404).json({data:'Resource not found'})
 })
 
 module.exports = router

@@ -14,7 +14,7 @@ router.route('/move').get().put(moveItem)
 router.route('/display').get(displayItems)
 router.get('/display/:id', displayItem)
 router.route('*', (req, res)=>{
-    res.status(404).json({"code":404, "message":'Resource not found'})
+    res.status(404).json({data:'Resource not found'})
 })
 
 module.exports = router

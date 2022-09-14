@@ -71,3 +71,6 @@ CREATE TABLE IF NOT EXISTS gatepass
  CONSTRAINT PK_10 PRIMARY KEY ( gatepass_id ),
  CONSTRAINT gatepass_item_fk FOREIGN KEY ( item_id ) REFERENCES item(item_id)
 );
+
+-- To create Temporary category
+INSERT INTO category(name, dep_type, num_dep, freq_dep) VALUES('Temporary', 'None', 0, 0);

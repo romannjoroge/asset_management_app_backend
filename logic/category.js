@@ -114,10 +114,13 @@ async function updateCategory(req, res){
         if (result.rows.length == 0){
             return res.status(404).json({data:`Category ${name} doesn't exist`})
         }
-        const result2 = await pool.query(category.getCategoryFromName, [new_name])
-        // If result2 has rows then category with new name already exists
-        if (result2.rowCount > 0){
-            return res.status(404).json({data: `Category ${new_name} already exists pick a different category name`})
+        // If new_name is not the same as old name check if new name already exists
+        if (new_name != name){
+            const result2 = await pool.query(category.getCategoryFromName, [new_name])
+            // If result2 has rows then category with new name already exists
+            if (result2.rowCount > 0){
+                return res.status(404).json({data: `Category ${new_name} already exists pick a different category name`})
+            }
         }
         category_id = result.rows[0]['category_id']
     }catch (error){
@@ -165,10 +168,27 @@ async function getCategories(req, res){
     // Send data
     try{
         const result = await pool.query(category.getAllCategorys)
-        return res.status(200).json({"success":true, "message": "Data sent", "data":result.rows})
+        return res.status(200).json({data:result.rows})
     }catch(error){
         console.log(error)
-        return res.status(404).send('Problem with request')
+        return res.status(404).json({data:"Server couldn't get categories try again later"})
+    }
+}
+
+async function getCategoryName(req, res) {
+    console.log("Ive been hit")
+    // Get data
+    try{
+        // Getting category names
+        const result = await pool.query(category.getCategroyName)
+        // Empty result so no categories
+        if (result.rowCount == 0){
+            return res.status(404).json({data:"Server has no categories"})
+        }
+        res.status(200).json({data:result.rows})
+    }catch(err){
+        console.log(err)
+        res.status(501).json({data:"Server couldn't load category names"})
     }
 }
 
@@ -177,5 +197,6 @@ module.exports = {
     removeCategory,
     updateCategory,
     getCategory,
-    getCategories
+    getCategories,
+    getCategoryName
 }
