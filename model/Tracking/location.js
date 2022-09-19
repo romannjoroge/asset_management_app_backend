@@ -7,6 +7,9 @@ const getLocationNames = 'SELECT name FROM Location WHERE branch_id = $1'
 const getBranches = 'SELECT name, branch_id FROM branch'
 const getLocationFromName = 'SELECT location_id FROM location WHERE name=$1 AND branch_id=$2'
 const getBranch = 'SELECT name FROM branch WHERE branch_id=$1'
+const getBranchFromName = 'SELECT branch_id FROM branch WHERE name=$1'
+const addLocation = 'INSERT INTO location(branch_id, name) VALUES($1, $2)'
+const addBranch = 'INSERT INTO branch(company_id, city, name) VALUES(1, $1, $2)'
 
 module.exports = {
     getLocation,
@@ -17,5 +20,8 @@ module.exports = {
     getLocationNames,
     getBranches,
     getBranch,
-    getLocationFromName
+    getLocationFromName,
+    getBranchFromName,
+    addLocation,
+    addBranch
 }

@@ -122,10 +122,85 @@ async function getBranchNames(req, res){
     }
 }
 
+async function addLocation(req, res){
+    // Adds a location to the system
+    
+    // Getting location_name and branch of location from server
+    let {
+        location_name,
+        branch_name
+    } = req.body
+
+    let branch_id;
+
+    // Making sure nothing is empty
+    if (utility.isAnyEmpty([location_name, branch_name])){
+        // If true something was empty and an error should be raised
+        return res.status(404).json({data: "One of the details was empty"})
+    }
+
+    // Making sure branch exists
+    try{
+        const result = await pool.query(location.getBranchFromName, [branch_name])
+        // If result is empty then the branch does not exist
+        if (result.rowCount == 0){
+            return res.status(404).json({data:`Branch ${branch_name} does not exist`})
+        }
+        // Else store branch_id
+        branch_id = result.rows[0]['branch_id']
+
+        // Make sure that branch location combination does not exist
+        const result2 = await pool.query(location.getLocationFromName, [location_name, branch_id])
+        // If result has something then means that combination exists
+        if (result2.rowCount > 0){
+            return res.status(404).json({data:`Location ${location_name} already exists in branch ${branch_name}`})
+        }
+
+        // Add location
+        await pool.query(location.addLocation, [branch_id, location_name])
+        res.status(201).json({data: `Location ${location_name} has been created`})
+    }catch(err){
+        console.log(err)
+        res.status(501).json({data:`Server had trouble adding ${location_name} please try again`})
+    }
+}
+
+async function addBranch(req, res){
+    // Get branch details
+    let {
+        city,
+        name
+    } = req.body
+
+    // Make sure non is null
+    if(utility.isAnyEmpty([city, name])){
+        // Raise error if any is empty
+        return res.status(404).json({data:"One of the details is empty"})
+    }
+
+    // Make sure name is not used
+    try {
+        const result = await pool.query(location.getBranchFromName, [name])
+        // If result is not empty then name exists and error should be sent
+        if (result.rowCount > 0){
+            return res.status(404).json({data:`Branch ${branch_name} already exists`})
+        }
+
+        // Add branch
+        await pool.query(location.addBranch, [city, name])
+        res.status(201).json({data:`Branch ${name} has been added`})
+    }catch(err){
+        console.log(err)
+        res.status(501).json({data:`Server had trouble adding branch ${name}`})
+    }
+}
+
 module.exports = {
     moveItem,
     displayItem,
     displayItems,
     getLocationFromBranch,
-    getBranchNames
+    getBranchNames,
+    addLocation,
+    addBranch
 }
