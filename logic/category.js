@@ -176,7 +176,6 @@ async function getCategories(req, res){
 }
 
 async function getCategoryName(req, res) {
-    console.log("Ive been hit")
     // Get data
     try{
         // Getting category names

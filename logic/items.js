@@ -1,7 +1,7 @@
 const utility = require('../utility/utility')
 const category = require('../model/Assets/category')
 const items = require('../model/Assets/items')
-const pool = require('../test/datbase/connection_test')
+const pool = require('../db')
 const location = require('../model/Tracking/location')
 
 async function addItem(req, res){

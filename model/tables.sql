@@ -63,12 +63,16 @@ CREATE TABLE item(
 
 CREATE TABLE IF NOT EXISTS gatepass
 (
- gatepass_id  varchar(255),
+ gatepass_id  serial,
  leaving_time timestamp NOT NULL,
  item_id      varchar(255) NOT NULL,
  reason       varchar(255) NOT NULL,
  days_gone    int NOT NULL,
+ location_id int NOT NULL,
+ user_id varchar(255) NOT NULL,
  CONSTRAINT PK_10 PRIMARY KEY ( gatepass_id ),
+ CONSTRAINT gatepass_user_fk FOREIGN KEY (user_id) REFERENCES users(user_id),
+ CONSTRAINT gatepass_location_fk FOREIGN KEY (location_id) REFERENCES location(location_id),
  CONSTRAINT gatepass_item_fk FOREIGN KEY ( item_id ) REFERENCES item(item_id)
 );
 

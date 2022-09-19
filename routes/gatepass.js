@@ -11,7 +11,7 @@ const {test} = require('../test/routes_test')
 // Test to see if the route is reachable
 router.get('/', test)
 
-router.route('/authorize').get().post(authorize)
+router.post('/authorize', authorize)
 // router.route('/leave').put(leaveStatus)
 router.get('/history', historyAllItems)
 router.get('/history/:id', historyItem)

@@ -3,7 +3,9 @@ const router = express.Router()
 const{
     moveItem,
     displayItem,
-    displayItems
+    displayItems,
+    getLocationFromBranch,
+    getBranchNames
 } = require('../logic/tracking')
 
 const {test} = require('../test/routes_test') 
@@ -13,6 +15,9 @@ router.get('/', test)
 router.route('/move').get().put(moveItem)
 router.route('/display').get(displayItems)
 router.get('/display/:id', displayItem)
+router.get('/locationFromBranch/:id', getLocationFromBranch)
+router.get('/getBranchNames', getBranchNames)
+
 router.route('*', (req, res)=>{
     res.status(404).json({data:'Resource not found'})
 })

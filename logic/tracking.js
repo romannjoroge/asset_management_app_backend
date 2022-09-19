@@ -86,8 +86,46 @@ async function displayItem(req, res){
     }
 }
 
+async function getLocationFromBranch(req, res){
+    // Get branch ID from params
+    let id = req.params.id
+
+    // Convert to a number
+    id = parseInt(id)
+
+    // Send locations from server
+    try{
+        const result = await pool.query(location.getLocationNames, [id])
+        // If result is empty send an error
+        if (result.rowCount == 0){
+            return res.status(404).json({data:`There are no locations in branch ${id}`})
+        }
+        res.status(200).json({data: result.rows})
+    }catch(err){
+        console.log(err)
+        res.status(501).json({data:`Server couldn't get locations in branch ${id}`})
+    }
+}
+
+async function getBranchNames(req, res){
+    // Return branch names and ids from server
+    try {
+        const result = await pool.query(location.getBranches)
+        // If result is empty return an error
+        if (result.rowCount == 0){
+            return res.status(404).json({data:"No branches in system"})
+        }
+        res.status(200).json({data: result.rows})
+    }catch(error){
+        console.log(error)
+        res.status(501).json({data: "Server had trouble getting branches try again"})
+    }
+}
+
 module.exports = {
     moveItem,
     displayItem,
-    displayItems
+    displayItems,
+    getLocationFromBranch,
+    getBranchNames
 }

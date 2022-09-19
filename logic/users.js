@@ -1,4 +1,4 @@
-const pool = require('../../db')
+const pool = require('../db')
 const userStatements = require('../model/Users/users')
 const utility = require('../utility/utility')
 
