@@ -2,32 +2,58 @@ const category = require('../model/Assets/category')
 const pool = require('../db')
 const utility = require('../utility/utility')
 const item = require('../model/Assets/items')
+const {addlog} = require('../logic/log')
+const users = require('../model/Users/users')
 
 async function addCategory(req, res){
     // Get details from request body
     let{
+        username,
         num_dep,
         name,
         dep_type,
         freq_dep
     } = req.body
 
+    let user_id;
+
     // Verify that non are null
-    items = [num_dep, name, dep_type, freq_dep]
+    let items = [username, num_dep, name, dep_type, freq_dep]
     isEmpty = utility.isAnyEmpty(items)
     if(isEmpty){
         return res.status(404).json({data:'One of the items is empty'})
     }
     
+    // Verify username
+    try{
+        const result = await pool.query(users.getUserFromName, [username])
+        // If result is empty return an error
+        if (result.rowCount == 0){
+            return res.status(404).json({data:`User ${username} does not exist`})
+        }
+        user_id = result.rows[0]['user_id']
+    }catch(err){
+        console.log(err)
+        return res.status(501).json({data:`Server couldn't verify if user ${username} exists`})
+    }
+
     // Verify that the category does not exist
     try{
         const result = await pool.query(category.getCategoryFromName, [name])
         // If result rowCount is empty then category doesn't exist
         if (result.rowCount > 0){
+            if (await addlog(user_id, new Date().toLocaleString(), `Category ${name} already exists`, 'Adding Category')){
+                // If something other than 0 is returned an error occured
+                return res.status(501).json({data:'Server had trouble updating the log try again'})
+            }
             return res.status(404).json({data: `Category ${name} already exists`})
         }
     }catch(err){
         console.log(err)
+        if (await addlog(user_id, new Date().toLocaleString(), `Server had trouble checking if category ${name} exists`, 'Adding Category')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
         return res.status(501).json({data: `Server had trouble checking if category ${name} exists`})
     }
     // Convert items to appropriate types
@@ -38,18 +64,42 @@ async function addCategory(req, res){
     items = [name, dep_type, num_dep, freq_dep]
     try{
         const result = await pool.query(category.addCategory, items)
-        res.status(201).json({data:'Category succesfully added'})
+        if (await addlog(user_id, new Date().toLocaleString(), `Category ${name} succesfully added`, 'Adding Category')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
+        res.status(201).json({data:`Category ${name} succesfully added`})
     }catch(error){
         console.log(error)
-        res.status(501).json({data:"Server had an issue with adding the category please try again"})
+        if (await addlog(user_id, new Date().toLocaleString(), `Server had an issue with adding category ${name} please try again`, 'Adding Category')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
+        res.status(501).json({data:`Server had an issue with adding category ${name} please try again`})
     }
 }
 
 // Check how to redirect users to other path
 async function removeCategory(req, res){
     // Get category_name from request body
-    let {name} = req.body
-
+    let {
+        name,
+        username
+    } = req.body
+    
+    let user_id;
+    // Verify username
+    try{
+        const result = await pool.query(users.getUserFromName, [username])
+        // If result is empty return an error
+        if (result.rowCount == 0){
+            return res.status(404).json({data:`User ${username} does not exist`})
+        }
+        user_id = result.rows[0]['user_id']
+    }catch(err){
+        console.log(err)
+        return res.status(501).json({data:`Server couldn't verify if user ${username} exists`})
+    }
     // Validate category name
 
     // Check if null, if null send an error
@@ -61,6 +111,10 @@ async function removeCategory(req, res){
         const result = await pool.query(category.getCategoryFromName, [name])
         // If the result is empty the id doesn't exist and an error should be returned
         if (result.rows.length == 0){
+            if (await addlog(user_id, new Date().toLocaleString(), `Category ${name} doesn't exist`, 'Removing Category')){
+                // If something other than 0 is returned an error occured
+                return res.status(501).json({data:'Server had trouble updating the log try again'})
+            }
             return res.status(404).json({data:`Category ${name} doesn't exist`})
         }
         let category_id = result.rows[0]['category_id']
@@ -68,6 +122,10 @@ async function removeCategory(req, res){
         // Locate the temporary category
         const result2 = await pool.query(category.getCategoryFromName, ['Temporary'])
         if (result2.rowCount == 0){
+            if (await addlog(user_id, new Date().toLocaleString(), "There is no Temporary category to store items belonging to deleted category", 'Removing Category')){
+                // If something other than 0 is returned an error occured
+                return res.status(501).json({data:'Server had trouble updating the log try again'})
+            }
             // There is no Temporary category thus item cannot be deleted
             return res.status(501).json({data:"There is no Temporary category to store items belonging to deleted category"})
         }
@@ -78,10 +136,18 @@ async function removeCategory(req, res){
 
         // Remove category
         await pool.query(category.removeCategory, [category_id])
+        if (await addlog(user_id, new Date().toLocaleString(), `Category ${name} succesfully deleted. Items belonging to it have been moved to Temporary category`, 'Removing Category')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
         return res.status(201).json({data:`Category ${name} succesfully deleted. Items belonging to it have been moved to Temporary category`})
     }catch (error){
         console.log(error)
-        return res.status(501).json({data:"Server had issues removing the category"})
+        if (await addlog(user_id, new Date().toLocaleString(), `Server had issues removing category ${name}`, 'Removing Category')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
+        return res.status(501).json({data:`Server had issues removing category ${name}`})
     }
 
 }
@@ -89,6 +155,7 @@ async function removeCategory(req, res){
 async function updateCategory(req, res){
     // Get details from request body
     let{
+        username,
         new_name,
         num_dep,
         name,
@@ -98,12 +165,26 @@ async function updateCategory(req, res){
 
     // Initializing category_id
     let category_id;
+    let user_id;
 
     // Verify that non are null
-    items = [new_name,num_dep, name, dep_type, freq_dep]
+    items = [username, new_name,num_dep, name, dep_type, freq_dep]
     isEmpty = utility.isAnyEmpty(items)
     if(isEmpty){
         return res.status(404).json({data:'One of the items is empty'})
+    }
+
+    // Verifying username
+    try{
+        const result = await pool.query(users.getUserFromName, [username])
+        // If result is empty return an error
+        if (result.rowCount == 0){
+            return res.status(404).json({data:`User ${username} does not exist`})
+        }
+        user_id = result.rows[0]['user_id']
+    }catch(err){
+        console.log(err)
+        return res.status(501).json({data:`Server couldn't verify if user ${username} exists`})
     }
 
     // Check that name is valid
@@ -112,6 +193,10 @@ async function updateCategory(req, res){
         const result = await pool.query(category.getCategoryFromName, [name])
         // If the result is empty the category doesn't exist and an error should be returned
         if (result.rows.length == 0){
+            if (await addlog(user_id, new Date().toLocaleString(), `Category ${name} doesn't exist`, 'Updating Category')){
+                // If something other than 0 is returned an error occured
+                return res.status(501).json({data:'Server had trouble updating the log try again'})
+            }
             return res.status(404).json({data:`Category ${name} doesn't exist`})
         }
         // If new_name is not the same as old name check if new name already exists
@@ -119,12 +204,20 @@ async function updateCategory(req, res){
             const result2 = await pool.query(category.getCategoryFromName, [new_name])
             // If result2 has rows then category with new name already exists
             if (result2.rowCount > 0){
+                if (await addlog(user_id, new Date().toLocaleString(), `Category ${new_name} already exists pick a different category name`, 'Updating Category')){
+                    // If something other than 0 is returned an error occured
+                    return res.status(501).json({data:'Server had trouble updating the log try again'})
+                }
                 return res.status(404).json({data: `Category ${new_name} already exists pick a different category name`})
             }
         }
         category_id = result.rows[0]['category_id']
     }catch (error){
         console.log(error)
+        if (await addlog(user_id, new Date().toLocaleString(), `Server had trouble verifying category ${name} please try again`, 'Updating Category')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
         return res.status(501).json({data:`Server had trouble verifying category ${name} please try again`})
     }
 
@@ -136,9 +229,17 @@ async function updateCategory(req, res){
     items = [new_name, dep_type, num_dep, freq_dep, category_id]
     try{
         const result = await pool.query(category.updateCategory, items)
-        res.status(201).json({data:'Category updated'})
+        if (await addlog(user_id, new Date().toLocaleString(), `Category ${name} updated`, 'Updating Category')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
+        res.status(201).json({data:`Category ${name} updated`})
     }catch(error){
         console.log(error)
+        if (await addlog(user_id, new Date().toLocaleString(), `Server had trouble updating ${name} category please try again`, 'Updating Category')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
         res.status(501).json({data:`Server had trouble updating ${name} category please try again`})
     }
 }
