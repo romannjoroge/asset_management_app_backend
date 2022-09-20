@@ -78,3 +78,11 @@ CREATE TABLE IF NOT EXISTS gatepass
 
 -- To create Temporary category
 INSERT INTO category(name, dep_type, num_dep, freq_dep) VALUES('Temporary', 'None', 0, 0);
+
+CREATE TABLE IF NOT EXISTS item_reconciliation(
+    reconciliation_id serial,
+    item_id varchar(255) NOT NULL,
+    time_occur timestamp NOT NULL, 
+    CONSTRAINT PK_12 PRIMARY KEY (reconciliation_id),
+    CONSTRAINT reconciliation_item_fk FOREIGN KEY (item_id) REFERENCES item(item_id)
+);
