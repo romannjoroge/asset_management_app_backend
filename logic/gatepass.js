@@ -3,6 +3,7 @@ const pool = require('../db')
 const gatepass = require('../model/GatePass/gatepass')
 const item = require('../model/Assets/items')
 const location = require('../model/Tracking/location')
+const {addlog} = require('../logic/log')
 const users = require('../model/Users/users')
 
 async function authorize (req, res){
@@ -33,9 +34,20 @@ async function authorize (req, res){
     branch_id = parseInt(branch_id)
 
     try{
+        // Checking if username exists
+        const result4 = await pool.query(users.getUserFromName, [username])
+        if (result4.rowCount == 0){
+            return res.status(404).json({data:`User ${username} does not exist`})
+        }
+        user_id = result4.rows[0]['user_id']
+
         // Checking if an entry for item exists
         const result = await pool.query(item.getItem, [item_id])
         if (result.rows.length == 0){
+            if (await addlog(user_id, new Date().toLocaleString(), `Item ${item_id} does not exist`, 'Authorizing Gatepass')){
+                // If something other than 0 is returned an error occured
+                return res.status(501).json({data:'Server had trouble updating the log try again'})
+            }
             // Returns an error if item doesn't exist
             return res.status(404).json({data:`Item ${item_id} does not exist`})
         }
@@ -43,6 +55,10 @@ async function authorize (req, res){
         // Checking if an entry for location exists
         const result2 = await pool.query(location.getLocationFromName, [location_name, branch_id])
         if (result2.rows.length == 0){
+            if (await addlog(user_id, new Date().toLocaleString(), `Location ${location_name} does not exist`, 'Authorizing Gatepass')){
+                // If something other than 0 is returned an error occured
+                return res.status(501).json({data:'Server had trouble updating the log try again'})
+            }
             // Returns an error if location doesn't exist
             return res.status(404).json({data:`Location ${location_name} does not exist`})
         }
@@ -52,21 +68,28 @@ async function authorize (req, res){
         const result3 = await pool.query(location.getBranch, [branch_id])
         // If result3 is empty the branch does not exist
         if (result3.rowCount == 0){
+            if (await addlog(user_id, new Date().toLocaleString(), `Branch ${branch_id} does not exist`, 'Authorizing Gatepass')){
+                // If something other than 0 is returned an error occured
+                return res.status(501).json({data:'Server had trouble updating the log try again'})
+            }
             return res.status(404).json({data:`Branch ${branch_id} does not exist`})
         }
 
-        // Checking if username exists
-        const result4 = await pool.query(users.getUserFromName, [username])
-        if (result4.rowCount == 0){
-            return res.status(404).json({data:`User ${username} does not exist`})
-        }
-        user_id = result4.rows[0]['user_id']
+
 
         // Adding gatepass entry
         await pool.query(gatepass.authorize, [item_id, user_id, location_id, reason, date, num_days])
+        if (await addlog(user_id, new Date().toLocaleString(), `Item ${item_id} has been authorized to leave`, 'Authorizing Gatepass')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
         return res.status(201).json({data:`Item ${item_id} has been authorized to leave`})
     }catch(error){
         console.log(error)
+        if (await addlog(user_id, new Date().toLocaleString(), `Server couldn't authorize item ${item_id} to leave`, 'Authorizing Gatepass')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
         res.status(501).json({data:`Server couldn't authorize item ${item_id} to leave`})
     }
 }
