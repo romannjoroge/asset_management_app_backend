@@ -23,7 +23,7 @@ async function authorize (req, res){
     let user_id;
 
     // Validating that info isn't null
-    items = [branch_id, location_name, item_id, reason, username, date, num_days]
+    let items = [branch_id, location_name, item_id, reason, username, date, num_days]
     isEmpty = utility.isAnyEmpty(items)
     if (isEmpty){
         return res.status(404).json({data:'One of the fields are empty'})
