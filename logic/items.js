@@ -215,6 +215,7 @@ async function removeItem(req, res){
 async function updateItem(req, res){
     // Get item_id and other details about an item
     let {
+        username,
         item_id,
         category_name,
         name,
@@ -229,6 +230,23 @@ async function updateItem(req, res){
     // Initializing values for category ID and location ID
     let category_id;
     let location_id;
+    let user_id;
+
+    // Test if user exists
+    if (!username){
+        return res.status(404).json({data:"Username not provided"})
+    }
+    try{
+        const result = await pool.query(users.getUserFromName, [username])
+        // If result is empty return an error
+        if (result.rowCount == 0){
+            return res.status(404).json({data:`User ${username} does not exist`})
+        }
+        user_id = result.rows[0]['user_id']
+    }catch(err){
+        console.log(err)
+        return res.status(501).json({data:`Server couldn't verify if user ${username} exists`})
+    }
 
     // Validate item_id
     // Check if it is null
@@ -241,11 +259,19 @@ async function updateItem(req, res){
         const result = await pool.query(items.getItem, [item_id])
         // If the result is empty the id doesn't exist and an error should be returned
         if (result.rowCount == 0){
-            return res.status(404).json({data:"Item doesn't exist"})
+            if (await addlog(user_id, new Date().toLocaleString(), `Item ${item_id} doesn't exist`, 'Updating Item')){
+                // If something other than 0 is returned an error occured
+                return res.status(501).json({data:'Server had trouble updating the log try again'})
+            }
+            return res.status(404).json({data:`Item ${item_id} doesn't exist`})
         }
     }catch (error){
         console.log(error)
-        return res.status(501).json({data:"Server had an issue validating your Item ID try again"})
+        if (await addlog(user_id, new Date().toLocaleString(), `Server had an issue validating your Item ${item_id} try again`, 'Updating Item')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
+        return res.status(501).json({data:`Server had an issue validating your Item ${item_id} try again`})
     }
 
     // Validate category_name
@@ -260,12 +286,20 @@ async function updateItem(req, res){
         const result = await pool.query(category.getCategoryFromName, [category_name])
         // If the result is empty the id doesn't exist and an error should be returned
         if (result.rowCount == 0){
-            return res.status(404).json({data:"Category doesn't exist"})
+            if (await addlog(user_id, new Date().toLocaleString(), `Category ${category_name} doesn't exist`, 'Updating Item')){
+                // If something other than 0 is returned an error occured
+                return res.status(501).json({data:'Server had trouble updating the log try again'})
+            }
+            return res.status(404).json({data:`Category ${category_name} doesn't exist`})
         }
         category_id = result.rows[0]['category_id']
     }catch (error){
         console.log(error)
-        return res.status(501).json({data:"Server had issues validating your category try again"})
+        if (await addlog(user_id, new Date().toLocaleString(), `Server had issues validating category ${category_name} try again`, 'Updating Item')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
+        return res.status(501).json({data:`Server had issues validating category ${category_name} try again`})
     }
 
     // Validate location_id
@@ -276,12 +310,20 @@ async function updateItem(req, res){
     try{
         const result = await pool.query(location.getLocationID, [location_name])
         if (result.rowCount == 0){
-            return res.status(404).json({data:'Location does not exist'})
+            if (await addlog(user_id, new Date().toLocaleString(), `Location ${location_name} does not exist`, 'Updating Item')){
+                // If something other than 0 is returned an error occured
+                return res.status(501).json({data:'Server had trouble updating the log try again'})
+            }
+            return res.status(404).json({data:`Location ${location_name} does not exist`})
         }
         location_id = result.rows[0]['location_id']
     }catch(error){
         console.log(error)
-        return res.status(501).json({data:"Server had an error validating the location please try again"})
+        if (await addlog(user_id, new Date().toLocaleString(), `Server had an error validating location ${location_name} please try again`, 'Updating Item')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
+        return res.status(501).json({data:`Server had an error validating location ${location_name} please try again`})
     }
 
 
@@ -307,7 +349,11 @@ async function updateItem(req, res){
         return res.status(201).json({data:'Item has been updated'})
     }catch(error){
         console.log(error)
-        res.status(501).json({data:"Server had trouble updating the item please try again"})
+        if (await addlog(user_id, new Date().toLocaleString(), `Server had trouble updating item ${item_id} please try again`, 'Updating Item')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
+        res.status(501).json({data:`Server had trouble updating item ${item_id} please try again`})
     }
 }
 
