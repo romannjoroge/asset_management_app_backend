@@ -5,6 +5,7 @@ const getAllCategorys = 'SELECT name, dep_type, category_id FROM category'
 const getCategory = 'SELECT * FROM category WHERE category_id = $1'
 const getCategoryFromName = 'SELECT category_id FROM category WHERE name = $1'
 const getCategroyName = 'SELECT name FROM category'
+const getDeprDetails = 'SELECT dep_type, num_dep, freq_dep, percentage FROM category WHERE category_id=$1'
 
 module.exports = {
     addCategory,
@@ -13,5 +14,6 @@ module.exports = {
     getAllCategorys,
     getCategory,
     getCategoryFromName,
-    getCategroyName
+    getCategroyName,
+    getDeprDetails
 }

@@ -17,12 +17,11 @@ async function addItem(req, res){
         name,
         purchase_date,
         purchase_amount,
-        next_dep_date,
         accum_dep,
         isnew,
         location_name
     } = req.body
-    let item = [username, item_id, category_name, name, purchase_amount, purchase_date, next_dep_date, accum_dep, isnew, location_name]
+    let item = [username, item_id, category_name, name, purchase_amount, purchase_date, accum_dep, isnew, location_name]
     
     // Initializing category and location IDs that will be gotten from the database
     let category_id;
@@ -120,7 +119,7 @@ async function addItem(req, res){
     // Converting items to appropriate types
     purchase_amount = parseFloat(purchase_amount)
     accum_dep = parseFloat(accum_dep)
-    item = [item_id, category_id, name, purchase_date, purchase_amount, next_dep_date, accum_dep, isnew, location_id]
+    item = [item_id, category_id, name, purchase_date, purchase_amount, accum_dep, isnew, location_id]
 
     try{
         const result = await pool.query(items.addItem, item)
@@ -220,8 +219,7 @@ async function updateItem(req, res){
         category_name,
         name,
         purchase_date,
-        purchase_amount,
-        next_dep_date,
+        purchase_amount,        
         accum_dep,
         location_name,
         isnew
@@ -328,7 +326,7 @@ async function updateItem(req, res){
 
 
     // Check if any non-nullable items are null
-    item_list = [item_id, purchase_amount, purchase_date, next_dep_date, accum_dep, name, isnew]
+    item_list = [item_id, purchase_amount, purchase_date, accum_dep, name, isnew]
     // If null return error
     isEmpty = utility.isAnyEmpty(item_list)
     if (isEmpty){
@@ -342,7 +340,7 @@ async function updateItem(req, res){
 
     // Update the item
     // Run pool.query() if you get an error log it
-    item_list = [name, category_id, purchase_amount, purchase_date, next_dep_date, accum_dep,  isnew, location_id, item_id]
+    item_list = [name, category_id, purchase_amount, purchase_date, accum_dep,  isnew, location_id, item_id]
     
     try{
         const result = pool.query(items.updateItem, item_list)
@@ -374,7 +372,17 @@ async function getItem(req, res){
             return res.status(404).json({data:"Item doesn't exist"})
         }
         // Send the results
-        res.status(200).json({data:result.rows})
+        res.status(200).json({data:{
+            item_id: result.rows[0]['item_id'],
+            name: result.rows[0]['name'],
+            purchase_date: result.rows[0]['purchase_date'],
+            purchase_amount: result.rows[0]['purchase_amount'],
+            accum_dep: await calculateNewPrice(item_id),
+            isnew: result.rows[0]['isnew'],
+            location_name: result.rows[0]['location_name'],
+            category_name: result.rows[0]['category_name'],
+            username: result.rows[0]['username'],
+        }})
     }catch (error){
         console.log(error)
         return res.status(501).json({data:"Server had an issue getting the item please try again"})
@@ -391,6 +399,102 @@ async function getItems(req, res){
         res.status(404).send('Problem with items request')
     }
 }
+
+async function calculateNewPrice(item_id){
+    // Calculate the updated accumulated depreciation of an item
+
+    // Declaring variables for storing variable details
+    let category_id;
+    let purchase_amount;
+    let purchase_date;
+    let num_dep;
+    let freq_dep;
+    let dep_type;
+    let accum_dep;
+    let percentage;
+
+    // Get category and buying price from item
+    try{
+        const result = await pool.query(items.getDeprDetails, [item_id])
+        // If result is empty raise an error
+        if (result.rowCount == 0){
+            if (await addlog(user_id, new Date().toLocaleString(), `Couldn't get depreciation details for item ${item_id} from server`, 'Depreciation of Item')){
+                // If something other than 0 is returned an error occured
+                return res.status(501).json({data:'Server had trouble updating the log try again'})
+            }
+            return res.status(404).json({data:`Couldn't get depreciation details for item ${item_id} from server`})
+        }
+        category_id = result.rows[0]['category_id']
+        purchase_amount = result.rows[0]['purchase_amount']
+        purchase_date = result.rows[0]['purchase_date']
+        accum_dep = result.rows[0]['accum_dep']
+    }catch(err){
+        console.log(err)
+        if (await addlog(user_id, new Date().toLocaleString(), `Server encountered an error getting depreciation details of item ${item_id}`, 'Depreciation of Item')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
+        res.status(501).json({data:`Server encountered an error getting depreciation details of item ${item_id}`})
+    }
+
+    // Get num_dep, freq_dep from category
+    try{
+        const result = await pool.query(category.getDeprDetails, [category_id])
+        // If result is empty raise an error
+        if (result.rowCount == 0){
+            if (await addlog(user_id, new Date().toLocaleString(), `Server couldn't get category details of category ${category_id}`, 'Depreciation of Item')){
+                // If something other than 0 is returned an error occured
+                return res.status(501).json({data:'Server had trouble updating the log try again'})
+            }
+            return res.status(404).json({data:`Server couldn't get category details of category ${category_id}`})
+        }
+        num_dep = result.rows[0]['num_dep']
+        dep_type = result.rows[0]['dep_type']
+        freq_dep = result.rows[0]['freq_dep']
+        percentage = result.rows[0]['percentage']
+    }catch(err){
+        console.log(err)
+        if (await addlog(user_id, new Date().toLocaleString(), `Server got an error getting category details of category ${category_id}`, 'Depreciation of Item')){
+            // If something other than 0 is returned an error occured
+            return res.status(501).json({data:'Server had trouble updating the log try again'})
+        }
+        res.status(501).json({data:`Server got an error getting category details of category ${category_id}`})
+    }
+
+    // Get number of months from purchase_date
+    let date_1 = new Date(purchase_date)
+    let date_2 = new Date()
+
+    let months = (date_2.getFullYear() - date_1.getFullYear()) * 12
+    months += date_2.getMonth() - date_1.getMonth()
+
+    // Straight depreciation method (item depreceates by a fixed amount after a fixed amount of time)
+    if (dep_type == 'Straight line'){
+        // Divide buying price by number of depreciations to get amount of each depreciation
+        let amount_each_dep = purchase_amount / num_dep
+        // Divide that amount by freq of depreciations to get depreciation per month
+        let dep_per_month = amount_each_dep / freq_dep
+
+        accum_dep += months * dep_per_month
+    }else if(dep_type == 'Double Declining Balance' || dep_type == 'Written Down Value'){
+        if (dep_type == 'Double Declining Balance'){
+            percentage = 0.8
+        }else{
+            percentage = 1 - (percentage / 100)
+        }
+        
+        // Convert months from purchase date to years
+        let years = months / 12
+        // Calculate number of depreciations by multiplying freq by above
+        depreciations = years * freq_dep
+        // The value drops by 20% at every depreciation
+        accum_dep += purchase_amount - ((purchase_amount - accum_dep) * percentage ** depreciations)
+    }
+
+    // Return the accum_dep
+    return(accum_dep.toFixed(2))
+}
+
 
 module.exports = {
     addItem,
