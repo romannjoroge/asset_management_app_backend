@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS category
  dep_type varchar(30) NOT NULL,
  num_dep  int NOT NULL,
  freq_dep int NOT NULL,
+ percentage int NOT NULL,
  CONSTRAINT PK_5 PRIMARY KEY ( category_id )
 );
 
@@ -85,4 +86,14 @@ CREATE TABLE IF NOT EXISTS item_reconciliation(
     time_occur timestamp NOT NULL, 
     CONSTRAINT PK_12 PRIMARY KEY (reconciliation_id),
     CONSTRAINT reconciliation_item_fk FOREIGN KEY (item_id) REFERENCES item(item_id)
+);
+
+CREATE TABLE log(
+    log_id serial,
+    user_id varchar(255) NOT NULL,
+    time_occur timestamp NOT NULL,
+    event TEXT NOT NULL,
+    action TEXT NOT NULL,
+    CONSTRAINT PK_13 PRIMARY KEY (log_id),
+    CONSTRAINT log_user_fk FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
