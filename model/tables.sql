@@ -46,7 +46,6 @@ CREATE TABLE item(
     user_id             varchar(50),        -- id of the owner of an item
     purchase_date       date,
     purchase_amount     real,       -- buying price of the item
-    next_dep_date       date,       -- the date of its next depreciation
     accum_dep           real,       -- the accumulated depreciation on the item
     isnew               boolean,    -- whether the item was newly purchased or its an existing item
     location_id         serial,
