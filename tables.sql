@@ -1,27 +1,28 @@
-CREATE TABLE "User" (
-  "ID" serial,
-  "email" varchar(50),
-  "password" varchar(50),
-  "username" varchar(50),
-  "companyName" varchar(50),
-  PRIMARY KEY ("ID"),
+CREATE TABLE User2 (
+  fname varchar(50) NOT NULL,
+  lname varchar(50) NOT NULL,
+  email varchar(50) NOT NULL,
+  password varchar(50) NOT NULL,
+  username varchar(50),
+  companyName varchar(50) NOT NULL,
+  PRIMARY KEY (username),
   CONSTRAINT "FK_User.companyName"
-    FOREIGN KEY ("companyName")
-      REFERENCES "Company"("name")
+    FOREIGN KEY (companyName)
+      REFERENCES Company(name)
 );
 
-CREATE TABLE "Company" (
-  "name" varchar(50),
-  "ownerID" int,
-  PRIMARY KEY ("name"),
-  CONSTRAINT "FK_Company.ownerID"
-    FOREIGN KEY ("ownerID")
-      REFERENCES "User"("ID")
+CREATE TABLE Company (
+  name varchar(50),
+  PRIMARY KEY (name)
 );
 
 CREATE TABLE Folder (
   ID serial,
   name varchar(50),
+  companyName varchar(50),
+  CONSTRAINT "FK_Folder.companyName"
+    FOREIGN KEY (companyName)
+      REFERENCES Company(name),
   PRIMARY KEY (ID)
 );
 
@@ -61,14 +62,14 @@ CREATE TABLE DepreciationPercent (
 
 CREATE TABLE "GatePass" (
   "ID" serial,
-  "expectedTime" timestampz,
+  "expectedTime" timestamptz,
   "entry" boolean,
-  "userID" int,
+  "username" varchar(50),
   "reason" text,
   PRIMARY KEY ("ID"),
-  CONSTRAINT "FK_GatePass.userID"
-    FOREIGN KEY ("userID")
-      REFERENCES "User"("ID")
+  CONSTRAINT "FK_GatePass.username"
+    FOREIGN KEY ("username")
+      REFERENCES "User2"("username")
 );
 
 CREATE TABLE "Asset" (
@@ -79,7 +80,7 @@ CREATE TABLE "Asset" (
   "acquisitionDate" date,
   "locationID" int,
   "status" varchar(10),
-  "custodianID" int,
+  "custodianname" varchar(50),
   "acquisitionCost" money,
   "insuranceValue" money,
   "categoryID" int,
@@ -93,7 +94,7 @@ CREATE TABLE "Asset" (
       REFERENCES "Category"("ID"),
   CONSTRAINT "FK_Asset.custodianID"
     FOREIGN KEY ("custodianID")
-      REFERENCES "User"("ID")
+      REFERENCES "User2"("username")
 );
 
 CREATE TABLE "Asset File" (
@@ -108,17 +109,17 @@ CREATE TABLE "Asset File" (
 CREATE TABLE "Stock Take" (
   "ID" serial,
   "locationID" int,
-  "date" timestampz,
+  "date" timestamptz,
   PRIMARY KEY ("ID"),
   CONSTRAINT "FK_Stock Take.locationID"
     FOREIGN KEY ("locationID")
       REFERENCES "Location"("ID")
 );
 
-CREATE TABLE "Role" (
-  "ID" serail,
-  "name" varchar(50),
-  PRIMARY KEY ("ID")
+CREATE TABLE Role (
+  ID serial,
+  name varchar(50),
+  PRIMARY KEY (ID)
 );
 
 CREATE TABLE "Parent Child Folder" (
@@ -163,26 +164,26 @@ CREATE TABLE "GatePass Asset" (
       REFERENCES "Asset"("assetTag")
 );
 
-CREATE TABLE "Log" (
-  "ID" serial,
-  "timestamp" timestampz,
-  "ipAddress" inet,
-  "userID" int,
-  "eventType" varchar(50),
-  "logDescription" text,
-  PRIMARY KEY ("ID"),
-  CONSTRAINT "FK_Log.userID"
-    FOREIGN KEY ("userID")
-      REFERENCES "User"("ID")
+CREATE TABLE Log (
+  ID serial,
+  timestamp timestamptz,
+  ipAddress inet,
+  username varchar(50),
+  eventType varchar(50),
+  logDescription text,
+  PRIMARY KEY (ID),
+  CONSTRAINT "FK_Log.username"
+    FOREIGN KEY (username)
+      REFERENCES User2(username)
 );
 
-CREATE TABLE "User Role" (
-  "userID" int,
-  "roleID" int,
-  PRIMARY KEY ("userID", "roleID"),
-  CONSTRAINT "FK_User Role.userID"
-    FOREIGN KEY ("userID")
-      REFERENCES "User"("ID")
+CREATE TABLE UserRole (
+  username varchar(50),
+  roleID int,
+  PRIMARY KEY (username, roleID),
+  CONSTRAINT "FK_User Role.username"
+    FOREIGN KEY (username)
+      REFERENCES User2(username)
 );
 
 CREATE TABLE "RFID Reader" (
@@ -194,3 +195,5 @@ CREATE TABLE "RFID Reader" (
       REFERENCES "Location"("ID")
 );
 
+-- Creates the home folder when the database is created. This is the topmost folder in the system
+INSERT INTO Folder(name) VALUES('home');
