@@ -19,10 +19,10 @@ CREATE TABLE "Company" (
       REFERENCES "User"("ID")
 );
 
-CREATE TABLE "Folder" (
-  "ID" serial,
-  "name" varchar(50),
-  PRIMARY KEY ("ID")
+CREATE TABLE Folder (
+  ID serial,
+  name varchar(50),
+  PRIMARY KEY (ID)
 );
 
 CREATE TABLE "Location" (
@@ -39,21 +39,24 @@ CREATE TABLE "Location" (
       REFERENCES "Folder"("ID")
 );
 
-CREATE TABLE "Category" (
-  "ID" serial,
-  "name" varchar(50),
-  "parentFolderID" int,
-  "depreciationType" varchar(50),
-  PRIMARY KEY ("ID"),
+CREATE TABLE Category (
+  ID serial,
+  name varchar(50) NOT NULL,
+  parentFolderID int,
+  depreciationType varchar(50) NOT NULL,
+  PRIMARY KEY (ID),
   CONSTRAINT "FK_Category.parentFolderID"
-    FOREIGN KEY ("parentFolderID")
-      REFERENCES "Folder"("ID")
+    FOREIGN KEY (parentFolderID)
+      REFERENCES Folder(ID)
 );
 
-CREATE TABLE "Depreciation Percent" (
-  "categoryID" int,
-  "percentage" float,
-  PRIMARY KEY ("categoryID")
+CREATE TABLE DepreciationPercent (
+  categoryID int,
+  percentage float NOT NULL,
+  PRIMARY KEY (categoryID),
+  CONSTRAINT "FK_DepreciationPercent.categoryID"
+    FOREIGN KEY (categoryID)
+      REFERENCES Category(ID)
 );
 
 CREATE TABLE "GatePass" (
@@ -139,10 +142,13 @@ CREATE TABLE "Stock Take Assets" (
       REFERENCES "Stock Take"("ID")
 );
 
-CREATE TABLE "Depreciation Per Year" (
-  "categoryID" int,
-  "value" money,
-  PRIMARY KEY ("categoryID")
+CREATE TABLE DepreciationPerYear (
+  categoryID int,
+  value money NOT NULL,
+  PRIMARY KEY (categoryID),
+  CONSTRAINT "FK_DepreciationPerYear.categoryID"
+    FOREIGN KEY (categoryID)
+      REFERENCES Category(ID)
 );
 
 CREATE TABLE "GatePass Asset" (
