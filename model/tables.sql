@@ -97,5 +97,3 @@ CREATE TABLE log(
     CONSTRAINT log_user_fk FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
--- Creates the home folder when the database is created. This is the topmost folder in the system
-INSERT INTO Folder(name) VALUES('home');
