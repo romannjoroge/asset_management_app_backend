@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --timeout 10000",
+    "test": "mocha",
+    "coverage": "nyc --reporter=lcov --reporter=text npm run test",
     "start": "nodemon app.js"
   },
   "keywords": [],
@@ -14,7 +15,9 @@
     "chai": "^4.3.7",
     "chai-http": "^4.3.0",
     "mocha": "^10.2.0",
-    "nodemon": "^2.0.19"
+    "nodemon": "^2.0.19",
+    "nyc": "^15.1.0",
+    "sinon": "^15.0.1"
   },
   "dependencies": {
     "dotenv": "^16.0.1",
