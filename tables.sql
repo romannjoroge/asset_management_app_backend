@@ -42,7 +42,7 @@ CREATE TABLE "Location" (
 
 CREATE TABLE Category (
   ID serial,
-  name varchar(50) NOT NULL,
+  name varchar(50) NOT NULL UNIQUE,
   parentFolderID int,
   depreciationType varchar(50) NOT NULL,
   PRIMARY KEY (ID),
