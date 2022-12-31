@@ -5,7 +5,7 @@ import pool from '../db2';
 import categoryTable from './db_category2';
 
 // Category Class
-function Category(name, parentFolderID, depreciationType, depDetail) {
+function Category(categoryName, parentFolderID, depreciationType, depDetail) {
    this.addCategory = addCategory;
 
     // Update Category
@@ -21,7 +21,7 @@ async function addCategory() {
     // Create Category
     /*
         Create a category from the following data:
-        name: string. Is the name of a category, should be unique
+        categoryName: string. Is the name of a category, should be unique
         parentFolder: string. Name of the folder
         depreciaitionType: string. The type of depreciation to apply to its assets. Its value should
             be in the depreciaition type list
@@ -34,15 +34,15 @@ async function addCategory() {
     // Validate Details
     let depTypes = ['Straight Line', 'Double Declining Balance', 'Written Down Value'];
     
-    // Check if depreciationType is in depTypes
+    // Asserting that depreciationType is in depTypes
     if (depreciationType in depTypes === false) {
         // If depreciationType isn't in depType it means an invalid depreciaition type was entered
         throw new Error("Invalid depreciation type")
     }
 
-    // Check if name is a string and less than 50 characters
-    if (typeof name !== 'sting' || name.length > 50) {
-        throw new Error('Invalid Name')
+    // Asserting that categoryName is a string and less than 50 characters
+    if (typeof categoryName !== 'sting' || categoryName.length > 50) {
+        throw new Error('Invalid category name')
     }
     
     // Check if parentFolderId is an int
@@ -62,12 +62,12 @@ async function addCategory() {
     // Create Category
     try{
         // Add an entry to Category table
-        const result = await pool.query(categoryTable.add, [name, parentFolderID, depreciationType])
+        const result = await pool.query(categoryTable.add, [categoryName, parentFolderID, depreciationType])
 
         // If depreciaitionType is not Double Declining Balance we get category ID of recent category
         if (depreciationType !== 'Double Declining Balance') {
             // Get id of recently created category
-            const result2 = await pool.query(categoryTable.getID, [name])
+            const result2 = await pool.query(categoryTable.getID, [categoryName])
             // Check if nothing was returned
             if (result2.rowCount === 0){
                 // This would mean that category was never created
