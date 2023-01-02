@@ -2,13 +2,14 @@ const addCategory = 'INSERT into Category (name, parentFolderID, depreciationTyp
 const getCategoryID = 'SELECT ID FROM Category WHERE name = $1'
 const addStraightLineDepreciationEntry = 'INSERT INTO DepreciationPerYear (categoryID, value) VALUES ($1, $2)'
 const addWrittenValueDepreciationEntry = 'INSERT INTO DepreciationPercent (categoryID, percentage) VALUES ($1, $2)'
-
+const updateCategoryName = "UPDATE Category SET name = $1 WHERE id = $2";
 
 let categoryTable = {
     add: addCategory,
     getID: getCategoryID,
     addStraight: addStraightLineDepreciationEntry,
-    addWritten: addWrittenValueDepreciationEntry
+    addWritten: addWrittenValueDepreciationEntry,
+    updateCategoryName: updateCategoryName
 }
 
 module.exports = categoryTable;
