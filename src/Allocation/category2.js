@@ -106,10 +106,9 @@ Category.prototype.addCategory = async function addCategory() {
         if (typeof this.categoryName !== 'string' || this.categoryName.length > 50) {
             throw new Error('Invalid category name')
         }
-        console.log(2);
 
         // Check if parentFolderId is an int
-        if (typeof this.parentFolderID !== 'int') {
+        if (!Number.isInteger(this.parentFolderID)) {
             throw new Error('Invalid parent Folder')
         }
         console.log(3);
