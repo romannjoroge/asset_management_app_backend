@@ -97,7 +97,7 @@ Category.prototype.addCategory = async function addCategory() {
 
         // Validate Details
         // Asserting that depreciationType is in depTypes
-        if (this.depreciationType in Category.depTypes === false) {
+        if (Category.depTypes.includes(this.depreciaitionType) === false) {
             // If depreciationType isn't in depType it means an invalid depreciaition type was entered
             throw new Error("Invalid depreciation type")
         }
@@ -106,26 +106,33 @@ Category.prototype.addCategory = async function addCategory() {
         if (typeof this.categoryName !== 'sting' || this.categoryName.length > 50) {
             throw new Error('Invalid category name')
         }
-        
+        console.log(2);
+
         // Check if parentFolderId is an int
         if (typeof this.parentFolderID !== 'int') {
             throw new Error('Invalid parent Folder')
         }
+        console.log(3);
 
         // Check if depdetail is a float that is greater than 0
         if (typeof this.depDetail !== 'float') {
+            console.log(4);
             throw new Error('Depreciation Detail is of the wrong type')
         } else {
+            console.log(5);
             if (this.depDetail < 0) {
+                console.log(6);
                 throw new Error('Invalid depreciation value')
             }
         }
-
+        console.log(7);
         // Create Category
         try{
             const result = Category.saveCategoryInDb(this.categoryName, this.parentFolderID, this.depreciaitionType, this.depDetail);
+            console.log(8);
             return result;
         }catch(err) {
+            console.log(9);
             throw new Error(err.message);
         }
     }
