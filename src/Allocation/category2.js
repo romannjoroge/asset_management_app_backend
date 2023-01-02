@@ -111,11 +111,9 @@ Category.prototype.addCategory = async function addCategory() {
         if (!Number.isInteger(this.parentFolderID)) {
             throw new Error('Invalid parent Folder')
         }
-        console.log(3);
 
         // Check if depdetail is a float that is greater than 0
-        if (typeof this.depDetail !== 'float') {
-            console.log(4);
+        if (!Number.isInteger(this.depDetail)) {
             throw new Error('Depreciation Detail is of the wrong type')
         } else {
             console.log(5);
