@@ -40,6 +40,16 @@ class Category {
 
     // Function that saves category in the database
     static async saveCategoryInDb(categoryName, parentFolderID, depreciationType, depDetail) {
+        // Test if category already exists
+        try{
+            const existing = await Category.getCategoryID(categoryName);
+            if (existing){
+                throw new MyError("Category already exists");
+            }
+        }catch(err){
+            throw err;
+        }
+
         try{
             // Add an entry to Category table
             const result = await pool.query(categoryTable.add, [categoryName, parentFolderID, depreciationType]);
