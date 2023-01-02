@@ -129,14 +129,23 @@ Category.prototype.addCategory = async function addCategory() {
             throw new MyError('Invalid parent Folder')
         }
 
-        // Check if depdetail is a float that is greater than 0
+        // Check if depdetail is a number
         if (!Number.isInteger(this.depDetail)) {
             throw new MyError('Depreciation Detail is of the wrong type')
-        } else {
-            if (this.depDetail < 0) {
-                throw new MyError('Invalid depreciation value')
+        }
+
+        // Check if depDetail depreciationType combo is valid
+        if (this.depreciaitionType === "Double Declining Balance"){
+            // Straight Line should not have a depreciation type
+            if (this.depDetail !== 0){
+                throw new MyError("Double Declining Balance should not have a depreciation value");
+            }
+        }else{
+            if (this.depreciaitionType <= 0){
+                throw new MyError("Invalid depreciation value");
             }
         }
+
         // Create Category
         const result = await Category.saveCategoryInDb(this.categoryName, this.parentFolderID, this.depreciaitionType, this.depDetail);
         return result;
