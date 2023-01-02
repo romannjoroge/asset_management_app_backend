@@ -141,7 +141,7 @@ Category.prototype.addCategory = async function addCategory() {
                 throw new MyError("Double Declining Balance should not have a depreciation value");
             }
         }else{
-            if (this.depreciaitionType <= 0){
+            if (this.depDetail <= 0){
                 throw new MyError("Invalid depreciation value");
             }
         }
