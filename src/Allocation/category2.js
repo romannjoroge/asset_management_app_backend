@@ -6,6 +6,7 @@ const categoryTable = require('./db_category2');
 
 // Importing custom MyError class
 const MyError = require('../../utility/myError');
+const Folder = require('./folder');
 
 class Category {
     // Constructor
@@ -46,6 +47,13 @@ class Category {
             if (existing){
                 throw new MyError("Category already exists");
             }
+        }catch(err){
+            throw err;
+        }
+
+        // Test if parent folder exists
+        try {
+            const folderName = await Folder.getFolderNameFromId(parentFolderID);
         }catch(err){
             throw err;
         }
