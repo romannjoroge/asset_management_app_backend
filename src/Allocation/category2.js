@@ -24,71 +24,64 @@ class Category {
 
     // Function that gets Category ID from name
     static async getCategoryID(categoryName) {
-        try{
-            // Get id of recently created category
-            const result = await pool.query(categoryTable.getID, [categoryName]);
-            // Check if nothing was returned
-            if (result.rowCount === 0){
-                // This would mean that category was never created
-                throw new MyError("No Category exists with that name");
-            } else {
-                return result.rows[0].id
-            }
+        // Get id of recently created category
+        const result = await pool.query(categoryTable.getID, [categoryName]);
+        // Check if nothing was returned
+        if (result.rowCount === 0){
+            // This would mean that category was never created
+            throw new MyError("No Category exists with that name");
+        } else {
+            return result.rows[0].id
+        }
+    }
+
+    static async doesCategoryExist(categoryName) {
+        try {
+            const exist = await Category.getCategoryID(categoryName);
+            return "Category Exists";
         }catch(err){
-            throw err;
+            return "Category Does Not Exist"
         }
     }
 
     // Function that saves category in the database
     static async saveCategoryInDb(categoryName, parentFolderID, depreciationType, depDetail) {
         // Test if category already exists
-        try{
-            const existing = await Category.getCategoryID(categoryName);
-            if (existing){
-                throw new MyError("Category already exists");
-            }
-        }catch(err){
-            throw err;
+        const exist = await Category.doesCategoryExist(categoryName);
+        if (exist === "Category Exists"){
+            throw new MyError("Category Exists");
         }
 
         // Test if parent folder exists
-        try {
-            const folderName = await Folder.getFolderNameFromId(parentFolderID);
-        }catch(err){
-            throw err;
-        }
+        const folderName = await Folder.getFolderNameFromId(parentFolderID);
 
-        try{
-            // Add an entry to Category table
-            const result = await pool.query(categoryTable.add, [categoryName, parentFolderID, depreciationType]);
-            let categoryID;
-            // If depreciaitionType is not Double Declining Balance we get category ID of recent category
-            if (this.depreciationType !== 'Double Declining Balance') {
-                try {
-                    categoryID = await Category.getCategoryID(categoryName);
-                }catch(err){
-                    throw new MyError(`Could not save category: ${err.message}`);
-                }
-
-                // If depreciationType is Straight Line add an entry to DepreciationPerYear
-                if (depreciationType === 'Straight Line') {
-                    try {
-                        await pool.query(categoryTable.addStraight, [categoryID, depDetail]);
-                    }catch(err){
-                        throw new MyError("Could not add Straight line Depreciation Entry");
-                    }
-                }else {
-                    // Else add entry to DepreciationPercent
-                    try {
-                        await pool.query(categoryTable.addWritten, [categoryID, depDetail]);
-                    }catch(err){
-                        throw new MyError("Could not add Written Down Value Depreciation");
-                    }
-                }
-                return "Category created"
+        // Add an entry to Category table
+        const result = await pool.query(categoryTable.add, [categoryName, parentFolderID, depreciationType]);
+        let categoryID;
+        // If depreciaitionType is not Double Declining Balance we get category ID of recent category
+        if (this.depreciationType !== 'Double Declining Balance') {
+            try {
+                categoryID = await Category.getCategoryID(categoryName);
+            }catch(err){
+                throw new MyError(`Could not save category: ${err.message}`);
             }
-        }catch(err) {
-            throw err;
+
+            // If depreciationType is Straight Line add an entry to DepreciationPerYear
+            if (depreciationType === 'Straight Line') {
+                try {
+                    await pool.query(categoryTable.addStraight, [categoryID, depDetail]);
+                }catch(err){
+                    throw new MyError("Could not add Straight line Depreciation Entry");
+                }
+            }else {
+                // Else add entry to DepreciationPercent
+                try {
+                    await pool.query(categoryTable.addWritten, [categoryID, depDetail]);
+                }catch(err){
+                    throw new MyError("Could not add Written Down Value Depreciation");
+                }
+            }
+            return "Category created"
         }
     }
 
@@ -142,12 +135,8 @@ Category.prototype.addCategory = async function addCategory() {
             }
         }
         // Create Category
-        try{
-            const result = await Category.saveCategoryInDb(this.categoryName, this.parentFolderID, this.depreciaitionType, this.depDetail);
-            return result;
-        }catch(err) {
-            throw err;
-        }
+        const result = await Category.saveCategoryInDb(this.categoryName, this.parentFolderID, this.depreciaitionType, this.depDetail);
+        return result;
     }
 
 module.exports = Category;
