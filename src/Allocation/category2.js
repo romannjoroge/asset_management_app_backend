@@ -5,18 +5,12 @@ import pool from '../../db2';
 import categoryTable from './db_category2';
 
 class Category {
-    // Declare private properties
-    #categoryName;
-    #parentFolderID;
-    #depreciaitionType;
-    #depDetail
-
     // Constructor
     constructor(n, p, d, dd) {
-        this.#categoryName = n;
-        this.#parentFolderID = p;
-        this.#depreciaitionType = d;
-        this.#depDetail = dd;
+        this.categoryName = n;
+        this.parentFolderID = p;
+        this.depreciaitionType = d;
+        this.depDetail = dd;
     }
 
     // Static fields
@@ -86,54 +80,55 @@ class Category {
     // Get Depreciation Details
 }
 
-async function addCategory() {
-    // Create Category
-    /*
-        Create a category from the following data:
-        categoryName: string. Is the name of a category, should be unique
-        parentFolder: string. Name of the folder
-        depreciaitionType: string. The type of depreciation to apply to its assets. Its value should
-            be in the depreciaition type list
-        depDetail: float. Either the depreciaition per year or depreciation percent depending on value of 
-            depreciationType. Can't be zero and must be positive. 
-        depreciationPerYear: float. Is a monetary value, has a maximum of 2dp
-        depreciationPercentage: float. The percentage depreciation
-    */
+// Adds a category in system
+Category.prototype.addCategory = async function addCategory() {
+        // Create Category
+        /*
+            Create a category from the following data:
+            categoryName: string. Is the name of a category, should be unique
+            parentFolder: string. Name of the folder
+            depreciaitionType: string. The type of depreciation to apply to its assets. Its value should
+                be in the depreciaition type list
+            depDetail: float. Either the depreciaition per year or depreciation percent depending on value of 
+                depreciationType. Can't be zero and must be positive. 
+            depreciationPerYear: float. Is a monetary value, has a maximum of 2dp
+            depreciationPercentage: float. The percentage depreciation
+        */
 
-    // Validate Details
-    // Asserting that depreciationType is in depTypes
-    if (this.depreciationType in this.depTypes === false) {
-        // If depreciationType isn't in depType it means an invalid depreciaition type was entered
-        throw new Error("Invalid depreciation type")
-    }
+        // Validate Details
+        // Asserting that depreciationType is in depTypes
+        if (this.depreciationType in Category.depTypes === false) {
+            // If depreciationType isn't in depType it means an invalid depreciaition type was entered
+            throw new Error("Invalid depreciation type")
+        }
 
-    // Asserting that categoryName is a string and less than 50 characters
-    if (typeof this.categoryName !== 'sting' || this.categoryName.length > 50) {
-        throw new Error('Invalid category name')
-    }
-    
-    // Check if parentFolderId is an int
-    if (typeof this.parentFolderID !== 'int') {
-        throw new Error('Invalid parent Folder')
-    }
+        // Asserting that categoryName is a string and less than 50 characters
+        if (typeof this.categoryName !== 'sting' || this.categoryName.length > 50) {
+            throw new Error('Invalid category name')
+        }
+        
+        // Check if parentFolderId is an int
+        if (typeof this.parentFolderID !== 'int') {
+            throw new Error('Invalid parent Folder')
+        }
 
-    // Check if depdetail is a float that is greater than 0
-    if (typeof this.depDetail !== 'float') {
-        throw new Error('Depreciation Detail is of the wrong type')
-    } else {
-        if (this.depDetail < 0) {
-            throw new Error('Invalid depreciation value')
+        // Check if depdetail is a float that is greater than 0
+        if (typeof this.depDetail !== 'float') {
+            throw new Error('Depreciation Detail is of the wrong type')
+        } else {
+            if (this.depDetail < 0) {
+                throw new Error('Invalid depreciation value')
+            }
+        }
+
+        // Create Category
+        try{
+            const result = Category.saveCategoryInDb(this.categoryName, this.parentFolderID, this.depreciaitionType, this.depDetail);
+            return result;
+        }catch(err) {
+            throw new Error(err.message);
         }
     }
-
-    // Create Category
-    try{
-        const result = this.saveCategoryInDb();
-        return result;
-    }catch(err) {
-        throw new Error(err.message);
-    }
-}
 
 module.exports = Category;
 
