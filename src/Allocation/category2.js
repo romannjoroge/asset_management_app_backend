@@ -53,7 +53,10 @@ class Category {
         }
 
         // Test if parent folder exists
-        const folderName = await Folder.getFolderNameFromId(parentFolderID);
+        const folderExist = await Folder.doesFolderExist(parentFolderID);
+        if (folderExist === "Folder does not Exist"){
+            throw new MyError("Folder does not Exist");
+        }
 
         // Add an entry to Category table
         const result = await pool.query(categoryTable.add, [categoryName, parentFolderID, depreciationType]);
