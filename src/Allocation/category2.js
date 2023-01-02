@@ -1,8 +1,8 @@
 // Importing the database bool from db2.js. This will allow me to connect to the database
-import pool from '../../db2';
+const pool = require('../../db2');
 
 // Importing SQL commands involving categories
-import categoryTable from './db_category2';
+const categoryTable = require('./db_category2');
 
 class Category {
     // Constructor
