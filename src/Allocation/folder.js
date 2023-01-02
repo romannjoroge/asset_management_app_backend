@@ -9,12 +9,14 @@ class Folder {
     }
 
     // Gets the name of a folder from an id
-    static async getFolderNameFromId(id) {
+    static async doesFolderExist(id) {
         try {
             const result = await pool.query(folderTable.getFolderName, [id]);
-            return result.rows[0].name;
+            if (result.rowCount === 0){
+                return "Folder Exists";
+            }
         }catch(err){
-            throw new MyError("Folder does not exist");
+            return "Folder does not Exist";
         }
     }
 }
