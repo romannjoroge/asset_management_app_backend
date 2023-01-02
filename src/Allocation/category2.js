@@ -38,9 +38,9 @@ class Category {
     static async doesCategoryExist(categoryName) {
         try {
             const exist = await Category.getCategoryID(categoryName);
-            return "Category Exists";
+            return true;
         }catch(err){
-            return "Category Does Not Exist"
+            return false;
         }
     }
 
@@ -48,13 +48,13 @@ class Category {
     static async saveCategoryInDb(categoryName, parentFolderID, depreciationType, depDetail) {
         // Test if category already exists
         const exist = await Category.doesCategoryExist(categoryName);
-        if (exist === "Category Exists"){
+        if (exist === true){
             throw new MyError("Category Exists");
         }
 
         // Test if parent folder exists
         const folderExist = await Folder.doesFolderExist(parentFolderID);
-        if (folderExist === "Folder does not Exist"){
+        if (folderExist === false){
             throw new MyError("Folder does not Exist");
         }
 
@@ -89,7 +89,22 @@ class Category {
     }
 
     // Update Category
- 
+    static async updateCategoryName(oldName, newName){
+        // Verify the new name
+        if (typeof newName !== "string"){
+            // If not a string throw an error
+            throw new MyError("Category Name is of invalid type");
+        }else if (newName.length > 50){
+            // Throw an error for a name that's too long
+            throw new MyError("Category Name is too long");
+        }
+
+        // Check if the name exists
+        const exist = await Category.doesCategoryExist(newName);
+        if (exist === true){
+            throw new MyError(`${newName} category already exists`);
+        }
+    }
     // Delete Category
 
     // View Category Details
