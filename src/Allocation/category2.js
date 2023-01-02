@@ -4,60 +4,86 @@ import pool from '../../db2';
 // Importing SQL commands involving categories
 import categoryTable from './db_category2';
 
+class Category {
+    // Declare private properties
+    #categoryName;
+    #parentFolderID;
+    #depreciaitionType;
+    #depDetail
 
-// Function that gets Category ID from name
-async function getCategoryID() {
-    try{
-        // Get id of recently created category
-        const result = await pool.query(categoryTable.getID, [this.categoryName])
-        // Check if nothing was returned
-        if (result.rowCount === 0){
-            // This would mean that category was never created
-            throw new Error("No Category exists with that name")
-        } else {
-            return result.rows[0].id
-        }
-
-    }catch(err){
-        throw new Error("Could not get category ID")
+    // Constructor
+    constructor(n, p, d, dd) {
+        this.#categoryName = n;
+        this.#parentFolderID = p;
+        this.#depreciaitionType = d;
+        this.#depDetail = dd;
     }
-}
 
-// Function that saves category in the database
-async function saveCategoryInDb() {
-    try{
-        // Add an entry to Category table
-        const result = await pool.query(categoryTable.add, [this.categoryName, this.parentFolderID, 
-                                                            this,depreciationType]);
+    // Static fields
+    static depTypes = ['Straight Line', 'Double Declining Balance', 'Written Down Value'];
 
-        // If depreciaitionType is not Double Declining Balance we get category ID of recent category
-        if (this.depreciationType !== 'Double Declining Balance') {
-            try {
-                const categoryID = await this.getCategoryID();
-            }catch(err){
-                throw new Error(`Could not save category: ${err.message}`);
+    // Static methods
+
+    // Function that gets Category ID from name
+    static async getCategoryID(categoryName) {
+        try{
+            // Get id of recently created category
+            const result = await pool.query(categoryTable.getID, [categoryName])
+            // Check if nothing was returned
+            if (result.rowCount === 0){
+                // This would mean that category was never created
+                throw new Error("No Category exists with that name")
+            } else {
+                return result.rows[0].id
             }
-
-            // If depreciationType is Straight Line add an entry to DepreciationPerYear
-            if (depreciationType === 'Straight Line') {
-                try {
-                    await pool.query(categoryTable.addStraight, [this.categoryID, this.depDetail]);
-                }catch(err){
-                    throw new Error("Could not add Straight line Depreciation Entry");
-                }
-            }else {
-                // Else add entry to DepreciationPercent
-                try {
-                    await pool.query(categoryTable.addWritten, [this.categoryID, this.depDetail]);
-                }catch(err){
-                    throw new Error("Could not add Written Down Value Depreciation");
-                }
-            }
-            return "Category created"
+        }catch(err){
+            throw new Error("Could not get category ID")
         }
-    }catch(err) {
-        throw new Error(err.message);
     }
+
+    // Function that saves category in the database
+    static async saveCategoryInDb(categoryName, parentFolderID, depreciationType, depDetail) {
+        try{
+            // Add an entry to Category table
+            const result = await pool.query(categoryTable.add, [categoryName, parentFolderID, depreciationType]);
+            let categoryID;
+            // If depreciaitionType is not Double Declining Balance we get category ID of recent category
+            if (this.depreciationType !== 'Double Declining Balance') {
+                try {
+                    categoryID = await Category.getCategoryID(categoryName);
+                }catch(err){
+                    throw new Error(`Could not save category: ${err.message}`);
+                }
+
+                // If depreciationType is Straight Line add an entry to DepreciationPerYear
+                if (depreciationType === 'Straight Line') {
+                    try {
+                        await pool.query(categoryTable.addStraight, [categoryID, depDetail]);
+                    }catch(err){
+                        throw new Error("Could not add Straight line Depreciation Entry");
+                    }
+                }else {
+                    // Else add entry to DepreciationPercent
+                    try {
+                        await pool.query(categoryTable.addWritten, [categoryID, depDetail]);
+                    }catch(err){
+                        throw new Error("Could not add Written Down Value Depreciation");
+                    }
+                }
+                return "Category created"
+            }
+        }catch(err) {
+            throw new Error(err.message);
+        }
+    }
+
+    // Update Category
+ 
+    // Delete Category
+
+    // View Category Details
+
+    // Get Depreciation Details
 }
 
 async function addCategory() {
@@ -107,48 +133,6 @@ async function addCategory() {
     }catch(err) {
         throw new Error(err.message);
     }
-}
-
-// Category Constructor function
-function Category(n, p, d, dd) {
-    
-    // Instantiate private variables
-    let categoryName = n;
-    let parentFolderID = p;
-    let depreciaitionType = d;
-    let depDetail = dd;
-    let depTypes = ['Straight Line', 'Double Declining Balance', 'Written Down Value'];
-
-    // Private Functions
-    this.getCategoryID = getCategoryID;
-    this.saveCategoryInDb = saveCategoryInDb;
-    
-    this.addCategory = addCategory;
- 
-     // Update Category
- 
-     // Delete Category
- 
-     // View Category Details
- 
-     // Get Depreciation Details
-}
-
-class Category {
-    // Constructor
-    constructor(n, p, d, dd) {
-        this.categoryName = n;
-        this.parentFolderID = p;
-        this.depreciaitionType = d;
-        this.depDetail = dd;
-    }
-
-    // Static fields
-    static depTypes = ['Straight Line', 'Double Declining Balance', 'Written Down Value'];
-
-    // Static methods
-    static saveCategoryInDb = saveCategoryInDb;
-    static getCategoryID = getCategoryID;
 }
 
 module.exports = Category;
