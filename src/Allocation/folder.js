@@ -13,10 +13,10 @@ class Folder {
         try {
             const result = await pool.query(folderTable.getFolderName, [id]);
             if (result.rowCount === 0){
-                return "Folder Exists";
+                return true;
             }
         }catch(err){
-            return "Folder does not Exist";
+            return false;
         }
     }
 }
