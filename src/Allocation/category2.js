@@ -89,7 +89,7 @@ class Category {
     }
 
     // Update Category
-    static async updateCategoryName(oldName, newName){
+    static async verifyCategoryName(newName){
         // Verify the new name
         if (typeof newName !== "string"){
             // If not a string throw an error
@@ -104,7 +104,30 @@ class Category {
         if (exist === true){
             throw new MyError(`${newName} category already exists`);
         }
+
+        return "Name is valid!";
     }
+
+    static async updateNameinDb (category_id, newName) {
+        // Run command
+        try {
+            await pool.query(categoryTable.updateCategoryName, [newName, category_id]);
+        }catch(err){
+            throw new MyError("Could not update category name");
+        }
+    }
+
+    static async updateCategoryName(newName, oldName) {
+        // Verify newName
+        const isValid = await Category.verifyCategoryName(newName);
+        
+        // Get id of category
+        const category_id = await Category.getCategoryID(oldName);
+
+        // Update database
+        await Category.updateNameinDb(category_id, newName);
+    }
+    
     // Delete Category
 
     // View Category Details
