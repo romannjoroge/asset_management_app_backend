@@ -121,13 +121,12 @@ class Category {
         // Verify newName
         const isValid = await Category.verifyCategoryName(newName);
         
-        // Get id of category
         const category_id = await Category.getCategoryID(oldName);
 
         // Update database
         await Category.updateNameinDb(category_id, newName);
     }
-    
+
     // Delete Category
 
     // View Category Details
