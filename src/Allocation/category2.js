@@ -4,6 +4,9 @@ const pool = require('../../db2');
 // Importing SQL commands involving categories
 const categoryTable = require('./db_category2');
 
+// Importing custom MyError class
+const MyError = require('../../utility/myError');
+
 class Category {
     // Constructor
     constructor(n, p, d, dd) {
@@ -22,16 +25,16 @@ class Category {
     static async getCategoryID(categoryName) {
         try{
             // Get id of recently created category
-            const result = await pool.query(categoryTable.getID, [categoryName])
+            const result = await pool.query(categoryTable.getID, [categoryName]);
             // Check if nothing was returned
             if (result.rowCount === 0){
                 // This would mean that category was never created
-                throw new Error("No Category exists with that name")
+                throw new MyError("No Category exists with that name");
             } else {
                 return result.rows[0].id
             }
         }catch(err){
-            throw new Error("Could not get category ID")
+            throw err;
         }
     }
 
@@ -46,7 +49,7 @@ class Category {
                 try {
                     categoryID = await Category.getCategoryID(categoryName);
                 }catch(err){
-                    throw new Error(`Could not save category: ${err.message}`);
+                    throw new MyError(`Could not save category: ${err.message}`);
                 }
 
                 // If depreciationType is Straight Line add an entry to DepreciationPerYear
@@ -54,20 +57,20 @@ class Category {
                     try {
                         await pool.query(categoryTable.addStraight, [categoryID, depDetail]);
                     }catch(err){
-                        throw new Error("Could not add Straight line Depreciation Entry");
+                        throw new MyError("Could not add Straight line Depreciation Entry");
                     }
                 }else {
                     // Else add entry to DepreciationPercent
                     try {
                         await pool.query(categoryTable.addWritten, [categoryID, depDetail]);
                     }catch(err){
-                        throw new Error("Could not add Written Down Value Depreciation");
+                        throw new MyError("Could not add Written Down Value Depreciation");
                     }
                 }
                 return "Category created"
             }
         }catch(err) {
-            throw new Error(err.message);
+            throw err;
         }
     }
 
@@ -99,38 +102,33 @@ Category.prototype.addCategory = async function addCategory() {
         // Asserting that depreciationType is in depTypes
         if (Category.depTypes.includes(this.depreciaitionType) === false) {
             // If depreciationType isn't in depType it means an invalid depreciaition type was entered
-            throw new Error("Invalid depreciation type")
+            throw new MyError("Invalid depreciation type")
         }
 
         // Asserting that categoryName is a string and less than 50 characters
         if (typeof this.categoryName !== 'string' || this.categoryName.length > 50) {
-            throw new Error('Invalid category name')
+            throw new MyError('Invalid category name')
         }
 
         // Check if parentFolderId is an int
         if (!Number.isInteger(this.parentFolderID)) {
-            throw new Error('Invalid parent Folder')
+            throw new MyError('Invalid parent Folder')
         }
 
         // Check if depdetail is a float that is greater than 0
         if (!Number.isInteger(this.depDetail)) {
-            throw new Error('Depreciation Detail is of the wrong type')
+            throw new MyError('Depreciation Detail is of the wrong type')
         } else {
-            console.log(5);
             if (this.depDetail < 0) {
-                console.log(6);
-                throw new Error('Invalid depreciation value')
+                throw new MyError('Invalid depreciation value')
             }
         }
-        console.log(7);
         // Create Category
         try{
-            const result = Category.saveCategoryInDb(this.categoryName, this.parentFolderID, this.depreciaitionType, this.depDetail);
-            console.log(8);
+            const result = await Category.saveCategoryInDb(this.categoryName, this.parentFolderID, this.depreciaitionType, this.depDetail);
             return result;
         }catch(err) {
-            console.log(9);
-            throw new Error(err.message);
+            throw err;
         }
     }
 
