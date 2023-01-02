@@ -103,7 +103,7 @@ Category.prototype.addCategory = async function addCategory() {
         }
 
         // Asserting that categoryName is a string and less than 50 characters
-        if (typeof this.categoryName !== 'sting' || this.categoryName.length > 50) {
+        if (typeof this.categoryName !== 'string' || this.categoryName.length > 50) {
             throw new Error('Invalid category name')
         }
         console.log(2);
