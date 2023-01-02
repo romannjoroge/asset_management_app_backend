@@ -10,4 +10,4 @@ let categoryTable = {
     addWritten: addWrittenValueDepreciationEntry
 }
 
-export default categoryTable
+module.exports = categoryTable;
