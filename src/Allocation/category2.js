@@ -160,6 +160,27 @@ class Category {
         await Category.updateFolderinDB(categoryID, newFolderID);
     }
 
+    static async verifyDepreciationDetails(depType, depValue) {
+        // Verifies that depreciation details are valid
+        // Make sure that depType is valid
+        if(!Category.depTypes.includes(depType)) {
+            throw new MyError("Invalid Depreciation Type");
+        }
+
+        // Make sure deptype depvalue pair is valid
+        if (depType === "Double Declining Balance") {
+            if (depValue) {
+                throw new MyError("Double Declining Balance should not have depreciation value");
+            }
+        }else{
+            if (!Number.isInteger(depValue) || depValue <= 0){
+                throw new MyError("Invalid depreciation value");
+            }
+        }
+    }
+
+    
+
     // Delete Category
 
     // View Category Details
