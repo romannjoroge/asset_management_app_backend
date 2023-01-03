@@ -5,7 +5,7 @@ const addWrittenValueDepreciationEntry = 'INSERT INTO DepreciationPercent (categ
 const updateCategoryName = "UPDATE Category SET name = $1 WHERE id = $2";
 const updateFolderID = "UPDATE Category SET parentFolderID = $1 WHERE id = $2";
 const updateDepreciationType = "UPDATE Category SET depreciationType = $1 WHERE id = $2";
-const updateDepreciationPerYear = "UPDATE DepreciationPerYear SET categoryID = $1, value = $2 WHERE categoryID = $1";
+const insertDepreciationPerYear = "INSERT INTO DepreciationPerYear(categoryID, value) VALUES ($1, $2)";
 
 let categoryTable = {
     add: addCategory,
@@ -15,7 +15,7 @@ let categoryTable = {
     updateCategoryName: updateCategoryName,
     updateFolderID: updateFolderID,
     updateDepreciationType: updateDepreciationType,
-    updateDepreciationPerYear: updateDepreciationPerYear,
+    insertDepreciationPerYear: insertDepreciationPerYear,
 }
 
 module.exports = categoryTable;
