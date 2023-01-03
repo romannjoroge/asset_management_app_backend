@@ -147,8 +147,27 @@ class Category {
         }
     }
 
-    static async updateFolderinDB(categoryName, newID) {
-        
+    static async updateFolderinDB(category_id, newID) {
+        // Run the SQL command
+        try{
+            await pool.query(categoryTable.updateFolderID, [newID, category_id]);
+        }catch(err){
+            throw new MyError("Could not update category folder");
+        }
+    }
+
+    static async updateCategoryFolder(newFolderID, categoryName) {
+        // Verify new folder ID
+        const validID = await Category.verifyFolder(newFolderID);
+        if (validID !== "Folder Exists"){
+            throw new MyError("Folder does not exist");
+        }
+
+        // Get category ID from categoryName
+        const categoryID = Category.getCategoryID(categoryName);
+
+        // Update details in DB
+        await Category.updateFolderinDB(categoryID, newFolderID);
     }
 
     // Delete Category
