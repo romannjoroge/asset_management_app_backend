@@ -212,6 +212,14 @@ class Category {
         }
     }
 
+    static async deleteDepreciationPercentInDb(category_id) {
+        try {
+            await pool.query(categoryTable.deleteDepreciationPercent, [category_id]);
+        }catch(err){
+            throw new MyError("Could not delete depreciation percentage entry");
+        }
+    }
+
     // Delete Category
 
     // View Category Details
