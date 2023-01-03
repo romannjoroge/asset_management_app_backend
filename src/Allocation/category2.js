@@ -161,7 +161,7 @@ class Category {
         // Make sure deptype depvalue pair is valid
         if (depType === "Double Declining Balance") {
             if (depValue) {
-                throw new MyError("Double Declining Balance should not have depreciation value");
+                throw new MyError("Double Declining Balance should not have a depreciation value");
             }
         }else{
             if (!Number.isInteger(depValue) || depValue <= 0){
