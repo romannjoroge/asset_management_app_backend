@@ -220,6 +220,29 @@ class Category {
         }
     }
 
+    static async updateDepreciationType(depType, value, categoryName){
+        // Verify Depreciation Details
+        await Category.verifyDepreciationDetails(depType, value);
+
+        // Get category ID
+        const category_id = Category.getCategoryID(categoryName);
+
+        // Update Depreciation Type Entry in Category Table
+        await Category.updateDepreciationTypeInDB(category_id, depType);
+
+        // Delete Depreciation Type and Depreciation Per Year in category table
+        await Category.deleteDepreciationPerYearInDb(category_id);
+        await Category.deleteDepreciationPercentInDb(category_id);
+
+        // Insert DepreciationPerYear of DepreciationPercent
+        if (depType === "Straight Line") {
+            // Insert DepreciationPerYear
+            await Category.insertDepreciationPercentInDb(category_id, value);
+        }else if (depType === "Written Down Value"){
+            await Category.insertDepreciationValueInDB(category_id, value);
+        }
+    }
+
     // Delete Category
 
     // View Category Details
