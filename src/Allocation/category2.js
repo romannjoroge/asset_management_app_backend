@@ -71,20 +71,11 @@ class Category {
 
             // If depreciationType is Straight Line add an entry to DepreciationPerYear
             if (depreciationType === 'Straight Line') {
-                try {
-                    await pool.query(categoryTable.addStraight, [categoryID, depDetail]);
-                }catch(err){
-                    throw new MyError("Could not add Straight line Depreciation Entry");
-                }
+                await Category.insertDepreciationValueInDB(categoryID, depDetail);
             }else {
                 // Else add entry to DepreciationPercent
-                try {
-                    await pool.query(categoryTable.addWritten, [categoryID, depDetail]);
-                }catch(err){
-                    throw new MyError("Could not add Written Down Value Depreciation");
-                }
+                await Category.insertDepreciationPercentInDb(categoryID, depDetail);
             }
-            return "Category created"
         }
     }
 
@@ -160,7 +151,7 @@ class Category {
         await Category.updateFolderinDB(categoryID, newFolderID);
     }
 
-    static async verifyDepreciationDetails(depType, depValue) {
+    static verifyDepreciationDetails(depType, depValue) {
         // Verifies that depreciation details are valid
         // Make sure that depType is valid
         if(!Category.depTypes.includes(depType)) {
@@ -266,12 +257,6 @@ Category.prototype.addCategory = async function addCategory() {
         */
 
         // Validate Details
-        // Asserting that depreciationType is in depTypes
-        if (Category.depTypes.includes(this.depreciaitionType) === false) {
-            // If depreciationType isn't in depType it means an invalid depreciaition type was entered
-            throw new MyError("Invalid depreciation type")
-        }
-
         // Asserting that categoryName is a string and less than 50 characters
         if (typeof this.categoryName !== 'string' || this.categoryName.length > 50) {
             throw new MyError('Invalid category name')
@@ -282,22 +267,8 @@ Category.prototype.addCategory = async function addCategory() {
             throw new MyError('Invalid parent Folder')
         }
 
-        // Check if depdetail is a number
-        if (!Number.isInteger(this.depDetail)) {
-            throw new MyError('Depreciation Detail is of the wrong type')
-        }
-
-        // Check if depDetail depreciationType combo is valid
-        if (this.depreciaitionType === "Double Declining Balance"){
-            // Straight Line should not have a depreciation type
-            if (this.depDetail !== 0){
-                throw new MyError("Double Declining Balance should not have a depreciation value");
-            }
-        }else{
-            if (this.depDetail <= 0){
-                throw new MyError("Invalid depreciation value");
-            }
-        }
+        // Verify Depreciation Details
+        Category.verifyDepreciationDetails(this.depreciaitionType, this.depDetail);
 
         // Create Category
         const result = await Category.saveCategoryInDb(this.categoryName, this.parentFolderID, this.depreciaitionType, this.depDetail);
@@ -305,4 +276,3 @@ Category.prototype.addCategory = async function addCategory() {
     }
 
 module.exports = Category;
-
