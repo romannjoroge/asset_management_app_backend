@@ -188,16 +188,16 @@ class Category {
         }
     }
 
-    static async updateDepreciationValueInDB(category_id, value) {
+    static async insertDepreciationValueInDB(category_id, value) {
         try {
-            await pool.query(categoryTable.updateDepreciationPerYear, [category_id, value]);
+            await pool.query(categoryTable.insertDepreciationPerYear, [category_id, value]);
         }catch(err){
-            throw new MyError("Could not update depreciation per year");
+            throw new MyError("Could not insert depreciation per year");
         }
     }
 
-    static async updateDepreciationPercentInDb(category_id, percent) {
-        
+    static async insertDepreciationPercentInDb(category_id, percent) {
+
     }
 
     // Delete Category
