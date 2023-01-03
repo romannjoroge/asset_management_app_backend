@@ -179,7 +179,18 @@ class Category {
         }
     }
 
-    
+    static async updateDepreciationTypeInDB(category_id, depType){
+        // Update the depreciation type in category table
+        try {
+            await pool.query(categoryTable.updateDepreciationType, [depType, category_id]);
+        }catch(err){
+            throw new MyError("Could not update Depreciation Type");
+        }
+    }
+
+    static async updateDepreciationValueInDB(category_id, value) {
+        
+    }
 
     // Delete Category
 
