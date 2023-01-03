@@ -197,8 +197,14 @@ class Category {
     }
 
     static async insertDepreciationPercentInDb(category_id, percent) {
-
+        try{
+            await pool.query(categoryTable.insertDepreciationPercent, [category_id, percent]);
+        }catch(err){
+            throw new MyError("Could not insert depreciation percentage");
+        }
     }
+
+    static async delete
 
     // Delete Category
 
