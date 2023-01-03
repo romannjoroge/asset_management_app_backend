@@ -234,6 +234,26 @@ class Category {
         }
     }
 
+    static async updateCategory(updateJSON, categoryName) {
+        // Update whatever item is specified in json
+        /*
+        json: an object that could have the following keys: name, parentFolder or depreciaiton
+        Each key contains the new info to use to update that property of a category.
+        The depreciation key contains another object that has depreciation type and value
+        */
+        if ("name" in updateJSON) {
+            await Category.updateCategoryName(updateJSON.name, categoryName);
+        }
+        
+        if("parentFolder" in updateJSON){
+            await Category.updateCategoryFolder(updateJSON.parentFolder, categoryName);
+        }
+
+        if ("depreciation" in updateJSON){
+            await Category.updateDepreciationType(updateJSON.depreciation.type, updateJSON.depreciation.value, categoryName);
+        }
+    }
+
     // Delete Category
 
     // View Category Details
