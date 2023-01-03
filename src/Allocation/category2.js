@@ -127,6 +127,30 @@ class Category {
         await Category.updateNameinDb(category_id, newName);
     }
 
+    static async verifyFolder(id) {
+        // Verifies a folder ID
+        // Test if folder ID is an int
+        if (!Number.isInteger(id)){
+            throw new MyError("Invalid Folder");
+        }
+
+        // Test if id exists
+        try{
+            const exist = Folder.doesFolderExist(id);
+            if (!exist) {
+                throw new MyError("Folder does not exist");
+            }else{
+                return "Folder Exists";
+            }
+        }catch(err){
+            throw new MyError("Could not verify folder");
+        }
+    }
+
+    static async updateFolderinDB(categoryName, newID) {
+        
+    }
+
     // Delete Category
 
     // View Category Details
