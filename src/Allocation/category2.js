@@ -189,6 +189,14 @@ class Category {
     }
 
     static async updateDepreciationValueInDB(category_id, value) {
+        try {
+            await pool.query(categoryTable.updateDepreciationPerYear, [category_id, value]);
+        }catch(err){
+            throw new MyError("Could not update depreciation per year");
+        }
+    }
+
+    static async updateDepreciationPercentInDb(category_id, percent) {
         
     }
 
