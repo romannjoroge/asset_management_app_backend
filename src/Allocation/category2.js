@@ -204,7 +204,13 @@ class Category {
         }
     }
 
-    static async delete
+    static async deleteDepreciationPerYearInDb(category_id) {
+        try{
+            await pool.query(categoryTable.deleteDepreciationPerYear, [category_id]);
+        }catch(err){
+            throw new MyError("Could not delete DepreciationPerYear entry")
+        }
+    }
 
     // Delete Category
 
