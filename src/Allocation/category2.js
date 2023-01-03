@@ -134,16 +134,9 @@ class Category {
             throw new MyError("Invalid Folder");
         }
 
-        // Test if id exists
-        try{
-            const exist = Folder.doesFolderExist(id);
-            if (!exist) {
-                throw new MyError("Folder does not exist");
-            }else{
-                return "Folder Exists";
-            }
-        }catch(err){
-            throw new MyError("Could not verify folder");
+        const exist = Folder.doesFolderExist(id);
+        if (!exist) {
+            throw new MyError("Folder does not exist");
         }
     }
 
@@ -158,10 +151,7 @@ class Category {
 
     static async updateCategoryFolder(newFolderID, categoryName) {
         // Verify new folder ID
-        const validID = await Category.verifyFolder(newFolderID);
-        if (validID !== "Folder Exists"){
-            throw new MyError("Folder does not exist");
-        }
+        await Category.verifyFolder(newFolderID);
 
         // Get category ID from categoryName
         const categoryID = Category.getCategoryID(categoryName);
