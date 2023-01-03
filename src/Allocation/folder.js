@@ -13,6 +13,8 @@ class Folder {
         try {
             const result = await pool.query(folderTable.getFolderName, [id]);
             if (result.rowCount === 0){
+                return false;
+            }else{
                 return true;
             }
         }catch(err){
