@@ -228,9 +228,9 @@ class Category {
         // Insert DepreciationPerYear of DepreciationPercent
         if (depType === "Straight Line") {
             // Insert DepreciationPerYear
-            await Category.insertDepreciationPercentInDb(category_id, value);
-        }else if (depType === "Written Down Value"){
             await Category.insertDepreciationValueInDB(category_id, value);
+        }else if (depType === "Written Down Value"){
+            await Category.insertDepreciationPercentInDb(category_id, value);
         }
     }
 
