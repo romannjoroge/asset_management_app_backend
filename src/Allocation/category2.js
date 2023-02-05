@@ -258,7 +258,65 @@ class Category {
     // Deleting a category would involve deleting the depreiciation details of all the assets under the category which
     // To me doesn't make alot of sense. So I've decided to not add this functionality for now
 
+    static async getCategoryDepreciationType(categoryName){
+        let fetchResult;
+
+        // Throws an error when database request results to an error
+        try{
+            fetchResult = await pool.query(categoryTable.getCategoryDepreciationType, [categoryName]);
+        }catch(err){
+            throw new MyError("Could not get depreciation type of category");
+        }
+
+        // Throws an error if database request returned nothing
+        if (fetchResult.rowCount === 0){
+            throw new MyError("Could not get depreciation type of category");
+        }
+        let categoryDepreciationType = fetchResult.rows[0].depreciationtype;
+        return categoryDepreciationType;
+    }
+
+    static verifyDatabaseFetchResults(fetchResult, errorMessage){
+        if(fetchResult.rowCount === 0){
+            throw new MyError(errorMessage);
+        }
+    }
+
+    static async getCategoryDepreciationValue(categoryID, depreciationType){
+        let value;
+        let fetchResult;
+
+        if(depreciationType === "Straight Line"){
+            fetchResult = await pool.query(categoryTable.getDepreciationPercent, [categoryID]);
+            Category.verifyDatabaseFetchResults(fetchResult, "Could not get depreciation details for category");
+            value = fetchResult.rows[0].percentage;
+        }else if(depreciationType === "Written Down Value"){
+            fetchResult = await pool.query(categoryTable.getDepreciationPerYear, [categoryID]);
+            Category.verifyDatabaseFetchResults(fetchResult, "Could not get depreciation details for category");
+            value = fetchResult.rows[0].value;
+        }else{
+            value = null;
+        }
+        return value;
+    }
+
     // View Category Details
+    static async viewDetails(categoryName){
+        let categoryExist = await Category.doesCategoryExist(categoryName);
+        if (!categoryExist) {
+            throw new MyError("Category Does Not Exist");
+        }
+
+        let categoryID = await Category.getCategoryID(categoryName);
+        let depreciationType = await Category.getCategoryDepreciationType(categoryName);
+        let depreciationValue = await Category.getCategoryDepreciationValue(categoryID, depreciationType);
+
+        return {
+            categoryName: categoryName,
+            depreciationType: depreciationType,
+            depreciationValue: depreciationValue
+        }
+    }
 
     // Get Depreciation Details
 }
