@@ -255,6 +255,8 @@ class Category {
     }
 
     // Delete Category
+    // Deleting a category would involve deleting the depreiciation details of all the assets under the category which
+    // To me doesn't make alot of sense. So I've decided to not add this functionality for now
 
     // View Category Details
 
