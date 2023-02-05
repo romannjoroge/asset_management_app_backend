@@ -9,6 +9,9 @@ const insertDepreciationPerYear = "INSERT INTO DepreciationPerYear (categoryID, 
 const insertDepreciationPercent = "INSERT INTO DepreciationPercent (categoryID, percentage) VALUES ($1, $2)";
 const deleteDepreciationPerYear = "DELETE FROM DepreciationPerYear WHERE categoryID = $1";
 const deleteDepreciationPercent = "DELETE FROM DepreciationPercent WHERE categoryID = $1";
+const getCategoryDepreciationType = "SELECT depreciationType FROM Category WHERE name = $1";
+const getDepreciationPercent = "SELECT percentage FROM DepreciationPercent WHERE categoryID = $1";
+const getDepreciationPerYear = "SELECT value FROM DepreciationPerYear WHERE categoryID = $1";
 
 let categoryTable = {
     add: addCategory,
@@ -22,6 +25,9 @@ let categoryTable = {
     insertDepreciationPercent: insertDepreciationPercent,
     deleteDepreciationPerYear: deleteDepreciationPerYear,
     deleteDepreciationPercent: deleteDepreciationPercent,
+    getCategoryDepreciationType: getCategoryDepreciationType,
+    getDepreciationPercent: getDepreciationPercent,
+    getDepreciationPerYear: getDepreciationPerYear,
 }
 
 module.exports = categoryTable;
