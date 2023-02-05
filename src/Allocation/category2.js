@@ -21,18 +21,19 @@ class Category {
     static depTypes = ['Straight Line', 'Double Declining Balance', 'Written Down Value'];
 
     // Static methods
+    static verifyDatabaseFetchResults(fetchResult, errorMessage){
+        if(fetchResult.rowCount === 0){
+            throw new MyError(errorMessage);
+        }
+    }
 
     // Function that gets Category ID from name
     static async getCategoryID(categoryName) {
         // Get id of recently created category
         const result = await pool.query(categoryTable.getID, [categoryName]);
         // Check if nothing was returned
-        if (result.rowCount === 0){
-            // This would mean that category was never created
-            throw new MyError("No Category exists with that name");
-        } else {
-            return result.rows[0].id
-        }
+        Category.verifyDatabaseFetchResults(result, "No Category exists with that name");
+        return result.rows[0].id
     }
 
     static async doesCategoryExist(categoryName) {
@@ -59,7 +60,7 @@ class Category {
         }
 
         // Add an entry to Category table
-        const result = await pool.query(categoryTable.add, [categoryName, parentFolderID, depreciationType]);
+        await pool.query(categoryTable.add, [categoryName, parentFolderID, depreciationType]);
         let categoryID;
         // If depreciaitionType is not Double Declining Balance we get category ID of recent category
         if (this.depreciationType !== 'Double Declining Balance') {
@@ -276,12 +277,6 @@ class Category {
         return categoryDepreciationType;
     }
 
-    static verifyDatabaseFetchResults(fetchResult, errorMessage){
-        if(fetchResult.rowCount === 0){
-            throw new MyError(errorMessage);
-        }
-    }
-
     static async getCategoryDepreciationValue(categoryID, depreciationType){
         let value;
         let fetchResult;
@@ -317,8 +312,6 @@ class Category {
             depreciationValue: depreciationValue
         }
     }
-
-    // Get Depreciation Details
 }
 
 // Adds a category in system
