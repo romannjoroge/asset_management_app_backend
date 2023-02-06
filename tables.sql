@@ -26,18 +26,18 @@ CREATE TABLE Folder (
   PRIMARY KEY (ID)
 );
 
-CREATE TABLE "Location" (
-  "ID" serial,
-  "name" varchar(50),
-  "parentFolderID" int,
-  "companyName" varchar(50),
-  PRIMARY KEY ("ID"),
+CREATE TABLE Location (
+  ID serial,
+  name varchar(50),
+  parentFolderID int,
+  companyName varchar(50),
+  PRIMARY KEY (ID),
   CONSTRAINT "FK_Location.companyName"
-    FOREIGN KEY ("companyName")
-      REFERENCES "Company"("name"),
+    FOREIGN KEY (companyName)
+      REFERENCES Company(name),
   CONSTRAINT "FK_Location.parentFolderID"
-    FOREIGN KEY ("parentFolderID")
-      REFERENCES "Folder"("ID")
+    FOREIGN KEY (parentFolderID)
+      REFERENCES Folder(ID)
 );
 
 CREATE TABLE Category (
