@@ -1,3 +1,5 @@
+const MyError = require("./myError")
+
 function isAnyEmpty(arr){
     /*
         arr - arr is an array of variables of any type
@@ -13,6 +15,13 @@ function isAnyEmpty(arr){
    return isEmpty
 }
 
+function checkIfBoolean(x, message) {
+    if (typeof x !== "boolean"){
+        throw new MyError(message);
+    }
+}
+
 module.exports = {
-    isAnyEmpty
+    isAnyEmpty,
+    checkIfBoolean
 }
