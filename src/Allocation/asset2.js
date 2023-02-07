@@ -101,6 +101,10 @@ class Asset{
         }
     }
 
+    static async _updateAssetAcquisitionDate(assetTag, newDate){
+        await pool.query(assetTable.updateAssetAcquisitionDate, [newDate, assetTag]);
+    }
+
     static async updateAsset(updateAssetDict, assetTag){
         // Throw an error if no asset with asset tag exists
         await Asset.doesAssetTagExist(assetTag, "Asset Does Not Exist");
@@ -115,6 +119,7 @@ class Asset{
         }
         else if ('acquisitionDate' in updateAssetDict){
             newDate = utility.checkIfValidDate(acquisitionDate, "Invalid acquisition date");
+            await Asset._updateAssetAcquisitionDate(assetTag, newDate);
         }
     }
 }

@@ -4,12 +4,14 @@ const addAssetToAssetRegister =`INSERT INTO Asset (assetTag, makeAndModelNo, isF
 const addAssetFileAttachment = "INSERT INTO Asset_File (assetTag, attachment) VALUES ($1, $2)";
 const updateAssetFixedStatus = "UPDATE Asset SET isFixed = $1 WHERE assetTag = $2";
 const updateAssetLifeSpan = "UPDATE Asset SET assetLifeSpan = $1 WHERE assetTag = $2";
+const updateAssetAcquisitionDate = "UPDATE Asset SET acquisitionDate = $1 WHERE assetTag = $2";
 
 module.exports = {
     doesAssetTagExist,
     addAssetToAssetRegister,
     addAssetFileAttachment,
     updateAssetFixedStatus,
-    updateAssetLifeSpan
+    updateAssetLifeSpan,
+    updateAssetAcquisitionDate
 
 }
