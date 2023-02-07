@@ -7,6 +7,7 @@ const categoryTable = require('./db_category2');
 // Importing custom MyError class
 const MyError = require('../../utility/myError');
 const Folder = require('./folder');
+const utility = require('../../utility/utility');
 
 class Category {
     // Constructor
@@ -20,19 +21,12 @@ class Category {
     // Static fields
     static depTypes = ['Straight Line', 'Double Declining Balance', 'Written Down Value'];
 
-    // Static methods
-    static verifyDatabaseFetchResults(fetchResult, errorMessage){
-        if(fetchResult.rowCount === 0){
-            throw new MyError(errorMessage);
-        }
-    }
-
     // Function that gets Category ID from name
     static async getCategoryID(categoryName) {
         // Get id of recently created category
         const result = await pool.query(categoryTable.getID, [categoryName]);
         // Check if nothing was returned
-        Category.verifyDatabaseFetchResults(result, "No Category exists with that name");
+        utility.verifyDatabaseFetchResults(result, "No Category exists with that name");
         return result.rows[0].id
     }
 
@@ -283,11 +277,11 @@ class Category {
 
         if(depreciationType === "Straight Line"){
             fetchResult = await pool.query(categoryTable.getDepreciationPercent, [categoryID]);
-            Category.verifyDatabaseFetchResults(fetchResult, "Could not get depreciation details for category");
+            utility.verifyDatabaseFetchResults(fetchResult, "Could not get depreciation details for category");
             value = fetchResult.rows[0].percentage;
         }else if(depreciationType === "Written Down Value"){
             fetchResult = await pool.query(categoryTable.getDepreciationPerYear, [categoryID]);
-            Category.verifyDatabaseFetchResults(fetchResult, "Could not get depreciation details for category");
+            utility.verifyDatabaseFetchResults(fetchResult, "Could not get depreciation details for category");
             value = fetchResult.rows[0].value;
         }else{
             value = null;
