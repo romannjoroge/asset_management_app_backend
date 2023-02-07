@@ -1,5 +1,7 @@
 const express = require('express')
 const app = express()
+const multer = require('multer'); // Deals with file upload
+const upload = multer({dest: 'attachments/'});  // Specifies path to store uploaded attachments
 const dotenv = require('dotenv')
 dotenv.config()  // Brings varaibles from .env file
 
