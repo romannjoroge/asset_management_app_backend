@@ -60,6 +60,10 @@ function checkIfInList(list, item, errorMessage){
     }
 }
 
+// function fileUpload(req, res){
+
+// }
+
 module.exports = {
     isAnyEmpty,
     checkIfBoolean,
