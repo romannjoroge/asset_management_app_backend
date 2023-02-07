@@ -117,6 +117,26 @@ class Asset{
         await pool.query(assetTable.updateAssetLocation, [newLocation, assetTag]);
     }
 
+    static async _updateAssetStatus(assetTag, newStatus){
+        await pool.query(assetTable.updateAssetStatus, [newStatus, assetTag]);
+    }
+
+    static async _updateAssetCustodian(assetTag, newCustodian){
+        await pool.query(assetTable.updateAssetCustodian, [newCustodian, assetTag]);
+    }
+
+    static async _updateAssetAcquisitionCost(assetTag, newAcquisitionCost){
+        await pool.query(assetTable.updateAssetAcquisitionCost, [newAcquisitionCost, assetTag]);
+    }
+    
+    static async _updateAssetInsuranceValue(assetTag, newInsuranceValue){
+        await pool.query(assetTable.updateAssetInsuranceValue, [newInsuranceValue, assetTag]);
+    }
+
+    static async _updateAssetCategoryID(assetTag, newCategoryID){
+        await pool.query(assetTable.updateAssetCategory, [newCategoryID, assetTag]);
+    }
+
     static async updateAsset(updateAssetDict, assetTag){
         // Throw an error if no asset with asset tag exists
         await Asset.doesAssetTagExist(assetTag, "Asset Does Not Exist");
@@ -134,8 +154,39 @@ class Asset{
             await Asset._updateAssetAcquisitionDate(assetTag, newDate);
         }
         else if ('locationID' in updateAssetDict){
-            await Location.verifyLocationID(this.locationID, "Invalid location");
-            await Asset._updateAssetLocation(assetTag, newLocation);
+            await Location.verifyLocationID(updateAssetDict.locationID, "Invalid location");
+            await Asset._updateAssetLocation(assetTag, updateAssetDict.locationID);
+        }
+        else if('status' in updateAssetDict){
+            if (!updateAssetDict.status instanceof String){
+                throw new MyError("Invalid status");
+            }
+            utility.checkIfInList(Asset.assetStatusOptions, updateAssetDict.status.toLowerCase(), "Invalid status");
+            await Asset._updateAssetStatus(assetTag, updateAssetDict.status);
+        }
+        else if ('custodianName' in updateAssetDict){
+            await User.checkIfUserExists(updateAssetDict.custodianName, "Invalid custodian");
+            await Asset._updateAssetCustodian(assetTag, updateAssetDict.custodianName);
+        }
+        else if ('acquisitionCost' in updateAssetDict){
+            utility.checkIfNumberisPositive(updateAssetDict.acquisitionCost, "Invalid acquisition cost");
+            await Asset._updateAssetAcquisitionCost(assetTag, updateAssetDict.acquisitionCost);
+        }
+        else if ('insuranceValue' in updateAssetDict){
+            utility.checkIfNumberisPositive(updateAssetDict.insuranceValue, "Invalid insurance value");
+            await Asset._updateAssetInsuranceValue(assetTag, updateAssetDict.insuranceValue);
+        }
+        else if ('categoryName' in updateAssetDict){
+            try{
+                if (!await Category.doesCategoryExist(updateAssetDict.categoryName)){
+                    throw new MyError("Invalid category");
+                }else{
+                    let categoryID = await Category.getCategoryID(updateAssetDict.categoryName);
+                    await Asset._updateAssetCategoryID(assetTag, categoryID);
+                }
+            }catch(err){
+                throw new MyError("Invalid category");
+            }
         }
     }
 }
