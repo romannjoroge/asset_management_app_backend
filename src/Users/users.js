@@ -5,3 +5,18 @@ const pool = require('../../db2');
 const MyError = require('../../utility/myError');
 const Folder = require('../Allocation/folder');
 const utility = require('../../utility/utility');
+const userTable = require('../Users/db_users');
+
+class User {
+    constructor(){}
+
+    static async checkIfUserExists(username, errorMessage) {
+        try{
+            await pool.query(userTable.checkIfUserInDB, [username]);
+        }catch(err){
+            throw new MyError(errorMessage);
+        }
+    }
+}
+
+module.exports = User;
