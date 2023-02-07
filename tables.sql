@@ -197,3 +197,6 @@ CREATE TABLE "RFID Reader" (
 
 -- Creates the home folder when the database is created. This is the topmost folder in the system
 INSERT INTO Folder(name) VALUES('home');
+
+-- Set dates to be in format mm-dd-yyyy
+SET datestyle TO MDY;
