@@ -72,38 +72,38 @@ CREATE TABLE "GatePass" (
       REFERENCES "User2"("username")
 );
 
-CREATE TABLE "Asset" (
-  "assetTag" varchar(50),
-  "makeAndModelNo" varchar(50),
-  "isFixed" boolean,
-  "serialNumber" varchar(50),
-  "acquisitionDate" date,
-  "locationID" int,
-  "status" varchar(10),
-  "custodianname" varchar(50),
-  "acquisitionCost" money,
-  "insuranceValue" money,
-  "categoryID" int,
-  "assetLifeSpan" smallint,
-  PRIMARY KEY ("assetTag"),
+CREATE TABLE Asset (
+  assetTag varchar(50),
+  makeAndModelNo varchar(50),
+  isFixed boolean,
+  serialNumber varchar(50),
+  acquisitionDate date,
+  locationID int,
+  status varchar(10),
+  custodianName varchar(50),
+  acquisitionCost money,
+  insuranceValue money,
+  categoryID int,
+  assetLifeSpan smallint,
+  PRIMARY KEY (assetTag),
   CONSTRAINT "FK_Asset.locationID"
-    FOREIGN KEY ("locationID")
-      REFERENCES "Location"("ID"),
+    FOREIGN KEY (locationID)
+      REFERENCES Location(ID),
   CONSTRAINT "FK_Asset.categoryID"
-    FOREIGN KEY ("categoryID")
-      REFERENCES "Category"("ID"),
+    FOREIGN KEY (categoryID)
+      REFERENCES Category(ID),
   CONSTRAINT "FK_Asset.custodianID"
-    FOREIGN KEY ("custodianID")
-      REFERENCES "User2"("username")
+    FOREIGN KEY (custodianName)
+      REFERENCES User2(username)
 );
 
-CREATE TABLE "Asset File" (
-  "assetTag" varchar(50),
-  "attachment" varchar(50),
-  PRIMARY KEY ("assetTag", "attachment"),
+CREATE TABLE Asset_File (
+  assetTag varchar(50),
+  attachment varchar(100),
+  PRIMARY KEY (assetTag, attachment),
   CONSTRAINT "FK_Asset File.assetTag"
-    FOREIGN KEY ("assetTag")
-      REFERENCES "Asset"("assetTag")
+    FOREIGN KEY (assetTag)
+      REFERENCES Asset(assetTag)
 );
 
 CREATE TABLE "Stock Take" (
