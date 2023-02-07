@@ -113,6 +113,10 @@ class Asset{
         await pool.query(assetTable.updateAssetLifeSpan, [newLifeSpan, assetTag]); 
     }
 
+    static async _updateAssetLocation(assetTag, newLocation){
+        await pool.query(assetTable.updateAssetLocation, [newLocation, assetTag]);
+    }
+
     static async updateAsset(updateAssetDict, assetTag){
         // Throw an error if no asset with asset tag exists
         await Asset.doesAssetTagExist(assetTag, "Asset Does Not Exist");
@@ -128,6 +132,10 @@ class Asset{
         else if ('acquisitionDate' in updateAssetDict){
             newDate = utility.checkIfValidDate(updateAssetDict.acquisitionDate, "Invalid acquisition date");
             await Asset._updateAssetAcquisitionDate(assetTag, newDate);
+        }
+        else if ('locationID' in updateAssetDict){
+            await Location.verifyLocationID(this.locationID, "Invalid location");
+            await Asset._updateAssetLocation(assetTag, newLocation);
         }
     }
 }
