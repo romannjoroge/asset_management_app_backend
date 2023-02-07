@@ -6,7 +6,7 @@ const MyError = require('../../utility/myError');
 const Folder = require('./folder');
 const utility = require('../../utility/utility');
 const Location = require('../Tracking/location');
-const locationTable = require('../Tracking/db_location');
+const User = require('../Users/users');
 
 
 class Asset{
@@ -25,7 +25,14 @@ class Asset{
                     Location.verifyLocationID(locationID, "Invalid location");
                     this.locationID = locationID;
 
+                    if (!status instanceof String){
+                        throw new MyError("Invalid status");
+                    }
                     utility.checkIfInList(Asset.assetStatusOptions, status.toLowerCase(), "Invalid status");
+
+                    User.checkIfUserExists(custodianName, "Invalid custodian");
+
+                    utility.checkIfNumberisPositive(acquisitionCost, "Invalid acquisition cost");
                 }
 }
 
