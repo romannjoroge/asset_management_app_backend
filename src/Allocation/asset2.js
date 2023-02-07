@@ -88,8 +88,17 @@ class Asset{
         }
     }
 
-    async storeInDB(){
-        
+    async storeAssetInAssetRegister(){
+        try{
+            await pool.query(assetTable.addAssetToAssetRegister, [this.assetTag, this.makeAndModelNo, this.fixed, this.serialNumber,
+                            this.acquisitionDate, this.locationID, this.status, this.custodianName, this.acquisitionCost, this.insuranceValue, this.categoryID,
+                            this.assetLifeSpan]);
+            for (let i = 0; i < this.attachments.length; i++){
+                await pool.query(assetTable.addAssetFileAttachment, [this.assetTag. this.attachments[i]]);
+            }
+        }catch(err){
+            throw new MyError("Could not add asset to asset Register");
+        }
     }
 }
 
