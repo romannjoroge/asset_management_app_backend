@@ -65,5 +65,6 @@ module.exports = {
     checkIfBoolean,
     checkIfNumberisPositive,
     checkIfValidDate,
-    verifyDatabaseFetchResults
+    verifyDatabaseFetchResults,
+    checkIfInList
 }
