@@ -100,6 +100,22 @@ class Asset{
             throw new MyError("Could not add asset to asset Register");
         }
     }
+
+    static async updateAsset(updateAssetDict, assetTag){
+        // Throw an error if no asset with asset tag exists
+        await Asset.doesAssetTagExist(assetTag, "Asset Does Not Exist");
+
+        if ('fixed' in updateAssetDict){
+            utility.checkIfBoolean(updateAssetDict.fixed, "Invalid Fixed Status");
+            await pool.query(assetTable.updateAssetFixedStatus, [updateAssetDict.fixed, assetTag]);
+        }
+        else if ('assetLifeSpan' in updateAssetDict){
+            utility.checkIfNumberisPositive(updateAssetDict.assetLifeSpan, "Invalid asset life span");
+        }
+        else if ('acquisitionDate' in updateAssetDict){
+            newDate = utility.checkIfValidDate(acquisitionDate, "Invalid acquisition date");
+        }
+    }
 }
 
 module.exports = Asset;
