@@ -111,6 +111,7 @@ class Asset{
         }
         else if ('assetLifeSpan' in updateAssetDict){
             utility.checkIfNumberisPositive(updateAssetDict.assetLifeSpan, "Invalid asset life span");
+            await pool.query(assetTable.updateAssetLifeSpan, [updateAssetDict.assetLifeSpan, assetTag]);
         }
         else if ('acquisitionDate' in updateAssetDict){
             newDate = utility.checkIfValidDate(acquisitionDate, "Invalid acquisition date");
