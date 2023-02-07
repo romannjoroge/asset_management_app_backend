@@ -105,6 +105,10 @@ class Asset{
         await pool.query(assetTable.updateAssetAcquisitionDate, [newDate, assetTag]);
     }
 
+    static async _updateAssetFixedStatus(assetTag, newFixedStatus){
+        await pool.query(assetTable.updateAssetFixedStatus, [newFixedStatus, assetTag]);
+    }
+
     static async updateAsset(updateAssetDict, assetTag){
         // Throw an error if no asset with asset tag exists
         await Asset.doesAssetTagExist(assetTag, "Asset Does Not Exist");
