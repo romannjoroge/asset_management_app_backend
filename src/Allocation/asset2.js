@@ -93,9 +93,7 @@ class Asset{
             await pool.query(assetTable.addAssetToAssetRegister, [this.assetTag, this.makeAndModelNo, this.fixed, this.serialNumber,
                             this.acquisitionDate, this.locationID, this.status, this.custodianName, this.acquisitionCost, this.insuranceValue, this.categoryID,
                             this.assetLifeSpan]);
-            for (let i = 0; i < this.attachments.length; i++){
-                await pool.query(assetTable.addAssetFileAttachment, [this.assetTag. this.attachments[i]]);
-            }
+            Asset._insertAssetAttachments(this.assetTag, this.attachments, "Invalid attachments");
         }catch(err){
             throw new MyError("Could not add asset to asset Register");
         }
@@ -135,6 +133,16 @@ class Asset{
 
     static async _updateAssetCategoryID(assetTag, newCategoryID){
         await pool.query(assetTable.updateAssetCategory, [newCategoryID, assetTag]);
+    }
+
+    static async _insertAssetAttachments(assetTag, attachments, errorMessage){
+        for (let i = 0; i < attachments.length; i++){
+            try{
+                await pool.query(assetTable.addAssetFileAttachment, [assetTag, attachments[i]]);
+            }catch(err){
+                throw new MyError(errorMessage);
+            }
+        }
     }
 
     static async updateAsset(updateAssetDict, assetTag){
@@ -187,6 +195,20 @@ class Asset{
             }catch(err){
                 throw new MyError("Invalid category");
             }
+        }
+        else if('attachments' in updateAssetDict){
+            if (!Array.isArray(updateAssetDict.attachments)){
+                throw new MyError("Invalid attachments")
+            }else{
+                if (updateAssetDict.attachments.length){
+                    for (let i = 0; i < updateAssetDict.attachments.length; i++){
+                        if(!fs.existsSync(updateAssetDict.attachments[i])){
+                            throw new MyError("Invalid attachments");
+                        }
+                    }
+                }
+            }
+            await Asset._insertAssetAttachments(assetTag, updateAssetDict.attachments, "Invalid attachments");
         }
     }
 }

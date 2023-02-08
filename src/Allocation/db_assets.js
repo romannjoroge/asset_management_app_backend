@@ -10,7 +10,7 @@ const updateAssetStatus = "UPDATE Asset SET status = $1 WHERE assetTag = $2";
 const updateAssetCustodian = "UPDATE Asset SET custodianName = $1 WHERE assetTag = $2";
 const updateAssetAcquisitionCost = "UPDATE Asset SET acquisitionCost = $1 WHERE assetTag = $2";
 const updateAssetInsuranceValue = "UPDATE Asset SET insuranceValue = $1 WHERE assetTag = $2";
-const updateAssetCategory = "UPDATE Asset SET insuranceValue = $1 WHERE assetTag = $2";
+const updateAssetCategory = "UPDATE Asset SET categoryID = $1 WHERE assetTag = $2";
 
 module.exports = {
     doesAssetTagExist,
@@ -24,6 +24,6 @@ module.exports = {
     updateAssetCustodian,
     updateAssetAcquisitionCost,
     updateAssetInsuranceValue,
-    updateAssetCategory
+    updateAssetCategory,
 
 }
