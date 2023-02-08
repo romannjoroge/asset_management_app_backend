@@ -60,6 +60,14 @@ function checkIfInList(list, item, errorMessage){
     }
 }
 
+async function addErrorHandlingToAsyncFunction(func, errorMessage, ...params){
+    try{
+        await func(...params);
+    }catch(err){
+        throw new MyError(errorMessage);
+    }
+}
+
 // function fileUpload(req, res){
 
 // }
@@ -70,5 +78,6 @@ module.exports = {
     checkIfNumberisPositive,
     checkIfValidDate,
     verifyDatabaseFetchResults,
-    checkIfInList
+    checkIfInList,
+    addErrorHandlingToAsyncFunction
 }
