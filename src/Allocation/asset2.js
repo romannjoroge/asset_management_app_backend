@@ -152,9 +152,12 @@ class Asset{
                                                         updateAssetDict.fixed);
         }
         else if ('assetLifeSpan' in updateAssetDict){
+            console.log(1);
             utility.checkIfNumberisPositive(updateAssetDict.assetLifeSpan, "Invalid asset life span");
+            console.log(2);
             await utility.addErrorHandlingToAsyncFunction(Asset._updateAssetLifeSpan, "Invalid asset life span",
                                                         assetTag, updateAssetDict.assetLifeSpan);
+            console.log(3);
         }
         else if ('acquisitionDate' in updateAssetDict){
             newDate = utility.checkIfValidDate(updateAssetDict.acquisitionDate, "Invalid acquisition date");
@@ -216,6 +219,24 @@ class Asset{
             await Asset._insertAssetAttachments(assetTag, updateAssetDict.attachments);
             await utility.addErrorHandlingToAsyncFunction(Asset._insertAssetAttachments, "Invalid attachments",
                                                         assetTag, updateAssetDict.attachments);
+        }
+    }
+
+    static async displayAllAssetTags(){
+        try{
+            let fetchResult = await pool.query(assetTable.getAssetTags);
+            let assetTags = fetchResult.rows.map(obj => obj.assettag);
+            return assetTags;
+        }catch(err){
+            throw new MyError("Could not get asset tags");
+        }
+    }
+
+    static async disposeAsset(assetTag){
+        try{
+            await pool.query(assetTable.disposeAsset, [assetTag]);
+        }catch(err){
+            throw new MyError("Asset Could Not Be Deleted");
         }
     }
 }

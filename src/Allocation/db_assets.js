@@ -11,6 +11,8 @@ const updateAssetCustodian = "UPDATE Asset SET custodianName = $1 WHERE assetTag
 const updateAssetAcquisitionCost = "UPDATE Asset SET acquisitionCost = $1 WHERE assetTag = $2";
 const updateAssetInsuranceValue = "UPDATE Asset SET insuranceValue = $1 WHERE assetTag = $2";
 const updateAssetCategory = "UPDATE Asset SET categoryID = $1 WHERE assetTag = $2";
+const getAssetTags = "SELECT assetTag FROM Asset";
+const disposeAsset = "DELETE FROM Asset WHERE assettag = $1";
 
 module.exports = {
     doesAssetTagExist,
@@ -25,5 +27,6 @@ module.exports = {
     updateAssetAcquisitionCost,
     updateAssetInsuranceValue,
     updateAssetCategory,
-
+    getAssetTags,
+    disposeAsset
 }
