@@ -135,13 +135,9 @@ class Asset{
         await pool.query(assetTable.updateAssetCategory, [newCategoryID, assetTag]);
     }
 
-    static async _insertAssetAttachments(assetTag, attachments, errorMessage){
+    static async _insertAssetAttachments(assetTag, attachments){
         for (let i = 0; i < attachments.length; i++){
-            try{
-                await pool.query(assetTable.addAssetFileAttachment, [assetTag, attachments[i]]);
-            }catch(err){
-                throw new MyError(errorMessage);
-            }
+            await pool.query(assetTable.addAssetFileAttachment, [assetTag, attachments[i]]);
         }
     }
 
@@ -151,38 +147,47 @@ class Asset{
 
         if ('fixed' in updateAssetDict){
             utility.checkIfBoolean(updateAssetDict.fixed, "Invalid Fixed Status");
-            await Asset._updateAssetFixedStatus(assetTag, updateAssetDict.fixed);
+            await utility.addErrorHandlingToAsyncFunction(Asset._updateAssetFixedStatus, 
+                                                        "Invalid Fixed Status", assetTag, 
+                                                        updateAssetDict.fixed);
         }
         else if ('assetLifeSpan' in updateAssetDict){
             utility.checkIfNumberisPositive(updateAssetDict.assetLifeSpan, "Invalid asset life span");
-            await Asset._updateAssetLifeSpan(assetTag, updateAssetDict.assetLifeSpan);
+            await utility.addErrorHandlingToAsyncFunction(Asset._updateAssetLifeSpan, "Invalid asset life span",
+                                                        assetTag, updateAssetDict.assetLifeSpan);
         }
         else if ('acquisitionDate' in updateAssetDict){
             newDate = utility.checkIfValidDate(updateAssetDict.acquisitionDate, "Invalid acquisition date");
-            await Asset._updateAssetAcquisitionDate(assetTag, newDate);
+            await utility.addErrorHandlingToAsyncFunction(Asset._updateAssetAcquisitionDate, "Invalid acquisition date",
+                                                        assetTag, newDate);
         }
         else if ('locationID' in updateAssetDict){
             await Location.verifyLocationID(updateAssetDict.locationID, "Invalid location");
-            await Asset._updateAssetLocation(assetTag, updateAssetDict.locationID);
+            await utility.addErrorHandlingToAsyncFunction(Asset._updateAssetLocation, "Invalid location",
+                                                        assetTag, updateAssetDict.locationID);
         }
         else if('status' in updateAssetDict){
             if (!updateAssetDict.status instanceof String){
                 throw new MyError("Invalid status");
             }
             utility.checkIfInList(Asset.assetStatusOptions, updateAssetDict.status.toLowerCase(), "Invalid status");
-            await Asset._updateAssetStatus(assetTag, updateAssetDict.status);
+            await utility.addErrorHandlingToAsyncFunction(Asset._updateAssetStatus, "Invalid status",
+                                                        assetTag, updateAssetDict.status);
         }
         else if ('custodianName' in updateAssetDict){
             await User.checkIfUserExists(updateAssetDict.custodianName, "Invalid custodian");
-            await Asset._updateAssetCustodian(assetTag, updateAssetDict.custodianName);
+            await utility.addErrorHandlingToAsyncFunction(Asset._updateAssetCustodian, "Invalid custodian",
+                                                        assetTag, updateAssetDict.custodianName);
         }
         else if ('acquisitionCost' in updateAssetDict){
             utility.checkIfNumberisPositive(updateAssetDict.acquisitionCost, "Invalid acquisition cost");
-            await Asset._updateAssetAcquisitionCost(assetTag, updateAssetDict.acquisitionCost);
+            await utility.addErrorHandlingToAsyncFunction(Asset._updateAssetAcquisitionCost, "Invalid acquisition cost",
+                                                        assetTag, updateAssetDict.acquisitionCost);
         }
         else if ('insuranceValue' in updateAssetDict){
             utility.checkIfNumberisPositive(updateAssetDict.insuranceValue, "Invalid insurance value");
-            await Asset._updateAssetInsuranceValue(assetTag, updateAssetDict.insuranceValue);
+            await utility.addErrorHandlingToAsyncFunction(Asset._updateAssetInsuranceValue, "Invalid insurance value",
+                                                        assetTag, updateAssetDict.insuranceValue);
         }
         else if ('categoryName' in updateAssetDict){
             try{
@@ -208,7 +213,9 @@ class Asset{
                     }
                 }
             }
-            await Asset._insertAssetAttachments(assetTag, updateAssetDict.attachments, "Invalid attachments");
+            await Asset._insertAssetAttachments(assetTag, updateAssetDict.attachments);
+            await utility.addErrorHandlingToAsyncFunction(Asset._insertAssetAttachments, "Invalid attachments",
+                                                        assetTag, updateAssetDict.attachments);
         }
     }
 }
