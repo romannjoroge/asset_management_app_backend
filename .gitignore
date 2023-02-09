@@ -1,7 +1,5 @@
 node_modules
-db2.js
 Roman Test
-test
 coverage
 .nyc_output
 .nycrc.json
