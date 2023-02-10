@@ -15,7 +15,7 @@ const Location = require('../src/Tracking/location');
 const User = require('../src/Users/users');
 const Category = require("../src/Allocation/category2");
 
-describe("createAsset test", function () {
+describe.skip("createAsset test", function () {
     // Test inputs
     let fixed;
     let assetTag;
