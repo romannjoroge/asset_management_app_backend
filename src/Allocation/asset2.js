@@ -109,6 +109,12 @@ class Asset{
         }
     }
 
+    static async _getAssetCategoryName(assetTag){
+        let fetchResults = await pool.query(assetTable.getAssetCategoryName, [assetTag]);
+        utility.verifyDatabaseFetchResults(fetchResults, "Could not get asset category name");
+        return fetchResults.rows[0].name;
+    }
+
     static async _updateAssetAcquisitionDate(assetTag, newDate){
         await pool.query(assetTable.updateAssetAcquisitionDate, [newDate, assetTag]);
     }
@@ -149,6 +155,10 @@ class Asset{
         for (let i = 0; i < attachments.length; i++){
             await pool.query(assetTable.addAssetFileAttachment, [assetTag, attachments[i]]);
         }
+    }
+
+    static async _updateAssetResidualValue(assetTag, residualValue){
+        await pool.query(assetTable.updateAssetResidualValue, [assetTag, residualValue]);
     }
 
     static async updateAsset(updateAssetDict, assetTag){
@@ -229,6 +239,18 @@ class Asset{
             await Asset._insertAssetAttachments(assetTag, updateAssetDict.attachments);
             await utility.addErrorHandlingToAsyncFunction(Asset._insertAssetAttachments, "Invalid attachments",
                                                         assetTag, updateAssetDict.attachments);
+        }
+        else if('residualValue' in updateAssetDict){
+            utility.checkIfNumberisPositive(updateAssetDict.residualValue, "Invalid Residual Value");
+            let assetCategoryName = utility.addErrorHandlingToAsyncFunction(Asset._getAssetCategoryName, "Could not get category name for asset",
+                                                                            assetTag);
+            if (assetCategoryName !== "Straight Line"){
+                if(updateAssetDict.residualValue){
+                    throw new MyError("Invalid Residual Value for the Depreciation Type");
+                }
+            }
+            utility.addErrorHandlingToAsyncFunction(Asset._updateAssetResidualValue, "Invalid Residual Value",
+                                                    assetTag, updateAssetDict.residualValue);
         }
     }
 
