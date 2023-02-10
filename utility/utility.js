@@ -62,7 +62,7 @@ function checkIfInList(list, item, errorMessage){
 
 async function addErrorHandlingToAsyncFunction(func, errorMessage, ...params){
     try{
-        await func(...params);
+        return await func(...params);
     }catch(err){
         throw new MyError(errorMessage);
     }
