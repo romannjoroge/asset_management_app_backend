@@ -56,21 +56,11 @@ class Category {
         // Add an entry to Category table
         await pool.query(categoryTable.add, [categoryName, parentFolderID, depreciationType]);
         let categoryID;
-        // If depreciaitionType is not Double Declining Balance we get category ID of recent category
-        if (this.depreciationType !== 'Double Declining Balance') {
-            try {
-                categoryID = await Category.getCategoryID(categoryName);
-            }catch(err){
-                throw new MyError(`Could not save category: ${err.message}`);
-            }
-
-            // If depreciationType is Straight Line add an entry to DepreciationPerYear
-            if (depreciationType === 'Straight Line') {
-                await Category.insertDepreciationValueInDB(categoryID, depDetail);
-            }else {
-                // Else add entry to DepreciationPercent
-                await Category.insertDepreciationPercentInDb(categoryID, depDetail);
-            }
+        // If depreciation type is written value we add an entry to DepreciationPercent table
+        if (depreciationType === "Written Value"){
+            categoryID = Category.getCategoryID(categoryName);
+            utility.addErrorHandlingToAsyncFunction(pool.query, "Invalid Depreciation Percentage Value",
+            categoryTable.addWritten, [categoryID, depDetail]);
         }
     }
 
@@ -154,7 +144,7 @@ class Category {
         }
 
         // Make sure deptype depvalue pair is valid
-        if (depType === "Double Declining Balance") {
+        if (depType === "Double Declining Balance" || depType === "Straight Line") {
             if (depValue) {
                 throw new MyError("Double Declining Balance should not have a depreciation value");
             }
