@@ -142,6 +142,34 @@ describe("updateAsset test cases", function (){
         await updateAssetShouldThrowError(updateAssetDict, "Invalid attachments");
     });
 
+    it("should return an error when a negative residual value is given", async function(){
+        // Test inputs
+        let updateAssetDict = {
+            residualValue: -100
+        }
+
+        await updateAssetShouldThrowError(updateAssetDict, "Invalid Residual Value");
+    });
+
+    it("should return an error when a non negative residual value is given but depreciation type is not straight line", async function(){
+        // Test inputs
+        let updateAssetDict = {
+            residualValue: 100
+        }
+
+        let categoryName = "Category with written value depreciation";
+
+        let _getAssetCategoryName = sinon.stub(Asset, "_getAssetCategoryName")
+                                    .withArgs(assetTag)
+                                    .returns(categoryName);
+
+        let getCategoryDepreciationTypeStub = sinon.stub(Category, "getCategoryDepreciationType")
+                                                .withArgs(categoryName)
+                                                .returns("Written Down Value");
+
+        await updateAssetShouldThrowError(updateAssetDict, "Invalid Residual Value for the Depreciation Type");
+    });
+
     it("should run successfuly when valid information is given", async function(){
         // Test inputs
         let updateAssetDict = {
@@ -154,7 +182,8 @@ describe("updateAsset test cases", function (){
             locationID: 1,
             acquisitionDate: "12-22-2021",
             assetLifeSpan : 1,
-            fixed: true
+            fixed: true,
+            residualValue: 100
         }
 
         let fsExistsSyncStub = sinon.stub(fs, "existsSync")
@@ -188,6 +217,14 @@ describe("updateAsset test cases", function (){
                                         .withArgs(assetTag, updateAssetDict.assetLifeSpan);
         let _updateAssetFixedStatusStub = sinon.stub(Asset, "_updateAssetFixedStatus")
                                             .withArgs(assetTag, updateAssetDict.fixed);
+        let _getAssetCategoryName = sinon.stub(Asset, "_getAssetCategoryName")
+                                    .withArgs(assetTag)
+                                    .returns(updateAssetDict.categoryName);
+        let getCategoryDepreciationTypeStub = sinon.stub(Category, "getCategoryDepreciationType")
+                                                .withArgs(updateAssetDict.categoryName)
+                                                .returns("Straight Line");
+        let _updateAssetResidualValueStub = sinon.stub(Asset, "_updateAssetResidualValue")
+                                            .withArgs(assetTag, updateAssetDict.residualValue);
                                             
         try{
             await Asset.updateAsset(updateAssetDict, assetTag);
