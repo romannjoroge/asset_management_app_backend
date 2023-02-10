@@ -83,6 +83,7 @@ CREATE TABLE Asset (
   custodianName varchar(50),
   acquisitionCost money,
   insuranceValue money,
+  residualValue money,
   categoryID int,
   assetLifeSpan smallint,
   PRIMARY KEY (assetTag),
