@@ -196,6 +196,19 @@ CREATE TABLE "RFID Reader" (
       REFERENCES "Location"("ID")
 );
 
+CREATE TABLE DepreciationSchedule (
+  year int NOT NULL,
+  openingBookValue money NOT NULL,
+  depreciationExpense money NOT NULL,
+  accumulatedDepreciation money NOT NULL,
+  closingBookValue money NOT NULL,
+  assetTag varchar(50),
+  CONSTRAINT "FK_DepreciationSchedule.assetTag"
+    FOREIGN KEY (assetTag)
+      REFERENCES Asset(assetTag),
+  PRIMARY KEY (year, assetTag)
+);
+
 -- Creates the home folder when the database is created. This is the topmost folder in the system
 INSERT INTO Folder(name) VALUES('home');
 
