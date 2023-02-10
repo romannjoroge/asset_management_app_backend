@@ -18,7 +18,7 @@ class Asset{
 
     constructor(fixed, assetLifeSpan, acquisitionDate, locationID, status, custodianName,
                 acquisitionCost, insuranceValue, categoryName, attachments, assetTag, makeAndModelNo,
-                serialNumber){
+                serialNumber, residualValue){
                     utility.checkIfBoolean(fixed, "Invalid Fixed Status");
                     this.fixed = fixed;
 
@@ -60,6 +60,9 @@ class Asset{
                     this.assetTag = assetTag;
                     this.makeAndModelNo = makeAndModelNo;
                     this.serialNumber = serialNumber;
+
+                    utility.checkIfNumberisPositive(residualValue, "Invalid Residual Value");
+                    this.residualValue = residualValue;
                 }
     // Since the constructor cannot make asynchronous calls a seprate initialize function is needed to initialize
     // asynchronous values
@@ -77,6 +80,13 @@ class Asset{
         await Location.verifyLocationID(this.locationID, "Invalid location");
         await User.checkIfUserExists(this.custodianName, "Invalid custodian");
         await Asset.doesAssetTagExist(this.assetTag, "Asset Tag Has Already Been Assigned");
+
+        let depreciaitionType = Category.getCategoryDepreciationType(this.categoryName);
+        if (depreciaitionType !== "Straight Line"){
+            if(this.residualValue){
+                throw new MyError("Invalid Residual Value for Depreciation Type");
+            }
+        }
     }
 
     static async doesAssetTagExist(assetTag, errorMessage){
