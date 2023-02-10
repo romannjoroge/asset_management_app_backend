@@ -144,15 +144,6 @@ CREATE TABLE "Stock Take Assets" (
       REFERENCES "Stock Take"("ID")
 );
 
-CREATE TABLE DepreciationPerYear (
-  categoryID int,
-  value money NOT NULL,
-  PRIMARY KEY (categoryID),
-  CONSTRAINT "FK_DepreciationPerYear.categoryID"
-    FOREIGN KEY (categoryID)
-      REFERENCES Category(ID)
-);
-
 CREATE TABLE "GatePass Asset" (
   "gatePassID" int,
   "assetTag" varchar(50),
