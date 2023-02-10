@@ -15,7 +15,7 @@ const Location = require('../src/Tracking/location');
 const User = require('../src/Users/users');
 const Category = require("../src/Allocation/category2");
 
-describe.skip("createAsset test", function () {
+describe("createAsset test", function () {
     // Test inputs
     let fixed;
     let assetTag;
@@ -39,11 +39,13 @@ describe.skip("createAsset test", function () {
     let assetTagErrorMessage = "Asset Tag Has Already Been Assigned";
     let makeAndModelNo = "FSDFSDFSDFSDF";
     let serialNumber = 'ERSRSESRESFSe';
+    let residualValue;
+    let getCategoryDepreciationTypeStub;
 
     async function assertThatAssetConstructorFails(errorMessage){
         try{
             let asset = new Asset(fixed, assetLifeSpan, acquisitionDate, locationID, status, custodianName, 
-                    acquisitionCost, insuranceValue, categoryName, attachments, assetTag, makeAndModelNo, serialNumber);
+                    acquisitionCost, insuranceValue, categoryName, attachments, assetTag, makeAndModelNo, serialNumber, residualValue);
             await asset.initialize();
         }catch(err){
             if (err instanceof MyError && err.message === errorMessage){
@@ -85,6 +87,10 @@ describe.skip("createAsset test", function () {
                            .returns(true);
         doesAssetTagExistStub = sinon.stub(Asset, "doesAssetTagExist")
                                 .withArgs(assetTag, assetTagErrorMessage);
+        residualValue = 100;
+        getCategoryDepreciationTypeStub = sinon.stub(Category, "getCategoryDepreciationType")
+                                            .withArgs(categoryName)
+                                            .returns("Straight Line");
     });
 
     it("should fail when an invalid fixed status is provided", async function () {
@@ -196,12 +202,37 @@ describe.skip("createAsset test", function () {
     it("should add asset when all details are valid", async function(){
         try{
             let asset = new Asset(fixed, assetLifeSpan, acquisitionDate, locationID, status, custodianName, 
-                acquisitionCost, insuranceValue, categoryName, attachments, assetTag, makeAndModelNo, serialNumber);
+                acquisitionCost, insuranceValue, categoryName, attachments, assetTag, makeAndModelNo, serialNumber, residualValue);
             await asset.initialize();
             assert(true, "Test Passed");
         }catch(err){
             console.log(err);
             asset(false, "An Error Should not have been thrown");
         }
+    });
+
+    it("should fail when a negative residual value is given", async function(){
+        // Test inputs
+        residualValue = -11;
+
+        await assertThatAssetConstructorFails("Invalid Residual Value");
+    });
+
+    it("should fail when a non zero residual value is given when depreciation type is not straight line", async function(){
+        // Test inputs
+        residualValue = 100;
+        categoryName = "Category with written down depreciation type";
+
+        // Stubbing database calls
+        Category.getCategoryDepreciationType.restore();
+        Category.doesCategoryExist.restore();
+        doesCategoryExistStub = sinon.stub(Category, "doesCategoryExist")
+                                .withArgs(categoryName)
+                                .returns(true);
+        getCategoryDepreciationTypeStub = sinon.stub(Category, "getCategoryDepreciationType")
+                                            .withArgs(categoryName)
+                                            .returns("Written Down Value");
+
+        await assertThatAssetConstructorFails("Invalid Residual Value for Depreciation Type");
     });
 })
