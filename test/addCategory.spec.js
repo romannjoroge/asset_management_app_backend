@@ -60,8 +60,7 @@ describe("addCategory Test", function () {
                                 .withArgs(parentFolderID)
                                 .returns(true);
 
-    })
-
+    });
 
     it("should add category when depreciation type is double declining with no depreciation value", async function () {
         // Test input values
