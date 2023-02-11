@@ -27,6 +27,12 @@ function checkIfNumberisPositive(x, errorMessage){
     }
 }
 
+function checkIfNumberisGreaterThanZero(x, errorMessage){
+    if (!Number.isInteger(x) || x <= 0){
+        throw new MyError(errorMessage);
+    } 
+}
+
 function checkIfValidDate(x, errorMessage){
     let splitDate = x.split('-');
     let month = splitDate[0];
@@ -79,5 +85,6 @@ module.exports = {
     checkIfValidDate,
     verifyDatabaseFetchResults,
     checkIfInList,
-    addErrorHandlingToAsyncFunction
+    addErrorHandlingToAsyncFunction,
+    checkIfNumberisGreaterThanZero
 }
