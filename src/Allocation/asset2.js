@@ -172,12 +172,9 @@ class Asset{
                                                         updateAssetDict.fixed);
         }
         else if ('assetLifeSpan' in updateAssetDict){
-            console.log(1);
             utility.checkIfNumberisPositive(updateAssetDict.assetLifeSpan, "Invalid asset life span");
-            console.log(2);
             await utility.addErrorHandlingToAsyncFunction(Asset._updateAssetLifeSpan, "Invalid asset life span",
                                                         assetTag, updateAssetDict.assetLifeSpan);
-            console.log(3);
         }
         else if ('acquisitionDate' in updateAssetDict){
             newDate = utility.checkIfValidDate(updateAssetDict.acquisitionDate, "Invalid acquisition date");
