@@ -11,11 +11,55 @@ const utility = require('../../utility/utility');
 
 class Category {
     // Constructor
-    constructor(n, p, d, dd) {
-        this.categoryName = n;
-        this.parentFolderID = p;
-        this.depreciaitionType = d;
-        this.depDetail = dd;
+    constructor(categoryName, parentFolderID, depreciationType, depreciationPercentage) {
+        if (utility.isAnyEmpty([categoryName, parentFolderID, depreciationType])){
+            throw new MyError("Missing Information");
+        }
+
+        if (typeof categoryName === "string"){
+            this.categoryName = categoryName;
+        }else{
+            throw new MyError("Invalid Category Name");
+        }
+
+        if (!Number.isInteger(parentFolderID)){
+            throw new MyError("Invalid parent folder");
+        }else{
+            this.parentFolderID = parentFolderID;
+        }
+
+        Category.verifyDepreciationDetails(depreciationType, depreciationPercentage);
+        this.depreciaitionType = depreciationType;
+        this.depreciationPercentage = depreciationPercentage;
+    }
+
+    // Function that saves category in the database
+    static async saveCategoryInDb(categoryName, parentFolderID, depreciationType, depDetail) {
+        // Add an entry to Category table
+        utility.addErrorHandlingToAsyncFunction(pool.query, "Could not save category in database",
+        categoryTable.add, [categoryName, parentFolderID, depreciationType]);
+        
+        let categoryID;
+        // If depreciation type is written value we add an entry to DepreciationPercent table
+        if (depreciationType === "Written Value"){
+            categoryID = Category.getCategoryID(categoryName);
+            utility.addErrorHandlingToAsyncFunction(pool.query, "Could not add category depreciation percentage",
+            categoryTable.addWritten, [categoryID, depDetail]);
+        }
+    }
+
+    async initialize(){
+        if (!await Category.doesCategoryExist(this.categoryName)){
+            throw new MyError("Category Already Exists");
+        }
+
+        if (!await Folder.doesFolderExist(this.parentFolderID)){
+            throw new MyError("Parent Folder Does Not Exist");
+        }
+
+        utility.addErrorHandlingToAsyncFunction(Category.saveCategoryInDb, "Could not add category to system"
+                                                ,this.categoryName, this.parentFolderID, this.depreciaitionType, 
+                                                this.depreciationPercentage);
     }
 
     // Static fields
@@ -36,31 +80,6 @@ class Category {
             return true;
         }catch(err){
             return false;
-        }
-    }
-
-    // Function that saves category in the database
-    static async saveCategoryInDb(categoryName, parentFolderID, depreciationType, depDetail) {
-        // Test if category already exists
-        const exist = await Category.doesCategoryExist(categoryName);
-        if (exist === true){
-            throw new MyError("Category Exists");
-        }
-
-        // Test if parent folder exists
-        const folderExist = await Folder.doesFolderExist(parentFolderID);
-        if (folderExist === false){
-            throw new MyError("Folder does not Exist");
-        }
-
-        // Add an entry to Category table
-        await pool.query(categoryTable.add, [categoryName, parentFolderID, depreciationType]);
-        let categoryID;
-        // If depreciation type is written value we add an entry to DepreciationPercent table
-        if (depreciationType === "Written Value"){
-            categoryID = Category.getCategoryID(categoryName);
-            utility.addErrorHandlingToAsyncFunction(pool.query, "Invalid Depreciation Percentage Value",
-            categoryTable.addWritten, [categoryID, depDetail]);
         }
     }
 
@@ -139,19 +158,15 @@ class Category {
     static verifyDepreciationDetails(depType, depValue) {
         // Verifies that depreciation details are valid
         // Make sure that depType is valid
-        if(!Category.depTypes.includes(depType)) {
-            throw new MyError("Invalid Depreciation Type");
-        }
+        utility.checkIfInList(Category.depTypes, depType, "Invalid Depreciation Type");
 
         // Make sure deptype depvalue pair is valid
         if (depType === "Double Declining Balance" || depType === "Straight Line") {
             if (depValue) {
-                throw new MyError("Double Declining Balance should not have a depreciation value");
+                throw new MyError("There should be no depreciation percentage");
             }
-        }else{
-            if (!Number.isInteger(depValue) || depValue <= 0){
-                throw new MyError("Invalid depreciation value");
-            }
+        }else if (depType === "Written Down Value"){
+            utility.checkIfNumberisGreaterThanZero(depValue, "Invalid Depreciation Percentage");
         }
     }
 
@@ -272,39 +287,5 @@ class Category {
         }
     }
 }
-
-// Adds a category in system
-Category.prototype.addCategory = async function addCategory() {
-        // Create Category
-        /*
-            Create a category from the following data:
-            categoryName: string. Is the name of a category, should be unique
-            parentFolder: string. Name of the folder
-            depreciaitionType: string. The type of depreciation to apply to its assets. Its value should
-                be in the depreciaition type list
-            depDetail: float. Either the depreciaition per year or depreciation percent depending on value of 
-                depreciationType. Can't be zero and must be positive. 
-            depreciationPerYear: float. Is a monetary value, has a maximum of 2dp
-            depreciationPercentage: float. The percentage depreciation
-        */
-
-        // Validate Details
-        // Asserting that categoryName is a string and less than 50 characters
-        if (typeof this.categoryName !== 'string' || this.categoryName.length > 50) {
-            throw new MyError('Invalid category name')
-        }
-
-        // Check if parentFolderId is an int
-        if (!Number.isInteger(this.parentFolderID)) {
-            throw new MyError('Invalid parent Folder')
-        }
-
-        // Verify Depreciation Details
-        Category.verifyDepreciationDetails(this.depreciaitionType, this.depDetail);
-
-        // Create Category
-        const result = await Category.saveCategoryInDb(this.categoryName, this.parentFolderID, this.depreciaitionType, this.depDetail);
-        return result;
-    }
 
 module.exports = Category;
