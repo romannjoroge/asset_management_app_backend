@@ -164,27 +164,11 @@ class Category {
         }
     }
 
-    static async insertDepreciationValueInDB(category_id, value) {
-        try {
-            await pool.query(categoryTable.insertDepreciationPerYear, [category_id, value]);
-        }catch(err){
-            throw new MyError("Could not insert depreciation per year");
-        }
-    }
-
     static async insertDepreciationPercentInDb(category_id, percent) {
         try{
             await pool.query(categoryTable.insertDepreciationPercent, [category_id, percent]);
         }catch(err){
             throw new MyError("Could not insert depreciation percentage");
-        }
-    }
-
-    static async deleteDepreciationPerYearInDb(category_id) {
-        try{
-            await pool.query(categoryTable.deleteDepreciationPerYear, [category_id]);
-        }catch(err){
-            throw new MyError("Could not delete DepreciationPerYear entry")
         }
     }
 
@@ -198,7 +182,7 @@ class Category {
 
     static async updateDepreciationType(depType, value, categoryName){
         // Verify Depreciation Details
-        await Category.verifyDepreciationDetails(depType, value);
+        Category.verifyDepreciationDetails(depType, value);
 
         // Get category ID
         const category_id = Category.getCategoryID(categoryName);
@@ -207,14 +191,10 @@ class Category {
         await Category.updateDepreciationTypeInDB(category_id, depType);
 
         // Delete Depreciation Type and Depreciation Per Year in category table
-        await Category.deleteDepreciationPerYearInDb(category_id);
         await Category.deleteDepreciationPercentInDb(category_id);
 
         // Insert DepreciationPerYear of DepreciationPercent
-        if (depType === "Straight Line") {
-            // Insert DepreciationPerYear
-            await Category.insertDepreciationValueInDB(category_id, value);
-        }else if (depType === "Written Down Value"){
+        if (depType === "Written Down Value"){
             await Category.insertDepreciationPercentInDb(category_id, value);
         }
     }
@@ -264,13 +244,8 @@ class Category {
     static async getCategoryDepreciationValue(categoryID, depreciationType){
         let value;
         let fetchResult;
-
-        if(depreciationType === "Straight Line"){
+        if(depreciationType === "Written Down Value"){
             fetchResult = await pool.query(categoryTable.getDepreciationPercent, [categoryID]);
-            utility.verifyDatabaseFetchResults(fetchResult, "Could not get depreciation details for category");
-            value = fetchResult.rows[0].percentage;
-        }else if(depreciationType === "Written Down Value"){
-            fetchResult = await pool.query(categoryTable.getDepreciationPerYear, [categoryID]);
             utility.verifyDatabaseFetchResults(fetchResult, "Could not get depreciation details for category");
             value = fetchResult.rows[0].value;
         }else{
