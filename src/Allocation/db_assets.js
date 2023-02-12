@@ -15,6 +15,8 @@ const getAssetTags = "SELECT assetTag FROM Asset";
 const disposeAsset = "DELETE FROM Asset WHERE assettag = $1";
 const getAssetCategoryName = "Placeholder SQL command";
 const updateAssetResidualValue = "UPDATE Asset SET residualValue = $1 WHERE assetTag = $2";
+const getCloseBookValue = "SELECT closingBookValue FROM DepreciationSchedule WHERE assetTag = $1 AND year = $2";
+const getAccumulatedDepreciation = "SELECT SUM(depreciationExpense) AS accumulatedDepreciation FROM DepreciationSchedule GROUP BY assetTag WHERE assetTag = $1";
 
 module.exports = {
     doesAssetTagExist,
@@ -32,5 +34,7 @@ module.exports = {
     getAssetTags,
     disposeAsset,
     getAssetCategoryName,
-    updateAssetResidualValue
+    updateAssetResidualValue,
+    getCloseBookValue,
+    getAccumulatedDepreciation
 }
