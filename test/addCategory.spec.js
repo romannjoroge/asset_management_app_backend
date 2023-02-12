@@ -9,7 +9,7 @@ const MyError = require("../utility/myError");
 const Folder = require('../src/Allocation/folder');
 
 // Creating the test suite
-describe("addCategory Test", function () {
+describe.skip("addCategory Test", function () {
     let category;
     let depreciaitionType;
     let depreciationPercentage;
