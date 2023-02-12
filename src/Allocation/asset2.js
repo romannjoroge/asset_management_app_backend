@@ -303,16 +303,11 @@ class Asset{
                     openBookValue = acquisitionCost;
                     closeBookValue = openBookValue - depreciationExpense;
 
-                    utility.addErrorHandlingToAsyncFunction(Asset._insertDepreciationSchedule, "Invalid Depreciation Schedule Entry",
-                                                            assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation, 
-                                                            closeBookValue);
                 }else{
                     openBookValue = utility.addErrorHandlingToAsyncFunction(Asset._getCloseBookValue, "No close book value",
                                                                                 assetTag, year);
                     closeBookValue = openBookValue - depreciationExpense;
-                    utility.addErrorHandlingToAsyncFunction(Asset._insertDepreciationSchedule, "Invalid Depreciation Schedule Entry",
-                                                            assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation, 
-                                                            closeBookValue);
+
                 }
             }else if (depreciationType === "Double Declining Balance"){
                 if (i === 0){
@@ -322,9 +317,6 @@ class Asset{
                     accumulatedDepreciation = depreciationExpense;
                     closeBookValue = openBookValue - depreciationExpense;
 
-                    utility.addErrorHandlingToAsyncFunction(Asset._insertDepreciationSchedule, "Invalid Depreciation Schedule Entry",
-                                                            assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation, 
-                                                            closeBookValue);
                 }else{
                     openBookValue = utility.addErrorHandlingToAsyncFunction(Asset._getCloseBookValue, "No close book value",
                                                                                 assetTag, year);
@@ -333,9 +325,6 @@ class Asset{
                                                     assetTag);
                     closeBookValue = openBookValue - depreciationExpense;
 
-                    utility.addErrorHandlingToAsyncFunction(Asset._insertDepreciationSchedule, "Invalid Depreciation Schedule Entry",
-                                                            assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation, 
-                                                            closeBookValue);
                 }
             }else if (depreciationType === "Written Down Value"){
                 if (i === 0){
@@ -343,9 +332,7 @@ class Asset{
                     depreciationExpense = openBookValue * (depreciationPercentage / 100);
                     accumulatedDepreciation = depreciationExpense;
                     closeBookValue = openBookValue - depreciationExpense;
-                    utility.addErrorHandlingToAsyncFunction(Asset._insertDepreciationSchedule, "Invalid Depreciation Schedule Entry",
-                                                            assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation, 
-                                                            closeBookValue);
+
                 }else{
                     openBookValue = utility.addErrorHandlingToAsyncFunction(Asset._getCloseBookValue, "No close book value",
                                         assetTag, year);
@@ -353,13 +340,14 @@ class Asset{
                     accumulatedDepreciation = utility.addErrorHandlingToAsyncFunction(Asset._getAccumulatedDepreciation, "Could not get accumulated depreciation",
                                                     assetTag);
                     closeBookValue = openBookValue - depreciationExpense;
-                    utility.addErrorHandlingToAsyncFunction(Asset._insertDepreciationSchedule, "Invalid Depreciation Schedule Entry",
-                                                            assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation, 
-                                                            closeBookValue);
+
                 }
             }else{
                 throw new MyError("Depreciation Type is not supported");
             }
+            utility.addErrorHandlingToAsyncFunction(Asset._insertDepreciationSchedule, "Invalid Depreciation Schedule Entry",
+                                                            assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation, 
+                                                            closeBookValue);
         }
     }
 }
