@@ -301,50 +301,41 @@ class Asset{
 
                 if (i === 0){
                     openBookValue = acquisitionCost;
-                    closeBookValue = openBookValue - depreciationExpense;
-
                 }else{
-                    openBookValue = utility.addErrorHandlingToAsyncFunction(Asset._getCloseBookValue, "No close book value",
-                                                                                assetTag, year);
-                    closeBookValue = openBookValue - depreciationExpense;
-
+                    openBookValue = utility.addErrorHandlingToAsyncFunction(Asset._getCloseBookValue, "No close book value", assetTag, year);
                 }
+
             }else if (depreciationType === "Double Declining Balance"){
                 if (i === 0){
-                    console.log(3);
                     openBookValue = acquisitionCost;
-                    depreciationExpense = 2 * (1 / assetLifeSpan) * openBookValue;
                     accumulatedDepreciation = depreciationExpense;
-                    closeBookValue = openBookValue - depreciationExpense;
-
                 }else{
                     openBookValue = utility.addErrorHandlingToAsyncFunction(Asset._getCloseBookValue, "No close book value",
-                                                                                assetTag, year);
-                    depreciationExpense = 2 * (1 / assetLifeSpan) * openBookValue;
+                                                                                assetTag, year);                 
                     accumulatedDepreciation = utility.addErrorHandlingToAsyncFunction(Asset._getAccumulatedDepreciation, "Could Not Get Accumulated Depreciation",
                                                     assetTag);
-                    closeBookValue = openBookValue - depreciationExpense;
-
                 }
+
+                depreciationExpense = 2 * (1 / assetLifeSpan) * openBookValue;
+
             }else if (depreciationType === "Written Down Value"){
                 if (i === 0){
                     openBookValue = acquisitionCost;
-                    depreciationExpense = openBookValue * (depreciationPercentage / 100);
                     accumulatedDepreciation = depreciationExpense;
-                    closeBookValue = openBookValue - depreciationExpense;
-
                 }else{
                     openBookValue = utility.addErrorHandlingToAsyncFunction(Asset._getCloseBookValue, "No close book value",
                                         assetTag, year);
-                    depreciationExpense = openBookValue * (depreciationPercentage / 100);
                     accumulatedDepreciation = utility.addErrorHandlingToAsyncFunction(Asset._getAccumulatedDepreciation, "Could not get accumulated depreciation",
                                                     assetTag);
-                    closeBookValue = openBookValue - depreciationExpense;
-
                 }
+
+                depreciationExpense = openBookValue * (depreciationPercentage / 100);
+
             }else{
                 throw new MyError("Depreciation Type is not supported");
             }
+
+            closeBookValue = openBookValue - depreciationExpense;
             utility.addErrorHandlingToAsyncFunction(Asset._insertDepreciationSchedule, "Invalid Depreciation Schedule Entry",
                                                             assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation, 
                                                             closeBookValue);
