@@ -293,10 +293,10 @@ class Asset{
         let accumulatedDepreciation;
         let closeBookValue;
 
-        if (depreciationType === "Straight Line"){
-            let depreciationExpense = ((acquisitionCost - residualValue) / assetLifeSpan);
-            for (let i = 0; i < assetLifeSpan; i++){
-                year = acquisitionDate.getFullYear() + i;
+        for (let i = 0; i < assetLifeSpan; i++){
+            year = acquisitionDate.getFullYear() + i;
+            if (depreciationType === "Straight Line"){
+                depreciationExpense = ((acquisitionCost - residualValue) / assetLifeSpan);
                 accumulatedDepreciation = depreciationExpense * i;
 
                 if (i === 0){
@@ -314,10 +314,7 @@ class Asset{
                                                             assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation, 
                                                             closeBookValue);
                 }
-            }
-        }else if (depreciationType === "Double Declining Balance"){
-            for (let i = 0; i < assetLifeSpan; i++){
-                year = acquisitionDate.getFullYear() + i;
+            }else if (depreciationType === "Double Declining Balance"){
                 if (i === 0){
                     console.log(3);
                     openBookValue = acquisitionCost;
@@ -340,10 +337,7 @@ class Asset{
                                                             assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation, 
                                                             closeBookValue);
                 }
-            }
-        }else if (depreciationType === "Written Down Value"){
-            for (let i = 0; i < assetLifeSpan; i++){
-                year = acquisitionDate.getFullYear() + i;
+            }else if (depreciationType === "Written Down Value"){
                 if (i === 0){
                     openBookValue = acquisitionCost;
                     depreciationExpense = openBookValue * (depreciationPercentage / 100);
@@ -363,9 +357,9 @@ class Asset{
                                                             assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation, 
                                                             closeBookValue);
                 }
+            }else{
+                throw new MyError("Depreciation Type is not supported");
             }
-        }else{
-            throw new MyError("Depreciation Type is not supported");
         }
     }
 }
