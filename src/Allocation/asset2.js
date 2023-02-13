@@ -325,6 +325,13 @@ class Asset{
                                                             closeBookValue);
         }
     }
+
+    static async allocateAsset(assetTag, username){
+        await Asset.doesAssetTagExist(assetTag, "Asset Does Not Exist");
+        await User.checkIfUserExists(username, "User Does Not Exist");
+        utility.addErrorHandlingToAsyncFunction(Asset._updateAssetCustodian, "Could Not Assign Asset To User", 
+                                                assetTag, username);
+    }
 }
 
 module.exports = Asset;

@@ -12,7 +12,8 @@ class User {
 
     static async checkIfUserExists(username, errorMessage) {
         try{
-            await pool.query(userTable.checkIfUserInDB, [username]);
+            let fetchResults = await pool.query(userTable.checkIfUserInDB, [username]);
+            utility.verifyDatabaseFetchResults(fetchResults, errorMessage);
         }catch(err){
             throw new MyError(errorMessage);
         }
