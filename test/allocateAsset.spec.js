@@ -7,24 +7,11 @@ const assert = require('chai').assert;
 const Asset = require('../src/Allocation/asset2');
 const User = require('../src/Users/users');
 const MyError = require('../utility/myError');
+const utility = require('../utility/utility');
 
-describe.skip("Allocate Asset To User Test", function(){
+describe("Allocate Asset To User Test", function(){
     let assetTag;
     let username;
-
-    async function assertThatAllocateUserFails(errorMessage){
-        try{
-            await Asset.allocateAsset(assetTag, username);
-            assert(false, "Error Should Have Been Thrown");
-        }catch(err){
-            if (err instanceof MyError && err.message === errorMessage){
-                assert(true);
-            }else{
-                console.log(err);
-                assert(false, "Wrong Error Thrown");
-            }
-        }
-    }
 
     beforeEach(async function(){
         assetTag = 'AUA0001';
@@ -45,25 +32,28 @@ describe.skip("Allocate Asset To User Test", function(){
         // Test Inputs
         assetTag = "Does Not Exist";
 
-        await assertThatAllocateUserFails("Asset Does Not Exist");
+        await utility.assertThatAsynchronousFunctionFails(Asset.allocateAsset, "Asset Does Not Exist", assetTag, username);
     });
 
     it("should fail when a username that doesn't exist is given", async function(){
         // Test Inputs
         username = "Does Not Exist";
 
-        await assertThatAllocateUserFails("User Does Not Exist");
+        await utility.assertThatAsynchronousFunctionFails(Asset.allocateAsset, "User Does Not Exist", assetTag, username);
     });
 
     it("should pass when an asset and user that already exists is given", async function(){
         try{
             await Asset.allocateAsset(assetTag, username);
-            assert(true);
+            let fetchResult = await pool.query("SELECT custodianName FROM Asset WHERE assetTag=$1", [assetTag]);
+            utility.verifyDatabaseFetchResults(fetchResult, "Asset Not Allocated");
+            let custodianName = fetchResult.rows[0].custodianname
+            assert.equal(custodianName, username, "Wrong User Assigned to Asset");
         }catch(err){
             console.log(err);
             assert(false, "No Error Should be thrown");
         }
-    })
+    });
 
     afterEach(async function(){
         try{
