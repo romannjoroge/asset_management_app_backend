@@ -1,3 +1,4 @@
+const { assert } = require("chai");
 const MyError = require("./myError")
 
 function isAnyEmpty(arr){
@@ -74,6 +75,20 @@ async function addErrorHandlingToAsyncFunction(func, errorMessage, ...params){
     }
 }
 
+async function assertThatAsynchronousFunctionFails(func, errorMessage, ...params){
+    try{
+        await func(...params);
+        assert(false, "Error Should Have Been Thrown");
+    }catch(err){
+        if (err instanceof MyError && err.message === errorMessage){
+            assert(true);
+        }else{
+            console.log(err);
+            assert(false, "Wrong Error Thrown");
+        }
+    }
+}
+
 // function fileUpload(req, res){
 
 // }
@@ -86,5 +101,6 @@ module.exports = {
     verifyDatabaseFetchResults,
     checkIfInList,
     addErrorHandlingToAsyncFunction,
-    checkIfNumberisGreaterThanZero
+    checkIfNumberisGreaterThanZero,
+    assertThatAsynchronousFunctionFails
 }
