@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "mocha",
+    "test": "nodemon --exec 'mocha'",
     "coverage": "nyc --reporter=lcov --reporter=text npm run test",
     "start": "nodemon app.js"
   },
