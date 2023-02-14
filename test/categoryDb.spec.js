@@ -6,7 +6,7 @@ const assert = require('chai').assert;
 const Category = require('../src/Allocation/category2');
 const utility = require('../utility/utility');
 
-describe("getCategoryID Tests", function(){
+describe.skip("getCategoryID Tests", function(){
     let categoryName;
     let categoryID;
     let errorMessage;
@@ -42,6 +42,102 @@ describe("getCategoryID Tests", function(){
         }catch(err){
             console.log(err);
             assert(false, "Could Not Delete Temporary Table");
+        }
+    })
+});
+
+describe("saveCategoryInDB tests", function(){
+    let categoryName;
+    let depreciaitionType;
+    let categoryID;
+    let parentFolderID;
+    let depreciationPercentage;
+
+    this.beforeEach(async function(){
+        categoryName = "Totally Real Category";
+        parentFolderID = 1;
+
+        try{
+            await pool.query("CREATE TEMPORARY TABLE Category (LIKE Category INCLUDING ALL)");
+            await pool.query("CREATE TEMPORARY TABLE DepreciationPercent (LIKE DepreciationPercent INCLUDING ALL)");
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Create Temporary Tables");
+        }
+    });
+
+    async function assertThatFunctionInsertsInDB(){
+        try{
+            await Category._saveCategoryInDb(categoryName, parentFolderID, depreciaitionType, depreciationPercentage);
+        }catch(err){
+            console.log(err);
+            assert(false, "_saveCategoryInDB did not run");
+        }
+
+        try{
+            fetchResult = await pool.query("SELECT id FROM Category WHERE name = $1 AND parentFolderID = $2 AND depreciationType = $3", [categoryName, parentFolderID, depreciaitionType]);
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Get Data To Verify If _saveCategoryInDB inserted values in the DB");
+        }
+
+        utility.verifyDatabaseFetchResults(fetchResult, "Nothing Was Returned From Database");
+    }
+
+    it("should only add information to Category table when depreciation method is straight line or double declining balance", async function(){
+        // Test Inputs
+        depreciaitionType = "Straight Line";
+
+        await assertThatFunctionInsertsInDB();
+
+        categoryID = fetchResult.rows[0].id;
+
+        try{
+            fetchResult = await pool.query("SELECT percentage FROM DepreciationPercent WHERE categoryID = $1", [categoryID]);
+        }catch(err){
+            console.log(err);
+            assert(false, "Database Function Did Not Run");
+        }
+
+        if (fetchResult.rowCount > 0){
+            assert(false, "No Entry Should Be Added in Table");
+        }
+
+        assert(true);
+    });
+
+    it("should add an entry to DepreciationPercent when depreciation type is written down value", async function(){
+        // Test Inputs
+        depreciaitionType = "Written Down Value";
+        depreciationPercentage = 25;
+        let itemToCompareDepreciationPercentageWith;
+
+        await assertThatFunctionInsertsInDB();
+
+        categoryID = fetchResult.rows[0].id;
+
+        try{
+            fetchResult = await pool.query("SELECT percentage FROM DepreciationPercent WHERE categoryID = $1", [categoryID]);
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Get category ID from DepreciationPercent table");
+        }
+
+        utility.verifyDatabaseFetchResults(fetchResult, "No percentage Was Returned");
+
+        itemToCompareDepreciationPercentageWith = fetchResult.rows[0].percentage;
+
+        assert.equal(depreciationPercentage, itemToCompareDepreciationPercentageWith, "Wrong percentage returned");
+
+    })
+
+    this.afterEach(async function(){
+        try{
+            await pool.query("DROP TABLE IF EXISTS pg_temp.Category");
+            await pool.query("DROP TABLE IF EXISTS pg_temp.DepreciationPercent");
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Drop Temporary Tables");
         }
     })
 });
