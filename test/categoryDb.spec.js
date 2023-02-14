@@ -33,7 +33,7 @@ describe("getCategoryID Tests", function(){
     });
 
     it("should return a category ID when a valid category ID is given", async function(){
-        await utility.assertThatDBFunctionReturnsRightThing(Category.getCategoryID, categoryID, "id", categoryName, errorMessage);
+        await utility.assertThatAsyncFunctionReturnsRightThing(Category.getCategoryID, categoryID, categoryName);
     });
 
     afterEach(async function(){
