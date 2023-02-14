@@ -42,7 +42,7 @@ class Category {
         let categoryID;
         // If depreciation type is written value we add an entry to DepreciationPercent table
         if (depreciationType === "Written Value"){
-            categoryID = Category.getCategoryID(categoryName, "Could Not Get Category ID");
+            categoryID = Category.getCategoryID(categoryName);
             utility.addErrorHandlingToAsyncFunction(pool.query, "Could not add category depreciation percentage",
             categoryTable.addWritten, [categoryID, depDetail]);
         }
@@ -66,22 +66,25 @@ class Category {
     static depTypes = ['Straight Line', 'Double Declining Balance', 'Written Down Value'];
 
     // Function that gets Category ID from name
-    static async getCategoryID(categoryName, errorMessage) {
+    static async getCategoryID(categoryName) {
+        let fetchResult;
+        let categoryID;
+
         try{
-            // Get id of recently created category
-            const result = await pool.query(categoryTable.getID, [categoryName]);
-            // Check if nothing was returned
-            utility.verifyDatabaseFetchResults(result, errorMessage);
-            return result.rows[0].id
+            fetchResult = await pool.query(categoryTable.getID, [categoryName]);
         }catch(err){
-            console.log(err);
-            throw new MyError(errorMessage);
+            throw new MyError("Could Not Get Category ID From System");
         }
+
+        utility.verifyDatabaseFetchResults(fetchResult, "Category Does Not Exist");
+
+        categoryID = fetchResult.rows[0].id;
+        return categoryID;
     }
 
     static async doesCategoryExist(categoryName) {
         try {
-            const exist = await Category.getCategoryID(categoryName, "Could Not Get Category ID");
+            const exist = await Category.getCategoryID(categoryName);
             return true;
         }catch(err){
             return false;
@@ -121,7 +124,7 @@ class Category {
         // Verify newName
         const isValid = await Category.verifyCategoryName(newName);
         
-        const category_id = await Category.getCategoryID(oldName, "Could Not Get Category ID");
+        const category_id = await Category.getCategoryID(oldName);
 
         // Update database
         await Category.updateNameinDb(category_id, newName);
@@ -154,7 +157,7 @@ class Category {
         await Category.verifyFolder(newFolderID);
 
         // Get category ID from categoryName
-        const categoryID = Category.getCategoryID(categoryName, "Could Not Get Category ID");
+        const categoryID = Category.getCategoryID(categoryName);
 
         // Update details in DB
         await Category.updateFolderinDB(categoryID, newFolderID);
@@ -205,7 +208,7 @@ class Category {
         Category.verifyDepreciationDetails(depType, value);
 
         // Get category ID
-        const category_id = Category.getCategoryID(categoryName, "Could Not Get Category ID");
+        const category_id = Category.getCategoryID(categoryName);
 
         // Update Depreciation Type Entry in Category Table
         await Category.updateDepreciationTypeInDB(category_id, depType);
@@ -281,7 +284,7 @@ class Category {
             throw new MyError("Category Does Not Exist");
         }
 
-        let categoryID = await Category.getCategoryID(categoryName, "Could Not Get Category ID");
+        let categoryID = await Category.getCategoryID(categoryName);
         let depreciationType = await Category.getCategoryDepreciationType(categoryName);
         let depreciationValue = await Category.getCategoryDepreciationValue(categoryID, depreciationType);
 
