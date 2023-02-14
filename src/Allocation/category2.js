@@ -34,17 +34,23 @@ class Category {
     }
 
     // Function that saves category in the database
-    static async saveCategoryInDb(categoryName, parentFolderID, depreciationType, depDetail) {
-        // Add an entry to Category table
-        utility.addErrorHandlingToAsyncFunction(pool.query, "Could not save category in database",
-        categoryTable.add, [categoryName, parentFolderID, depreciationType]);
-        
+    static async _saveCategoryInDb(categoryName, parentFolderID, depreciationType, depreciationPercentage) {
+        // Categories of all depreciation types have a name, parent folder and a depreciation type
         let categoryID;
-        // If depreciation type is written value we add an entry to DepreciationPercent table
-        if (depreciationType === "Written Value"){
-            categoryID = Category.getCategoryID(categoryName);
-            utility.addErrorHandlingToAsyncFunction(pool.query, "Could not add category depreciation percentage",
-            categoryTable.addWritten, [categoryID, depDetail]);
+        try{
+            await pool.query(categoryTable.add, [categoryName, parentFolderID, depreciationType]);
+        }catch(err){
+            throw new MyError("Could Not Add Category To System")
+        }
+
+        // Only written down value depreciation uses a custom depreciation percentage that needs to be stored in the system
+        if (depreciationType === "Written Down Value"){
+            try{
+                categoryID = await Category.getCategoryID(categoryName);
+                await pool.query(categoryTable.addWritten, [categoryID, depreciationPercentage]);
+            }catch(err){
+                throw new MyError("Could Not Add Entry to DepreciationPercentage table");
+            }
         }
     }
 
@@ -57,7 +63,7 @@ class Category {
             throw new MyError("Parent Folder Does Not Exist");
         }
 
-        utility.addErrorHandlingToAsyncFunction(Category.saveCategoryInDb, "Could not add category to system"
+        utility.addErrorHandlingToAsyncFunction(Category._saveCategoryInDb, "Could not add category to system"
                                                 ,this.categoryName, this.parentFolderID, this.depreciaitionType, 
                                                 this.depreciationPercentage);
     }
