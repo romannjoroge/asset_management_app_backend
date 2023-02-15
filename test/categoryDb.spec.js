@@ -256,7 +256,7 @@ describe.skip("_deleteDepreciationPercentInDb test", function (){
             await pool.query("CREATE TEMPORARY TABLE Category (LIKE Category INCLUDING ALL)");
             await pool.query("CREATE TEMPORARY TABLE DepreciationPercent (LIKE DepreciationPercent INCLUDING ALL)");
             await pool.query("INSERT INTO Category VALUES ($1, 'New Category', 1, 'Straight Line')", [categoryID]);
-            await pool.query("INSERT INTO DepreciationPercent VALUES($1, $2)", [categoryID, depreciationPercentage])
+            await pool.query("INSERT INTO DepreciationPercent VALUES($1, $2)", [categoryID, depreciationPercentage]);
         }catch(err){
             console.log(err);
             assert(false, "Could Not Create Temporary Tables");
@@ -373,6 +373,64 @@ describe.skip("_doesCategoryIDExist Test", function(){
     this.afterEach(async function(){
         try{
             await pool.query("DROP TABLE IF EXISTS pg_temp.Category");
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Delete Temporary Tables");
+        }
+    });
+});
+
+describe("_getCategoryDepreciationPercent test", function(){
+    let depreciaitionType;
+    let depreciaitionType2;
+    let categoryID2;
+    let depreciationPercentage = 30;;
+    let categoryID;
+
+    this.beforeEach(async function(){
+        categoryID = 3;
+        categoryID2 = 4;
+        depreciaitionType = 'Written Down Value';
+        depreciaitionType2 = 'Straight Line'
+
+        try{
+            await pool.query("CREATE TEMPORARY TABLE Category (LIKE Category INCLUDING ALL)");
+            await pool.query("INSERT INTO Category VALUES ($1, 'New Category', 1, $2)", [categoryID, depreciaitionType]);
+            await pool.query("INSERT INTO Category VALUES ($1, 'New Category 2', 1, $2)", [categoryID2, depreciaitionType2]);
+            await pool.query("CREATE TEMPORARY TABLE DepreciationPercent (LIKE DepreciationPercent INCLUDING ALL)");
+            await pool.query("INSERT INTO DepreciationPercent VALUES($1, $2)", [categoryID, depreciationPercentage]);
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Create Temporary Tables")
+        }
+    });
+
+    it("should throw an error when category does not exist", async function(){
+        // Test  Inputs
+        categoryID = 100;
+
+        await utility.assertThatAsynchronousFunctionFails(Category._getCategoryDepreciationPercent, "Category Does Not Exist", categoryID);
+    });
+
+    it("should return null when category exist but its depreciation type is not written value", async function(){
+        // Test Inputs
+        categoryID = 4;
+        
+        await utility.assertThatAsyncFunctionReturnsNull(Category._getCategoryDepreciationPercent, categoryID);
+    });
+
+    it("should return a value when given a category with a depreciation type of written down value", async function(){
+        // Test Inputs
+        categoryID = 3;
+
+        await utility.assertThatAsyncFunctionReturnsRightThing(Category._getCategoryDepreciationPercent, depreciationPercentage, categoryID);
+    })
+
+    this.afterEach(async function(){
+        try{
+            await pool.query("DROP TABLE IF EXISTS pg_temp.Category");
+            await pool.query("DROP TABLE IF EXISTS pg_temp.DepreciationPercent");
+            
         }catch(err){
             console.log(err);
             assert(false, "Could Not Delete Temporary Tables");
