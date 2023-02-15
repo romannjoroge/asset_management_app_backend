@@ -4,9 +4,10 @@ const pool = require('../db2');
 const assert = require('chai').assert;
 
 const Category = require('../src/Allocation/category2');
+const MyError = require('../utility/myError');
 const utility = require('../utility/utility');
 
-describe.skip("getCategoryID Tests", function(){
+describe.skip("_getCategoryID Tests", function(){
     let categoryName;
     let categoryID;
     let errorMessage;
@@ -29,11 +30,11 @@ describe.skip("getCategoryID Tests", function(){
         // Test Inputs
         categoryName = "Does Not Exist";
 
-        await utility.assertThatAsynchronousFunctionFails(Category.getCategoryID, errorMessage, categoryName, errorMessage);
+        await utility.assertThatAsynchronousFunctionFails(Category._getCategoryID, errorMessage, categoryName, errorMessage);
     });
 
     it("should return a category ID when a valid category ID is given", async function(){
-        await utility.assertThatAsyncFunctionReturnsRightThing(Category.getCategoryID, categoryID, categoryName);
+        await utility.assertThatAsyncFunctionReturnsRightThing(Category._getCategoryID, categoryID, categoryName);
     });
 
     afterEach(async function(){
@@ -142,7 +143,7 @@ describe.skip("saveCategoryInDB tests", function(){
     });
 });
 
-describe("Update Category Database Functions Test", function(){
+describe.skip("Update Category Database Functions Test", function(){
     let categoryID = 3;
     let fetchResult;
     let result;
@@ -243,3 +244,138 @@ describe("Update Category Database Functions Test", function(){
         }
     })
 });
+
+describe.skip("_deleteDepreciationPercentInDb test", function (){
+    let categoryID = 3;
+    let depreciationPercentage = 30;
+    let fetchResult;
+
+
+    this.beforeEach(async function(){
+        try{
+            await pool.query("CREATE TEMPORARY TABLE Category (LIKE Category INCLUDING ALL)");
+            await pool.query("CREATE TEMPORARY TABLE DepreciationPercent (LIKE DepreciationPercent INCLUDING ALL)");
+            await pool.query("INSERT INTO Category VALUES ($1, 'New Category', 1, 'Straight Line')", [categoryID]);
+            await pool.query("INSERT INTO DepreciationPercent VALUES($1, $2)", [categoryID, depreciationPercentage])
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Create Temporary Tables");
+        }
+    });
+
+    it("should delete entry in depreciation percent table", async function(){
+        try{
+            await Category._deleteDepreciationPercentInDb(categoryID);
+        }catch(err){
+            console.log(err);
+            assert(false, "_deleteDepreciationPercentInDb function did not run");
+        }
+
+        try{
+            fetchResult = await pool.query("SELECT percentage FROM DepreciationPercent WHERE categoryID = $1", [categoryID]);
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Fetch Percentage From DB");
+        }
+
+        if (fetchResult.rowCount > 0){
+            console.log(fetchResult.rows[0]);
+            assert(false, "Entry Was Not Deleted");
+        }else{
+            assert(true);
+        }
+
+    });
+
+    this.afterEach(async function(){
+        try{
+            await pool.query("DROP TABLE IF EXISTS pg_temp.Category");
+            await pool.query("DROP TABLE IF EXISTS pg_temp.DepreciationPercent");
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Delete Tables");
+        }
+    });
+})
+
+describe.skip("Getter Category Tests", function(){
+    let categoryID;
+    let depreciaitionType;
+    let fetchResult;
+    let result;
+    let resultingDepreciationType;
+
+    this.beforeEach(async function(){
+        categoryID = 3;
+        depreciaitionType = 'Straight Line';
+
+        try{
+            await pool.query("CREATE TEMPORARY TABLE Category (LIKE Category INCLUDING ALL)");
+            await pool.query("INSERT INTO Category VALUES ($1, 'New Category', 1, $2)", [categoryID, depreciaitionType]);
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Create Temporary Tables");
+        }
+    })
+
+    it("_getCategoryDepreciationType should return an error when category does not exist", async function(){
+        // Test Inputs
+        categoryID = 10;
+
+        await utility.assertThatAsynchronousFunctionFails(Category._getCategoryDepreciationType, "Category Does Not Exist", categoryID);
+    });
+
+    it("_getCategoryDepreciationType should return depreciationType when category exists", async function(){
+        // Test Inputs
+        categoryID = 3;
+
+        await utility.assertThatAsyncFunctionReturnsRightThing(Category._getCategoryDepreciationType, depreciaitionType, categoryID);
+    })
+
+    this.afterEach(async function(){
+        try{
+            await pool.query("DROP TABLE IF EXISTS pg_temp.Category");
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Delete Temporary Tables");
+        }
+    })
+});
+
+describe.skip("_doesCategoryIDExist Test", function(){
+    let categoryID;
+
+    this.beforeEach(async function(){
+        categoryID = 3;
+        try{
+            await pool.query("CREATE TEMPORARY TABLE Category (LIKE Category INCLUDING ALL)");
+            await pool.query("INSERT INTO Category VALUES ($1, 'New Category', 1, 'Straight Line')", [categoryID]);
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Create Temporary Tables");
+        }
+    });
+
+    it("should return false when given a category that does not exist", async function(){
+        // Test Inputs
+        categoryID = 100;
+
+        await utility.assertThatAsyncFunctionReturnsRightThing(Category._doesCategoryIDExist, false, categoryID);
+    });
+
+    it("should return true when category that exists is given", async function(){
+        // Test Inputs
+        categoryID = 3;
+
+        await utility.assertThatAsyncFunctionReturnsRightThing(Category._doesCategoryIDExist, true, categoryID);
+    })
+
+    this.afterEach(async function(){
+        try{
+            await pool.query("DROP TABLE IF EXISTS pg_temp.Category");
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Delete Temporary Tables");
+        }
+    });
+})
