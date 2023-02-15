@@ -7,8 +7,9 @@ const updateDepreciationType = "UPDATE Category SET depreciationType = $1 WHERE 
 const insertDepreciationPercent = "INSERT INTO DepreciationPercent (categoryID, percentage) VALUES ($1, $2)";
 const deleteDepreciationPerYear = "DELETE FROM DepreciationPerYear WHERE categoryID = $1";
 const deleteDepreciationPercent = "DELETE FROM DepreciationPercent WHERE categoryID = $1";
-const getCategoryDepreciationType = "SELECT depreciationType FROM Category WHERE name = $1";
+const getCategoryDepreciationType = "SELECT depreciationType FROM Category WHERE ID = $1";
 const getDepreciationPercent = "SELECT percentage FROM DepreciationPercent WHERE categoryID = $1";
+const doesCategoryIDExist = "SELECT name FROM Category WHERE ID = $1";
 
 let categoryTable = {
     add: addCategory,
@@ -22,6 +23,7 @@ let categoryTable = {
     deleteDepreciationPercent: deleteDepreciationPercent,
     getCategoryDepreciationType: getCategoryDepreciationType,
     getDepreciationPercent: getDepreciationPercent,
+    doesCategoryIDExist
 }
 
 module.exports = categoryTable;
