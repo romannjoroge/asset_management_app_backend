@@ -117,7 +117,7 @@ class Category {
         return "Name is valid!";
     }
 
-    static async updateNameinDb (category_id, newName) {
+    static async _updateNameinDb (category_id, newName) {
         // Run command
         try {
             await pool.query(categoryTable.updateCategoryName, [newName, category_id]);
@@ -126,14 +126,14 @@ class Category {
         }
     }
 
-    static async updateCategoryName(newName, oldName) {
+    static async _updateCategoryName(newName, oldName) {
         // Verify newName
         const isValid = await Category.verifyCategoryName(newName);
         
         const category_id = await Category.getCategoryID(oldName);
 
         // Update database
-        await Category.updateNameinDb(category_id, newName);
+        await Category._updateNameinDb(category_id, newName);
     }
 
     static async verifyFolder(id) {
@@ -149,8 +149,7 @@ class Category {
         }
     }
 
-    static async updateFolderinDB(category_id, newID) {
-        // Run the SQL command
+    static async _updateFolderinDB(category_id, newID) {
         try{
             await pool.query(categoryTable.updateFolderID, [newID, category_id]);
         }catch(err){
@@ -166,7 +165,7 @@ class Category {
         const categoryID = Category.getCategoryID(categoryName);
 
         // Update details in DB
-        await Category.updateFolderinDB(categoryID, newFolderID);
+        await Category._updateFolderinDB(categoryID, newFolderID);
     }
 
     static verifyDepreciationDetails(depType, depValue) {
@@ -184,7 +183,7 @@ class Category {
         }
     }
 
-    static async updateDepreciationTypeInDB(category_id, depType){
+    static async _updateDepreciationTypeInDB(category_id, depType){
         // Update the depreciation type in category table
         try {
             await pool.query(categoryTable.updateDepreciationType, [depType, category_id]);
@@ -193,7 +192,7 @@ class Category {
         }
     }
 
-    static async insertDepreciationPercentInDb(category_id, percent) {
+    static async _insertDepreciationPercentInDb(category_id, percent) {
         try{
             await pool.query(categoryTable.insertDepreciationPercent, [category_id, percent]);
         }catch(err){
@@ -217,7 +216,7 @@ class Category {
         const category_id = Category.getCategoryID(categoryName);
 
         // Update Depreciation Type Entry in Category Table
-        await Category.updateDepreciationTypeInDB(category_id, depType);
+        await Category._updateDepreciationTypeInDB(category_id, depType);
 
         // Delete Depreciation Type and Depreciation Per Year in category table
         await Category.deleteDepreciationPercentInDb(category_id);
