@@ -288,17 +288,27 @@ class Category {
         return depreciaitionType;
     }
 
-    static async getCategoryDepreciationValue(categoryID, depreciationType){
-        let value;
+    static async _getCategoryDepreciationPercent(categoryID){
         let fetchResult;
-        if(depreciationType === "Written Down Value"){
-            fetchResult = await pool.query(categoryTable.getDepreciationPercent, [categoryID]);
-            utility.verifyDatabaseFetchResults(fetchResult, "Could not get depreciation details for category");
-            value = fetchResult.rows[0].value;
-        }else{
-            value = null;
+        let depreciationPercentage;
+
+        if (!await Category._doesCategoryIDExist(categoryID)){
+            throw new MyError("Category Does Not Exist");
         }
-        return value;
+
+        if(await Category._getCategoryDepreciationType(categoryID) === "Written Down Value"){
+            try{
+                fetchResult = await pool.query(categoryTable.getDepreciationPercent, [categoryID]);
+            }catch(err){
+                throw new MyError("Could Not Get Depreciation Percentage")
+            }
+
+            depreciationPercentage = fetchResult.rows[0].percentage;
+        }else{
+            depreciationPercentage = null;
+        }
+
+        return depreciationPercentage;
     }
 
     // View Category Details
@@ -310,7 +320,7 @@ class Category {
 
         let categoryID = await Category._getCategoryID(categoryName);
         let depreciationType = await Category._getCategoryDepreciationType(categoryID);
-        let depreciationValue = await Category.getCategoryDepreciationValue(categoryID, depreciationType);
+        let depreciationValue = await Category._getCategoryDepreciationPercent(categoryID, depreciationType);
 
         return {
             categoryName: categoryName,
