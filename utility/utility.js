@@ -106,6 +106,19 @@ async function assertThatAsyncFunctionReturnsRightThing(func, itemToReturn, ...p
     assert.equal(returnedItem, itemToReturn, "Returned Item Is Different");
 }
 
+async function assertThatAsyncFunctionReturnsNull(func, ...params){
+    let returnedItem;
+
+    try{
+        returnedItem = await func(...params);
+    }catch(err){
+        console.log(err);
+        throw new MyError(`${func.name} Did Not Run`);
+    }
+
+    assert.equal(returnedItem, null, "Returned Item Is Different");
+}
+
 // function fileUpload(req, res){
 
 // }
@@ -120,5 +133,6 @@ module.exports = {
     addErrorHandlingToAsyncFunction,
     checkIfNumberisGreaterThanZero,
     assertThatAsynchronousFunctionFails,
-    assertThatAsyncFunctionReturnsRightThing
+    assertThatAsyncFunctionReturnsRightThing,
+    assertThatAsyncFunctionReturnsNull
 }
