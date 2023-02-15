@@ -257,7 +257,6 @@ class Category {
         try{
             fetchResult = await pool.query(categoryTable.doesCategoryIDExist, [categoryID]);
         }catch(err){
-            console.log(err);
             throw new MyError("Could Not Confirm If Category Exists");
         }
 
