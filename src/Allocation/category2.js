@@ -46,7 +46,7 @@ class Category {
         // Only written down value depreciation uses a custom depreciation percentage that needs to be stored in the system
         if (depreciationType === "Written Down Value"){
             try{
-                categoryID = await Category.getCategoryID(categoryName);
+                categoryID = await Category._getCategoryID(categoryName);
                 await pool.query(categoryTable.addWritten, [categoryID, depreciationPercentage]);
             }catch(err){
                 throw new MyError("Could Not Add Entry to DepreciationPercentage table");
@@ -55,7 +55,7 @@ class Category {
     }
 
     async initialize(){
-        if (!await Category.doesCategoryExist(this.categoryName)){
+        if (!await Category._doesCategoryExist(this.categoryName)){
             throw new MyError("Category Already Exists");
         }
 
@@ -72,7 +72,7 @@ class Category {
     static depTypes = ['Straight Line', 'Double Declining Balance', 'Written Down Value'];
 
     // Function that gets Category ID from name
-    static async getCategoryID(categoryName) {
+    static async _getCategoryID(categoryName) {
         let fetchResult;
         let categoryID;
 
@@ -88,9 +88,9 @@ class Category {
         return categoryID;
     }
 
-    static async doesCategoryExist(categoryName) {
+    static async _doesCategoryExist(categoryName) {
         try {
-            const exist = await Category.getCategoryID(categoryName);
+            const exist = await Category._getCategoryID(categoryName);
             return true;
         }catch(err){
             return false;
@@ -109,7 +109,7 @@ class Category {
         }
 
         // Check if the name exists
-        const exist = await Category.doesCategoryExist(newName);
+        const exist = await Category._doesCategoryExist(newName);
         if (exist === true){
             throw new MyError(`${newName} category already exists`);
         }
@@ -130,7 +130,7 @@ class Category {
         // Verify newName
         const isValid = await Category.verifyCategoryName(newName);
         
-        const category_id = await Category.getCategoryID(oldName);
+        const category_id = await Category._getCategoryID(oldName);
 
         // Update database
         await Category._updateNameinDb(category_id, newName);
@@ -162,7 +162,7 @@ class Category {
         await Category.verifyFolder(newFolderID);
 
         // Get category ID from categoryName
-        const categoryID = Category.getCategoryID(categoryName);
+        const categoryID = Category._getCategoryID(categoryName);
 
         // Update details in DB
         await Category._updateFolderinDB(categoryID, newFolderID);
@@ -200,7 +200,7 @@ class Category {
         }
     }
 
-    static async deleteDepreciationPercentInDb(category_id) {
+    static async _deleteDepreciationPercentInDb(category_id) {
         try {
             await pool.query(categoryTable.deleteDepreciationPercent, [category_id]);
         }catch(err){
@@ -208,18 +208,18 @@ class Category {
         }
     }
 
-    static async updateDepreciationType(depType, value, categoryName){
+    static async _updateDepreciationType(depType, value, categoryName){
         // Verify Depreciation Details
         Category.verifyDepreciationDetails(depType, value);
 
         // Get category ID
-        const category_id = Category.getCategoryID(categoryName);
+        const category_id = Category._getCategoryID(categoryName);
 
         // Update Depreciation Type Entry in Category Table
         await Category._updateDepreciationTypeInDB(category_id, depType);
 
         // Delete Depreciation Type and Depreciation Per Year in category table
-        await Category.deleteDepreciationPercentInDb(category_id);
+        await Category._deleteDepreciationPercentInDb(category_id);
 
         // Insert DepreciationPerYear of DepreciationPercent
         if (depType === "Written Down Value"){
@@ -243,7 +243,7 @@ class Category {
         }
 
         if ("depreciation" in updateJSON){
-            await Category.updateDepreciationType(updateJSON.depreciation.type, updateJSON.depreciation.value, categoryName);
+            await Category._updateDepreciationType(updateJSON.depreciation.type, updateJSON.depreciation.value, categoryName);
         }
     }
 
@@ -251,22 +251,41 @@ class Category {
     // Deleting a category would involve deleting the depreiciation details of all the assets under the category which
     // To me doesn't make alot of sense. So I've decided to not add this functionality for now
 
-    static async getCategoryDepreciationType(categoryName){
+    static async _doesCategoryIDExist(categoryID){
         let fetchResult;
 
-        // Throws an error when database request results to an error
         try{
-            fetchResult = await pool.query(categoryTable.getCategoryDepreciationType, [categoryName]);
+            fetchResult = await pool.query(categoryTable.doesCategoryIDExist, [categoryID]);
         }catch(err){
-            throw new MyError("Could not get depreciation type of category");
+            console.log(err);
+            throw new MyError("Could Not Confirm If Category Exists");
         }
 
-        // Throws an error if database request returned nothing
         if (fetchResult.rowCount === 0){
-            throw new MyError("Could not get depreciation type of category");
+            return false;
+        }else{
+            return true;
         }
-        let categoryDepreciationType = fetchResult.rows[0].depreciationtype;
-        return categoryDepreciationType;
+    }
+
+    static async _getCategoryDepreciationType(categoryID){
+        let fetchResult;
+
+        // Check if Category Exists
+        if (!await Category._doesCategoryIDExist(categoryID)){
+            throw new MyError("Category Does Not Exist");
+        }
+
+        try{
+            fetchResult = await pool.query(categoryTable.getCategoryDepreciationType, [categoryID]);
+        }catch(err){
+            throw new MyError("Could Not Get Category Depreciation Type");
+        }
+
+        utility.verifyDatabaseFetchResults(fetchResult, "Error Querying Database");
+
+        let depreciaitionType = fetchResult.rows[0].depreciationtype;
+        return depreciaitionType;
     }
 
     static async getCategoryDepreciationValue(categoryID, depreciationType){
@@ -284,13 +303,13 @@ class Category {
 
     // View Category Details
     static async viewDetails(categoryName){
-        let categoryExist = await Category.doesCategoryExist(categoryName);
+        let categoryExist = await Category._doesCategoryExist(categoryName);
         if (!categoryExist) {
             throw new MyError("Category Does Not Exist");
         }
 
-        let categoryID = await Category.getCategoryID(categoryName);
-        let depreciationType = await Category.getCategoryDepreciationType(categoryName);
+        let categoryID = await Category._getCategoryID(categoryName);
+        let depreciationType = await Category._getCategoryDepreciationType(categoryID);
         let depreciationValue = await Category.getCategoryDepreciationValue(categoryID, depreciationType);
 
         return {
