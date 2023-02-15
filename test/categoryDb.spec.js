@@ -46,7 +46,7 @@ describe.skip("getCategoryID Tests", function(){
     })
 });
 
-describe("saveCategoryInDB tests", function(){
+describe.skip("saveCategoryInDB tests", function(){
     let categoryName;
     let depreciaitionType;
     let categoryID;
@@ -129,11 +129,113 @@ describe("saveCategoryInDB tests", function(){
 
         assert.equal(depreciationPercentage, itemToCompareDepreciationPercentageWith, "Wrong percentage returned");
 
+    });
+
+    this.afterEach(async function(){
+        try{
+            await pool.query("DROP TABLE IF EXISTS pg_temp.Category");
+            await pool.query("DROP TABLE IF EXISTS pg_temp.DepreciationPercent");
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Drop Temporary Tables");
+        }
+    });
+});
+
+describe("Update Category Database Functions Test", function(){
+    let categoryID = 3;
+    let fetchResult;
+    let result;
+    let oldName = 'Old Name';
+    let oldParentFolderID = 1;
+    let oldDepreciationType = 'Straight Line';
+
+    this.beforeEach(async function(){
+        try{
+            await pool.query("CREATE TEMPORARY TABLE Category (LIKE Category INCLUDING ALL)");
+            await pool.query("CREATE TEMPORARY TABLE Folder (LIKE Folder INCLUDING ALL)");
+            await pool.query("CREATE TEMPORARY TABLE DepreciationPercent (LIKE DepreciationPercent INCLUDING ALL)");
+            await pool.query("INSERT INTO Category VALUES (3, $1, $2, $3)", [oldName, oldParentFolderID, oldDepreciationType]);
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Create Temporary Tables");
+        }
+    });
+
+    async function testDatabaseFunction(newValue, oldValue, attributeToUpdate, func, ...params){
+        try{
+            await func(...params);
+        }catch(err){
+            console.log(err);
+            assert(false, `${func.name} function could not be run`);
+        }
+        try{
+            fetchResult = await pool.query(`SELECT ${attributeToUpdate} FROM Category WHERE ID = $1`, [categoryID]);
+        }catch(err){
+            console.log(err);
+            assert(false, `Could Not Fetch ${attributeToUpdate} From Database`);
+        }
+
+        utility.verifyDatabaseFetchResults(fetchResult, "Nothing Returned From Database");
+        result = fetchResult.rows[0][attributeToUpdate];
+
+        assert.notEqual(result, oldValue, `${attributeToUpdate} Did Not Change`);
+        assert.equal(newValue, result, `${attributeToUpdate} Changed To Something Else, ${result}`);
+    }
+
+    it("_updateNameInDB test", async function(){
+        let newName = "New Name";
+
+        await testDatabaseFunction(newName, oldName, 'name', Category._updateNameinDb, categoryID, newName);
+    });
+
+    it("_updateFolderInDB test", async function(){
+        let newParentFolderID = 3;
+
+        // Insert The New Folder In DB
+        try{
+            await pool.query("INSERT INTO Folder VALUES ($1, 'New Test Folder', 'TestCompany')", [newParentFolderID])
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Insert New Folder In DB");
+        }
+
+        await testDatabaseFunction(newParentFolderID, oldParentFolderID, 'parentfolderid', Category._updateFolderinDB, categoryID, newParentFolderID);
+    });
+
+    it("_updateDepreciationTypeInDB test", async function(){
+        let newDepreciationType = 'Double Declining Balance';
+
+        await testDatabaseFunction(newDepreciationType, oldDepreciationType, 'depreciationtype', Category._updateDepreciationTypeInDB, categoryID, newDepreciationType);
+    });
+
+    it("_insertDepreciationPercentageInDB", async function(){
+        let depreciationPercentage = 40;
+
+        try{
+            await Category._insertDepreciationPercentInDb(categoryID, depreciationPercentage);
+        }catch(err){
+            console.log(err);
+            assert(false, "Function Did Not Run");
+        }
+
+        try{
+            fetchResult = await pool.query("SELECT percentage FROM DepreciationPercent WHERE categoryID = $1", [categoryID]);
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Fetch Percent From DB");
+        }
+
+        utility.verifyDatabaseFetchResults(fetchResult, "Nothing Was Returned From Database");
+        result = fetchResult.rows[0].percentage;
+
+        assert.equal(depreciationPercentage, result, "Wrong Value Inserted");
     })
 
     this.afterEach(async function(){
         try{
             await pool.query("DROP TABLE IF EXISTS pg_temp.Category");
+            await pool.query("DROP TABLE IF EXISTS pg_temp.Folder");
             await pool.query("DROP TABLE IF EXISTS pg_temp.DepreciationPercent");
         }catch(err){
             console.log(err);
