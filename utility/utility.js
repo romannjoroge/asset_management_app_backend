@@ -89,32 +89,22 @@ async function assertThatAsynchronousFunctionFails(func, errorMessage, ...params
     }
 }
 
-async function assertThatAsyncFunctionReturnsRightThing(func, itemToCheckAgainst, ...params){
-    let result;
+async function assertThatAsyncFunctionReturnsRightThing(func, itemToReturn, ...params){
+    let returnedItem;
+
     try{
-        result = await func(...params);
+        returnedItem = await func(...params);
     }catch(err){
-        throw new MyError("Function Failed To Run");
+        console.log(err);
+        throw new MyError(`${func.name} Did Not Run`);
     }
 
-    assert.equal(result, itemToCheckAgainst, "Wrong Item Returned");
-    assert(true);
+    if (returnedItem === null || returnedItem === 'undefined'){
+        assert(false, "Nothing Was Returned");
+    }
+
+    assert.equal(returnedItem, itemToReturn, "Returned Item Is Different");
 }
-
-// async function assertThatDBFunctionReturnsRightThing(func, returnedItem, itemName, ...params){
-//     let fetchResult;
-
-//     try{
-//         fetchResult = await func(params);
-//     }catch(err){
-//         console.log(err);
-//         throw new MyError("Could Not Get Item From Database");
-//     }
-
-//     verifyDatabaseFetchResults(fetchResult, "Nothing Returned From Database");
-
-//     assert.equal(returnedItem, fetchResult.rows[0][itemName], "Returned Item Is Different");
-// }
 
 // function fileUpload(req, res){
 
