@@ -157,7 +157,7 @@ class Category {
         }
     }
 
-    static async updateCategoryFolder(newFolderID, categoryName) {
+    static async _updateCategoryFolder(newFolderID, categoryName) {
         // Verify new folder ID
         await Category.verifyFolder(newFolderID);
 
@@ -223,7 +223,7 @@ class Category {
 
         // Insert DepreciationPerYear of DepreciationPercent
         if (depType === "Written Down Value"){
-            await Category.insertDepreciationPercentInDb(category_id, value);
+            await Category._insertDepreciationPercentInDb(category_id, value);
         }
     }
 
@@ -235,11 +235,11 @@ class Category {
         The depreciation key contains another object that has depreciation type and value
         */
         if ("name" in updateJSON) {
-            await Category.updateCategoryName(updateJSON.name, categoryName);
+            await Category._updateCategoryName(updateJSON.name, categoryName);
         }
         
         if("parentFolder" in updateJSON){
-            await Category.updateCategoryFolder(updateJSON.parentFolder, categoryName);
+            await Category._updateCategoryFolder(updateJSON.parentFolder, categoryName);
         }
 
         if ("depreciation" in updateJSON){

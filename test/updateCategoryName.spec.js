@@ -9,7 +9,7 @@ const sinon = require('sinon');
 const Category = require("../src/Allocation/category2");
 const MyError = require("../utility/myError");
 
-describe.skip("verifyCategoryName test", function () {
+describe("verifyCategoryName test", function () {
     it("should deny a category name that is not a string", async function (){
         // Test input
         let newName = 1;
@@ -48,8 +48,8 @@ describe.skip("verifyCategoryName test", function () {
         // Test input
         let newName = "Existing";
 
-        // Stub doesCategoryExist
-        let stub = sinon.stub(Category, "doesCategoryExist")
+        // Stub _doesCategoryExist
+        let stub = sinon.stub(Category, "_doesCategoryExist")
                         .withArgs(newName)
                         .returns(true)
 
@@ -69,8 +69,8 @@ describe.skip("verifyCategoryName test", function () {
         // Test input
         let newName = "NewCategory";
 
-        // Stub doesCategoryExist
-        let stub = sinon.stub(Category, "doesCategoryExist")
+        // Stub _doesCategoryExist
+        let stub = sinon.stub(Category, "_doesCategoryExist")
                         .withArgs(newName)
                         .returns(false)
 
@@ -86,7 +86,7 @@ describe.skip("verifyCategoryName test", function () {
     })
 });
 
-describe.skip("updateCategoryName Test",async function () {
+describe("updateCategoryName Test",async function () {
     it("should update category table if new category name is valid and old category exists", async function () {
         
         // Test inputs
@@ -95,20 +95,20 @@ describe.skip("updateCategoryName Test",async function () {
 
         let category_id = 1;
 
-        // Stub getCategoryID
-        let getCategory = sinon.stub(Category, "getCategoryID")
+        // Stub _getCategoryID
+        let getCategory = sinon.stub(Category, "_getCategoryID")
                                .throws(new MyError("No Category exists with that name"))
                                .onCall(1)                             
                                .returns(1)
                                .onCall(2);
 
-        // Stub updateNameinDB
-        let updateNameinDB = sinon.stub(Category, "updateNameinDb");
+        // Stub _updateNameinDb
+        let _updateNameinDb = sinon.stub(Category, "_updateNameinDb");
         
         // Call function
         try{
-            await Category.updateCategoryName(newName, oldName);
-            sinon.assert.calledWith(updateNameinDB, category_id, newName);
+            await Category._updateCategoryName(newName, oldName);
+            sinon.assert.calledWith(_updateNameinDb, category_id, newName);
         }catch(err){
             console.log(err);
             console.log(getCategory.callCount);
@@ -121,23 +121,23 @@ describe.skip("updateCategoryName Test",async function () {
         let newName = "Valid";
         let oldName = "Non Existent";
 
-        // Stub getCategoryID
-        let stub = sinon.stub(Category, "getCategoryID")
+        // Stub _getCategoryID
+        let stub = sinon.stub(Category, "_getCategoryID")
                         .withArgs(oldName)
                         .throws(new MyError("No Category exists with that name"))
                         .withArgs(newName)
                         .throws(new MyError("No Category exists with that name"));
 
-        // Mock updateNameinDB
+        // Mock _updateNameinDb
         let mock = sinon.mock(Category);
-        let expectation = mock.expects("updateNameinDb");
+        let expectation = mock.expects("_updateNameinDb");
         expectation.exactly(0);
 
         mock.verify();
 
         // Run function
         try{
-            await Category.updateCategoryName(newName, oldName);
+            await Category._updateCategoryName(newName, oldName);
             assert.equal(true, false, "An error should have been thrown");
         }catch(err){
             if (err instanceof MyError && err.message === "No Category exists with that name"){
@@ -156,8 +156,8 @@ describe.skip("updateCategoryName Test",async function () {
         let category_id1 = 1;
         let category_id2 = 2;
 
-        // Stub getCategoryID
-        let stub = sinon.stub(Category, "getCategoryID")
+        // Stub _getCategoryID
+        let stub = sinon.stub(Category, "_getCategoryID")
                         .withArgs(newName)
                         .returns(category_id1)
                         .withArgs(oldName)
@@ -165,7 +165,7 @@ describe.skip("updateCategoryName Test",async function () {
 
         // Run function
         try {
-            await Category.updateCategoryName(newName, oldName);
+            await Category._updateCategoryName(newName, oldName);
             assert.equal(true, false, "An Error Should Have Been Thrown");
         }catch(err){
             if (err instanceof MyError && err.message === `${newName} category already exists`) {
@@ -183,7 +183,7 @@ describe.skip("updateCategoryName Test",async function () {
 
         // Run function
         try {
-            await Category.updateCategoryName(newName, oldName);
+            await Category._updateCategoryName(newName, oldName);
             assert.equal(true, false, "An Error Should Have Been Thrown");
         }catch(err){
             if (err instanceof MyError && err.message === "Category Name is of invalid type"){

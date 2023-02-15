@@ -9,7 +9,7 @@ const MyError = require("../utility/myError");
 const Folder = require('../src/Allocation/folder');
 
 // Creating the test suite
-describe.skip("addCategory Test", function () {
+describe("addCategory Test", function () {
     let category;
     let depreciaitionType;
     let depreciationPercentage;
@@ -51,10 +51,10 @@ describe.skip("addCategory Test", function () {
         categoryName = "Existing Category";
         parentFolderID = 1;
 
-        doesCategoryExistStub = sinon.stub(Category, "doesCategoryExist")
+        doesCategoryExistStub = sinon.stub(Category, "_doesCategoryExist")
                                 .withArgs(categoryName)
                                 .returns(true);
-        saveCategoryStub = sinon.stub(Category, "saveCategoryInDb")
+        saveCategoryStub = sinon.stub(Category, "_saveCategoryInDb")
                             .withArgs(categoryName, parentFolderID, depreciaitionType, depreciationPercentage);
         doesFolderExistStub = sinon.stub(Folder, "doesFolderExist")
                                 .withArgs(parentFolderID)
@@ -84,8 +84,8 @@ describe.skip("addCategory Test", function () {
         // Test inputs
         categoryName = "existing"
 
-        Category.doesCategoryExist.restore();
-        doesCategoryExistStub = sinon.stub(Category, "doesCategoryExist")
+        Category._doesCategoryExist.restore();
+        doesCategoryExistStub = sinon.stub(Category, "_doesCategoryExist")
                                 .withArgs(categoryName)
                                 .returns(false);
         await assertThatCategotyConstructorFails("Category Already Exists");

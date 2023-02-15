@@ -13,7 +13,7 @@ const User = require('../src/Users/users');
 const Category = require("../src/Allocation/category2");
 const { expect } = require('chai');
 
-describe.skip("updateAsset test cases", function (){
+describe("updateAsset test cases", function (){
     async function updateAssetShouldThrowError(updateAssetDict, errorMessage){
         try{
             await Asset.updateAsset(updateAssetDict, assetTag);
@@ -122,7 +122,7 @@ describe.skip("updateAsset test cases", function (){
             categoryName: "Does not exist"
         }
 
-        let getCategoryIDStub = sinon.stub(Category, "getCategoryID")
+        let getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
                                 .withArgs(updateAssetDict.categoryName)
                                 .throws(new MyError("Category Does not Exist"));
 
@@ -163,7 +163,7 @@ describe.skip("updateAsset test cases", function (){
                                     .withArgs(assetTag)
                                     .returns(categoryName);
 
-        let getCategoryDepreciationTypeStub = sinon.stub(Category, "getCategoryDepreciationType")
+        let getCategoryDepreciationTypeStub = sinon.stub(Category, "_getCategoryDepreciationType")
                                                 .withArgs(categoryName)
                                                 .returns("Written Down Value");
 
@@ -191,7 +191,7 @@ describe.skip("updateAsset test cases", function (){
                                 .returns(true);
         let _insertAssetAttachmentsStub = sinon.stub(Asset, "_insertAssetAttachments")
                                             .withArgs(assetTag, updateAssetDict.attachments[0])
-        let getCategoryIDStub = sinon.stub(Category, "getCategoryID")
+        let getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
                                 .withArgs(updateAssetDict.categoryName)
                                 .returns(1);
         let _updateAssetCategoryIDStub = sinon.stub(Asset, "_updateAssetCategoryID")
@@ -220,7 +220,7 @@ describe.skip("updateAsset test cases", function (){
         let _getAssetCategoryName = sinon.stub(Asset, "_getAssetCategoryName")
                                     .withArgs(assetTag)
                                     .returns(updateAssetDict.categoryName);
-        let getCategoryDepreciationTypeStub = sinon.stub(Category, "getCategoryDepreciationType")
+        let getCategoryDepreciationTypeStub = sinon.stub(Category, "_getCategoryDepreciationType")
                                                 .withArgs(updateAssetDict.categoryName)
                                                 .returns("Straight Line");
         let _updateAssetResidualValueStub = sinon.stub(Asset, "_updateAssetResidualValue")

@@ -15,7 +15,7 @@ const Location = require('../src/Tracking/location');
 const User = require('../src/Users/users');
 const Category = require("../src/Allocation/category2");
 
-describe.skip("createAsset test", function () {
+describe("createAsset test", function () {
     // Test inputs
     let fixed;
     let assetTag;
@@ -47,6 +47,7 @@ describe.skip("createAsset test", function () {
             let asset = new Asset(fixed, assetLifeSpan, acquisitionDate, locationID, status, custodianName, 
                     acquisitionCost, insuranceValue, categoryName, attachments, assetTag, makeAndModelNo, serialNumber, residualValue);
             await asset.initialize();
+            assert(false, "An Error Should Be Thrown");
         }catch(err){
             if (err instanceof MyError && err.message === errorMessage){
                 assert(true);
@@ -76,10 +77,10 @@ describe.skip("createAsset test", function () {
                             .returns("Test");
         checkIfUserExistsStub = sinon.stub(User, "checkIfUserExists")
                                 .withArgs(custodianName, invalidCustodianErrorMessage);
-        doesCategoryExistStub = sinon.stub(Category, "doesCategoryExist")
+        doesCategoryExistStub = sinon.stub(Category, "_doesCategoryExist")
                                 .withArgs(categoryName)
                                 .returns(true);
-        getCategoryIDStub = sinon.stub(Category, "getCategoryID")
+        getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
                             .withArgs(categoryName)
                             .returns(1);
         fsExistsSyncStub = sinon.stub(fs, "existsSync")
@@ -88,7 +89,7 @@ describe.skip("createAsset test", function () {
         doesAssetTagExistStub = sinon.stub(Asset, "doesAssetTagExist")
                                 .withArgs(assetTag, assetTagErrorMessage);
         residualValue = 100;
-        getCategoryDepreciationTypeStub = sinon.stub(Category, "getCategoryDepreciationType")
+        getCategoryDepreciationTypeStub = sinon.stub(Category, "_getCategoryDepreciationType")
                                             .withArgs(categoryName)
                                             .returns("Straight Line");
     });
@@ -163,12 +164,12 @@ describe.skip("createAsset test", function () {
         categoryName = "Does Not Exist";
 
 
-        Category.doesCategoryExist.restore();
-        Category.getCategoryID.restore();
-        doesCategoryExistStub = sinon.stub(Category, "doesCategoryExist")
+        Category._doesCategoryExist.restore();
+        Category._getCategoryID.restore();
+        doesCategoryExistStub = sinon.stub(Category, "_doesCategoryExist")
                                 .withArgs(categoryName)
                                 .returns(false);
-        getCategoryIDStub = sinon.stub(Category, "getCategoryID")
+        getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
                             .withArgs(categoryName)
                             .throws("Category Does Not Exist");
 
@@ -207,7 +208,7 @@ describe.skip("createAsset test", function () {
             assert(true, "Test Passed");
         }catch(err){
             console.log(err);
-            asset(false, "An Error Should not have been thrown");
+            assert(false, "An Error Should not have been thrown");
         }
     });
 
@@ -224,12 +225,12 @@ describe.skip("createAsset test", function () {
         categoryName = "Category with written down depreciation type";
 
         // Stubbing database calls
-        Category.getCategoryDepreciationType.restore();
-        Category.doesCategoryExist.restore();
-        doesCategoryExistStub = sinon.stub(Category, "doesCategoryExist")
+        Category._getCategoryDepreciationType.restore();
+        Category._doesCategoryExist.restore();
+        doesCategoryExistStub = sinon.stub(Category, "_doesCategoryExist")
                                 .withArgs(categoryName)
                                 .returns(true);
-        getCategoryDepreciationTypeStub = sinon.stub(Category, "getCategoryDepreciationType")
+        getCategoryDepreciationTypeStub = sinon.stub(Category, "_getCategoryDepreciationType")
                                             .withArgs(categoryName)
                                             .returns("Written Down Value");
 

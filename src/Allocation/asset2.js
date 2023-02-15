@@ -68,10 +68,10 @@ class Asset{
     // asynchronous values
     async initialize(){
         try{
-            if (!await Category.doesCategoryExist(this.categoryName)){
+            if (!await Category._doesCategoryExist(this.categoryName)){
                 throw new MyError("Invalid category");
             }else{
-                this.categoryID = await Category.getCategoryID(this.categoryName);
+                this.categoryID = await Category._getCategoryID(this.categoryName);
             }
         }catch(err){
             throw new MyError("Invalid category");
@@ -81,7 +81,7 @@ class Asset{
         await User.checkIfUserExists(this.custodianName, "Invalid custodian");
         await Asset.doesAssetTagExist(this.assetTag, "Asset Tag Has Already Been Assigned");
 
-        let depreciaitionType = Category.getCategoryDepreciationType(this.categoryName);
+        let depreciaitionType = Category._getCategoryDepreciationType(this.categoryName);
         if (depreciaitionType !== "Straight Line"){
             if(this.residualValue){
                 throw new MyError("Invalid Residual Value for Depreciation Type");
@@ -211,10 +211,10 @@ class Asset{
         }
         else if ('categoryName' in updateAssetDict){
             try{
-                if (!await Category.doesCategoryExist(updateAssetDict.categoryName)){
+                if (!await Category._doesCategoryExist(updateAssetDict.categoryName)){
                     throw new MyError("Invalid category");
                 }else{
-                    let categoryID = await Category.getCategoryID(updateAssetDict.categoryName);
+                    let categoryID = await Category._getCategoryID(updateAssetDict.categoryName);
                     await Asset._updateAssetCategoryID(assetTag, categoryID);
                 }
             }catch(err){

@@ -10,7 +10,7 @@ const Category = require("../src/Allocation/category2");
 const MyError = require("../utility/myError");
 const Folder = require("../src/Allocation/folder");
 
-describe.skip("verifyFolder Test", function () {
+describe("verifyFolder Test", function () {
     it("should deny a folder id that is not a number", async function() {
         // Test inputs
         let id = "hello";
@@ -52,7 +52,7 @@ describe.skip("verifyFolder Test", function () {
     });
 });
 
-describe.skip("updateCategoryFolder Test", function () {
+describe("updateCategoryFolder Test", function () {
     it("should add a folder if new folder ID exists", async function () {
         // Test input
         let id = 2;
@@ -65,20 +65,20 @@ describe.skip("updateCategoryFolder Test", function () {
                         .withArgs(id)
                         .returns(true);
 
-        // Stub getCategoryID
-        let getCategoryID = sinon.stub(Category, "getCategoryID")
+        // Stub _getCategoryID
+        let _getCategoryID = sinon.stub(Category, "_getCategoryID")
                         .withArgs(categotyName)
                         .returns(category_id);
 
-        // Stub updateFolderinDB
-        let updateFolderinDB = sinon.stub(Category, "updateFolderinDB");
+        // Stub _updateFolderinDB
+        let _updateFolderinDB = sinon.stub(Category, "_updateFolderinDB");
 
         // Call function
         try{
-            await Category.updateCategoryFolder(id, categotyName);
+            await Category._updateCategoryFolder(id, categotyName);
             
-            // Assert that updateFolderinDB was called with the right arguements
-            sinon.assert.calledWith(updateFolderinDB, category_id, id);
+            // Assert that _updateFolderinDB was called with the right arguements
+            sinon.assert.calledWith(_updateFolderinDB, category_id, id);
 
         }catch(err){
             console.log(err);
@@ -90,27 +90,27 @@ describe.skip("updateCategoryFolder Test", function () {
         let id = 1000;
         let categoryName = "Existing";
 
-        // Stub getCategoryID
-        let getCategoryID = sinon.stub(Category, "getCategoryID");
+        // Stub _getCategoryID
+        let _getCategoryID = sinon.stub(Category, "_getCategoryID");
 
         // Stub does folder exist
         let stub2 = sinon.stub(Folder, "doesFolderExist")
                          .withArgs(id)
                          .returns(false);
 
-        // Stub updateFolderinDB
-        let updateFolderinDB = sinon.stub(Category, "updateFolderinDB");
+        // Stub _updateFolderinDB
+        let _updateFolderinDB = sinon.stub(Category, "_updateFolderinDB");
 
         // Run function
         try{
-            await Category.updateCategoryFolder(id, categoryName);
+            await Category._updateCategoryFolder(id, categoryName);
             assert.equal(true, false, "An Error Should Have Been Thrown");
         }catch(err){
             if (err instanceof MyError && err.message === "Folder does not exist"){
-                // Assert that getCategoryID is not called
-                sinon.assert.notCalled(getCategoryID);
-                // Assert that updateFolderinDB is not called
-                sinon.assert.notCalled(updateFolderinDB);
+                // Assert that _getCategoryID is not called
+                sinon.assert.notCalled(_getCategoryID);
+                // Assert that _updateFolderinDB is not called
+                sinon.assert.notCalled(_updateFolderinDB);
             }else{
                 assert.equal(true, false, "Wrong Error Thrown");
             }
@@ -124,24 +124,24 @@ describe.skip("updateCategoryFolder Test", function () {
         // Stub doesFolderExist
         let doesFolderExist = sinon.stub(Folder, "doesFolderExist");
 
-        // Stub getCategoryID
-        let getCategoryID = sinon.stub(Category, "getCategoryID");
+        // Stub _getCategoryID
+        let _getCategoryID = sinon.stub(Category, "_getCategoryID");
 
-        // Stub updateFolderinDB
-        let updateFolderinDB = sinon.stub(Category, "updateFolderinDB");
+        // Stub _updateFolderinDB
+        let _updateFolderinDB = sinon.stub(Category, "_updateFolderinDB");
 
         // Run function
         try{
-            await Category.updateCategoryFolder(id, categoryName);
+            await Category._updateCategoryFolder(id, categoryName);
             assert.equal(true, false, "An Error Should have been thrown");
         }catch(err){
             if (err instanceof MyError && err.message === "Invalid Folder"){
                 // Assert that doesFolderExist is not called
                 sinon.assert.notCalled(doesFolderExist);
-                // Assert that getCategoryID is not called
-                sinon.assert.notCalled(getCategoryID);
-                // Assert that updateFolderinDB is not called
-                sinon.assert.notCalled(updateFolderinDB);
+                // Assert that _getCategoryID is not called
+                sinon.assert.notCalled(_getCategoryID);
+                // Assert that _updateFolderinDB is not called
+                sinon.assert.notCalled(_updateFolderinDB);
             }else{
                 console.log(err);
                 assert.equal(true, false, "Wrong Error Thrown");

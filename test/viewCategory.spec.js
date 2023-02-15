@@ -9,14 +9,14 @@ const sinon = require('sinon');
 const Category = require("../src/Allocation/category2");
 const MyError = require("../utility/myError");
 
-describe.skip("Category.view test", function () {
+describe("Category.view test", function () {
     it("should return an error when a category that doesn't exist is given", async function () {
         // Test Values
         let categoryName = 'test';
 
         let viewDetailsSpy = sinon.spy(Category, "viewDetails");
 
-        let doesCategoryExistStub = sinon.stub(Category, "doesCategoryExist")
+        let _doesCategoryExistStub = sinon.stub(Category, "_doesCategoryExist")
                                     .withArgs(categoryName)
                                     .returns(false);
 
@@ -34,25 +34,25 @@ describe.skip("Category.view test", function () {
         let depreciationValue = 200;
         let categoryID = 1;
 
-        let getDepreciationTypeStub = sinon.stub(Category, "getCategoryDepreciationType")
-                                     .withArgs(categoryName)
+        let getDepreciationTypeStub = sinon.stub(Category, "_getCategoryDepreciationType")
+                                     .withArgs(categoryID)
                                      .returns(depreciaitionType);
-        let getDepreciationValueStub = sinon.stub(Category, "getCategoryDepreciationValue")
-                                       .withArgs(categoryID, depreciaitionType)
+        let getDepreciationValueStub = sinon.stub(Category, "_getCategoryDepreciationPercent")
+                                       .withArgs(categoryID)
                                        .returns(depreciationValue);
-        let getCategoryIDStub = sinon.stub(Category, "getCategoryID")
+        let _getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
                                 .withArgs(categoryName)
                                 .returns(categoryID);
         
         try {
             let result = await Category.viewDetails(categoryName);
-            assert(getDepreciationTypeStub.calledWith(categoryName));
-            assert(getDepreciationValueStub.calledWith(categoryID, depreciaitionType));
+            assert(getDepreciationTypeStub.calledWith(categoryID), "getDepreciationTypeStub");
+            assert(getDepreciationValueStub.calledWith(categoryID), "getDepreciationValueStub");
             assert.deepEqual(result, {
                 categoryName: categoryName,
                 depreciationType: depreciaitionType,
                 depreciationValue: depreciationValue
-            });
+            }, "Not Equal");
         }catch(err){
             console.log(err);
             assert.equal(true, false, "Error should not have been thrown");
@@ -65,21 +65,21 @@ describe.skip("Category.view test", function () {
         let depreciationValue = null;
         let categoryID = 1;
 
-        let getDepreciationTypeStub = sinon.stub(Category, "getCategoryDepreciationType")
-                                     .withArgs(categoryName)
+        let getDepreciationTypeStub = sinon.stub(Category, "_getCategoryDepreciationType")
+                                     .withArgs(categoryID)
                                      .returns(depreciaitionType);
-        let getDepreciationValueStub = sinon.stub(Category, "getCategoryDepreciationValue")
-                                       .withArgs(categoryID, depreciaitionType)
+        let getDepreciationValueStub = sinon.stub(Category, "_getCategoryDepreciationPercent")
+                                       .withArgs(categoryID)
                                        .returns(depreciationValue);
-        let getCategoryIDStub = sinon.stub(Category, "getCategoryID")
+        let _getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
                                 .withArgs(categoryName)
                                 .returns(categoryID);
         
         try {
             let result = await Category.viewDetails(categoryName);
-            assert(getDepreciationTypeStub.calledWith(categoryName));
-            assert(getDepreciationValueStub.calledWith(categoryID, depreciaitionType));
-            assert.equal(result.depreciationValue, null);
+            assert(getDepreciationTypeStub.calledWith(categoryID), "getDepreciationTypeStub");
+            assert(getDepreciationValueStub.calledWith(categoryID), "getDepreciationValueStub");
+            assert.equal(result.depreciationValue, null, "Depreciation Value");
         }catch(err){
             console.log(err);
             assert.equal(true, false, "Error should not have been thrown");

@@ -10,7 +10,7 @@ const Category = require("../src/Allocation/category2");
 const MyError = require("../utility/myError");
 const Folder = require("../src/Allocation/folder");
 
-describe.skip("updateCategory Test", function () {
+describe("updateCategory Test", function () {
     it("should update depreciation type is double declining, value is 0 and the other details are valid", async function () {
         // Test inputs
         let updateJSON = {
@@ -29,22 +29,16 @@ describe.skip("updateCategory Test", function () {
 
         // Stubs for updateDepreciation
         // Stub updateDepreciationTypeInDB
-        let updateDepreciationTypeInDB = sinon.stub(Category, "updateDepreciationTypeInDB");
-
-        // Stub deleteDepreciationPerYearInDb
-        let deleteDepreciationPerYearInDb = sinon.stub(Category, "deleteDepreciationPerYearInDb");
+        let updateDepreciationTypeInDB = sinon.stub(Category, "_updateDepreciationTypeInDB");
 
         // Mock deleteDepreciationPercentInDb
-        let deleteDepreciationPercentInDb = sinon.stub(Category, "deleteDepreciationPercentInDb");
+        let deleteDepreciationPercentInDb = sinon.stub(Category, "_deleteDepreciationPercentInDb");
 
         // Mock insertDepreciationPercentInDb
-        let insertDepreciationPercentInDb = sinon.stub(Category, "insertDepreciationPercentInDb");
-
-        // Mock insertDepreciationValueInDB
-        let insertDepreciationValueInDB = sinon.stub(Category, "insertDepreciationValueInDB");
+        let insertDepreciationPercentInDb = sinon.stub(Category, "_insertDepreciationPercentInDb");
 
         // Stub getCategoryID
-        let getCategoryID = sinon.stub(Category, "getCategoryID")
+        let getCategoryID = sinon.stub(Category, "_getCategoryID")
                         .withArgs(categoryName)
                         .returns(category_id)
                         .withArgs(updateJSON.name)
@@ -56,10 +50,10 @@ describe.skip("updateCategory Test", function () {
                          .returns(true);
 
         // Mocks for updateCategoryName
-        let updateNameinDb = sinon.stub(Category, "updateNameinDb");
+        let updateNameinDb = sinon.stub(Category, "_updateNameinDb");
 
         // Mocks for updateCategoryFolder
-        let updateFolderinDB = sinon.stub(Category, "updateFolderinDB");
+        let updateFolderinDB = sinon.stub(Category, "_updateFolderinDB");
 
         // Run function
         try{
@@ -71,18 +65,14 @@ describe.skip("updateCategory Test", function () {
             sinon.assert.calledWith(updateFolderinDB, category_id, updateJSON.parentFolder);
             // Assert that updateDepreciationTypeInDB is called with the right arguements
             sinon.assert.calledWith(updateDepreciationTypeInDB, category_id, updateJSON.depreciation.type);
-            // Assert that deleteDepreciationPerYearInDb is called with the right arguements
-            sinon.assert.calledWith(deleteDepreciationPerYearInDb, category_id);
             // Assert that deleteDepreciationPercentInDb is called with the right arguements
             sinon.assert.calledWith(deleteDepreciationPercentInDb, category_id);
-            // Assert that insertDepreciationValueInDB is not called
-            sinon.assert.notCalled(insertDepreciationValueInDB);
             // Assert that insertDepreciationPercentInDb is not called
             sinon.assert.notCalled(insertDepreciationPercentInDb);
 
         }catch(err){
             console.log(err);
-            assert.equal(true, false, "No Error Should have been thrown");
+            assert(false, "No Error Should have been thrown");
         }
     });
     it("should pass when depreciation type is written down, value is 200 and the rest is fine", async function () {
@@ -98,12 +88,10 @@ describe.skip("updateCategory Test", function () {
         let categoryName = "Existing";
         let category_id = 1;
         
-        let updateDepreciationTypeInDBStub = sinon.stub(Category, "updateDepreciationTypeInDB");
-        let deleteDepreciationPerYearInDbStub = sinon.stub(Category, "deleteDepreciationPerYearInDb");
-        let deleteDepreciationPercentInDbStub = sinon.stub(Category, "deleteDepreciationPercentInDb");
-        let insertDepreciationPercentInDbStub = sinon.stub(Category, "insertDepreciationPercentInDb");
-        let insertDepreciationValueInDBStub = sinon.stub(Category, "insertDepreciationValueInDB");
-        let getCategoryIDStub = sinon.stub(Category, "getCategoryID")
+        let updateDepreciationTypeInDBStub = sinon.stub(Category, "_updateDepreciationTypeInDB");
+        let deleteDepreciationPercentInDbStub = sinon.stub(Category, "_deleteDepreciationPercentInDb");
+        let insertDepreciationPercentInDbStub = sinon.stub(Category, "_insertDepreciationPercentInDb");
+        let getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
                         .withArgs(categoryName)
                         .returns(category_id)
                         .withArgs(updateJSON.name)
@@ -112,28 +100,24 @@ describe.skip("updateCategory Test", function () {
                          .withArgs(updateJSON.parentFolder)
                          .returns(true);
 
-        let updateCategoryNameStub = sinon.stub(Category, "updateCategoryName");
-        let updateCategoryFolderStub = sinon.stub(Category, "updateCategoryFolder");
+        let updateCategoryNameStub = sinon.stub(Category, "_updateCategoryName");
+        let updateCategoryFolderStub = sinon.stub(Category, "_updateCategoryFolder");
 
         // Run function
         try{
             await Category.updateCategory(updateJSON, categoryName);
-            assert(updateDepreciationTypeInDBStub.calledOnce);
-            assert(updateDepreciationTypeInDBStub.calledWith(category_id, updateJSON.depreciation.type));
-            assert(deleteDepreciationPerYearInDbStub.calledOnce);
-            assert(deleteDepreciationPerYearInDbStub.calledWith(category_id));
-            assert(deleteDepreciationPercentInDbStub.calledOnce);
-            assert(deleteDepreciationPercentInDbStub.calledWith(category_id));
-            assert(insertDepreciationPercentInDbStub.notCalled);
-            assert(insertDepreciationValueInDBStub.calledOnce);
-            assert(insertDepreciationValueInDBStub.calledWith(category_id, updateJSON.depreciation.value));
-            assert(updateCategoryFolderStub.calledOnce);
-            assert(updateCategoryFolderStub.calledWith(category_id, updateJSON.parentFolder));
-            assert(updateCategoryNameStub.calledOnce);
-            assert(updateCategoryNameStub.calledWith(category_id, updateJSON.name));
+            assert(updateDepreciationTypeInDBStub.calledOnce, 'updateDepreciationTypeInDBStub 1');
+            assert(updateDepreciationTypeInDBStub.calledWith(category_id, updateJSON.depreciation.type), 'updateDepreciationTypeInDBStub 2');
+            assert(deleteDepreciationPercentInDbStub.calledOnce, 'deleteDepreciationPercentInDbStub 1');
+            assert(deleteDepreciationPercentInDbStub.calledWith(category_id), 'deleteDepreciationPercentInDbStub 2');
+            assert(insertDepreciationPercentInDbStub.calledOnce, 'insertDepreciationPercentInDbStub 1');
+            assert(updateCategoryFolderStub.calledOnce, 'updateCategoryFolderStub 1');
+            assert(updateCategoryFolderStub.calledWith(updateJSON.parentFolder, categoryName), "updateCategoryFolderStub 2");
+            assert(updateCategoryNameStub.calledOnce, 'updateCategoryNameStub 1');
+            assert(updateCategoryNameStub.calledWith(updateJSON.name, categoryName), "updateCategoryNameStub 2");
         }catch(err){
             console.log(err);
-            assert.equal(true, false, "No Error Should have been thrown");
+            assert(false, "No Error Should have been thrown");
         }
     });
 })

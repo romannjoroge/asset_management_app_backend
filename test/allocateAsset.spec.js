@@ -9,7 +9,7 @@ const User = require('../src/Users/users');
 const MyError = require('../utility/myError');
 const utility = require('../utility/utility');
 
-describe.skip("Allocate Asset To User Test", function(){
+describe("Allocate Asset To User Test", function(){
     let assetTag;
     let username;
 
@@ -64,5 +64,5 @@ describe.skip("Allocate Asset To User Test", function(){
             assert(false, "Could Not Delete Temporary Tables");
         }
     })
-})
+});
 
