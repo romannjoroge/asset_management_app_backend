@@ -192,7 +192,6 @@ CREATE TABLE DepreciationSchedule (
   openingBookValue real NOT NULL,
   depreciationExpense real NOT NULL,
   accumulatedDepreciation real NOT NULL,
-  closingBookValue real NOT NULL,
   assetTag varchar(50),
   CONSTRAINT "FK_DepreciationSchedule.assetTag"
     FOREIGN KEY (assetTag)
