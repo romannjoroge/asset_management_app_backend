@@ -80,7 +80,7 @@ class Asset{
         await Location.verifyLocationID(this.locationID, "Invalid location");
         await User.checkIfUserExists(this.custodianName, "Invalid custodian");
 
-        if(!await Asset._doesAssetTagExist(this.assetTag)){
+        if(await Asset._doesAssetTagExist(this.assetTag)){
             throw new MyError("Asset Tag Has Already Been Assigned");
         }
 
@@ -90,6 +90,8 @@ class Asset{
                 throw new MyError("Invalid Residual Value for Depreciation Type");
             }
         }
+
+        await this._storeAssetInAssetRegister();
     }
 
     static async _doesAssetTagExist(assetTag){
@@ -103,7 +105,7 @@ class Asset{
         return utility.isFetchResultEmpty(fetchResult);
     }
 
-    async storeAssetInAssetRegister(){
+    async _storeAssetInAssetRegister(){
         try{
             await pool.query(assetTable.addAssetToAssetRegister, [this.assetTag, this.makeAndModelNo, this.fixed, this.serialNumber,
                             this.acquisitionDate, this.locationID, this.status, this.custodianName, this.acquisitionCost, this.insuranceValue, this.categoryID,
@@ -168,7 +170,7 @@ class Asset{
 
     static async updateAsset(updateAssetDict, assetTag){
         // Throw an error if no asset with asset tag exists
-        if (! await Asset._doesAssetTagExist(assetTag)){
+        if (await Asset._doesAssetTagExist(assetTag)){
             throw new MyError("Asset Does Not Exist");
         }
 
@@ -293,7 +295,7 @@ class Asset{
     }
 
     static async createDepreciationSchedule(depreciationType, assetTag, assetLifeSpan, acquisitionCost, acquisitionDate, residualValue, depreciationPercentage){
-        if (! await Asset._doesAssetTagExist(assetTag)){
+        if (await Asset._doesAssetTagExist(assetTag)){
             throw new MyError("Asset Does Not Exist");
         }
 
@@ -337,7 +339,7 @@ class Asset{
     }
 
     static async allocateAsset(assetTag, username){
-        if (! await Asset._doesAssetTagExist(assetTag)){
+        if (await Asset._doesAssetTagExist(assetTag)){
             throw new MyError("Asset Does Not Exist");
         }
 
