@@ -55,8 +55,20 @@ function checkIfValidDate(x, errorMessage){
 }
 
 function verifyDatabaseFetchResults(fetchResult, errorMessage){
+    if (!'rowCount' in fetchResult){
+        throw new MyError("rowCount is not in fetchResult");
+    }else{
+        if(fetchResult.rowCount === 0){
+            throw new MyError(errorMessage);
+        }
+    }
+}
+
+function isFetchResultEmpty(fetchResult){
     if(fetchResult.rowCount === 0){
-        throw new MyError(errorMessage);
+        return false;
+    }else{
+        return true;
     }
 }
 
@@ -134,5 +146,6 @@ module.exports = {
     checkIfNumberisGreaterThanZero,
     assertThatAsynchronousFunctionFails,
     assertThatAsyncFunctionReturnsRightThing,
-    assertThatAsyncFunctionReturnsNull
+    assertThatAsyncFunctionReturnsNull,
+    isFetchResultEmpty
 }
