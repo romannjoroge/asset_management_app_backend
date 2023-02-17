@@ -81,9 +81,9 @@ CREATE TABLE Asset (
   locationID int,
   status varchar(10),
   custodianName varchar(50),
-  acquisitionCost money,
-  insuranceValue money,
-  residualValue money,
+  acquisitionCost real,
+  insuranceValue real,
+  residualValue real,
   categoryID int,
   assetLifeSpan smallint,
   PRIMARY KEY (assetTag),
@@ -189,10 +189,10 @@ CREATE TABLE "RFID Reader" (
 
 CREATE TABLE DepreciationSchedule (
   year int NOT NULL,
-  openingBookValue money NOT NULL,
-  depreciationExpense money NOT NULL,
-  accumulatedDepreciation money NOT NULL,
-  closingBookValue money NOT NULL,
+  openingBookValue real NOT NULL,
+  depreciationExpense real NOT NULL,
+  accumulatedDepreciation real NOT NULL,
+  closingBookValue real NOT NULL,
   assetTag varchar(50),
   CONSTRAINT "FK_DepreciationSchedule.assetTag"
     FOREIGN KEY (assetTag)
