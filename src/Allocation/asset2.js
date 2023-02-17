@@ -79,7 +79,10 @@ class Asset{
 
         await Location.verifyLocationID(this.locationID, "Invalid location");
         await User.checkIfUserExists(this.custodianName, "Invalid custodian");
-        await Asset.doesAssetTagExist(this.assetTag, "Asset Tag Has Already Been Assigned");
+
+        if(!await Asset._doesAssetTagExist(this.assetTag)){
+            throw new MyError("Asset Tag Has Already Been Assigned");
+        }
 
         let depreciaitionType = Category._getCategoryDepreciationType(this.categoryName);
         if (depreciaitionType !== "Straight Line"){
@@ -89,13 +92,15 @@ class Asset{
         }
     }
 
-    static async doesAssetTagExist(assetTag, errorMessage){
+    static async _doesAssetTagExist(assetTag){
+        let fetchResult;
         try{
-            let fetchResult = await pool.query(assetTable.doesAssetTagExist, [assetTag]);
-            utility.verifyDatabaseFetchResults(fetchResult, errorMessage);
+            fetchResult = await pool.query(assetTable.doesAssetTagExist, [assetTag]);
         }catch(err){
-            throw new MyError(errorMessage);
+            throw new MyError("Could Not Verify Asset Tag");
         }
+
+        return utility.isFetchResultEmpty(fetchResult);
     }
 
     async storeAssetInAssetRegister(){
@@ -163,7 +168,9 @@ class Asset{
 
     static async updateAsset(updateAssetDict, assetTag){
         // Throw an error if no asset with asset tag exists
-        await Asset.doesAssetTagExist(assetTag, "Asset Does Not Exist");
+        if (! await Asset._doesAssetTagExist(assetTag)){
+            throw new MyError("Asset Does Not Exist");
+        }
 
         if ('fixed' in updateAssetDict){
             utility.checkIfBoolean(updateAssetDict.fixed, "Invalid Fixed Status");
@@ -286,7 +293,10 @@ class Asset{
     }
 
     static async createDepreciationSchedule(depreciationType, assetTag, assetLifeSpan, acquisitionCost, acquisitionDate, residualValue, depreciationPercentage){
-        Asset.doesAssetTagExist(assetTag, "Asset Does Not Exist");
+        if (! await Asset._doesAssetTagExist(assetTag)){
+            throw new MyError("Asset Does Not Exist");
+        }
+
         let year;
         let openBookValue;
         let depreciationExpense;
@@ -327,7 +337,10 @@ class Asset{
     }
 
     static async allocateAsset(assetTag, username){
-        await Asset.doesAssetTagExist(assetTag, "Asset Does Not Exist");
+        if (! await Asset._doesAssetTagExist(assetTag)){
+            throw new MyError("Asset Does Not Exist");
+        }
+
         await User.checkIfUserExists(username, "User Does Not Exist");
         utility.addErrorHandlingToAsyncFunction(Asset._updateAssetCustodian, "Could Not Assign Asset To User", 
                                                 assetTag, username);
