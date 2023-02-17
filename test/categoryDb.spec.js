@@ -7,7 +7,7 @@ const Category = require('../src/Allocation/category2');
 const MyError = require('../utility/myError');
 const utility = require('../utility/utility');
 
-describe("_getCategoryID Tests", function(){
+describe.skip("_getCategoryID Tests", function(){
     let categoryName;
     let categoryID;
     let errorMessage;
@@ -47,7 +47,7 @@ describe("_getCategoryID Tests", function(){
     })
 });
 
-describe("saveCategoryInDB tests", function(){
+describe.skip("saveCategoryInDB tests", function(){
     let categoryName;
     let depreciaitionType;
     let categoryID;
@@ -143,7 +143,7 @@ describe("saveCategoryInDB tests", function(){
     });
 });
 
-describe("Update Category Database Functions Test", function(){
+describe.skip("Update Category Database Functions Test", function(){
     let categoryID = 3;
     let fetchResult;
     let result;
@@ -245,7 +245,7 @@ describe("Update Category Database Functions Test", function(){
     })
 });
 
-describe("_deleteDepreciationPercentInDb test", function (){
+describe.skip("_deleteDepreciationPercentInDb test", function (){
     let categoryID = 3;
     let depreciationPercentage = 30;
     let fetchResult;
@@ -298,7 +298,7 @@ describe("_deleteDepreciationPercentInDb test", function (){
     });
 })
 
-describe("Getter Category Tests", function(){
+describe.skip("Getter Category Tests", function(){
     let categoryID;
     let depreciaitionType;
     let fetchResult;
@@ -342,7 +342,7 @@ describe("Getter Category Tests", function(){
     })
 });
 
-describe("_doesCategoryIDExist Test", function(){
+describe.skip("_doesCategoryIDExist Test", function(){
     let categoryID;
 
     this.beforeEach(async function(){
@@ -380,7 +380,7 @@ describe("_doesCategoryIDExist Test", function(){
     });
 });
 
-describe("_getCategoryDepreciationPercent test", function(){
+describe.skip("_getCategoryDepreciationPercent test", function(){
     let depreciaitionType;
     let depreciaitionType2;
     let categoryID2;

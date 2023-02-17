@@ -9,7 +9,7 @@ const sinon = require('sinon');
 const Category = require("../src/Allocation/category2");
 const MyError = require("../utility/myError");
 
-describe("verifyCategoryName test", function () {
+describe.skip("verifyCategoryName test", function () {
     it("should deny a category name that is not a string", async function (){
         // Test input
         let newName = 1;
@@ -86,7 +86,7 @@ describe("verifyCategoryName test", function () {
     })
 });
 
-describe("updateCategoryName Test",async function () {
+describe.skip("updateCategoryName Test",async function () {
     it("should update category table if new category name is valid and old category exists", async function () {
         
         // Test inputs

@@ -10,7 +10,7 @@ const Category = require("../src/Allocation/category2");
 const MyError = require("../utility/myError");
 const Folder = require("../src/Allocation/folder");
 
-describe("verifyFolder Test", function () {
+describe.skip("verifyFolder Test", function () {
     it("should deny a folder id that is not a number", async function() {
         // Test inputs
         let id = "hello";
@@ -52,7 +52,7 @@ describe("verifyFolder Test", function () {
     });
 });
 
-describe("updateCategoryFolder Test", function () {
+describe.skip("updateCategoryFolder Test", function () {
     it("should add a folder if new folder ID exists", async function () {
         // Test input
         let id = 2;

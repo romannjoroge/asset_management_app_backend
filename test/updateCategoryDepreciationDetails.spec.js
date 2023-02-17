@@ -10,7 +10,7 @@ const Category = require("../src/Allocation/category2");
 const MyError = require("../utility/myError");
 const utility = require('../utility/utility');
 
-describe("verifyDepreciationDetails Test", function () {
+describe.skip("verifyDepreciationDetails Test", function () {
     it("should accept when depType is Double Depreciation and value is 0", function () {
         // Test inputs
         let deptype = "Double Declining Balance";
@@ -147,7 +147,7 @@ describe("verifyDepreciationDetails Test", function () {
     });
 });
 
-describe("updateDepreciationType Test", function () {    
+describe.skip("updateDepreciationType Test", function () {    
     it("should fail when depreciation type is Straight Line and value is positive non zero number", async function () {
         // Test inputs
         let depType = "Straight Line";

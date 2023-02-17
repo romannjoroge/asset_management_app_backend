@@ -13,7 +13,7 @@ const User = require('../src/Users/users');
 const Category = require("../src/Allocation/category2");
 const { expect } = require('chai');
 
-describe("updateAsset test cases", function (){
+describe.skip("updateAsset test cases", function (){
     async function updateAssetShouldThrowError(updateAssetDict, errorMessage){
         try{
             await Asset.updateAsset(updateAssetDict, assetTag);

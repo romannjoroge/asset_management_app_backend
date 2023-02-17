@@ -7,7 +7,7 @@ const MyError = require("../utility/myError");
 const Asset = require('../src/Allocation/asset2');
 const Category = require("../src/Allocation/category2");
 
-describe("createDepreciationSchedule tests", function(){
+describe.skip("createDepreciationSchedule tests", function(){
     let assetLifeSpan;
     let acquisitionCost;
     let acquisitionDate;

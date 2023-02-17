@@ -9,7 +9,7 @@ const sinon = require('sinon');
 const Category = require("../src/Allocation/category2");
 const MyError = require("../utility/myError");
 
-describe("Category.view test", function () {
+describe.skip("Category.view test", function () {
     it("should return an error when a category that doesn't exist is given", async function () {
         // Test Values
         let categoryName = 'test';

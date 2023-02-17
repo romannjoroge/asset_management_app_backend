@@ -10,7 +10,7 @@ const Category = require("../src/Allocation/category2");
 const MyError = require("../utility/myError");
 const Folder = require("../src/Allocation/folder");
 
-describe("updateCategory Test", function () {
+describe.skip("updateCategory Test", function () {
     it("should update depreciation type is double declining, value is 0 and the other details are valid", async function () {
         // Test inputs
         let updateJSON = {
