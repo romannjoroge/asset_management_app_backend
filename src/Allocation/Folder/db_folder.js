@@ -1,8 +1,8 @@
 const getFolderName = "SELECT name FROM Folder WHERE id = $1";
 
-folderTable = {
+let folderTable = {
     getFolderName: getFolderName
 };
 
-module.exports = folderTable;
+export default folderTable;
 

@@ -1,13 +1,13 @@
 // Importing the database bool from db2.js. This will allow me to connect to the database
-const pool = require('../../db2');
+import pool from '../../../db2.js';
 
 // Importing SQL commands involving categories
-const categoryTable = require('./db_category2');
+import categoryTable from './db_category2.js';
 
 // Importing custom MyError class
-const MyError = require('../../utility/myError');
-const Folder = require('./folder');
-const utility = require('../../utility/utility');
+import MyError from '../../../utility/myError.js';
+import Folder from '../Folder/folder.js';
+import utility from '../../../utility/utility.js';
 
 class Category {
     // Constructor
@@ -329,4 +329,4 @@ class Category {
     }
 }
 
-module.exports = Category;
+export default Category;

@@ -18,7 +18,7 @@ const updateAssetResidualValue = "UPDATE Asset SET residualValue = $1 WHERE asse
 const getCloseBookValue = "SELECT closingBookValue FROM DepreciationSchedule WHERE assetTag = $1 AND year = $2";
 const getAccumulatedDepreciation = "SELECT SUM(depreciationExpense) AS accumulatedDepreciation FROM DepreciationSchedule GROUP BY assetTag WHERE assetTag = $1";
 
-module.exports = {
+const assetTable = {
     doesAssetTagExist,
     addAssetToAssetRegister,
     addAssetFileAttachment,
@@ -38,3 +38,5 @@ module.exports = {
     getCloseBookValue,
     getAccumulatedDepreciation
 }
+
+export default assetTable;

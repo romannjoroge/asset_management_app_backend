@@ -1,5 +1,5 @@
-const { assert } = require("chai");
-const MyError = require("./myError")
+import { assert } from "chai";
+import MyError from "./myError.js";
 
 function isAnyEmpty(arr){
     /*
@@ -123,7 +123,7 @@ async function assertThatAsyncFunctionReturnsNull(func, ...params){
 
 // }
 
-module.exports = {
+const utility = {
     isAnyEmpty,
     checkIfBoolean,
     checkIfNumberisPositive,
@@ -136,3 +136,5 @@ module.exports = {
     assertThatAsyncFunctionReturnsRightThing,
     assertThatAsyncFunctionReturnsNull
 }
+
+export default utility;

@@ -26,4 +26,4 @@ let categoryTable = {
     doesCategoryIDExist
 }
 
-module.exports = categoryTable;
+export default categoryTable;

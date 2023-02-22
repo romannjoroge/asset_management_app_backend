@@ -1,5 +1,7 @@
 let getLocation = "SELECT name FROM Location WHERE id = $1";
 
-module.exports = {
+let locationTable = {
     getLocation: getLocation
 }
+
+export default locationTable;
