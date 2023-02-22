@@ -13,7 +13,11 @@ CREATE TABLE User2 (
 
 CREATE TABLE Company (
   name varchar(50),
-  PRIMARY KEY (name)
+  topFolderID int,
+  PRIMARY KEY (name),
+  CONSTRAINT 'FK_Company.topFolderID'
+    FOREIGN KEY (topFolderID)
+      REFERENCES Folder(ID)
 );
 
 CREATE TABLE Folder (
