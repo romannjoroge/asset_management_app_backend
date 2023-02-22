@@ -12,7 +12,6 @@ let pool;
 
 async function testDatabaseConnection(pool){
     try{
-        console.log(pool);
         const fetchResult = await pool.query('SELECT NOW()')
         console.log(fetchResult);
     }catch(err){
@@ -22,14 +21,14 @@ async function testDatabaseConnection(pool){
 
 // Changing database connection based on node environment
 const env = process.env.NODE_ENV || "development";
-if (env === "test"){
+if (env.match('test')){
     pool = new Pool({
         user: process.env.TESTDATABASEUSER,
         database: process.env.TESTDATABASE,
         port: process.env.PORT,
         password: process.env.PASSWORD
     })
-} else if (env === 'windows'){
+} else if (env.match('windows')){
     pool = new Pool({
         user: 'postgres',
         database: 'postgres',
@@ -45,5 +44,4 @@ if (env === "test"){
     })
 }
 
-await testDatabaseConnection(pool);
 export default pool;
