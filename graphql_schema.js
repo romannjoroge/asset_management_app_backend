@@ -4,8 +4,8 @@ const typeDefs = `#graphql
         lname: Sting!
         email: String!
         password: String!
-        username: User!
-        companyName: ID!
+        username: String!
+        company: Company!
         role: String!
         assets: [Asset!]
     }
@@ -13,14 +13,14 @@ const typeDefs = `#graphql
     type Company {
         name: ID!
         users: [User!]!
-        topFolderID: Int!
+        topFolder: Folder!
         locations: [Location!]!
     }
 
     type Folder {
         id: Int!
         name: String!
-        companyName: ID!
+        company: Company!
         childFolders: [Folder!]!
         locations: [Location!]!
         categories: [Category!]!
@@ -29,8 +29,8 @@ const typeDefs = `#graphql
     type Location {
         id: Int!
         name: String!
-        parentFolderID: Int!
-        companyName: ID!
+        parentFolder: Folder!
+        company: Company!
         assets: [Asset!]!
         rfid_readers: [RFID_Reader!]!
     }
@@ -38,7 +38,7 @@ const typeDefs = `#graphql
     type Category {
         id: Int!
         name: String!
-        parentFolderID: Int!
+        parentFolder: Folder!
         depreciaitionType: String!
         assets: [Asset!]!
         depreciationPercentage: Float
@@ -46,9 +46,9 @@ const typeDefs = `#graphql
 
     type GatePass {
         id: Int!
-        expectedTime: Date!
+        expectedTime: String!
         entry: Boolean!
-        username: String!
+        user: User!
         reason: String!
         assets: [Asset!]!
     }
@@ -58,14 +58,14 @@ const typeDefs = `#graphql
         makeAndModelNo: String!
         isFixed: Boolean!
         serialNumber: String!
-        acquisitionDate: Date!
-        locationID: Int!
+        acquisitionDate: String!
+        location: Location!
         status: String!
-        custodianName: String!
+        custodian: User!
         acquisitionCost: Float!
         insuranceValue: Float!
         residualValue: Float!
-        categoryID: Int!
+        category: Category!
         assetLifeSpan: Int!
         attachments: [String!]!
         DepreciationSchedule: DepreciationSchedule!
@@ -74,13 +74,13 @@ const typeDefs = `#graphql
     type Stock Take {
         id: ID!
         location: Location!
-        date: Date!
+        String: String!
         assets: [Asset!]!
     }
 
     type Log {
         id: ID!
-        timestamp: Date!
+        timestamp: String!
         ipAddress: String!
         username: String!
         eventType: String!
@@ -89,16 +89,16 @@ const typeDefs = `#graphql
 
     type RFID_Reader {
         id: ID!
-        locationID: Int!
+        location: Location!
     }
 
     type DepreciationSchedule {
-        year: Int
+        year: Int!
         openingBookValue: Float!
         depreciationExpense: Float!
         accumulatedDepreciation: Float!
         closingBookValue: Float!
-        assetTag: String!
+        asset: Asset!
     }
 `
 
