@@ -1,16 +1,15 @@
-const fs = require('fs');
+import fs from 'fs';
 
 // Importing the database bool from db2.js. This will allow me to connect to the database
-const pool = require('../../db2');
+const pool = require('../../../db2.js');
 
 // Importing custom classes
-const MyError = require('../../utility/myError');
-const Folder = require('./folder');
-const utility = require('../../utility/utility');
-const Location = require('../Tracking/location');
-const User = require('../Users/users');
-const Category = require('../Allocation/category2');
-const assetTable = require('../Allocation/db_assets');
+import MyError from '../../../utility/myError.js';
+import utility from '../../../utility/utility.js';
+import Location from '../../Tracking/location.js';
+import User from '../../Users/users.js';
+import Category from '../Category/category2.js';
+import assetTable from './db_assets.js';
 
 
 class Asset{
@@ -361,4 +360,4 @@ class Asset{
     }
 }
 
-module.exports = Asset;
+export default Asset;

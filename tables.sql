@@ -13,7 +13,11 @@ CREATE TABLE User2 (
 
 CREATE TABLE Company (
   name varchar(50),
-  PRIMARY KEY (name)
+  topFolderID int,
+  PRIMARY KEY (name),
+  CONSTRAINT 'FK_Company.topFolderID'
+    FOREIGN KEY (topFolderID)
+      REFERENCES Folder(ID)
 );
 
 CREATE TABLE Folder (
@@ -81,9 +85,9 @@ CREATE TABLE Asset (
   locationID int,
   status varchar(10),
   custodianName varchar(50),
-  acquisitionCost real,
-  insuranceValue real,
-  residualValue real,
+  acquisitionCost float,
+  insuranceValue float,
+  residualValue float,
   categoryID int,
   assetLifeSpan smallint,
   PRIMARY KEY (assetTag),
@@ -189,9 +193,10 @@ CREATE TABLE "RFID Reader" (
 
 CREATE TABLE DepreciationSchedule (
   year int NOT NULL,
-  openingBookValue real NOT NULL,
-  depreciationExpense real NOT NULL,
-  accumulatedDepreciation real NOT NULL,
+  openingBookValue float NOT NULL,
+  depreciationExpense float NOT NULL,
+  accumulatedDepreciation float NOT NULL,
+  closingBookValue float NOT NULL,
   assetTag varchar(50),
   CONSTRAINT "FK_DepreciationSchedule.assetTag"
     FOREIGN KEY (assetTag)

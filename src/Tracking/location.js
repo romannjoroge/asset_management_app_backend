@@ -1,11 +1,11 @@
 // Importing the database bool from db2.js. This will allow me to connect to the database
-const pool = require('../../db2');
+import pool from '../../db2.js';
 
 // Importing custom classes
-const MyError = require('../../utility/myError');
-const Folder = require('../Allocation/folder');
-const utility = require('../../utility/utility');
-const locationTable = require('../Tracking/db_location');
+import MyError from '../../utility/myError.js';
+import Folder from '../Allocation/Folder/folder.js';
+import utility from '../../utility/utility.js';
+import locationTable from './db_location.js';
 
 class Location {
     constructor (){}

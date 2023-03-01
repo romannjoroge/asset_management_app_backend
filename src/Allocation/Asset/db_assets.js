@@ -19,7 +19,7 @@ const getCloseBookValue = "SELECT closingBookValue FROM DepreciationSchedule WHE
 const getAccumulatedDepreciation = "SELECT SUM(depreciationExpense) AS accumulatedDepreciation FROM DepreciationSchedule GROUP BY assetTag WHERE assetTag = $1";
 const insertDepreciationSchedule = "INSERT INTO DepreciationSchedule VALUES ($1, $2, $3, $4, $5)";
 
-module.exports = {
+const assetTable = {
     doesAssetTagExist,
     addAssetToAssetRegister,
     addAssetFileAttachment,
@@ -37,6 +37,7 @@ module.exports = {
     getAssetCategoryName,
     updateAssetResidualValue,
     getCloseBookValue,
-    getAccumulatedDepreciation,
-    insertDepreciationSchedule
+    getAccumulatedDepreciation
 }
+
+export default assetTable;

@@ -1,6 +1,5 @@
-const { assert } = require("chai");
-const MyError = require("./myError")
-const pool = require('../db2');
+import { assert } from "chai";
+import MyError from "./myError.js";
 
 function isAnyEmpty(arr){
     /*
@@ -157,7 +156,7 @@ async function returnFetchedResultsFromDatabase(query, arguements, valueWanted){
 
 // }
 
-module.exports = {
+const utility = {
     isAnyEmpty,
     checkIfBoolean,
     checkIfNumberisPositive,
@@ -173,3 +172,5 @@ module.exports = {
     assertThatFunctionWorks,
     returnFetchedResultsFromDatabase
 }
+
+export default utility;

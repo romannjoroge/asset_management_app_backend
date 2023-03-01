@@ -1,6 +1,6 @@
-const folderTable = require('./db_folder');
-const pool = require('../../db2');
-const MyError = require('../../utility/myError');
+import folderTable from './db_folder.js';
+import pool from '../../../db2.js';
+import MyError from '../../../utility/myError.js';
 
 class Folder {
     constructor (_name, _companyName) {
@@ -23,4 +23,4 @@ class Folder {
     }
 }
 
-module.exports = Folder;
+export default Folder;

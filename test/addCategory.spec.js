@@ -1,12 +1,10 @@
 // Importing modules used to write tests
-const assert = require('chai').assert;
-const sinon = require('sinon');
-
-// Importing classes to be used in test
-const Category = require('../src/Allocation/category2');
-const pool = require('../db2');
-const MyError = require("../utility/myError");
-const Folder = require('../src/Allocation/folder');
+import {assert} from 'chai';
+import sinon from 'sinon';
+import Category from '../src/Allocation/Category/category2.js';
+import pool from '../db2.js';
+import MyError from '../utility/myError.js';
+import Folder from '../src/Allocation/Folder/folder.js';
 
 // Creating the test suite
 describe.skip("addCategory Test", function () {
