@@ -1,21 +1,21 @@
 const typeDefs = `#graphql
-    type User {
-        fname: String!
-        lname: Sting!
-        email: String!
-        password: String!
-        username: String!
-        company: Company!
-        role: String!
-        assets: [Asset!]
-    }
+    # type User {
+    #     fname: String!
+    #     lname: Sting!
+    #     email: String!
+    #     password: String!
+    #     username: String!
+    #     company: Company!
+    #     role: String!
+    #     assets: [Asset!]
+    # }
 
-    type Company {
-        name: ID!
-        users: [User!]!
-        topFolder: Folder!
-        locations: [Location!]!
-    }
+    # type Company {
+    #     name: ID!
+    #     users: [User!]!
+    #     topFolder: Folder!
+    #     locations: [Location!]!
+    # }
 
     type Folder {
         id: Int!
@@ -26,14 +26,14 @@ const typeDefs = `#graphql
         categories: [Category!]!
     }
 
-    type Location {
-        id: Int!
-        name: String!
-        parentFolder: Folder!
-        company: Company!
-        assets: [Asset!]!
-        rfid_readers: [RFID_Reader!]!
-    }
+    # type Location {
+    #     id: Int!
+    #     name: String!
+    #     parentFolder: Folder!
+    #     company: Company!
+    #     assets: [Asset!]!
+    #     rfid_readers: [RFID_Reader!]!
+    # }
 
     type Category {
         id: Int!
@@ -44,14 +44,14 @@ const typeDefs = `#graphql
         depreciationPercentage: Float
     }
 
-    type GatePass {
-        id: Int!
-        expectedTime: String!
-        entry: Boolean!
-        user: User!
-        reason: String!
-        assets: [Asset!]!
-    }
+    # type GatePass {
+    #     id: Int!
+    #     expectedTime: String!
+    #     entry: Boolean!
+    #     user: User!
+    #     reason: String!
+    #     assets: [Asset!]!
+    # }
 
     type Asset {
         assetTag: ID!
@@ -71,34 +71,38 @@ const typeDefs = `#graphql
         DepreciationSchedule: DepreciationSchedule!
     }
 
-    type Stock Take {
-        id: ID!
-        location: Location!
-        String: String!
-        assets: [Asset!]!
-    }
+    # type Stock Take {
+    #     id: ID!
+    #     location: Location!
+    #     String: String!
+    #     assets: [Asset!]!
+    # }
 
-    type Log {
-        id: ID!
-        timestamp: String!
-        ipAddress: String!
-        username: String!
-        eventType: String!
-        logDescription: String!
-    }
+    # type Log {
+    #     id: ID!
+    #     timestamp: String!
+    #     ipAddress: String!
+    #     username: String!
+    #     eventType: String!
+    #     logDescription: String!
+    # }
 
-    type RFID_Reader {
-        id: ID!
-        location: Location!
-    }
+    # type RFID_Reader {
+    #     id: ID!
+    #     location: Location!
+    # }
 
-    type DepreciationSchedule {
-        year: Int!
-        openingBookValue: Float!
-        depreciationExpense: Float!
-        accumulatedDepreciation: Float!
-        closingBookValue: Float!
-        asset: Asset!
+    # type DepreciationSchedule {
+    #     year: Int!
+    #     openingBookValue: Float!
+    #     depreciationExpense: Float!
+    #     accumulatedDepreciation: Float!
+    #     closingBookValue: Float!
+    #     asset: Asset!
+    # }
+
+    type Query {
+        categories: [Category!]!,
     }
 `
 
