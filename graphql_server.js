@@ -1,17 +1,19 @@
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 
-import typeDefs from './graphql_schema';
-import Category from './src/resolvers/category';
-import {Category as Category_class} from './src/Allocation/Category/category2';
+import typeDefs from './graphql_schema.js';
+import Category from './src/resolvers/category.js';
+import {Category as category_class} from './src/Allocation/Category/category2.js';
+import Query from './src/resolvers/query.js';
 
 const server = new ApolloServer({
     typeDefs,
     resolvers: {
         Category,
+        Query,
     },
     context: async(req, res) => ({
-        category: Category_class,
+        category_class
     }),
 });
 
