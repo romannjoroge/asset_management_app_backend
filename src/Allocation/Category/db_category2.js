@@ -10,6 +10,7 @@ const deleteDepreciationPercent = "DELETE FROM DepreciationPercent WHERE categor
 const getCategoryDepreciationType = "SELECT depreciationType FROM Category WHERE ID = $1";
 const getDepreciationPercent = "SELECT percentage FROM DepreciationPercent WHERE categoryID = $1";
 const doesCategoryIDExist = "SELECT name FROM Category WHERE ID = $1";
+const getCategoryAssets = 'SELECT * FROM Asset WHERE categoryid = $1';
 
 let categoryTable = {
     add: addCategory,
@@ -23,7 +24,8 @@ let categoryTable = {
     deleteDepreciationPercent: deleteDepreciationPercent,
     getCategoryDepreciationType: getCategoryDepreciationType,
     getDepreciationPercent: getDepreciationPercent,
-    doesCategoryIDExist
+    doesCategoryIDExist,
+    getCategoryAssets
 }
 
 export default categoryTable;

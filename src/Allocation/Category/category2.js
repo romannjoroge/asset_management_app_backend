@@ -328,7 +328,21 @@ class Category {
         }
     }
 
-    static as
+    static async viewCategoryAssets(categoryName) {
+        if (! await Category._doesCategoryExist(categoryName)) {
+            throw new MyError("Category Does Not Exist");
+        }
+
+        let categoryId = await Category._getCategoryID(categoryName);
+        let fetchResult;
+
+        try{
+            fetchResult = await pool.query(categoryTable.getCategoryAssets, [categoryId]);
+            return fetchResult.rows;
+        }catch(err){
+            throw new MyError("Could Not Get Assets For The Category")
+        }        
+    }
 }
 
 export default Category;
