@@ -80,7 +80,7 @@ class Asset{
         await Location.verifyLocationID(this.locationID, "Invalid location");
         await User.checkIfUserExists(this.custodianName, "Invalid custodian");
 
-        if(await Asset._doesAssetTagExist(this.assetTag)){
+        if(!await Asset._doesAssetTagExist(this.assetTag)){
             throw new MyError("Asset Tag Has Already Been Assigned");
         }
 
@@ -102,7 +102,11 @@ class Asset{
             throw new MyError("Could Not Verify Asset Tag");
         }
 
-        return utility.isFetchResultEmpty(fetchResult);
+        if (utility.isFetchResultEmpty(fetchResult)){
+            return false;
+        }else{
+            return true;
+        }
     }
 
     async _storeAssetInAssetRegister(){
@@ -110,16 +114,28 @@ class Asset{
             await pool.query(assetTable.addAssetToAssetRegister, [this.assetTag, this.makeAndModelNo, this.fixed, this.serialNumber,
                             this.acquisitionDate, this.locationID, this.status, this.custodianName, this.acquisitionCost, this.insuranceValue, this.categoryID,
                             this.assetLifeSpan]);
-            Asset._insertAssetAttachments(this.assetTag, this.attachments, "Invalid attachments");
+            Asset._insertAssetAttachments(this.assetTag, this.attachments);
         }catch(err){
             throw new MyError("Could not add asset to asset Register");
         }
     }
 
     static async _getAssetCategoryName(assetTag){
-        let fetchResults = await pool.query(assetTable.getAssetCategoryName, [assetTag]);
-        utility.verifyDatabaseFetchResults(fetchResults, "Could not get asset category name");
-        return fetchResults.rows[0].name;
+        let fetchResult;
+
+        if (! await Asset._doesAssetTagExist(assetTag)){
+            throw new MyError("Asset Does Not Exist");
+        }else{
+            try{
+                fetchResult = await pool.query(assetTable.getAssetCategoryName, [assetTag]);
+            }catch(err){
+                throw new MyError("Could Not Get Category Name");
+            }
+
+            utility.verifyDatabaseFetchResults(fetchResult, "Nothing Was Returned From Database");
+
+            return fetchResult.rows[0].name;
+        }
     }
 
     static async _updateAssetAcquisitionDate(assetTag, newDate){
@@ -165,12 +181,12 @@ class Asset{
     }
 
     static async _updateAssetResidualValue(assetTag, residualValue){
-        await pool.query(assetTable.updateAssetResidualValue, [assetTag, residualValue]);
+        await pool.query(assetTable.updateAssetResidualValue, [residualValue, assetTag]);
     }
 
     static async updateAsset(updateAssetDict, assetTag){
         // Throw an error if no asset with asset tag exists
-        if (await Asset._doesAssetTagExist(assetTag)){
+        if (!await Asset._doesAssetTagExist(assetTag)){
             throw new MyError("Asset Does Not Exist");
         }
 
@@ -242,7 +258,6 @@ class Asset{
                     }
                 }
             }
-            await Asset._insertAssetAttachments(assetTag, updateAssetDict.attachments);
             await utility.addErrorHandlingToAsyncFunction(Asset._insertAssetAttachments, "Invalid attachments",
                                                         assetTag, updateAssetDict.attachments);
         }
@@ -278,8 +293,8 @@ class Asset{
         }
     }
 
-    static async _insertDepreciationSchedule(assetTag, year, depreciationExpense, accumulatedDepreciation, closeBookValue){
-
+    static async _insertDepreciationSchedule(assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation){
+        await pool.query(assetTable.insertDepreciationSchedule, [year, openBookValue, depreciationExpense, accumulatedDepreciation, assetTag]);
     }
 
     static async _getCloseBookValue(assetTag, year){
@@ -295,7 +310,7 @@ class Asset{
     }
 
     static async createDepreciationSchedule(depreciationType, assetTag, assetLifeSpan, acquisitionCost, acquisitionDate, residualValue, depreciationPercentage){
-        if (await Asset._doesAssetTagExist(assetTag)){
+        if (!await Asset._doesAssetTagExist(assetTag)){
             throw new MyError("Asset Does Not Exist");
         }
 
@@ -303,7 +318,6 @@ class Asset{
         let openBookValue;
         let depreciationExpense;
         let accumulatedDepreciation;
-        let closeBookValue;
 
         for (let i = 0; i < assetLifeSpan; i++){
             year = acquisitionDate.getFullYear() + i;
@@ -331,15 +345,13 @@ class Asset{
                 throw new MyError("Depreciation Type is not supported");
             }
 
-            closeBookValue = openBookValue - depreciationExpense;
             utility.addErrorHandlingToAsyncFunction(Asset._insertDepreciationSchedule, "Invalid Depreciation Schedule Entry",
-                                                            assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation, 
-                                                            closeBookValue);
+                                                            assetTag, openBookValue, year, openBookValue, depreciationExpense, accumulatedDepreciation);
         }
     }
 
     static async allocateAsset(assetTag, username){
-        if (await Asset._doesAssetTagExist(assetTag)){
+        if (!await Asset._doesAssetTagExist(assetTag)){
             throw new MyError("Asset Does Not Exist");
         }
 

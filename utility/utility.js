@@ -1,5 +1,6 @@
 const { assert } = require("chai");
 const MyError = require("./myError")
+const pool = require('../db2');
 
 function isAnyEmpty(arr){
     /*
@@ -66,9 +67,9 @@ function verifyDatabaseFetchResults(fetchResult, errorMessage){
 
 function isFetchResultEmpty(fetchResult){
     if(fetchResult.rowCount === 0){
-        return false;
-    }else{
         return true;
+    }else{
+        return false;
     }
 }
 
@@ -131,6 +132,27 @@ async function assertThatAsyncFunctionReturnsNull(func, ...params){
     assert.equal(returnedItem, null, "Returned Item Is Different");
 }
 
+async function assertThatFunctionWorks(func, ...params){
+    try{
+        await func(...params);
+    }catch(err){
+        console.log(err);
+        assert(false, `${func.name} did not run`);
+    }
+}
+
+async function returnFetchedResultsFromDatabase(query, arguements, valueWanted){
+    let fetchResult;
+
+    try{
+        fetchResult = await pool.query(query, arguements);
+    }catch(err){
+        throw new MyError(`Could Not Get ${valueWanted} From Database`);
+    }
+
+    return fetchResult;
+}
+
 // function fileUpload(req, res){
 
 // }
@@ -147,5 +169,7 @@ module.exports = {
     assertThatAsynchronousFunctionFails,
     assertThatAsyncFunctionReturnsRightThing,
     assertThatAsyncFunctionReturnsNull,
-    isFetchResultEmpty
+    isFetchResultEmpty,
+    assertThatFunctionWorks,
+    returnFetchedResultsFromDatabase
 }

@@ -6,6 +6,8 @@ const assert = require('chai').assert;
 
 const Asset = require('../src/Allocation/asset2');
 const utility = require('../utility/utility');
+const { _insertDepreciationPercentInDb } = require('../src/Allocation/category2');
+const { _insertDepreciationSchedule } = require('../src/Allocation/asset2');
 
 
 describe.skip("_doesAssetTagExist Test", function(){
@@ -313,6 +315,71 @@ describe.skip("update Asset Functions", function(){
             console.log(err);
             assert(false, "Could Not Drop Temporary Tables");
         }
-    })
+    });
 });
+
+describe("insert Asset Tests", function(){
+    let assetTag = 'AUA0004';
+    let fetchResult;
+    let valueFromDatabase;
+
+    this.beforeEach(async function(){
+        try{
+            await pool.query("CREATE TEMPORARY TABLE Asset (LIKE Asset INCLUDING ALL)");
+            await pool.query("INSERT INTO Asset VALUES ($1, 'HP Folio 13', true, 'SSDFDAS', '01-12-2022', 1, 'good', 'John Doe', 10000, 1000, 5000, 1, 4)", [assetTag]);
+            await pool.query("CREATE TEMPORARY TABLE Asset_File (LIKE Asset_File INCLUDING ALL)");
+            await pool.query("CREATE TEMPORARY TABLE DepreciationSchedule (LIKE DepreciationSchedule INCLUDING ALL)");
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Create Temporary Tables");
+        }
+    });
+
+    it("_insertAssetAttachments Test", async function(){
+        let attachments = ['attachments/download.jpeg'];
+
+        await utility.assertThatFunctionWorks(Asset._insertAssetAttachments, assetTag, attachments);
+
+        fetchResult = await utility.returnFetchedResultsFromDatabase("SELECT attachment FROM Asset_File WHERE assetTag = $1", [assetTag], 'attachment');
+        
+        utility.verifyDatabaseFetchResults(fetchResult, "Nothing Returned");
+        
+        valueFromDatabase = fetchResult.rows[0].attachment;
+
+        assert.equal(attachments[0], valueFromDatabase, "Wrong Attachment Returned");
+    });
+
+    it("_insertDepreciationSchedule Test", async function(){
+        // Test Inputs
+        let year = 2023;
+        let openingBookValue = 10_000;
+        let depreciationExpense = 2_500;
+        let accumulatedDepreciation = 2_500;
+        
+        await utility.assertThatFunctionWorks(Asset._insertDepreciationSchedule, assetTag, openingBookValue, year, depreciationExpense, accumulatedDepreciation);
+
+        fetchResult = await utility.returnFetchedResultsFromDatabase("SELECT openingBookValue, depreciationExpense, accumulatedDepreciation FROM DepreciationSchedule WHERE assetTag = $1 AND year = $2", 
+                                                        [assetTag, year], 'Opening Book Value');
+
+        utility.verifyDatabaseFetchResults(fetchResult, "Nothing Was Returned");
+        valueFromDatabase = fetchResult.rows[0]
+
+        assert.deepEqual({
+            openingbookvalue: openingBookValue,
+            depreciationexpense: depreciationExpense,
+            accumulateddepreciation: accumulatedDepreciation
+        }, valueFromDatabase, "Wrong Item Returned");
+    })
+
+    this.afterEach(async function(){
+        try{
+            await pool.query("DROP TABLE IF EXISTS pg_temp.Asset");
+            await pool.query("DROP TABLE IF EXISTS pg_temp.Asset_File");
+            await pool.query("DROP TABLE IF EXISTS pg_temp.DepreciationSchedule");
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Drop Temporary Tables");
+        }
+    })
+})
 

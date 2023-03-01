@@ -13,10 +13,11 @@ const updateAssetInsuranceValue = "UPDATE Asset SET insuranceValue = $1 WHERE as
 const updateAssetCategory = "UPDATE Asset SET categoryID = $1 WHERE assetTag = $2";
 const getAssetTags = "SELECT assetTag FROM Asset";
 const disposeAsset = "DELETE FROM Asset WHERE assettag = $1";
-const getAssetCategoryName = "Placeholder SQL command";
+const getAssetCategoryName = "SELECT name FROM Category WHERE ID = (SELECT categoryID from Asset WHERE assetTag = $1)";
 const updateAssetResidualValue = "UPDATE Asset SET residualValue = $1 WHERE assetTag = $2";
 const getCloseBookValue = "SELECT closingBookValue FROM DepreciationSchedule WHERE assetTag = $1 AND year = $2";
 const getAccumulatedDepreciation = "SELECT SUM(depreciationExpense) AS accumulatedDepreciation FROM DepreciationSchedule GROUP BY assetTag WHERE assetTag = $1";
+const insertDepreciationSchedule = "INSERT INTO DepreciationSchedule VALUES ($1, $2, $3, $4, $5)";
 
 module.exports = {
     doesAssetTagExist,
@@ -36,5 +37,6 @@ module.exports = {
     getAssetCategoryName,
     updateAssetResidualValue,
     getCloseBookValue,
-    getAccumulatedDepreciation
+    getAccumulatedDepreciation,
+    insertDepreciationSchedule
 }
