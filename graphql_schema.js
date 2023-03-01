@@ -1,21 +1,21 @@
 const typeDefs = `#graphql
-    # type User {
-    #     fname: String!
-    #     lname: Sting!
-    #     email: String!
-    #     password: String!
-    #     username: String!
-    #     company: Company!
-    #     role: String!
-    #     assets: [Asset!]
-    # }
+    type User {
+        fname: String!
+        lname: String!
+        email: String!
+        password: String!
+        username: String!
+        company: Company!
+        role: String!
+        assets: [Asset!]
+    }
 
-    # type Company {
-    #     name: ID!
-    #     users: [User!]!
-    #     topFolder: Folder!
-    #     locations: [Location!]!
-    # }
+    type Company {
+        name: ID!
+        users: [User!]!
+        topFolder: Folder!
+        locations: [Location!]!
+    }
 
     type Folder {
         id: Int!
@@ -26,83 +26,83 @@ const typeDefs = `#graphql
         categories: [Category!]!
     }
 
-    # type Location {
-    #     id: Int!
-    #     name: String!
-    #     parentFolder: Folder!
-    #     company: Company!
-    #     assets: [Asset!]!
-    #     rfid_readers: [RFID_Reader!]!
-    # }
-
-    type Category {
+    type Location {
         id: Int!
         name: String!
         parentFolder: Folder!
-        depreciaitionType: String!
+        company: Company!
         assets: [Asset!]!
-        depreciationPercentage: Float
+        rfid_readers: [RFID_Reader!]!
     }
 
-    # type GatePass {
-    #     id: Int!
-    #     expectedTime: String!
-    #     entry: Boolean!
-    #     user: User!
-    #     reason: String!
-    #     assets: [Asset!]!
-    # }
+    type Category {
+        name: String!
+        parentfolder: Folder!
+        depreciationtype: String!
+        assets: [Asset!]!
+        depreciationpercentage: Float
+    }
+
+    type GatePass {
+        id: Int!
+        expectedTime: String!
+        entry: Boolean!
+        user: User!
+        reason: String!
+        assets: [Asset!]!
+    }
 
     type Asset {
-        assetTag: ID!
-        makeAndModelNo: String!
-        isFixed: Boolean!
-        serialNumber: String!
-        acquisitionDate: String!
+        assettag: ID!
+        makeandmodelno: String!
+        isfixed: Boolean!
+        serialnumber: String!
+        acquisitiondate: String!
         location: Location!
         status: String!
         custodian: User!
-        acquisitionCost: Float!
-        insuranceValue: Float!
-        residualValue: Float!
+        acquisitioncost: Float!
+        insurancevalue: Float!
+        residualvalue: Float!
         category: Category!
-        assetLifeSpan: Int!
+        assetlifespan: Int!
         attachments: [String!]!
-        DepreciationSchedule: DepreciationSchedule!
+        depreciationschedule: DepreciationSchedule!
     }
 
-    # type Stock Take {
-    #     id: ID!
-    #     location: Location!
-    #     String: String!
-    #     assets: [Asset!]!
-    # }
+    type StockTake {
+        id: ID!
+        location: Location!
+        String: String!
+        assets: [Asset!]!
+    }
 
-    # type Log {
-    #     id: ID!
-    #     timestamp: String!
-    #     ipAddress: String!
-    #     username: String!
-    #     eventType: String!
-    #     logDescription: String!
-    # }
+    type Log {
+        id: ID!
+        timestamp: String!
+        ipAddress: String!
+        username: String!
+        eventType: String!
+        logDescription: String!
+    }
 
-    # type RFID_Reader {
-    #     id: ID!
-    #     location: Location!
-    # }
+    type RFID_Reader {
+        id: ID!
+        location: Location!
+    }
 
-    # type DepreciationSchedule {
-    #     year: Int!
-    #     openingBookValue: Float!
-    #     depreciationExpense: Float!
-    #     accumulatedDepreciation: Float!
-    #     closingBookValue: Float!
-    #     asset: Asset!
-    # }
+    type DepreciationSchedule {
+        year: Int!
+        openingBookValue: Float!
+        depreciationExpense: Float!
+        accumulatedDepreciation: Float!
+        closingBookValue: Float!
+        asset: Asset!
+    }
 
     type Query {
         categories: [Category!]!,
+        category (name: ID!): Category,
     }
 `
 
