@@ -1,14 +1,11 @@
-// Import pool
-const pool = require("../db2");
-
 // Importing testing packages
-const assert = require('chai').assert;
-const sinon = require('sinon');
+import { assert } from 'chai';
+import Sinon from 'sinon';
 
 // Importing classes
-const Category = require("../src/Allocation/category2");
-const MyError = require("../utility/myError");
-const utility = require('../utility/utility');
+import Category from '../src/Allocation/Category/category2.js';
+import MyError from '../utility/myError.js';
+import utility from '../utility/utility.js';
 
 describe.skip("verifyDepreciationDetails Test", function () {
     it("should accept when depType is Double Depreciation and value is 0", function () {
@@ -215,23 +212,23 @@ describe.skip("updateDepreciationType Test", function () {
         let category_id = 1;
 
         // Stub getCategoryID
-        let getCategoryID = sinon.stub(Category, "_getCategoryID")
+        let getCategoryID = Sinon.stub(Category, "_getCategoryID")
                         .withArgs(categoryName)
                         .returns(category_id);
 
         // Stub database functions
-        let _updateDepreciationTypeInDB = sinon.stub(Category, "_updateDepreciationTypeInDB");
-        let _deleteDepreciationPercentInDb = sinon.stub(Category, "_deleteDepreciationPercentInDb");
-        let _insertDepreciationPercentInDb = sinon.stub(Category, "_insertDepreciationPercentInDb");
+        let _updateDepreciationTypeInDB = Sinon.stub(Category, "_updateDepreciationTypeInDB");
+        let _deleteDepreciationPercentInDb = Sinon.stub(Category, "_deleteDepreciationPercentInDb");
+        let _insertDepreciationPercentInDb = Sinon.stub(Category, "_insertDepreciationPercentInDb");
 
         // Run function
         try{
             await Category._updateDepreciationType(depType, value, categoryName);
             
             // Make assertions on database funcitons
-            sinon.assert.calledWith(_updateDepreciationTypeInDB, category_id, depType);
-            sinon.assert.calledWith(_deleteDepreciationPercentInDb, category_id);
-            sinon.assert.notCalled(_insertDepreciationPercentInDb);
+            Sinon.assert.calledWith(_updateDepreciationTypeInDB, category_id, depType);
+            Sinon.assert.calledWith(_deleteDepreciationPercentInDb, category_id);
+            Sinon.assert.notCalled(_insertDepreciationPercentInDb);
         }catch(err){
             console.log(err);
             assert(false, "No Error Should Have Been Thrown");

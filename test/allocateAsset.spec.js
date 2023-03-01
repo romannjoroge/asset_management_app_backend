@@ -1,13 +1,9 @@
 // Importing the database pool
-const pool = require('../db2');
+import pool from '../db2.js';
+import { assert } from 'chai';
 
-const sinon = require('sinon');
-const assert = require('chai').assert;
-
-const Asset = require('../src/Allocation/asset2');
-const User = require('../src/Users/users');
-const MyError = require('../utility/myError');
-const utility = require('../utility/utility');
+import Asset from '../src/Allocation/Asset/asset2.js'
+import utility from '../utility/utility.js';
 
 describe.skip("Allocate Asset To User Test", function(){
     let assetTag;

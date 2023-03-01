@@ -327,6 +327,8 @@ class Category {
             depreciationValue: depreciationValue
         }
     }
+
+    static as
 }
 
 export default Category;

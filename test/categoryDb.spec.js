@@ -1,11 +1,10 @@
 // Importing pool
-const pool = require('../db2');
+import pool from '../db2.js';
 
-const assert = require('chai').assert;
+import { assert } from 'chai';
 
-const Category = require('../src/Allocation/category2');
-const MyError = require('../utility/myError');
-const utility = require('../utility/utility');
+import Category from '../src/Allocation/Category/category2.js';
+import utility from '../utility/utility.js';
 
 describe.skip("_getCategoryID Tests", function(){
     let categoryName;

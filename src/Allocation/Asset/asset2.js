@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 // Importing the database bool from db2.js. This will allow me to connect to the database
-const pool = require('../../../db2.js');
+import pool from '../../../db2.js';
 
 // Importing custom classes
 import MyError from '../../../utility/myError.js';

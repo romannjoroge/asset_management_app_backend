@@ -1,22 +1,19 @@
-// Import database pool
-const pool = require("../db2");
-
 // Import testing libraries
-const assert = require('chai').assert;
-const sinon = require('sinon');
+import { assert } from 'chai';
+import Sinon from 'sinon';
 
 // Import classes
-const Category = require("../src/Allocation/category2");
-const MyError = require("../utility/myError");
+import Category from '../src/Allocation/Category/category2.js';
+import MyError from '../utility/myError.js';
 
 describe.skip("Category.view test", function () {
     it("should return an error when a category that doesn't exist is given", async function () {
         // Test Values
         let categoryName = 'test';
 
-        let viewDetailsSpy = sinon.spy(Category, "viewDetails");
+        let viewDetailsSpy = Sinon.spy(Category, "viewDetails");
 
-        let _doesCategoryExistStub = sinon.stub(Category, "_doesCategoryExist")
+        let _doesCategoryExistStub = Sinon.stub(Category, "_doesCategoryExist")
                                     .withArgs(categoryName)
                                     .returns(false);
 
@@ -34,13 +31,13 @@ describe.skip("Category.view test", function () {
         let depreciationValue = 200;
         let categoryID = 1;
 
-        let getDepreciationTypeStub = sinon.stub(Category, "_getCategoryDepreciationType")
+        let getDepreciationTypeStub = Sinon.stub(Category, "_getCategoryDepreciationType")
                                      .withArgs(categoryID)
                                      .returns(depreciaitionType);
-        let getDepreciationValueStub = sinon.stub(Category, "_getCategoryDepreciationPercent")
+        let getDepreciationValueStub = Sinon.stub(Category, "_getCategoryDepreciationPercent")
                                        .withArgs(categoryID)
                                        .returns(depreciationValue);
-        let _getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
+        let _getCategoryIDStub = Sinon.stub(Category, "_getCategoryID")
                                 .withArgs(categoryName)
                                 .returns(categoryID);
         
@@ -65,13 +62,13 @@ describe.skip("Category.view test", function () {
         let depreciationValue = null;
         let categoryID = 1;
 
-        let getDepreciationTypeStub = sinon.stub(Category, "_getCategoryDepreciationType")
+        let getDepreciationTypeStub = Sinon.stub(Category, "_getCategoryDepreciationType")
                                      .withArgs(categoryID)
                                      .returns(depreciaitionType);
-        let getDepreciationValueStub = sinon.stub(Category, "_getCategoryDepreciationPercent")
+        let getDepreciationValueStub = Sinon.stub(Category, "_getCategoryDepreciationPercent")
                                        .withArgs(categoryID)
                                        .returns(depreciationValue);
-        let _getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
+        let _getCategoryIDStub = Sinon.stub(Category, "_getCategoryID")
                                 .withArgs(categoryName)
                                 .returns(categoryID);
         

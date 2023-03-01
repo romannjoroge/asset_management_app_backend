@@ -1,19 +1,16 @@
 // Import database pool
-const pool = require("../db2");
-const fs = require('fs');
+import fs from 'fs';
 
 // Import testing libraries
-const assert = require('chai').assert;
-const expect = require('chai').expect;
-const sinon = require('sinon');
+import { assert } from 'chai';
+import Sinon from 'sinon';
 
 // Import classes
-const MyError = require("../utility/myError");
-const utility = require('../utility/utility');
-const Asset = require('../src/Allocation/asset2');
-const Location = require('../src/Tracking/location');
-const User = require('../src/Users/users');
-const Category = require("../src/Allocation/category2");
+import MyError from '../utility/myError.js';
+import Asset from '../src/Allocation/Asset/asset2.js';
+import Location from '../src/Tracking/location.js'
+import User from '../src/Users/users.js';
+import Category from '../src/Allocation/Category/category2.js';
 
 describe.skip("createAsset test", function () {
     // Test inputs
@@ -72,24 +69,24 @@ describe.skip("createAsset test", function () {
         categoryName = "Test";
         attachments = ['attachments/908e0d1a8f2bc03775753a55d4bc57fe'];
         
-        verifyLocationStub = sinon.stub(Location, "verifyLocationID")
+        verifyLocationStub = Sinon.stub(Location, "verifyLocationID")
                             .withArgs(locationID, locationErrorMessage)
                             .returns("Test");
-        checkIfUserExistsStub = sinon.stub(User, "checkIfUserExists")
+        checkIfUserExistsStub = Sinon.stub(User, "checkIfUserExists")
                                 .withArgs(custodianName, invalidCustodianErrorMessage);
-        doesCategoryExistStub = sinon.stub(Category, "_doesCategoryExist")
+        doesCategoryExistStub = Sinon.stub(Category, "_doesCategoryExist")
                                 .withArgs(categoryName)
                                 .returns(true);
-        getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
+        getCategoryIDStub = Sinon.stub(Category, "_getCategoryID")
                             .withArgs(categoryName)
                             .returns(1);
-        fsExistsSyncStub = sinon.stub(fs, "existsSync")
+        fsExistsSyncStub = Sinon.stub(fs, "existsSync")
                            .withArgs(attachments[0])
                            .returns(true);
-        doesAssetTagExistStub = sinon.stub(Asset, "doesAssetTagExist")
+        doesAssetTagExistStub = Sinon.stub(Asset, "doesAssetTagExist")
                                 .withArgs(assetTag, assetTagErrorMessage);
         residualValue = 100;
-        getCategoryDepreciationTypeStub = sinon.stub(Category, "_getCategoryDepreciationType")
+        getCategoryDepreciationTypeStub = Sinon.stub(Category, "_getCategoryDepreciationType")
                                             .withArgs(categoryName)
                                             .returns("Straight Line");
     });
@@ -119,7 +116,7 @@ describe.skip("createAsset test", function () {
         locationID = 1000;
 
         Location.verifyLocationID.restore();
-        verifyLocationStub = sinon.stub(Location, "verifyLocationID")
+        verifyLocationStub = Sinon.stub(Location, "verifyLocationID")
                             .withArgs(locationID, locationErrorMessage)
                             .throws(new MyError(locationErrorMessage));
 
@@ -138,7 +135,7 @@ describe.skip("createAsset test", function () {
         custodianName = "Non Existent Name";
 
         User.checkIfUserExists.restore();
-        checkIfUserExistsStub = sinon.stub(User, "checkIfUserExists")
+        checkIfUserExistsStub = Sinon.stub(User, "checkIfUserExists")
                                 .withArgs(custodianName, invalidCustodianErrorMessage)
                                 .throws(new MyError(invalidCustodianErrorMessage));
 
@@ -166,10 +163,10 @@ describe.skip("createAsset test", function () {
 
         Category._doesCategoryExist.restore();
         Category._getCategoryID.restore();
-        doesCategoryExistStub = sinon.stub(Category, "_doesCategoryExist")
+        doesCategoryExistStub = Sinon.stub(Category, "_doesCategoryExist")
                                 .withArgs(categoryName)
                                 .returns(false);
-        getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
+        getCategoryIDStub = Sinon.stub(Category, "_getCategoryID")
                             .withArgs(categoryName)
                             .throws("Category Does Not Exist");
 
@@ -181,7 +178,7 @@ describe.skip("createAsset test", function () {
         attachments = ['this/does/not/exist'];
 
         fs.existsSync.restore();
-        fsExistsSyncStub = sinon.stub(fs, "existsSync")
+        fsExistsSyncStub = Sinon.stub(fs, "existsSync")
                             .withArgs(attachments[0])
                             .returns(false);
 
@@ -193,7 +190,7 @@ describe.skip("createAsset test", function () {
         assetTag = "Already assigned";
 
         Asset.doesAssetTagExist.restore();
-        doesAssetTagExistStub = sinon.stub(Asset, "doesAssetTagExist")
+        doesAssetTagExistStub = Sinon.stub(Asset, "doesAssetTagExist")
                                 .withArgs(assetTag, assetTagErrorMessage)
                                 .throws(new MyError(assetTagErrorMessage));
 
@@ -227,10 +224,10 @@ describe.skip("createAsset test", function () {
         // Stubbing database calls
         Category._getCategoryDepreciationType.restore();
         Category._doesCategoryExist.restore();
-        doesCategoryExistStub = sinon.stub(Category, "_doesCategoryExist")
+        doesCategoryExistStub = Sinon.stub(Category, "_doesCategoryExist")
                                 .withArgs(categoryName)
                                 .returns(true);
-        getCategoryDepreciationTypeStub = sinon.stub(Category, "_getCategoryDepreciationType")
+        getCategoryDepreciationTypeStub = Sinon.stub(Category, "_getCategoryDepreciationType")
                                             .withArgs(categoryName)
                                             .returns("Written Down Value");
 

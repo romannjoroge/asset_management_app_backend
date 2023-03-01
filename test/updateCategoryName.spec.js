@@ -1,13 +1,10 @@
-// Import database pool
-const pool = require("../db2");
-
 // Import testing libraries
-const assert = require('chai').assert;
-const sinon = require('sinon');
+import { assert } from 'chai';
+import Sinon from 'sinon';
 
 // Import classes
-const Category = require("../src/Allocation/category2");
-const MyError = require("../utility/myError");
+import Category from '../src/Allocation/Category/category2.js';
+import MyError from '../utility/myError.js';
 
 describe.skip("verifyCategoryName test", function () {
     it("should deny a category name that is not a string", async function (){
@@ -49,7 +46,7 @@ describe.skip("verifyCategoryName test", function () {
         let newName = "Existing";
 
         // Stub _doesCategoryExist
-        let stub = sinon.stub(Category, "_doesCategoryExist")
+        let stub = Sinon.stub(Category, "_doesCategoryExist")
                         .withArgs(newName)
                         .returns(true)
 
@@ -70,7 +67,7 @@ describe.skip("verifyCategoryName test", function () {
         let newName = "NewCategory";
 
         // Stub _doesCategoryExist
-        let stub = sinon.stub(Category, "_doesCategoryExist")
+        let stub = Sinon.stub(Category, "_doesCategoryExist")
                         .withArgs(newName)
                         .returns(false)
 
@@ -78,7 +75,7 @@ describe.skip("verifyCategoryName test", function () {
         try {
             const result = await Category.verifyCategoryName(newName);
             assert.equal(result, "Name is valid!");
-            sinon.assert.calledWith(stub, newName);
+            Sinon.assert.calledWith(stub, newName);
         }catch(err){
             console.log(err);
             assert.equal(false, true, "An Error Should not have been thrown");
@@ -96,19 +93,19 @@ describe.skip("updateCategoryName Test",async function () {
         let category_id = 1;
 
         // Stub _getCategoryID
-        let getCategory = sinon.stub(Category, "_getCategoryID")
+        let getCategory = Sinon.stub(Category, "_getCategoryID")
                                .throws(new MyError("No Category exists with that name"))
                                .onCall(1)                             
                                .returns(1)
                                .onCall(2);
 
         // Stub _updateNameinDb
-        let _updateNameinDb = sinon.stub(Category, "_updateNameinDb");
+        let _updateNameinDb = Sinon.stub(Category, "_updateNameinDb");
         
         // Call function
         try{
             await Category._updateCategoryName(newName, oldName);
-            sinon.assert.calledWith(_updateNameinDb, category_id, newName);
+            Sinon.assert.calledWith(_updateNameinDb, category_id, newName);
         }catch(err){
             console.log(err);
             console.log(getCategory.callCount);
@@ -122,14 +119,14 @@ describe.skip("updateCategoryName Test",async function () {
         let oldName = "Non Existent";
 
         // Stub _getCategoryID
-        let stub = sinon.stub(Category, "_getCategoryID")
+        let stub = Sinon.stub(Category, "_getCategoryID")
                         .withArgs(oldName)
                         .throws(new MyError("No Category exists with that name"))
                         .withArgs(newName)
                         .throws(new MyError("No Category exists with that name"));
 
         // Mock _updateNameinDb
-        let mock = sinon.mock(Category);
+        let mock = Sinon.mock(Category);
         let expectation = mock.expects("_updateNameinDb");
         expectation.exactly(0);
 
@@ -157,7 +154,7 @@ describe.skip("updateCategoryName Test",async function () {
         let category_id2 = 2;
 
         // Stub _getCategoryID
-        let stub = sinon.stub(Category, "_getCategoryID")
+        let stub = Sinon.stub(Category, "_getCategoryID")
                         .withArgs(newName)
                         .returns(category_id1)
                         .withArgs(oldName)

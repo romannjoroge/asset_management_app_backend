@@ -1,17 +1,16 @@
 // Import database pool
-const fs = require('fs');
+import fs from 'fs'
 
 // Import testing libraries
-const assert = require('chai').assert;
-const sinon = require('sinon');
+import { assert } from 'chai';
+import Sinon from 'sinon';
 
 // Import classes
-const MyError = require("../utility/myError");
-const Asset = require('../src/Allocation/asset2');
-const Location = require('../src/Tracking/location');
-const User = require('../src/Users/users');
-const Category = require("../src/Allocation/category2");
-const { expect } = require('chai');
+import MyError from '../utility/myError.js';
+import Asset from '../src/Allocation/Asset/asset2.js';
+import Location from '../src/Tracking/location.js'
+import User from '../src/Users/users.js';
+import Category from '../src/Allocation/Category/category2.js';
 
 describe.skip("updateAsset test cases", function (){
     async function updateAssetShouldThrowError(updateAssetDict, errorMessage){
@@ -32,7 +31,7 @@ describe.skip("updateAsset test cases", function (){
     let assetTag = 'AUA00001';
 
     this.beforeEach(function (){
-        doesAssetTagExistStub = sinon.stub(Asset, "doesAssetTagExist")
+        doesAssetTagExistStub = Sinon.stub(Asset, "doesAssetTagExist")
                                 .withArgs(assetTag, "Asset Does Not Exist");
     });
 
@@ -69,7 +68,7 @@ describe.skip("updateAsset test cases", function (){
             locationID: "LOL"
         }
 
-        let verifyLocationIDStub = sinon.stub(Location, "verifyLocationID")
+        let verifyLocationIDStub = Sinon.stub(Location, "verifyLocationID")
                                     .withArgs(updateAssetDict.locationID, "Invalid location")
                                     .throws(new MyError("Invalid location"));
 
@@ -91,7 +90,7 @@ describe.skip("updateAsset test cases", function (){
             custodianName: "Does Not Exist"
         }
 
-        let checkIfUserExistsStub = sinon.stub(User, "checkIfUserExists")
+        let checkIfUserExistsStub = Sinon.stub(User, "checkIfUserExists")
                                     .withArgs(updateAssetDict.custodianName, "Invalid custodian")
                                     .throws(new MyError("Invalid custodian"));
 
@@ -122,7 +121,7 @@ describe.skip("updateAsset test cases", function (){
             categoryName: "Does not exist"
         }
 
-        let getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
+        let getCategoryIDStub = Sinon.stub(Category, "_getCategoryID")
                                 .withArgs(updateAssetDict.categoryName)
                                 .throws(new MyError("Category Does not Exist"));
 
@@ -135,7 +134,7 @@ describe.skip("updateAsset test cases", function (){
             attachments: ['path/to/non-existent/file']
         }
 
-        let fsExistsSyncStub = sinon.stub(fs, "existsSync")
+        let fsExistsSyncStub = Sinon.stub(fs, "existsSync")
                                 .withArgs(updateAssetDict.attachments[0])
                                 .returns(false);
 
@@ -159,11 +158,11 @@ describe.skip("updateAsset test cases", function (){
 
         let categoryName = "Category with written value depreciation";
 
-        let _getAssetCategoryName = sinon.stub(Asset, "_getAssetCategoryName")
+        let _getAssetCategoryName = Sinon.stub(Asset, "_getAssetCategoryName")
                                     .withArgs(assetTag)
                                     .returns(categoryName);
 
-        let getCategoryDepreciationTypeStub = sinon.stub(Category, "_getCategoryDepreciationType")
+        let getCategoryDepreciationTypeStub = Sinon.stub(Category, "_getCategoryDepreciationType")
                                                 .withArgs(categoryName)
                                                 .returns("Written Down Value");
 
@@ -186,44 +185,44 @@ describe.skip("updateAsset test cases", function (){
             residualValue: 100
         }
 
-        let fsExistsSyncStub = sinon.stub(fs, "existsSync")
+        let fsExistsSyncStub = Sinon.stub(fs, "existsSync")
                                 .withArgs(updateAssetDict.attachments[0])
                                 .returns(true);
-        let _insertAssetAttachmentsStub = sinon.stub(Asset, "_insertAssetAttachments")
+        let _insertAssetAttachmentsStub = Sinon.stub(Asset, "_insertAssetAttachments")
                                             .withArgs(assetTag, updateAssetDict.attachments[0])
-        let getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
+        let getCategoryIDStub = Sinon.stub(Category, "_getCategoryID")
                                 .withArgs(updateAssetDict.categoryName)
                                 .returns(1);
-        let _updateAssetCategoryIDStub = sinon.stub(Asset, "_updateAssetCategoryID")
+        let _updateAssetCategoryIDStub = Sinon.stub(Asset, "_updateAssetCategoryID")
                                             .withArgs(assetTag, updateAssetDict.categoryName);
-        let _updateAssetInsuranceValueStub = sinon.stub(Asset, "_updateAssetInsuranceValue")
+        let _updateAssetInsuranceValueStub = Sinon.stub(Asset, "_updateAssetInsuranceValue")
                                             .withArgs(assetTag, updateAssetDict.insuranceValue);
-        let _updateAssetAcquisitionCostStub = sinon.stub(Asset, "_updateAssetAcquisitionCost")
+        let _updateAssetAcquisitionCostStub = Sinon.stub(Asset, "_updateAssetAcquisitionCost")
                                                 .withArgs(assetTag, updateAssetDict.acquisitionCost);
-        let _updateAssetCustodianStub = sinon.stub(Asset, "_updateAssetCustodian")
+        let _updateAssetCustodianStub = Sinon.stub(Asset, "_updateAssetCustodian")
                                         .withArgs(assetTag, updateAssetDict.custodianName);
-        let checkIfUserExistsStub = sinon.stub(User, "checkIfUserExists")
+        let checkIfUserExistsStub = Sinon.stub(User, "checkIfUserExists")
                                     .withArgs(updateAssetDict.custodianName, "Invalid custodian");
-        let _updateAssetStatusStub = sinon.stub(Asset, "_updateAssetStatus")
+        let _updateAssetStatusStub = Sinon.stub(Asset, "_updateAssetStatus")
                                     .withArgs(assetTag, updateAssetDict.status);
-        let verifyLocationIDStub = sinon.stub(Location, "verifyLocationID")
+        let verifyLocationIDStub = Sinon.stub(Location, "verifyLocationID")
                                     .withArgs(updateAssetDict.locationID, "Invalid location")
                                     .returns("Test");
-        let _updateAssetLocationStub = sinon.stub(Asset, "_updateAssetLocation")
+        let _updateAssetLocationStub = Sinon.stub(Asset, "_updateAssetLocation")
                                         .withArgs(assetTag, updateAssetDict.locationID);
-        let _updateAssetAcquisitionDateStub = sinon.stub(Asset, "_updateAssetAcquisitionDate")
+        let _updateAssetAcquisitionDateStub = Sinon.stub(Asset, "_updateAssetAcquisitionDate")
                                                 .withArgs(assetTag, updateAssetDict.acquisitionDate);
-        let _updateAssetLifeSpanStub = sinon.stub(Asset, "_updateAssetLifeSpan")
+        let _updateAssetLifeSpanStub = Sinon.stub(Asset, "_updateAssetLifeSpan")
                                         .withArgs(assetTag, updateAssetDict.assetLifeSpan);
-        let _updateAssetFixedStatusStub = sinon.stub(Asset, "_updateAssetFixedStatus")
+        let _updateAssetFixedStatusStub = Sinon.stub(Asset, "_updateAssetFixedStatus")
                                             .withArgs(assetTag, updateAssetDict.fixed);
-        let _getAssetCategoryName = sinon.stub(Asset, "_getAssetCategoryName")
+        let _getAssetCategoryName = Sinon.stub(Asset, "_getAssetCategoryName")
                                     .withArgs(assetTag)
                                     .returns(updateAssetDict.categoryName);
-        let getCategoryDepreciationTypeStub = sinon.stub(Category, "_getCategoryDepreciationType")
+        let getCategoryDepreciationTypeStub = Sinon.stub(Category, "_getCategoryDepreciationType")
                                                 .withArgs(updateAssetDict.categoryName)
                                                 .returns("Straight Line");
-        let _updateAssetResidualValueStub = sinon.stub(Asset, "_updateAssetResidualValue")
+        let _updateAssetResidualValueStub = Sinon.stub(Asset, "_updateAssetResidualValue")
                                             .withArgs(assetTag, updateAssetDict.residualValue);
                                             
         try{
