@@ -10,7 +10,7 @@ import MyError from '../utility/myError.js';
 import Asset from '../src/Allocation/Asset/asset2.js';
 import Location from '../src/Tracking/location.js'
 import User from '../src/Users/users.js';
-import Category from '../src/Allocation/Category/category2.js';
+import {Category} from '../src/Allocation/Category/category2.js';
 
 describe.skip("createAsset test", function () {
     // Test inputs

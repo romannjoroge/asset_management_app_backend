@@ -5,7 +5,7 @@ import Sinon from 'sinon';
 import { assert } from 'chai';
 
 // Importing classes used in tests
-import Category from '../src/Allocation/Category/category2.js';
+import {Category} from '../src/Allocation/Category/category2.js';
 import MyError from '../utility/myError.js';
 import Folder from '../src/Allocation/Folder/folder.js';
 

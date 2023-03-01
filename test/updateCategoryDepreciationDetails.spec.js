@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import Sinon from 'sinon';
 
 // Importing classes
-import Category from '../src/Allocation/Category/category2.js';
+import {Category} from '../src/Allocation/Category/category2.js';
 import MyError from '../utility/myError.js';
 import utility from '../utility/utility.js';
 

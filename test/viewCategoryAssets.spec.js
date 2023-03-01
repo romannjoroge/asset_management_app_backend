@@ -1,6 +1,6 @@
 import {assert} from 'chai';
 import sinon from 'sinon';
-import Category from '../src/Allocation/Category/category2.js';
+import {Category} from '../src/Allocation/Category/category2.js';
 import pool from '../db2.js';
 import utility from '../utility/utility.js';
 
@@ -75,5 +75,5 @@ describe.skip("viewCategoryAssets Test", function(){
             console.log(err);
             assert(false, "Could Not Delete Temporary Tables");
         }
-    })
+    });
 });
