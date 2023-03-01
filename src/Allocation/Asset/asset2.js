@@ -8,7 +8,7 @@ import MyError from '../../../utility/myError.js';
 import utility from '../../../utility/utility.js';
 import Location from '../../Tracking/location.js';
 import User from '../../Users/users.js';
-import Category from '../Category/category2.js';
+import {Category} from '../Category/category2.js';
 import assetTable from './db_assets.js';
 
 
