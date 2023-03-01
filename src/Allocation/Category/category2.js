@@ -343,6 +343,24 @@ class Category {
             throw new MyError("Could Not Get Assets For The Category")
         }        
     }
+
+    static async getCategory(categoryName) {
+        if (! await Category._doesCategoryExist(categoryName)) {
+            throw new MyError("Category Does Not Exist");
+        }
+
+        let categoryId = await Category._getCategoryID(categoryName);
+        let fetchResult;
+        try{
+            fetchResult = await pool.query(categoryTable.getCategory, [categoryId]);
+        }catch(err){
+            throw new MyError("Could Not Get Category Details");
+        }
+
+        utility.verifyDatabaseFetchResults(fetchResult, "Nothing Returned From Database");
+
+        return fetchResult.rows[0];
+    }
 }
 
-export default Category;
+export {Category};

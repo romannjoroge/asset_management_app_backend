@@ -11,6 +11,9 @@ const getCategoryDepreciationType = "SELECT depreciationType FROM Category WHERE
 const getDepreciationPercent = "SELECT percentage FROM DepreciationPercent WHERE categoryID = $1";
 const doesCategoryIDExist = "SELECT name FROM Category WHERE ID = $1";
 const getCategoryAssets = 'SELECT * FROM Asset WHERE categoryid = $1';
+const getCategory = `SELECT Category.name, Folder.name AS parentfolder, Category.depreciationtype, DepreciationPercent.percentage AS depreciationpercentage 
+                    FROM Category FULL JOIN DepreciationPercent ON Category.id = DepreciationPercent.categoryid 
+                    FULL JOIN Folder ON Category.parentfolderid = Folder.id WHERE Category.id = $1`;
 
 let categoryTable = {
     add: addCategory,
@@ -25,7 +28,8 @@ let categoryTable = {
     getCategoryDepreciationType: getCategoryDepreciationType,
     getDepreciationPercent: getDepreciationPercent,
     doesCategoryIDExist,
-    getCategoryAssets
+    getCategoryAssets,
+    getCategory,
 }
 
 export default categoryTable;
