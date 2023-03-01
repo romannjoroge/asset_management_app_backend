@@ -115,7 +115,7 @@ async function assertThatAsyncFunctionReturnsRightThing(func, itemToReturn, ...p
         assert(false, "Nothing Was Returned");
     }
 
-    assert.equal(returnedItem, itemToReturn, "Returned Item Is Different");
+    assert.deepEqual(returnedItem, itemToReturn, "Returned Item Is Different");
 }
 
 async function assertThatAsyncFunctionReturnsNull(func, ...params){
