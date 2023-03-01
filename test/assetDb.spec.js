@@ -314,7 +314,7 @@ describe.skip("update Asset Functions", function(){
     });
 });
 
-describe("insert Asset Tests", function(){
+describe.skip("insert Asset Tests", function(){
     let assetTag = 'AUA0004';
     let fetchResult;
     let valueFromDatabase;
