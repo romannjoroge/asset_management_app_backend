@@ -3,8 +3,71 @@ import pool from '../db2.js';
 
 import { assert } from 'chai';
 
-import Category from '../src/Allocation/Category/category2.js';
+import {Category} from '../src/Allocation/Category/category2.js';
 import utility from '../utility/utility.js';
+
+describe.skip("getCategory Test", function() {
+    let categoryName;
+    let assetTags = ['AUA0005', 'AUA0006'];
+    let categoryID;
+    let folderID;
+    let folderName;
+    let depreciationPercentage;
+
+    this.beforeEach(async function(){
+        categoryName = "Existing";
+        categoryID = 5;
+        folderID = 3;
+        folderName = 'TestFolder3';
+        depreciationPercentage = 30;
+
+        try{
+            await pool.query("CREATE TEMPORARY TABLE Category (LIKE Category INCLUDING ALL)");
+            await pool.query("CREATE TEMPORARY TABLE Folder (LIKE Folder INCLUDING ALL)");
+            await pool.query("CREATE TEMPORARY TABLE DepreciationPercent (LIKE DepreciationPercent INCLUDING ALL)");
+            await pool.query("INSERT INTO DepreciationPercent (categoryID, percentage) VALUES ($1, $2)", [categoryID, depreciationPercentage])
+            await pool.query("INSERT INTO Folder (ID, name, companyName) VALUES ($1, $2, 'TestCompany')", [folderID, folderName])
+            await pool.query("INSERT INTO Category (ID, name, parentFolderID, depreciationType) VALUES ($1, $2, 3, 'Written Down Value')", [categoryID, categoryName]);
+            await pool.query("CREATE TEMPORARY TABLE Asset (LIKE Asset INCLUDING ALL)");
+            await pool.query("INSERT INTO Asset VALUES ($1, 'HP Folio 13', true, 'SSDFDAS', '01-12-2022', 1, 'good', 'John Doe', 10000, 1000, 5000, 5, 4)", [assetTags[0]]);
+            await pool.query("INSERT INTO Asset VALUES ($1, 'HP Folio 13', true, 'SSDFDAS', '01-12-2022', 1, 'good', 'John Doe', 10000, 1000, 5000, 5, 4)", [assetTags[1]]);
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Create Temporary Tables");
+        }
+    });
+
+    it("should return an error if category does not exist", async function() {
+        categoryName = 'Does Not Exist';
+
+        await utility.assertThatAsynchronousFunctionFails(Category.getCategory, "Category Does Not Exist", categoryName);
+    });
+
+    it("should return category details when an existing category is given", async function() {
+        categoryName = 'Existing';
+        let expectedResult = {
+            name: categoryName,
+            parentfolder: folderName,
+            depreciationtype: 'Written Down Value',
+            depreciationpercentage: depreciationPercentage,
+        }
+
+        await utility.assertThatAsyncFunctionReturnsRightThing(Category.getCategory, expectedResult, categoryName);
+    })
+
+    this.afterEach(async function(){
+        try{
+            await pool.query("DROP TABLE IF EXISTS pg_temp.Asset");
+            await pool.query("DROP TABLE IF EXISTS pg_temp.Category");
+            await pool.query("DROP TABLE IF EXISTS pg_temp.DepreciationPercent");
+            await pool.query("DROP TABLE IF EXISTS pg_temp.Folder");
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Delete Temporary Tables");
+        }
+    });
+})
+
 
 describe.skip("_getCategoryID Tests", function(){
     let categoryName;
