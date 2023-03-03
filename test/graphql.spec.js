@@ -2,10 +2,23 @@ import { assert } from "chai";
 const url = 'http://localhost:5000/graphql';
 import { request, gql } from 'graphql-request';
 import pool from "../db2.js";
+import utility from '../utility/utility.js';
+import { ApolloServerErrorCode } from '@apollo/server/errors';
 
-describe.skip('GraphQL Test', function(){
+describe('Category Query Test', function(){
     let categoryName;
-    let query;
+    let query = gql`
+    query ($categoryName: ID!){
+        category (name: $categoryName) {
+            name
+            depreciationtype
+            assets {
+                assettag
+                makeandmodelno
+            }
+        }
+    }
+`
     let result;
     let assetTags = ['AUA0005', 'AUA0006'];
 
@@ -22,22 +35,26 @@ describe.skip('GraphQL Test', function(){
             console.log(err);
             assert(false, "Could Not Create Temporary Tables");
         }
-    })
-    it('category query should return a value when the specified category exists', async function(){
-        categoryName = 'Existing';
-        query = gql`
-            query ($categoryName: ID!){
-                category (name: $categoryName) {
-                    name
-                    depreciationtype
-                    assets {
-                        assettag
-                        makeandmodelno
-                    }
-                }
-            }
-        `
+    });
 
+    it("should return an error if no category exists with specified id", async function(){
+        categoryName = 'Does Not Exist';
+        let expectedResult = {
+            data: {},
+            error: {
+                message: 'Invalid Category Name',
+                extensions: {
+                    code: 'BAD_USER_INPUT',
+                    argumentName: 'categoryName',
+                },
+            },
+        }
+
+        await utility.assertThatGraphQLQueryFails(query, {categoryName: categoryName}, ApolloServerErrorCode.BAD_USER_INPUT, 'Category Does Not Exist');
+    });
+
+    it.skip('category query should return a value when the specified category exists', async function(){
+        categoryName = 'Existing';
         let expectedResult = {
             data: {
                 category: {

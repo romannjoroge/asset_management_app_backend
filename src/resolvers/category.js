@@ -1,6 +1,6 @@
 const Category = {
-    assets: (parent, args, {category}) => {
-        return category.d;
+    assets: (parent, args, contextValue) => {
+        return contextValue.Category;
     }
 };
 
