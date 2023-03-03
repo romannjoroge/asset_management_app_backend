@@ -10,12 +10,20 @@ const typeDefs = `#graphql
         assets: [Asset!]
     }
 
+    type DoesNotExist {
+        message: String!
+    }
+
     type Company {
         name: ID!
         users: [User!]!
         topFolder: Folder!
         locations: [Location!]!
     }
+
+    union CategoryResult = Category | DoesNotExist
+
+    union AssetResult = Asset | DoesNotExist
 
     type Folder {
         id: Int!
@@ -100,9 +108,12 @@ const typeDefs = `#graphql
         asset: Asset!
     }
 
+
+
     type Query {
         categories: [Category!]!,
-        category (name: ID!): Category,
+        category (name: ID!): CategoryResult,
+        asset_resolver (tag: ID!): AssetResult
     }
 `
 
