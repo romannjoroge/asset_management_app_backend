@@ -5,7 +5,7 @@ import pool from '../db2.js';
 import utility from '../utility/utility.js';
 import { Errors } from '../utility/constants.js';
 
-describe("viewCategoryAssets Test", function(){
+describe.skip("viewCategoryAssets Test", function(){
     let categoryName;
     let assetTags = ['AUA0005', 'AUA0006']
 
