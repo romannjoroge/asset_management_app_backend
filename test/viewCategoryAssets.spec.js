@@ -3,8 +3,9 @@ import sinon from 'sinon';
 import {Category} from '../src/Allocation/Category/category2.js';
 import pool from '../db2.js';
 import utility from '../utility/utility.js';
+import { Errors } from '../utility/constants.js';
 
-describe.skip("viewCategoryAssets Test", function(){
+describe("viewCategoryAssets Test", function(){
     let categoryName;
     let assetTags = ['AUA0005', 'AUA0006']
 
@@ -26,7 +27,7 @@ describe.skip("viewCategoryAssets Test", function(){
     it("should bring an error if a category that doesn't exist is given", async function(){
         categoryName = 'Does Not Exist';
 
-        await utility.assertThatAsynchronousFunctionFails(Category.viewCategoryAssets, "Category Does Not Exist", categoryName);
+        await utility.assertThatAsynchronousFunctionFails(Category.viewCategoryAssets, Errors[1], categoryName);
     });
 
     it("should return a list of categories assets when given an existing asset", async function(){
