@@ -8,6 +8,7 @@ import categoryTable from './db_category2.js';
 import MyError from '../../../utility/myError.js';
 import Folder from '../Folder/folder.js';
 import utility from '../../../utility/utility.js';
+import { Errors } from '../../../utility/constants.js';
 
 class Category {
     // Constructor
@@ -329,19 +330,26 @@ class Category {
     }
 
     static async viewCategoryAssets(categoryName) {
-        if (! await Category._doesCategoryExist(categoryName)) {
-            throw new MyError("Category Does Not Exist");
-        }
-
-        let categoryId = await Category._getCategoryID(categoryName);
-        let fetchResult;
-
-        try{
-            fetchResult = await pool.query(categoryTable.getCategoryAssets, [categoryId]);
-            return fetchResult.rows;
-        }catch(err){
-            throw new MyError("Could Not Get Assets For The Category")
-        }        
+        return new Promise((res, rej)=>{
+            Category._doesCategoryExist(categoryName).then((flag)=>{
+                if (!flag) return rej(new MyError(Errors[1]))
+                Category._getCategoryID(categoryName).then((id)=>{
+                    pool.query(categoryTable.getCategoryAssets, [id])
+                    .then((dbdits)=>{
+                        res(
+                            dbdits.rows
+                        )
+                    })
+                    .catch((e)=>{
+                        rej(e)
+                    })
+                }).catch((e)=>{
+                    rej(e)
+                })
+            }).catch((e)=>{
+                rej(e)
+            }) 
+        })
     }
 
     static async getCategory(categoryName) {
