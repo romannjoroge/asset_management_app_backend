@@ -18,6 +18,11 @@ const updateAssetResidualValue = "UPDATE Asset SET residualValue = $1 WHERE asse
 const getCloseBookValue = "SELECT closingBookValue FROM DepreciationSchedule WHERE assetTag = $1 AND year = $2";
 const getAccumulatedDepreciation = "SELECT SUM(depreciationExpense) AS accumulatedDepreciation FROM DepreciationSchedule GROUP BY assetTag WHERE assetTag = $1";
 const insertDepreciationSchedule = "INSERT INTO DepreciationSchedule VALUES ($1, $2, $3, $4, $5)";
+const getAssetDetails = `
+    select ass.* ,cat.name as categoryname from asset as ass
+    inner join category as cat on cat.id = ass.categoryid
+    where ass.assetTag = $1;
+`
 
 const assetTable = {
     doesAssetTagExist,
@@ -37,7 +42,8 @@ const assetTable = {
     getAssetCategoryName,
     updateAssetResidualValue,
     getCloseBookValue,
-    getAccumulatedDepreciation
+    getAccumulatedDepreciation,
+    getAssetDetails
 }
 
 export default assetTable;

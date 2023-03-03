@@ -2,6 +2,7 @@ import fs from 'fs';
 
 // Importing the database bool from db2.js. This will allow me to connect to the database
 import pool from '../../../db2.js';
+import { Errors } from '../../../utility/constants.js';
 
 // Importing custom classes
 import MyError from '../../../utility/myError.js';
@@ -358,6 +359,25 @@ class Asset{
         utility.addErrorHandlingToAsyncFunction(Asset._updateAssetCustodian, "Could Not Assign Asset To User", 
                                                 assetTag, username);
     }
+
+
+    /**
+     * @name get_asset_details
+     * @params asset_tag String
+     * @return Promise<any>
+     */
+    static get_asset_details(asset_tag) {
+        return new Promise(async (res, rej)=>{
+            console.log("at 375")
+            await pool.query(assetTable.getAssetDetails, [asset_tag]).then((result)=>{
+                console.log("some result". result)
+                return res(result.rows)
+            }).catch((e)=>{
+                console.log("Some error here", e)
+                return rej(new MyError(Errors["3"]))
+            })
+        })
+    } 
 }
 
 export default Asset;
