@@ -3,18 +3,23 @@ const url = 'http://localhost:5000/graphql';
 import { request, gql } from 'graphql-request';
 import pool from "../db2.js";
 import utility from '../utility/utility.js';
-import { ApolloServerErrorCode } from '@apollo/server/errors';
+import { Errors } from "../utility/constants.js";
 
 describe('Category Query Test', function(){
     let categoryName;
     let query = gql`
     query ($categoryName: ID!){
         category (name: $categoryName) {
-            name
-            depreciationtype
-            assets {
-                assettag
-                makeandmodelno
+            ... on Category {
+                name 
+                depreciationtype
+                assets {
+                    assettag
+                    makeandmodelno
+                }
+            }
+            ... on DoesNotExist {
+                message
             }
         }
     }
@@ -37,20 +42,22 @@ describe('Category Query Test', function(){
         }
     });
 
-    it("should return an error if no category exists with specified id", async function(){
+    it("should return an error message if no category exists with specified name", async function(){
         categoryName = 'Does Not Exist';
         let expectedResult = {
-            data: {},
-            error: {
-                message: 'Invalid Category Name',
-                extensions: {
-                    code: 'BAD_USER_INPUT',
-                    argumentName: 'categoryName',
+            data: {
+                category: {
+                    message: Errors[1],
                 },
             },
         }
-
-        await utility.assertThatGraphQLQueryFails(query, {categoryName: categoryName}, ApolloServerErrorCode.BAD_USER_INPUT, 'Category Does Not Exist');
+        request(url, query, {categoryName}).then((res)=>{
+            assert.deepEqual(expectedResult, res);
+        }).catch((e)=>{
+            console.log(e);
+            assert(false, "An Error Was Thrown")
+        })
+        // await utility.assertThatGraphQLQueryFails(query, {categoryName: categoryName}, ApolloServerErrorCode.BAD_USER_INPUT, 'Category Does Not Exist');
     });
 
     it.skip('category query should return a value when the specified category exists', async function(){
