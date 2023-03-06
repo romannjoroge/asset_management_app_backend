@@ -24,38 +24,38 @@ dotenv.config()  // Brings varaibles from .env file
 app.use(express.urlencoded({extended: false}))
 app.use(express.json())
 
-// // Importing routes
-// const allocate = require('./routes/allocation')
-// const items = require('./routes/items')
-// const category = require('./routes/category')
-// const tracking = require('./routes/tracking')
-// const gatepass = require('./routes/gatepass')
-// const reconciliation = require('./routes/reconciliation')
-// const users = require('./routes/users')
+// Importing routes
+import allocate from './routes/allocation.js';
+import items from './routes/items.js';
+import category from './routes/category.js';
+import tracking from './routes/tracking.js';
+import gatepass from './routes/gatepass.js';
+import reconciliation from './routes/reconciliation.js';
+import users from './routes/users.js'
 
-// // Routers to use for different modules
-// app.use('/allocation', allocate)
-// app.use('/assets/items', items)
-// app.use('/assets/category', category)
-// app.use('/tracking', tracking)
-// app.use('/gatepass', gatepass)
-// app.use('/reconciliation', reconciliation)
-// app.use('/users', users)
+// Routers to use for different modules
+app.use('/allocation', allocate)
+app.use('/assets/items', items)
+app.use('/assets/category', category)
+app.use('/tracking', tracking)
+app.use('/gatepass', gatepass)
+app.use('/reconciliation', reconciliation)
+app.use('/users', users)
 
-// app.get('/', (req, res)=>{
-//     console.log(req.oidc.isAuthenticated())
-//     res.status(200).json({success: true, msg: 'Secured resource'})
-// })
+app.get('/', (req, res)=>{
+    console.log(req.oidc.isAuthenticated())
+    res.status(200).json({success: true, msg: 'Secured resource'})
+})
 
-// app.get('/assets', (req, res)=>{
-//     res.status(200).json({'success':true, 'data':'To Be Determined'})
-// })
+app.get('/assets', (req, res)=>{
+    res.status(200).json({'success':true, 'data':'To Be Determined'})
+})
 
-// app.route('*', (req, res)=>{
-//     res.status(404).json({'code':404, 'message':'Resource not found'})
-// })
+app.route('*', (req, res)=>{
+    res.status(404).json({'code':404, 'message':'Resource not found'})
+})
 
 
 app.listen(4000, ()=>{
-    console.log('Server is listening on port 5000..')
+    console.log('Server is listening on port 4000..')
 })
