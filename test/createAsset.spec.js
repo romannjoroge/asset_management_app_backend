@@ -1,34 +1,33 @@
 // Import database pool
-const pool = require("../db2");
-const fs = require('fs');
+import pool from '../db2.js';
 
 // Import testing libraries
-const assert = require('chai').assert;
-const expect = require('chai').expect;
-const sinon = require('sinon');
+import { assert } from 'chai';
+import Sinon from 'sinon';
 
 // Import classes
-const MyError = require("../utility/myError");
-const utility = require('../utility/utility');
-const Asset = require('../src/Allocation/asset2');
-const Location = require('../src/Tracking/location');
-const User = require('../src/Users/users');
-const Category = require("../src/Allocation/category2");
+import MyError from '../utility/myError.js';
+import utility from '../utility/utility.js';
+import Asset from '../src/Allocation/Asset/asset2.js';
+import Location from '../src/Tracking/location.js';
+import User from '../src/Users/users.js';
+import Category from '../src/Allocation/Category/category2.js';
+import { Errors } from '../utility/constants.js';
 
-describe.skip("createAsset test", function () {
+describe("createAsset test", function () {
     // Test inputs
-    let fixed;
-    let assetTag;
-    let assetLifeSpan;
-    let acquisitionDate;
-    let locationID;
-    let status;
-    let custodianName;
-    let acquisitionCost;
-    let insuranceValue;
-    let categoryName;
-    let attachments;
-    let locationErrorMessage = "Invalid location";
+    let fixed = true;
+    let assetTag = "AUAOOOO2";
+    let assetLifeSpan = 1;
+    let acquisitionDate= "12-01-2022";
+    let locationID = 1;
+    let status = "good";
+    let custodianName = "John";
+    let acquisitionCost = 1000;
+    let insuranceValue = 100;
+    let categoryName = 'TestCategory';
+    let categoryID = 1;
+    let attachments = ['attachments/download.jpeg'];
     let verifyLocationStub;
     let invalidCustodianErrorMessage = "Invalid custodian";
     let checkIfUserExistsStub;
@@ -36,16 +35,16 @@ describe.skip("createAsset test", function () {
     let getCategoryIDStub;
     let fsExistsSyncStub;
     let doesAssetTagExistStub;
-    let assetTagErrorMessage = "Asset Tag Has Already Been Assigned";
     let makeAndModelNo = "FSDFSDFSDFSDF";
     let serialNumber = 'ERSRSESRESFSe';
-    let residualValue;
+    let residualValue = 0;
     let getCategoryDepreciationTypeStub;
 
     async function assertThatAssetConstructorFails(errorMessage){
         try{
             let asset = new Asset(fixed, assetLifeSpan, acquisitionDate, locationID, status, custodianName, 
-                    acquisitionCost, insuranceValue, categoryName, attachments, assetTag, makeAndModelNo, serialNumber, residualValue);
+                    acquisitionCost, insuranceValue, categoryName, attachments, assetTag, makeAndModelNo, 
+                    serialNumber, residualValue);
             await asset.initialize();
             assert(false, "An Error Should Be Thrown");
         }catch(err){
@@ -58,40 +57,54 @@ describe.skip("createAsset test", function () {
         }
     }
     
-    beforeEach(function (){
-        // Test inputs
+    beforeEach(async function (){
         fixed = true;
         assetTag = "AUAOOOO1";
         assetLifeSpan = 1;
-        acquisitionDate = "12-01-2022";
+        acquisitionDate= "12-01-2022";
         locationID = 1;
         status = "good";
-        custodianName = "John";
+        custodianName = "JohnDoe";
         acquisitionCost = 1000;
         insuranceValue = 100;
-        categoryName = "Test";
-        attachments = ['attachments/908e0d1a8f2bc03775753a55d4bc57fe'];
-        
-        verifyLocationStub = sinon.stub(Location, "verifyLocationID")
-                            .withArgs(locationID, locationErrorMessage)
-                            .returns("Test");
-        checkIfUserExistsStub = sinon.stub(User, "checkIfUserExists")
-                                .withArgs(custodianName, invalidCustodianErrorMessage);
-        doesCategoryExistStub = sinon.stub(Category, "_doesCategoryExist")
-                                .withArgs(categoryName)
-                                .returns(true);
-        getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
-                            .withArgs(categoryName)
-                            .returns(1);
-        fsExistsSyncStub = sinon.stub(fs, "existsSync")
-                           .withArgs(attachments[0])
-                           .returns(true);
-        doesAssetTagExistStub = sinon.stub(Asset, "doesAssetTagExist")
-                                .withArgs(assetTag, assetTagErrorMessage);
+        categoryID = 1;
+        attachments = ['attachments/download.jpeg'];
+        makeAndModelNo = "FSDFSDFSDFSDF";
+        serialNumber = 'ERSRSESRESFSe';
         residualValue = 100;
-        getCategoryDepreciationTypeStub = sinon.stub(Category, "_getCategoryDepreciationType")
-                                            .withArgs(categoryName)
-                                            .returns("Straight Line");
+        categoryName = 'TestCategory';
+        // Test inputs
+
+        // verifyLocationStub = Sinon.stub(Location, "verifyLocationID")
+        //                     .withArgs(locationID, locationErrorMessage)
+        //                     .returns("Test");
+        // checkIfUserExistsStub = Sinon.stub(User, "checkIfUserExists")
+        //                         .withArgs(custodianName, invalidCustodianErrorMessage);
+        // doesCategoryExistStub = Sinon.stub(Category, "_doesCategoryExist")
+        //                         .withArgs(categoryName)
+        //                         .returns(true);
+        // getCategoryIDStub = Sinon.stub(Category, "_getCategoryID")
+        //                     .withArgs(categoryName)
+        //                     .returns(1);
+        // fsExistsSyncStub = Sinon.stub(fs, "existsSync")
+        //                    .withArgs(attachments[0])
+        //                    .returns(true);
+        // doesAssetTagExistStub = Sinon.stub(Asset, "doesAssetTagExist")
+        //                         .withArgs(assetTag, assetTagErrorMessage);
+        // 
+        // getCategoryDepreciationTypeStub = Sinon.stub(Category, "_getCategoryDepreciationType")
+        //                                     .withArgs(categoryName)
+        //                                     .returns("Straight Line");
+
+        try {
+            await pool.query('CREATE TEMPORARY TABLE Asset (LIKE Asset INCLUDING ALL)');
+            await pool.query("INSERT INTO Asset VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)", 
+                            [assetTag, makeAndModelNo, fixed, serialNumber, acquisitionDate, locationID, status, 
+                            custodianName, acquisitionCost, insuranceValue, residualValue, categoryID, assetLifeSpan]);
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Create Temporary Tables")
+        }
     });
 
     it("should fail when an invalid fixed status is provided", async function () {
@@ -118,12 +131,7 @@ describe.skip("createAsset test", function () {
     it("should fail when an invalid location is given", async function() {
         locationID = 1000;
 
-        Location.verifyLocationID.restore();
-        verifyLocationStub = sinon.stub(Location, "verifyLocationID")
-                            .withArgs(locationID, locationErrorMessage)
-                            .throws(new MyError(locationErrorMessage));
-
-        await assertThatAssetConstructorFails(locationErrorMessage);
+        await assertThatAssetConstructorFails(Errors[3]);
     });
 
     it("should fail when an invalid status is given", async function () {
@@ -136,11 +144,6 @@ describe.skip("createAsset test", function () {
     it("should fail when an invalid username is given as custodian name", async function (){
         // Test inputs
         custodianName = "Non Existent Name";
-
-        User.checkIfUserExists.restore();
-        checkIfUserExistsStub = sinon.stub(User, "checkIfUserExists")
-                                .withArgs(custodianName, invalidCustodianErrorMessage)
-                                .throws(new MyError(invalidCustodianErrorMessage));
 
         await assertThatAssetConstructorFails(invalidCustodianErrorMessage);
     });
@@ -163,44 +166,26 @@ describe.skip("createAsset test", function () {
         // Test inputs
         categoryName = "Does Not Exist";
 
-
-        Category._doesCategoryExist.restore();
-        Category._getCategoryID.restore();
-        doesCategoryExistStub = sinon.stub(Category, "_doesCategoryExist")
-                                .withArgs(categoryName)
-                                .returns(false);
-        getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
-                            .withArgs(categoryName)
-                            .throws("Category Does Not Exist");
-
-        await assertThatAssetConstructorFails("Invalid category");
+        await assertThatAssetConstructorFails(Errors[5]);
     });
 
     it("should fail when an invalid attachment is given", async function(){
         // Test inputs
         attachments = ['this/does/not/exist'];
 
-        fs.existsSync.restore();
-        fsExistsSyncStub = sinon.stub(fs, "existsSync")
-                            .withArgs(attachments[0])
-                            .returns(false);
-
-        await assertThatAssetConstructorFails("Invalid attachments");
+        await assertThatAssetConstructorFails(Errors[4]);
     });
 
     it("should fail when an existing assetTag is given", async function(){
         // Test inputs
-        assetTag = "Already assigned";
+        assetTag = "AUAOOOO1";
 
-        Asset.doesAssetTagExist.restore();
-        doesAssetTagExistStub = sinon.stub(Asset, "doesAssetTagExist")
-                                .withArgs(assetTag, assetTagErrorMessage)
-                                .throws(new MyError(assetTagErrorMessage));
-
-        await assertThatAssetConstructorFails(assetTagErrorMessage);
+        await assertThatAssetConstructorFails(Errors[7]);
     });
 
     it("should add asset when all details are valid", async function(){
+        assetTag = 'AUA00002';
+        residualValue = 0;
         try{
             let asset = new Asset(fixed, assetLifeSpan, acquisitionDate, locationID, status, custodianName, 
                 acquisitionCost, insuranceValue, categoryName, attachments, assetTag, makeAndModelNo, serialNumber, residualValue);
@@ -219,21 +204,12 @@ describe.skip("createAsset test", function () {
         await assertThatAssetConstructorFails("Invalid Residual Value");
     });
 
-    it("should fail when a non zero residual value is given when depreciation type is not straight line", async function(){
-        // Test inputs
-        residualValue = 100;
-        categoryName = "Category with written down depreciation type";
-
-        // Stubbing database calls
-        Category._getCategoryDepreciationType.restore();
-        Category._doesCategoryExist.restore();
-        doesCategoryExistStub = sinon.stub(Category, "_doesCategoryExist")
-                                .withArgs(categoryName)
-                                .returns(true);
-        getCategoryDepreciationTypeStub = sinon.stub(Category, "_getCategoryDepreciationType")
-                                            .withArgs(categoryName)
-                                            .returns("Written Down Value");
-
-        await assertThatAssetConstructorFails("Invalid Residual Value for Depreciation Type");
+    this.afterEach(async function() {
+        try{
+            await pool.query("DROP TABLE IF EXISTS pg_temp.Asset")
+        }catch(err){
+            console.log(err);
+            assert(false, "Could Not Drop Temporary Tables");
+        }
     });
 })

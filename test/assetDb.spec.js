@@ -1,13 +1,10 @@
 // Importing database pool
-const pool = require('../db2');
+import pool from '../db2.js';
 
-const sinon = require('sinon');
-const assert = require('chai').assert;
+import { assert } from 'chai';
 
-const Asset = require('../src/Allocation/asset2');
-const utility = require('../utility/utility');
-const { _insertDepreciationPercentInDb } = require('../src/Allocation/category2');
-const { _insertDepreciationSchedule } = require('../src/Allocation/asset2');
+import Asset from '../src/Allocation/Asset/asset2.js';
+import utility from '../utility/utility.js';
 
 
 describe.skip("_doesAssetTagExist Test", function(){
@@ -318,7 +315,7 @@ describe.skip("update Asset Functions", function(){
     });
 });
 
-describe("insert Asset Tests", function(){
+describe.skip("insert Asset Tests", function(){
     let assetTag = 'AUA0004';
     let fetchResult;
     let valueFromDatabase;

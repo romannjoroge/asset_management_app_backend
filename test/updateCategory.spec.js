@@ -1,14 +1,14 @@
 // Import database pool
-const pool = require("../db2");
+import pool from '../db2.js';
 
 // Importing testing packages
-const sinon = require('sinon');
-const assert = require('chai').assert;
+import Sinon from 'sinon';
+import { assert } from 'chai';
 
 // Importing classes used in tests
-const Category = require("../src/Allocation/category2");
-const MyError = require("../utility/myError");
-const Folder = require("../src/Allocation/folder");
+import Category from '../src/Allocation/Category/category2.js';
+import MyError from '../utility/myError.js';
+import Folder from '../src/Allocation/Folder/folder.js';
 
 describe.skip("updateCategory Test", function () {
     it("should update depreciation type is double declining, value is 0 and the other details are valid", async function () {
@@ -29,46 +29,46 @@ describe.skip("updateCategory Test", function () {
 
         // Stubs for updateDepreciation
         // Stub updateDepreciationTypeInDB
-        let updateDepreciationTypeInDB = sinon.stub(Category, "_updateDepreciationTypeInDB");
+        let updateDepreciationTypeInDB = Sinon.stub(Category, "_updateDepreciationTypeInDB");
 
         // Mock deleteDepreciationPercentInDb
-        let deleteDepreciationPercentInDb = sinon.stub(Category, "_deleteDepreciationPercentInDb");
+        let deleteDepreciationPercentInDb = Sinon.stub(Category, "_deleteDepreciationPercentInDb");
 
         // Mock insertDepreciationPercentInDb
-        let insertDepreciationPercentInDb = sinon.stub(Category, "_insertDepreciationPercentInDb");
+        let insertDepreciationPercentInDb = Sinon.stub(Category, "_insertDepreciationPercentInDb");
 
         // Stub getCategoryID
-        let getCategoryID = sinon.stub(Category, "_getCategoryID")
+        let getCategoryID = Sinon.stub(Category, "_getCategoryID")
                         .withArgs(categoryName)
                         .returns(category_id)
                         .withArgs(updateJSON.name)
                         .throws(new MyError("No Category exists with that name"));
 
         // Stub doesFolderExist
-        let doesFolderExist = sinon.stub(Folder, "doesFolderExist")
+        let doesFolderExist = Sinon.stub(Folder, "doesFolderExist")
                          .withArgs(updateJSON.parentFolder)
                          .returns(true);
 
         // Mocks for updateCategoryName
-        let updateNameinDb = sinon.stub(Category, "_updateNameinDb");
+        let updateNameinDb = Sinon.stub(Category, "_updateNameinDb");
 
         // Mocks for updateCategoryFolder
-        let updateFolderinDB = sinon.stub(Category, "_updateFolderinDB");
+        let updateFolderinDB = Sinon.stub(Category, "_updateFolderinDB");
 
         // Run function
         try{
             await Category.updateCategory(updateJSON, categoryName);
 
             // Assert that updateNameinDb is called with right arguements
-            sinon.assert.calledWith(updateNameinDb, category_id, updateJSON.name);
+            Sinon.assert.calledWith(updateNameinDb, category_id, updateJSON.name);
             // Assert that updateFolderinDB is called with the right arguements
-            sinon.assert.calledWith(updateFolderinDB, category_id, updateJSON.parentFolder);
+            Sinon.assert.calledWith(updateFolderinDB, category_id, updateJSON.parentFolder);
             // Assert that updateDepreciationTypeInDB is called with the right arguements
-            sinon.assert.calledWith(updateDepreciationTypeInDB, category_id, updateJSON.depreciation.type);
+            Sinon.assert.calledWith(updateDepreciationTypeInDB, category_id, updateJSON.depreciation.type);
             // Assert that deleteDepreciationPercentInDb is called with the right arguements
-            sinon.assert.calledWith(deleteDepreciationPercentInDb, category_id);
+            Sinon.assert.calledWith(deleteDepreciationPercentInDb, category_id);
             // Assert that insertDepreciationPercentInDb is not called
-            sinon.assert.notCalled(insertDepreciationPercentInDb);
+            Sinon.assert.notCalled(insertDepreciationPercentInDb);
 
         }catch(err){
             console.log(err);
@@ -88,20 +88,20 @@ describe.skip("updateCategory Test", function () {
         let categoryName = "Existing";
         let category_id = 1;
         
-        let updateDepreciationTypeInDBStub = sinon.stub(Category, "_updateDepreciationTypeInDB");
-        let deleteDepreciationPercentInDbStub = sinon.stub(Category, "_deleteDepreciationPercentInDb");
-        let insertDepreciationPercentInDbStub = sinon.stub(Category, "_insertDepreciationPercentInDb");
-        let getCategoryIDStub = sinon.stub(Category, "_getCategoryID")
+        let updateDepreciationTypeInDBStub = Sinon.stub(Category, "_updateDepreciationTypeInDB");
+        let deleteDepreciationPercentInDbStub = Sinon.stub(Category, "_deleteDepreciationPercentInDb");
+        let insertDepreciationPercentInDbStub = Sinon.stub(Category, "_insertDepreciationPercentInDb");
+        let getCategoryIDStub = Sinon.stub(Category, "_getCategoryID")
                         .withArgs(categoryName)
                         .returns(category_id)
                         .withArgs(updateJSON.name)
                         .throws(new MyError("No Category exists with that name"));
-        let doesFolderExistStub = sinon.stub(Folder, "doesFolderExist")
+        let doesFolderExistStub = Sinon.stub(Folder, "doesFolderExist")
                          .withArgs(updateJSON.parentFolder)
                          .returns(true);
 
-        let updateCategoryNameStub = sinon.stub(Category, "_updateCategoryName");
-        let updateCategoryFolderStub = sinon.stub(Category, "_updateCategoryFolder");
+        let updateCategoryNameStub = Sinon.stub(Category, "_updateCategoryName");
+        let updateCategoryFolderStub = Sinon.stub(Category, "_updateCategoryFolder");
 
         // Run function
         try{

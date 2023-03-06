@@ -1,11 +1,11 @@
 // Import testing libraries
-const assert = require('chai').assert;
-const sinon = require('sinon');
+import { assert } from 'chai';
+import Sinon from 'sinon';
 
 // Import classes
-const MyError = require("../utility/myError");
-const Asset = require('../src/Allocation/asset2');
-const Category = require("../src/Allocation/category2");
+import MyError from '../utility/myError.js';
+import Asset from '../src/Allocation/Asset/asset2.js';
+import Category from '../src/Allocation/Category/category2.js';
 
 describe.skip("createDepreciationSchedule tests", function(){
     let assetLifeSpan;
@@ -31,17 +31,17 @@ describe.skip("createDepreciationSchedule tests", function(){
         acquisitionDate = new Date(year, month - 1, date);
         residualValue = 0;
 
-        doesAssetTagExistStub = sinon.stub(Asset, "doesAssetTagExist")
+        doesAssetTagExistStub = Sinon.stub(Asset, "doesAssetTagExist")
                                 .withArgs(assetTag, "Asset Does Not Exist");
     })
 
     async function assertThatDepreciationScheduleIsInserted(entries){
-        insertDepreciationScheduleStub = sinon.stub(Asset, "_insertDepreciationSchedule")
+        insertDepreciationScheduleStub = Sinon.stub(Asset, "_insertDepreciationSchedule")
                                         .withArgs(entries[0].assetTag, entries[0].year, entries[0].openBookValue, 
                                                   entries[0].depreciationExpense, entries[0].accumulatedDepreciation, entries[0].closeBookValue)
                                         .withArgs(entries[1].assetTag, entries[1].year, entries[1].openBookValue, 
                                                   entries[1].depreciationExpense, entries[1].accumulatedDepreciation, entries[1].closeBookValue);
-        _getCloseBookValueStub = sinon.stub(Asset, "_getCloseBookValue")
+        _getCloseBookValueStub = Sinon.stub(Asset, "_getCloseBookValue")
                                 .withArgs(assetTag, entries[0].year)
                                 .returns(entries[0].closeBookValue);
         try{
@@ -56,7 +56,7 @@ describe.skip("createDepreciationSchedule tests", function(){
         // Test Inputs
         assetTag = "Non Existent";
         Asset.doesAssetTagExist.restore();
-        doesAssetTagExistStub = sinon.stub(Asset, "doesAssetTagExist")
+        doesAssetTagExistStub = Sinon.stub(Asset, "doesAssetTagExist")
                                 .withArgs(assetTag, "Asset Does Not Exist")
                                 .throws(new MyError("Asset Does Not Exist"));
         try{
