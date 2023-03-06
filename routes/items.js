@@ -2,6 +2,8 @@ import express from 'express';
 const router = express.Router();
 import Asset from '../src/Allocation/Asset/asset2.js';
 import { Errors, Succes } from '../utility/constants.js';
+import pool from '../db2.js';
+import assetTable from '../src/Allocation/Asset/db_assets.js';
 
 // const {
 //     addItem,
@@ -75,7 +77,28 @@ router.get('/view', (req, res) => {
         })
     });
 })
-// router.get('/view/:id', getItem)
+
+router.get('/view/:id', (req, res) => {
+    // Get asset tag from request params
+    let assetTag = req.params.id;
+
+    // Query database for details of asset with given assettag
+    pool.query(assetTable.getAssetDetails, [assetTag]).then(fetchResult => {
+        if (fetchResult.rowCount <= 0) {
+            res.status(404).json({
+                message: Errors[8],
+            })
+        }else{
+            res.status(200).json({
+                data: fetchResult.rows[0],
+            })
+        }
+    }).catch(e => {
+        res.status(500).json({
+            message: Errors[9]
+        })
+    });
+})
 // router.route('*', (req, res) => {
 //     res.status(404).json({ data: 'Resource not found' })
 // })

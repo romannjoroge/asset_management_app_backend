@@ -18,6 +18,12 @@ const updateAssetResidualValue = "UPDATE Asset SET residualValue = $1 WHERE asse
 const getCloseBookValue = "SELECT closingBookValue FROM DepreciationSchedule WHERE assetTag = $1 AND year = $2";
 const getAccumulatedDepreciation = "SELECT SUM(depreciationExpense) AS accumulatedDepreciation FROM DepreciationSchedule GROUP BY assetTag WHERE assetTag = $1";
 const insertDepreciationSchedule = "INSERT INTO DepreciationSchedule VALUES ($1, $2, $3, $4, $5)";
+const getAssetDetails = `
+    SELECT a.makeandmodelno, a.isfixed, a.serialnumber, a.acquisitiondate, a.status, 
+    a.custodianname, a.acquisitioncost, a.insurancevalue, a.residualvalue, a.assetlifespan, 
+    l.name as locationname, c.name as categoryname FROM Asset as a JOIN Location as l ON a.locationid = l.id 
+    JOIN Category as c ON a.categoryid = c.id WHERE a.assettag = $1;
+`
 
 const assetTable = {
     doesAssetTagExist,
@@ -37,7 +43,8 @@ const assetTable = {
     getAssetCategoryName,
     updateAssetResidualValue,
     getCloseBookValue,
-    getAccumulatedDepreciation
+    getAccumulatedDepreciation,
+    getAssetDetails
 }
 
 export default assetTable;
