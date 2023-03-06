@@ -10,7 +10,7 @@ import locationTable from './db_location.js';
 class Location {
     constructor (){}
 
-    static async verifyLocationID(id, message){
+    static async verifyLocationID(id){
         // Throws an error if location doesn't exist and returns it's name if it does exist
         let fetchResult;
         try{
@@ -18,8 +18,8 @@ class Location {
         }catch(err){
             throw new MyError(message);
         }
-        return fetchResult.rows[0].name;
+        return (fetchResult.rowCount > 0);
     }
 }
 
-module.exports = Location;
+export default Location;
