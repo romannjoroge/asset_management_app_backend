@@ -1,1 +1,7 @@
 node_modules
+Roman Test
+coverage
+.nyc_output
+.nycrc.json
+oldCode
+.vscode

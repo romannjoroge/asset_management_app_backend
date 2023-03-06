@@ -96,3 +96,4 @@ CREATE TABLE log(
     CONSTRAINT PK_13 PRIMARY KEY (log_id),
     CONSTRAINT log_user_fk FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
+
