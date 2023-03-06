@@ -12,18 +12,14 @@ CREATE TABLE User2 (
 );
 
 CREATE TABLE Company (
-  name varchar(50),
-  topFolderID int,
-  PRIMARY KEY (name),
-  CONSTRAINT 'FK_Company.topFolderID'
-    FOREIGN KEY (topFolderID)
-      REFERENCES Folder(ID)
+  name varchar(50) NOT NULL,
+  PRIMARY KEY (name)
 );
 
 CREATE TABLE Folder (
   ID serial,
-  name varchar(50),
-  companyName varchar(50),
+  name varchar(50) NOT NULL,
+  companyName varchar(50) NOT NULL,
   CONSTRAINT "FK_Folder.companyName"
     FOREIGN KEY (companyName)
       REFERENCES Company(name),
@@ -32,9 +28,9 @@ CREATE TABLE Folder (
 
 CREATE TABLE Location (
   ID serial,
-  name varchar(50),
-  parentFolderID int,
-  companyName varchar(50),
+  name varchar(50) NOT NULL,
+  parentFolderID int NOT NULL,
+  companyName varchar(50) NOT NULL,
   PRIMARY KEY (ID),
   CONSTRAINT "FK_Location.companyName"
     FOREIGN KEY (companyName)
