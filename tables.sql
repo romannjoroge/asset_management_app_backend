@@ -1,3 +1,8 @@
+CREATE TABLE Company (
+  name varchar(50) NOT NULL,
+  PRIMARY KEY (name)
+);
+
 CREATE TABLE User2 (
   fname varchar(50) NOT NULL,
   lname varchar(50) NOT NULL,
@@ -9,11 +14,6 @@ CREATE TABLE User2 (
   CONSTRAINT "FK_User.companyName"
     FOREIGN KEY (companyName)
       REFERENCES Company(name)
-);
-
-CREATE TABLE Company (
-  name varchar(50) NOT NULL,
-  PRIMARY KEY (name)
 );
 
 CREATE TABLE Folder (
