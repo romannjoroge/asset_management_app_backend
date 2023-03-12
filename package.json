@@ -6,7 +6,8 @@
   "scripts": {
     "test": "export NODE_ENV=test && mocha",
     "coverage": "nyc --reporter=lcov --reporter=text npm run test",
-    "start": "export NODE_ENV=test && npx nodemon node app.js",
+    "start": "npx nodemon node app.js",
+    "start-dev": "export NODE_ENV=test && npx nodemon node app.js",
     "test-windows": "set NODE_ENV=windows && mocha",
     "debug": "npx nodemon 'set NODE_ENV=windows && mocha'",
     "other_test": "npx nodemon --exec 'mocha'"
