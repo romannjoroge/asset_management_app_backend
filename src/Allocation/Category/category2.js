@@ -55,7 +55,7 @@ class Category {
     }
 
     async initialize(){
-        if (!await Category._doesCategoryExist(this.categoryName)){
+        if (await Category._doesCategoryExist(this.categoryName)){
             throw new MyError("Category Already Exists");
         }
 

@@ -10,6 +10,9 @@ const deleteDepreciationPercent = "DELETE FROM DepreciationPercent WHERE categor
 const getCategoryDepreciationType = "SELECT depreciationType FROM Category WHERE ID = $1";
 const getDepreciationPercent = "SELECT percentage FROM DepreciationPercent WHERE categoryID = $1";
 const doesCategoryIDExist = "SELECT name FROM Category WHERE ID = $1";
+const getAllCategories = 'SELECT name FROM Category';
+const getCategory = `SELECT c.name, c.depreciationtype, f.name AS parentfolder FROM Category AS c JOIN Folder as f ON 
+                    c.parentfolderid = f.id WHERE c.name=$1`;
 
 let categoryTable = {
     add: addCategory,
@@ -23,7 +26,9 @@ let categoryTable = {
     deleteDepreciationPercent: deleteDepreciationPercent,
     getCategoryDepreciationType: getCategoryDepreciationType,
     getDepreciationPercent: getDepreciationPercent,
-    doesCategoryIDExist
+    doesCategoryIDExist,
+    getAllCategories,
+    getCategory
 }
 
 export default categoryTable;

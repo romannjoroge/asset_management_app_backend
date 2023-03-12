@@ -98,7 +98,7 @@ router.get('/view/:id', (req, res) => {
             message: Errors[9]
         })
     });
-})
+});
 // router.route('*', (req, res) => {
 //     res.status(404).json({ data: 'Resource not found' })
 // })

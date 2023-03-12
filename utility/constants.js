@@ -8,6 +8,9 @@ export const Errors = {
     '7': "Asset Already Exists",
     '8': "Could Not Get Asset Details",
     '9': "Internal Server Error",
+    '10': "Could Not Get Categories",
+    '11': "Could Not Get Category",
+    '12': 'Could Not Create Category',
 }
 
 export const Succes = {
