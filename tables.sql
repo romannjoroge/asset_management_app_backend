@@ -205,3 +205,6 @@ INSERT INTO Folder(name) VALUES('home');
 
 -- Set dates to be in format mm-dd-yyyy
 SET datestyle TO MDY;
+
+-- Gives asset_management the right password
+ALTER USER asset_management WITH PASSWORD 'the password';
