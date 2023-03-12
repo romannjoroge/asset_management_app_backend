@@ -1,5 +1,6 @@
 import express from 'express';
 const app = express();
+import cors from 'cors';
 import multer from 'multer'; // Deals with file upload
 const upload = multer({dest: 'attachments/'});  // Specifies path to store uploaded attachments
 import dotenv from 'dotenv';
@@ -21,6 +22,7 @@ dotenv.config()  // Brings varaibles from .env file
 
 
 // Reading JSON data from forms and JS respectively
+app.use(cors());
 app.use(express.urlencoded({extended: false}))
 app.use(express.json())
 
