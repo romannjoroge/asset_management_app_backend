@@ -11,6 +11,7 @@ export const Errors = {
     '10': "Could Not Get Categories",
     '11': "Could Not Get Category",
     '12': 'Could Not Create Category',
+    '13': "Could Not Get Locations",
 }
 
 export const Succes = {
