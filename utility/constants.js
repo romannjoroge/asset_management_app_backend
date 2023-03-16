@@ -1,4 +1,5 @@
 export const Errors = {
+    '0': "Route Does Not Exist",
     '1': 'Could Not Create Asset',
     '2': 'Could Not Display Assets',
     '3': "Location Does Not Exist",
@@ -13,8 +14,17 @@ export const Errors = {
     '12': 'Could Not Create Category',
     '13': "Could Not Get Locations",
     '14': "Could Not Get Users",
+    '15': "Could Not Create Physical Valuation Report",
+    '16': "Could Not Create File",
+    '17': "Could Not Send File",
+    '18': "User Has No Logs",
+    '19': "There Are No Missing Assets",
+    '20': "There Are No Allocation Records for asset",
+    '21': "There Are No Asset Movements",
+    '22': "Could Not Get Data"
 }
 
 export const Succes = {
     '1': 'Asset Created Successfuly',
+    '2': "Reports Sent Successfully",
 }

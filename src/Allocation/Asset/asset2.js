@@ -80,11 +80,9 @@ class Asset {
             throw new MyError(Errors[3]);
         }
         await User.checkIfUserExists(this.custodianName, "Invalid custodian");
-        console.log("What is the problem 4!");
         if (await Asset._doesAssetTagExist(this.assetTag)) {
             throw new MyError(Errors[7]);
         }
-        console.log("What is the problem 5!");
         let depreciaitionType = Category._getCategoryDepreciationType(this.categoryID);
         if (depreciaitionType !== "Straight Line") {
             if (this.residualValue) {
@@ -115,8 +113,9 @@ class Asset {
             await pool.query(assetTable.addAssetToAssetRegister, [this.assetTag, this.makeAndModelNo, this.fixed, this.serialNumber,
             this.acquisitionDate, this.locationID, this.status, this.custodianName, this.acquisitionCost, this.insuranceValue, this.categoryID,
             this.assetLifeSpan]);
-            Asset._insertAssetAttachments(this.assetTag, this.attachments);
+            await Asset._insertAssetAttachments(this.assetTag, this.attachments);
         } catch (err) {
+            console.log(err);
             throw new MyError("Could not add asset to asset Register");
         }
     }
