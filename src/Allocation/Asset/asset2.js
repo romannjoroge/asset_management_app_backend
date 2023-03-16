@@ -76,16 +76,15 @@ class Asset {
             console.log(err);
             throw new MyError(Errors[6]);
         }
-
         if (! await Location.verifyLocationID(this.locationID)) {
             throw new MyError(Errors[3]);
         }
         await User.checkIfUserExists(this.custodianName, "Invalid custodian");
-
+        console.log("What is the problem 4!");
         if (await Asset._doesAssetTagExist(this.assetTag)) {
             throw new MyError(Errors[7]);
         }
-
+        console.log("What is the problem 5!");
         let depreciaitionType = Category._getCategoryDepreciationType(this.categoryID);
         if (depreciaitionType !== "Straight Line") {
             if (this.residualValue) {

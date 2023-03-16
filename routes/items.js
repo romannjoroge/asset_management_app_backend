@@ -52,13 +52,12 @@ router.post('/add', (req, res) => {
 
     asset.initialize().then(data => {
         // Log new asset created
-
-        res.status(201).json({
+        return res.status(201).json({
             message: Succes[1],
         })
     }).catch(e => {
         console.log(e);
-        res.status(500).json({
+        return res.status(500).json({
             message: Errors[1],
         })
     });
