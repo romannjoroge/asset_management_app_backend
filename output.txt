@@ -1,0 +1,2 @@
+Asset Tag,Serial Number,Make And Model Number,Category,Location
+AUA0001,SSDFDAS,HP Folio 13,TestCategory,TestLocation

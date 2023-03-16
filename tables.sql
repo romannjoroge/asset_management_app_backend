@@ -107,14 +107,14 @@ CREATE TABLE Asset_File (
       REFERENCES Asset(assetTag)
 );
 
-CREATE TABLE "Stock Take" (
-  "ID" serial,
-  "locationID" int,
-  "date" timestamptz,
-  PRIMARY KEY ("ID"),
+CREATE TABLE StockTake (
+  ID serial,
+  locationID int,
+  date timestamptz,
+  PRIMARY KEY (ID),
   CONSTRAINT "FK_Stock Take.locationID"
-    FOREIGN KEY ("locationID")
-      REFERENCES "Location"("ID")
+    FOREIGN KEY (locationID)
+      REFERENCES Location(ID)
 );
 
 CREATE TABLE Role (
@@ -132,16 +132,16 @@ CREATE TABLE "Parent Child Folder" (
       REFERENCES "Folder"("ID")
 );
 
-CREATE TABLE "Stock Take Assets" (
-  "assetTag" varchar(50),
-  "stockTakeID" int,
-  PRIMARY KEY ("assetTag", "stockTakeID"),
+CREATE TABLE StockTakeAssets (
+  assetTag varchar(50),
+  stockTakeID int,
+  PRIMARY KEY (assetTag, stockTakeID),
   CONSTRAINT "FK_Stock Take Assets.assetTag"
-    FOREIGN KEY ("assetTag")
-      REFERENCES "Asset"("assetTag"),
+    FOREIGN KEY (assetTag)
+      REFERENCES Asset(assetTag),
   CONSTRAINT "FK_Stock Take Assets.stockTakeID"
-    FOREIGN KEY ("stockTakeID")
-      REFERENCES "Stock Take"("ID")
+    FOREIGN KEY (stockTakeID)
+      REFERENCES StockTake(ID)
 );
 
 CREATE TABLE "GatePass Asset" (

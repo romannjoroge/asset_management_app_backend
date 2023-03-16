@@ -32,7 +32,7 @@ import items from './routes/items.js';
 import category from './routes/category.js';
 import tracking from './routes/tracking.js';
 import gatepass from './routes/gatepass.js';
-import reconciliation from './routes/reconciliation.js';
+import reports from './routes/reports.js';
 import users from './routes/users.js'
 
 // Routers to use for different modules
@@ -41,7 +41,7 @@ app.use('/assets/items', items)
 app.use('/assets/category', category)
 app.use('/tracking', tracking)
 app.use('/gatepass', gatepass)
-app.use('/reconciliation', reconciliation)
+app.use('/reports', reports)
 app.use('/users', users)
 
 app.get('/', (req, res)=>{
