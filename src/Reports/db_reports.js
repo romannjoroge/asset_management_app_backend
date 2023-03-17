@@ -9,11 +9,14 @@ const chainOfCustody = `SELECT timestamp, username, logdescription FROM Log WHER
                         ORDER BY timestamp;`;
 const categoryCount = `SELECT c.name, COUNT(a.assettag) FROM Asset a JOIN Category c ON c.id = a.categoryid GROUP BY c.name`;
 const depreciationValues = 'SELECT openingBookvalue FROM DepreciationSchedule WHERE assettag = $1';
+const getStockTakes = "SELECT date, id FROM StockTake";
+
 export default {
     physical_valuation,
     missingAssets,
     chainOfCustody,
     movements,
     categoryCount,
-    depreciationValues
+    depreciationValues,
+    getStockTakes
 }

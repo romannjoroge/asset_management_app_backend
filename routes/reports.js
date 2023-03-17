@@ -139,6 +139,18 @@ router.get('/report/:type', (req, res) => {
             message: Errors[9]
         })
     });
+});
+
+router.get('/stockTakes', (req, res) => {
+    // Send all stock takes
+    pool.query(reportsTable.getStockTakes, []).then(data => {
+        if (data.rowCount == 0) {
+            return res.status(404).json({
+                message: Errors[22]
+            })
+        }
+        return res.status(200).json(data.rows);
+    })
 })
 
 router.route('*', (req, res) => {
