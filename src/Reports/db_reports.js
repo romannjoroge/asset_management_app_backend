@@ -1,6 +1,6 @@
 const physical_valuation = `SELECT a.assetTag AS "Asset Tag", a.serialnumber AS "Serial Number", a.makeandmodelno AS 
                             "Make And Model Number", c.name AS "Category", l.name AS "Location" FROM Asset a JOIN Category c 
-                            ON a.categoryid = c.id JOIN Location l ON l.id = a.locationid WHERE a.assettag = (SELECT assetTag FROM 
+                            ON a.categoryid = c.id JOIN Location l ON l.id = a.locationid WHERE a.assettag IN (SELECT assetTag FROM 
                             StockTakeAssets WHERE stockTakeID = $1)`;
 const missingAssets = `SELECT assettag FROM Asset a WHERE NOT EXISTS ( SELECT FROM StockTakeAssets WHERE assettag = a.assettag AND 
                        stocktakeid=$1 AND a.locationid = (SELECT locationid FROM StockTake WHERE id=$1))`;
