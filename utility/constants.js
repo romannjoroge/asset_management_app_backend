@@ -21,7 +21,8 @@ export const Errors = {
     '19': "There Are No Missing Assets",
     '20': "There Are No Allocation Records for asset",
     '21': "There Are No Asset Movements",
-    '22': "Could Not Get Data"
+    '22': "Could Not Get Data",
+    '23': "Could Not Delete File"
 }
 
 export const Succes = {

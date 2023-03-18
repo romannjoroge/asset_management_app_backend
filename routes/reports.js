@@ -117,6 +117,15 @@ router.get('/report/:type', (req, res) => {
                         message: Errors[17],
                     });
                 }
+
+                fs.unlink(path.join(__dirname, 'output.csv'), err => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).json({
+                            message: Errors[23],
+                        })
+                    }
+                })
             })
         }).catch(e => {
             console.log(e);
