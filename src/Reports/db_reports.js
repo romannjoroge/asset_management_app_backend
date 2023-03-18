@@ -7,7 +7,6 @@ const movements = `SELECT timestamp, username FROM Log WHERE logdescription ~* $
 const chainOfCustody = `SELECT timestamp, username, logdescription FROM Log WHERE logdescription ~* $1 AND eventtype = 'Allocate Asset' 
                         ORDER BY timestamp;`;
 const categoryCount = `SELECT c.name, COUNT(a.assettag) FROM Asset a JOIN Category c ON c.id = a.categoryid GROUP BY c.name`;
-const depreciationValues = 'SELECT openingBookvalue FROM DepreciationSchedule WHERE assettag = $1';
 const getStockTakes = "SELECT date, id FROM StockTake";
 const acquisitionReport = `SELECT a.assettag, l.name AS "Location", a.acquisitioncost FROM Asset a JOIN Location l ON l.id = a.locationid WHERE a.acquisitiondate BETWEEN $1 AND $2`
 const depreciationReport = `SELECT year, openingbookvalue FROM DepreciationSchedule WHERE assetTag = $1`
@@ -18,7 +17,6 @@ export default {
     chainOfCustody,
     movements,
     categoryCount,
-    depreciationValues,
     getStockTakes,
     acquisitionReport,
     depreciationReport

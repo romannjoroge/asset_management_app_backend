@@ -68,9 +68,6 @@ router.get('/report/:type', (req, res) => {
     } else if(reportType == 'category') {
         query = reportsTable.categoryCount;
         inputs = []
-    } else if (reportType == 'depreciation') {
-        query = reportsTable.depreciationValues;
-        inputs = [req.body.assettag];
     } else if (reportType == 'audit') {
         query = logTable.selectUserLogs;
         inputs = [req.body.username];
