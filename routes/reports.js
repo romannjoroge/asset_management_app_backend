@@ -38,9 +38,9 @@ router.get('/physical-verification/:stockTake', (req, res) => {
                         message: Errors[17],
                     });
                 }
-                return res.status(200).json({
-                    message: Succes[2]
-                })
+                // return res.status(200).json({
+                //     message: Succes[2]
+                // })
             })
         }).catch(e => {
             console.log(e);
