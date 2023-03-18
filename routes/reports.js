@@ -38,9 +38,6 @@ router.get('/physical-verification/:stockTake', (req, res) => {
                         message: Errors[17],
                     });
                 }
-                // return res.status(200).json({
-                //     message: Succes[2]
-                // })
             })
         }).catch(e => {
             console.log(e);
@@ -54,49 +51,6 @@ router.get('/physical-verification/:stockTake', (req, res) => {
             message: Errors[9]
         })
     });
-});
-
-router.get('/audit-trail/:username', (req, res) => {
-    // Get username from paramns
-    let username = req.params.username;
-    console.log(username);
-
-    // Get logs from database
-    pool.query(logTable.selectUserLogs, [username]).then(data => {
-        if (data.rowCount <= 0) {
-            return res.status(404).json({
-                message: Errors[18]
-            });
-        }
-        console.log(data.rows);
-        return res.status(200).json(data.rows);
-    }).catch(e => {
-        console.log(e);
-        return res.status(500).json({
-            message: Errors[9]
-        });
-    });
-});
-
-router.get('/missing-assets/:stockTake', (req, res) => {
-    // Get stock take id
-    let stockTakeID = req.params.stockTake;
-    stockTakeID = Number.parseInt(stockTakeID);
-
-    pool.query(reportsTable.missingAssets, [stockTakeID]).then(data => {
-        if (data.rowCount <= 0) {
-            return res.status(404).json({
-                message: Errors[19]
-            })
-        }
-
-        return res.status(200).json(data.rows);
-    }).catch(e => {
-        console.log(e);
-        return res.status(500).json({
-            message: Errors[9]
-        })
-    })
 });
 
 router.get('/report/:type', (req, res) => {
@@ -117,6 +71,22 @@ router.get('/report/:type', (req, res) => {
     } else if (reportType == 'depreciation') {
         query = reportsTable.depreciationValues;
         inputs = [req.body.assettag];
+    } else if (reportType == 'audit') {
+        query = logTable.selectUserLogs;
+        inputs = [req.body.username];
+    } else if (reportType == "missing") {
+        query = reportsTable.missingAssets;
+        inputs = [req.body.stockTake];
+    } else if (reportType == 'physical') {
+        query = reportsTable.physical_valuation;
+        inputs = [req.body.stockTake];
+    } else if (reportType == 'acquisition') {
+        query = reportsTable.acquisitionReport;
+        var year = Number.parseInt(req.body.year);
+        inputs = [new Date(year, 0, 1), new Date(year + 1, 0, 1)];
+    } else if (reportType == 'depreciationreport') {
+        query = reportsTable.depreciationReport;
+        inputs = [req.body.assettag];
     }
     else {
         return res.status(404).json({
@@ -132,7 +102,28 @@ router.get('/report/:type', (req, res) => {
                 message: Errors[22]
             })
         }
-        return res.status(200).json(data.rows);
+        
+        // Create a csv file from returned data
+        let csvData = data.rows;
+        let csvFromData = convertArrayToCSV(csvData);
+        fs.writeFile(path.join(__dirname, 'output.csv'), csvFromData).then(data => {
+            const options = {
+                root: path.join(__dirname),
+            }
+            res.sendFile('output.csv', options, err => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({
+                        message: Errors[17],
+                    });
+                }
+            })
+        }).catch(e => {
+            console.log(e);
+            return res.status(500).json({
+                message: Errors[16],
+            })
+        });
     }).catch(err => {
         console.log(err);
         return res.status(500).json({
