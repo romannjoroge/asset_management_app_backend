@@ -8,6 +8,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import logTable from '../src/Log/db_log.js';
+import userTable from '../src/Users/db_users.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -97,16 +98,29 @@ router.get('/report/:type', (req, res) => {
     });
 });
 
-router.get('/stockTakes', (req, res) => {
-    // Send all stock takes
-    pool.query(reportsTable.getStockTakes, []).then(data => {
+router.get("/data:data", (req, res) => {
+    let dataType = req.params.data;
+    let query;
+    let inputs = [];
+
+    if (dataType == "stocktake") {
+        query = reportsTable.getStockTakes;
+    } else if (dataType == "username"){
+        query = userTable.getUsers;
+    } else {
+        return res.status(404).json({
+            message: Errors[0]
+        });
+    }
+
+    pool.query(query, inputs).then(data => {
         if (data.rowCount == 0) {
             return res.status(404).json({
                 message: Errors[22]
             })
         }
         return res.status(200).json(data.rows);
-    })
+    });
 })
 
 router.route('*', (req, res) => {
