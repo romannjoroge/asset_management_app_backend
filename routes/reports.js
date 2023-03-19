@@ -98,7 +98,7 @@ router.get('/report/:type', (req, res) => {
     });
 });
 
-router.get("/data:data", (req, res) => {
+router.get("/data/:data", (req, res) => {
     let dataType = req.params.data;
     let query;
     let inputs = [];

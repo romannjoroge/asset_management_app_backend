@@ -88,9 +88,7 @@ router.get('/view/:id', (req, res) => {
                 message: Errors[8],
             })
         }else{
-            res.status(200).json({
-                data: fetchResult.rows[0],
-            })
+            res.status(200).json(fetchResult.rows[0]);
         }
     }).catch(e => {
         res.status(500).json({
