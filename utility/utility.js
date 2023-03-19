@@ -35,7 +35,7 @@ function checkIfNumberisGreaterThanZero(x, errorMessage){
 }
 
 function checkIfValidDate(x, errorMessage){
-    let splitDate = x.split('-');
+    let splitDate = x.split('/');
     let month = splitDate[0];
     let day = splitDate[1];
     let year = splitDate[2];
