@@ -16,9 +16,7 @@ router.get('/view/:name', (req, res) => {
                 message: Errors[11],
             });
         }  
-        return res.status(200).json({
-            data: data.rows[0],
-        }) 
+        return res.status(200).json(data.rows[0]) 
     }).catch(e => {
         return res.status(501).json({
             message: Errors[9]
@@ -34,9 +32,7 @@ router.get('/view', (req, res) => {
                 message: Errors[10],
             })
         }
-        return res.status(200).json({
-            data: data.rows
-        });
+        return res.status(200).json(data.rows);
     }).catch(e => {
         return res.status(500).json({
             message: Errors[9],
