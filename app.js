@@ -20,6 +20,7 @@ dotenv.config()  // Brings varaibles from .env file
 // // auth router attaches /login, /logout, and /callback routes to the baseURL
 // app.use(auth(config));
 
+// Use JWT Tokens
 
 // Reading JSON data from forms and JS respectively
 app.use(cors());
