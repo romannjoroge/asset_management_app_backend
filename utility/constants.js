@@ -22,7 +22,9 @@ export const Errors = {
     '20': "There Are No Allocation Records for asset",
     '21': "There Are No Asset Movements",
     '22': "Could Not Get Data",
-    '23': "Could Not Delete File"
+    '23': "Could Not Delete File",
+    '24': "User Already Exists",
+    '25': "Email Already Exists"
 }
 
 export const Succes = {

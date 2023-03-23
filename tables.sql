@@ -7,7 +7,7 @@ CREATE TABLE User2 (
   fname varchar(50) NOT NULL,
   lname varchar(50) NOT NULL,
   email varchar(50) NOT NULL,
-  password varchar(50) NOT NULL,
+  password text NOT NULL,
   username varchar(50),
   companyName varchar(50) NOT NULL,
   PRIMARY KEY (username),
