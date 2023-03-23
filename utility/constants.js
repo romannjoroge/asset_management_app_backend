@@ -26,7 +26,8 @@ export const Errors = {
     '24': "User Already Exists",
     '25': "Email Already Exists",
     '26': "Invalid Credentials",
-    '27': "Not Logged In"
+    '27': "Not Logged In",
+    '28': "Not Authorized"
 }
 
 export const Succes = {

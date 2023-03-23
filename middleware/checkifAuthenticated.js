@@ -1,4 +1,4 @@
-import { Errors } from "../utility/constants";
+import { Errors } from "../utility/constants.js";
 import JWT from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config()
