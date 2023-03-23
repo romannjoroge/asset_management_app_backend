@@ -4,6 +4,7 @@ import Asset from '../src/Allocation/Asset/asset2.js';
 import { Errors, Succes } from '../utility/constants.js';
 import pool from '../db2.js';
 import assetTable from '../src/Allocation/Asset/db_assets.js';
+import checkifAuthorized from '../middleware/checkifAuthorized.js';
 
 // const {
 //     addItem,
@@ -19,7 +20,7 @@ import assetTable from '../src/Allocation/Asset/db_assets.js';
 // Test to see if the route is reachable
 
 // router.get('/', test)
-router.post('/add', (req, res) => {
+router.post('/add', checkifAuthorized('Asset Administrator'), (req, res) => {
     // Get asset values from request
     let {
         fixed,
@@ -64,7 +65,7 @@ router.post('/add', (req, res) => {
 })
 // router.put('/update', updateItem)
 // router.delete('/remove', removeItem)
-router.get('/view', (req, res) => {
+router.get('/view', checkifAuthorized('Asset Administrator'), (req, res) => {
     Asset.displayAllAssetTags().then(data => {
         res.status(200).json(data);
     }).catch(e => {
@@ -75,7 +76,7 @@ router.get('/view', (req, res) => {
     });
 })
 
-router.get('/view/:id', (req, res) => {
+router.get('/view/:id', checkifAuthorized('Asset User'), (req, res) => {
     // Get asset tag from request params
     let assetTag = req.params.id;
 

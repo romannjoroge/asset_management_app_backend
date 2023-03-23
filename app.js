@@ -24,16 +24,18 @@ import category from './routes/category.js';
 import tracking from './routes/tracking.js';
 import gatepass from './routes/gatepass.js';
 import reports from './routes/reports.js';
-import users from './routes/users.js'
+import users from './routes/users.js';
+import checkifAuthenticated from './middleware/checkifAuthenticated.js';
+import checkifAuthorized from './middleware/checkifAuthorized.js';
 
 // Routers to use for different modules
-app.use('/allocation', allocate)
-app.use('/assets/items', items)
-app.use('/assets/category', category)
-app.use('/tracking', tracking)
-app.use('/gatepass', gatepass)
-app.use('/reports', reports)
-app.use('/users', users)
+app.use('/allocation', checkifAuthenticated, allocate)
+app.use('/assets/items', checkifAuthenticated, items)
+app.use('/assets/category', checkifAuthenticated, checkifAuthorized('Asset Administrator'), category)
+app.use('/tracking', checkifAuthenticated, tracking)
+app.use('/gatepass', checkifAuthenticated, gatepass)
+app.use('/reports', checkifAuthenticated, checkifAuthorized('Company Administrator'), reports)
+app.use('/users', checkifAuthenticated, checkifAuthorized('User Manager'), users)
 
 app.get('/', (req, res) => {
     console.log(req.oidc.isAuthenticated())
