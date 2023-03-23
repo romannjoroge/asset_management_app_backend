@@ -136,6 +136,38 @@ app.post('/signup',
     });
 });
 
+app.post('/login', (req, res) => {
+    // Get Details From Client
+    let {username, password} = req.body;
+
+    // Get User From Username
+    pool.query("SELECT password FROM User2 WHERE username=$1", [username]).then(data => {
+        // Return an error if user does not exist
+        if(data.rowCount <= 0) {
+            return res.status(400).json({message:Errors[26]});
+        }
+
+        const encryptedPassword = data.rows[0].password;
+        // Compare given password to that stored in database
+        bcrypt.compare(password, encryptedPassword).then(isSame => {
+            // Return an error if passwords are not the same
+            if(!isSame) {
+                return res.status(400).json({message:Errors[26]});
+            }
+
+            // Send JWT token
+            const token = JWT.sign({username}, process.env.TOKEN_SECRET, {expiresIn:3600});
+            return res.json({token});
+        }).catch(err => {
+            console.log(err);
+            res.status(500).json({message:Errors[9]});
+        });
+    }).catch(err => {
+        console.log(err);
+        res.status(500).json({message:Errors[9]});
+    });
+});
+
 app.listen(4000, () => {
     console.log('Server is listening on port 4000..')
 })
