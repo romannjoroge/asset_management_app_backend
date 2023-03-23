@@ -24,7 +24,9 @@ export const Errors = {
     '22': "Could Not Get Data",
     '23': "Could Not Delete File",
     '24': "User Already Exists",
-    '25': "Email Already Exists"
+    '25': "Email Already Exists",
+    '26': "Invalid Credentials",
+    '27': "Not Logged In"
 }
 
 export const Succes = {
