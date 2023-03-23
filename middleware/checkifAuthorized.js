@@ -1,5 +1,6 @@
 import userTable from "../src/Users/db_users.js";
-import { Errors } from "../utility/constants.js"
+import { Errors } from "../utility/constants.js";
+import pool from "../db2.js";
 
 export default (role) => {
     return (req, res, next) => {
@@ -14,7 +15,7 @@ export default (role) => {
         // Check if user has required role
         pool.query(userTable.isUserAuthorized, [role, username]).then(data => {
             // Return error if user does not have role
-            if(data.rowCount >= 0) {
+            if(data.rowCount <= 0) {
                 return res.status(400).json({message:Errors[28]});
             }
 
