@@ -29,7 +29,7 @@ import checkifAuthenticated from './middleware/checkifAuthenticated.js';
 import checkifAuthorized from './middleware/checkifAuthorized.js';
 
 // Routers to use for different modules
-app.use('/allocation', checkifAuthenticated, allocate)
+app.use('/allocation', checkifAuthenticated, checkifAuthorized('Asset Administrator'), allocate)
 app.use('/assets/items', checkifAuthenticated, items)
 app.use('/assets/category', checkifAuthenticated, checkifAuthorized('Asset Administrator'), category)
 app.use('/tracking', checkifAuthenticated, tracking)

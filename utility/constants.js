@@ -27,10 +27,13 @@ export const Errors = {
     '25': "Email Already Exists",
     '26': "Invalid Credentials",
     '27': "Not Logged In",
-    '28': "Not Authorized"
+    '28': "Not Authorized",
+    '29': "Asset Does Not Exist",
+    '30': "User Does Not Exist",
 }
 
 export const Succes = {
     '1': 'Asset Created Successfuly',
     '2': "Reports Sent Successfully",
+    '3': "Asset Allocated",
 }
