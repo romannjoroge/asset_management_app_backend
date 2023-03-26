@@ -67,4 +67,19 @@ router.post('/add', (req, res) => {
     });
 })
 
+router.post('/update', (req, res) => {
+    let {updateBody, name} = req.body
+
+    updateBody.parentFolder = Number.parseInt(updateBody.parentFolder);
+    updateBody.depreciation.value = Number.parseFloat(updateBody.depreciation.value);
+    
+    // Update items based on what is there
+    Category.updateCategory(updateBody, name).then(_ => {
+        return res.send("Category Updated");
+    }).catch(e => {
+        console.log(e);
+        return res.status(500).json({message:Errors[9]});
+    })
+})
+
 export default router;
