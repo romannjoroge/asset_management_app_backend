@@ -129,7 +129,7 @@ router.post('/tags', (req, res) => {
                 crc: tag.crc
             }];
             let csvFromData = convertArrayToCSV(csvData);
-            fs.appendFile(path.join(__dirname, 'tags.log'), `${new Date()}, ${commandCode}, ${hardwareKey}, ${tagRecNums}, ${tag.antNo}, ${tag.pc}, ${tag.epcID}, ${tag.crc}`).then(_ => {
+            fs.appendFile(path.join(__dirname, 'tags.log'), `${new Date().toISOString()},${commandCode},${hardwareKey},${tagRecNums},${tag.antNo},${tag.pc},${tag.epcID},${tag.crc}\n`).then(_ => {
                 
             }).catch(e => {
                 console.log(e);
