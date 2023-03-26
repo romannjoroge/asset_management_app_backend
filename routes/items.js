@@ -5,6 +5,13 @@ import { Errors, Succes } from '../utility/constants.js';
 import pool from '../db2.js';
 import assetTable from '../src/Allocation/Asset/db_assets.js';
 import checkifAuthorized from '../middleware/checkifAuthorized.js';
+import { convertArrayToCSV } from 'convert-array-to-csv';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // const {
 //     addItem,
@@ -98,6 +105,42 @@ router.get('/view/:id', checkifAuthorized('Asset User'), (req, res) => {
 
 router.post('/tags', (req, res) => {
     console.log(req.body);
+    // Get values from req.body
+    let {
+        commandCode, 
+        hardwareKey,
+        tagRecNums,
+        tagRecords
+    } = req.body;
+    // Add tag to database
+    for (var i in tagRecords) {
+        let tag = tagRecords[i];
+        console.log(tag);
+        pool.query(assetTable.insertAssetTag, [commandCode, hardwareKey, tagRecNums, tag.antNo, tag.pc, tag.epcID, tag.crc]).then(_ => {
+            // Add an entry to log.csv file
+            let csvData = [{
+                commandCode,
+                hardwareKey,
+                tagRecNums,
+                antNo: tag.antNo,
+                pc: tag.pc,
+                epcID: tag.epcID,
+                crc: tag.crc
+            }];
+            let csvFromData = convertArrayToCSV(csvData);
+            fs.appendFile(path.join(__dirname, 'log.csv'), csvFromData).then(_ => {
+                
+            }).catch(e => {
+                console.log(e);
+                return res.status(500).json({
+                    message: Errors[9],
+                })
+            });
+        }).catch(e => {
+            console.log(e);
+            return res.status(500).json({message: Errors[9]})
+        })
+    }
     res.send("Done");
 })
 

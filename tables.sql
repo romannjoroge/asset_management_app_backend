@@ -202,6 +202,7 @@ CREATE TABLE DepreciationSchedule (
 
 CREATE TABLE Tags(
   id serial,
+  scannedTime timestamp with time zone DEFAULT NOW(),
   commandCode varchar(50) NOT NULL,
   hardwareKey varchar(50) NOT NULL,
   tagRecNums varchar(50) NOT NULL,

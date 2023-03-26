@@ -24,6 +24,7 @@ const getAssetDetails = `
     l.name as locationname, c.name as categoryname FROM Asset as a JOIN Location as l ON a.locationid = l.id 
     JOIN Category as c ON a.categoryid = c.id WHERE a.assettag = $1;
 `
+const insertAssetTag = `INSERT INTO Tags(commandCode, hardwareKey, tagRecNums, antNo, pc, epcID, crc) VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
 const assetTable = {
     doesAssetTagExist,
@@ -44,7 +45,8 @@ const assetTable = {
     updateAssetResidualValue,
     getCloseBookValue,
     getAccumulatedDepreciation,
-    getAssetDetails
+    getAssetDetails,
+    insertAssetTag
 }
 
 export default assetTable;
