@@ -95,6 +95,19 @@ router.get('/view/:id', checkifAuthorized('Asset User'), (req, res) => {
         })
     });
 });
+
+router.post('/tags', (req, res) => {
+    console.log(req.body);
+    res.send("Done");
+})
+
+// 192.168.0.180:80
+
+router.post('/heartBeats', (req, res) => {
+    console.log("Heart Beat...");
+    console.log(req);
+    res.send("Done");
+})
 // router.route('*', (req, res) => {
 //     res.status(404).json({ data: 'Resource not found' })
 // })

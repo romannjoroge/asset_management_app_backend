@@ -200,6 +200,18 @@ CREATE TABLE DepreciationSchedule (
   PRIMARY KEY (year, assetTag)
 );
 
+CREATE TABLE Tags(
+  id serial,
+  commandCode varchar(50) NOT NULL,
+  hardwareKey varchar(50) NOT NULL,
+  tagRecNums varchar(50) NOT NULL,
+  antNo varchar(50) NOT NULL,
+  pc varchar(50) NOT NULL,
+  epcID varchar(50) NOT NULL,
+  crc varchar(50) NOT NULL,
+  PRIMARY KEY (id)
+);
+
 -- Creates the home folder when the database is created. This is the topmost folder in the system
 INSERT INTO Folder(name) VALUES('home');
 
