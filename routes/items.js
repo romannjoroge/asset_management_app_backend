@@ -5,6 +5,7 @@ import { Errors, Succes } from '../utility/constants.js';
 import pool from '../db2.js';
 import assetTable from '../src/Allocation/Asset/db_assets.js';
 import checkifAuthorized from '../middleware/checkifAuthorized.js';
+import checkifAuthenticated from '../middleware/checkifAuthenticated.js';
 import { convertArrayToCSV } from 'convert-array-to-csv';
 import fs from 'fs/promises';
 import path from 'path';
@@ -27,7 +28,7 @@ const __dirname = path.dirname(__filename);
 // Test to see if the route is reachable
 
 // router.get('/', test)
-router.post('/add', checkifAuthorized('Asset Administrator'), (req, res) => {
+router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     // Get asset values from request
     let {
         fixed,
@@ -72,7 +73,7 @@ router.post('/add', checkifAuthorized('Asset Administrator'), (req, res) => {
 })
 // router.put('/update', updateItem)
 // router.delete('/remove', removeItem)
-router.get('/view', checkifAuthorized('Asset Administrator'), (req, res) => {
+router.get('/view', checkifAuthenticated,  checkifAuthorized('Asset Administrator'), (req, res) => {
     Asset.displayAllAssetTags().then(data => {
         res.status(200).json(data);
     }).catch(e => {
@@ -83,7 +84,7 @@ router.get('/view', checkifAuthorized('Asset Administrator'), (req, res) => {
     });
 })
 
-router.get('/view/:id', checkifAuthorized('Asset User'), (req, res) => {
+router.get('/view/:id', checkifAuthenticated, checkifAuthorized('Asset User'), (req, res) => {
     // Get asset tag from request params
     let assetTag = req.params.id;
 
