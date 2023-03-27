@@ -8,7 +8,9 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import logTable from '../src/Log/db_log.js';
-import userTable from '../src/Users/db_users.js'
+import userTable from '../src/Users/db_users.js';
+import checkifAuthenticated from '../middleware/checkifAuthenticated.js';
+import checkifAuthorized from '../middleware/checkifAuthorized.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -98,7 +100,7 @@ router.get('/report/:type', (req, res) => {
     });
 });
 
-router.get("/data/:data", (req, res) => {
+router.get("/data/:data", checkifAuthenticated, checkifAuthorized('Company Administrator'), (req, res) => {
     let dataType = req.params.data;
     let query;
     let inputs = [];

@@ -34,7 +34,7 @@ app.use('/assets/items', items)
 app.use('/assets/category', checkifAuthenticated, checkifAuthorized('Asset Administrator'), category)
 app.use('/tracking', checkifAuthenticated, tracking)
 app.use('/gatepass', checkifAuthenticated, gatepass)
-app.use('/reports', checkifAuthenticated, checkifAuthorized('Company Administrator'), reports)
+app.use('/reports',  reports)
 app.use('/users', checkifAuthenticated, checkifAuthorized('User Manager'), users)
 
 app.get('/', (req, res) => {
