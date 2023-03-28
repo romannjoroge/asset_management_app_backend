@@ -104,7 +104,7 @@ app.post('/signup',
                 pool.query(userTable.addUser, [fname, lname, email, hashedPasswd, username, companyName]).then(_ => {
                     // Send JWT Token
                     const token = JWT.sign({username}, process.env.TOKEN_SECRET, {expiresIn:3600});
-                    return res.status(200).json({token});
+                    return res.status(200).json({token, username});
                 }).catch(err => {
                     console.log(err);
                     return res.status(500).json({
@@ -159,7 +159,7 @@ app.post('/login', (req, res) => {
 
             // Send JWT token
             const token = JWT.sign({username}, process.env.TOKEN_SECRET, {expiresIn:3600});
-            return res.json({token});
+            return res.json({token, username});
         }).catch(err => {
             console.log(err);
             res.status(500).json({message:Errors[9]});
