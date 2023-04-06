@@ -36,4 +36,5 @@ export const Succes = {
     '1': 'Asset Created Successfuly',
     '2': "Reports Sent Successfully",
     '3': "Asset Allocated",
+    '4': "User Created"
 }

@@ -71,6 +71,42 @@ router.get('/user/:id', (req, res) => {
         console.log(e);
         return res.status(500).json({ message: Errors[9] });
     })
-})
+});
+
+// Route To Add A User To A Company
+router.post('/addUser', (req, res) => {
+    // Get User Details And Roles From Frontend
+    let {
+        fname,
+        lname,
+        email,
+        password,
+        username,
+        companyName,
+        roles
+    } = req.body;
+
+    // Check if user with email already exists
+    pool.query(userTable.doesUserExist, [email, username]).then(fetchResult => {
+        // If the rows returned are not empty return an error
+        if (fetchResult.rowCount > 0) {
+            return res.status(400).json({message: Errors[24]})
+        }
+        // Add user if doesn't exist
+        pool.query(userTable.addUser, [fname, lname, email, password, username, companyName]).then(_ => {
+            // Add user roles
+            roles.forEach(role => {
+                pool.query(userTable.addUser, [role]).catch(err => {
+                    return res.status(501).json({message: Errors[9]})
+                })
+            });
+            res.json({message: Succes[4]})
+        }).catch(err => {
+            return res.status(501).json({message: Errors[9]})
+        })
+    }).catch(err => {
+        return res.status(501).json({message: Errors[9]})
+    })
+});
 
 export default router;
