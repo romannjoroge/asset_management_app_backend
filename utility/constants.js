@@ -30,6 +30,7 @@ export const Errors = {
     '28': "Not Authorized",
     '29': "Asset Does Not Exist",
     '30': "User Does Not Exist",
+    '31': "Could Not Get Company"
 }
 
 export const Succes = {

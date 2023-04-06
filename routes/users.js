@@ -90,23 +90,51 @@ router.post('/addUser', (req, res) => {
     pool.query(userTable.doesUserExist, [email, username]).then(fetchResult => {
         // If the rows returned are not empty return an error
         if (fetchResult.rowCount > 0) {
-            return res.status(400).json({message: Errors[24]})
+            return res.status(400).json({message: Errors[24]});
         }
         // Add user if doesn't exist
         pool.query(userTable.addUser, [fname, lname, email, password, username, companyName]).then(_ => {
             // Add user roles
             roles.forEach(role => {
                 pool.query(userTable.addUser, [role]).catch(err => {
-                    return res.status(501).json({message: Errors[9]})
+                    return res.status(501).json({message: Errors[9]});
                 })
             });
-            res.json({message: Succes[4]})
+            res.json({message: Succes[4]});
         }).catch(err => {
-            return res.status(501).json({message: Errors[9]})
+            return res.status(501).json({message: Errors[9]});
         })
     }).catch(err => {
-        return res.status(501).json({message: Errors[9]})
+        return res.status(501).json({message: Errors[9]});
     })
 });
+
+router.get('/getCompany/:username', (req, res) => {
+    // Check if username exits
+    pool.query(userTable.doesUsernameExist, [req.params.username]).then(fetchResult => {
+        // If nothing is returned the user does not exist
+        if(fetchResult.rowCount <= 0) {
+            return res.status(404).json({message: Errors[24]});
+        }
+
+        // Return company
+        pool.query(userTable.getCompany, [req.params.username]).then(fetchResult => {
+            // If nothing is returned returned error
+            if(fetchResult.rowCount <= 0) {
+                return res.status(400).json({message: Errors[31]});
+            }
+
+            // Return company
+            return res.json(fetchResult.rows[0]);
+        }).catch(err => {
+            console.log(err);
+            return res.status(501).json({message: Errors[9]});
+        })
+    }).catch(err => {
+        console.log(err);
+        return res.status(501).json({message: Errors[9]});
+    })
+    
+})
 
 export default router;
