@@ -44,17 +44,17 @@ router.post('/add', (req, res) => {
     // Get Category details from request body
     let {
         categoryName, 
-        parentFolderID, 
+        parentCategoryID, 
         depreciationType, 
         depreciationPercentage
     } = req.body;
 
     // Parse ints and floats from req.body
-    parentFolderID = Number.parseInt(parentFolderID);
+    parentCategoryID = Number.parseInt(parentCategoryID);
     depreciationPercentage = Number.parseFloat(depreciationPercentage);
 
     // Call database query
-    let categ = new Category(categoryName, parentFolderID, depreciationType, depreciationPercentage);
+    let categ = new Category(categoryName, parentCategoryID, depreciationType, depreciationPercentage);
     categ.initialize().then(data => {
         return res.status(201).json({
             message: 'Category Created'

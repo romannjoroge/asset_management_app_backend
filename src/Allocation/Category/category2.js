@@ -8,24 +8,25 @@ import categoryTable from './db_category2.js';
 import MyError from '../../../utility/myError.js';
 import Folder from '../Folder/folder.js';
 import utility from '../../../utility/utility.js';
+import { Errors } from '../../../utility/constants.js';
 
 class Category {
     // Constructor
-    constructor(categoryName, parentFolderID, depreciationType, depreciationPercentage) {
-        if (utility.isAnyEmpty([categoryName, parentFolderID, depreciationType])){
+    constructor(categoryName, parentCategoryID, depreciationType, depreciationPercentage) {
+        if (utility.isAnyEmpty([categoryName, parentCategoryID, depreciationType])) {
             throw new MyError("Missing Information");
         }
 
-        if (typeof categoryName === "string"){
+        if (typeof categoryName === "string") {
             this.categoryName = categoryName;
-        }else{
+        } else {
             throw new MyError("Invalid Category Name");
         }
 
-        if (!Number.isInteger(parentFolderID)){
-            throw new MyError("Invalid parent folder");
-        }else{
-            this.parentFolderID = parentFolderID;
+        if (!Number.isInteger(parentCategoryID)) {
+            throw new MyError("Invalid parent category");
+        } else {
+            this.parentCategoryID = parentCategoryID;
         }
 
         Category.verifyDepreciationDetails(depreciationType, depreciationPercentage);
@@ -34,38 +35,45 @@ class Category {
     }
 
     // Function that saves category in the database
-    static async _saveCategoryInDb(categoryName, parentFolderID, depreciationType, depreciationPercentage) {
+    static async _saveCategoryInDb(categoryName, parentCategoryID, depreciationType, depreciationPercentage) {
         // Categories of all depreciation types have a name, parent folder and a depreciation type
-        let categoryID;
-        try{
-            await pool.query(categoryTable.add, [categoryName, parentFolderID, depreciationType]);
-        }catch(err){
-            throw new MyError("Could Not Add Category To System")
-        }
-
-        // Only written down value depreciation uses a custom depreciation percentage that needs to be stored in the system
-        if (depreciationType === "Written Down Value"){
-            try{
-                categoryID = await Category._getCategoryID(categoryName);
-                await pool.query(categoryTable.addWritten, [categoryID, depreciationPercentage]);
-            }catch(err){
-                throw new MyError("Could Not Add Entry to DepreciationPercentage table");
-            }
-        }
+        // Add Entry To Category Folder
+        pool.query(categoryTable.add, [categoryName, depreciationType]).then(_ => {
+            // Get ID of created category
+            Category._getCategoryID(categoryName).then(ID => {
+                // Add category as child of parent category
+                pool.query(categoryTable.addChild, [parentCategoryID, ID]).then(_ => {
+                    // Only written down value depreciation uses a custom depreciation percentage that needs to be stored in the system
+                    if (depreciationType === "Written Down Value") {
+                        Category._getCategoryID(categoryName).then(Name => {
+                            pool.query(categoryTable.addWritten, [ID, depreciationPercentage])
+                        }).catch(err => {
+                            throw new MyError("Could Not Add Entry to DepreciationPercentage table");
+                        })
+                    }
+                })
+            }).catch(err => {
+                console.log(err);
+                throw new MyError(Errors[12]);
+            })
+        }).catch(err => {
+            console.log(err);
+            throw new MyError(Errors[12]);
+        })
     }
 
-    async initialize(){
-        if (await Category._doesCategoryExist(this.categoryName)){
+    async initialize() {
+        if (await Category._doesCategoryExist(this.categoryName)) {
             throw new MyError("Category Already Exists");
         }
 
-        if (!await Folder.doesFolderExist(this.parentFolderID)){
-            throw new MyError("Parent Folder Does Not Exist");
+        if (!await Category._doesCategoryIDExist(this.parentCategoryID)) {
+            throw new MyError("Parent Category Does Not Exist");
         }
 
         utility.addErrorHandlingToAsyncFunction(Category._saveCategoryInDb, "Could not add category to system"
-                                                ,this.categoryName, this.parentFolderID, this.depreciaitionType, 
-                                                this.depreciationPercentage);
+            , this.categoryName, this.parentCategoryID, this.depreciaitionType,
+            this.depreciationPercentage);
     }
 
     // Static fields
@@ -76,9 +84,9 @@ class Category {
         let fetchResult;
         let categoryID;
 
-        try{
+        try {
             fetchResult = await pool.query(categoryTable.getID, [categoryName]);
-        }catch(err){
+        } catch (err) {
             throw new MyError("Could Not Get Category ID From System");
         }
 
@@ -92,36 +100,36 @@ class Category {
         try {
             const exist = await Category._getCategoryID(categoryName);
             return true;
-        }catch(err){
+        } catch (err) {
             return false;
         }
     }
 
     // Update Category
-    static async verifyCategoryName(newName){
+    static async verifyCategoryName(newName) {
         // Verify the new name
-        if (typeof newName !== "string"){
+        if (typeof newName !== "string") {
             // If not a string throw an error
             throw new MyError("Category Name is of invalid type");
-        }else if (newName.length > 50){
+        } else if (newName.length > 50) {
             // Throw an error for a name that's too long
             throw new MyError("Category Name is too long");
         }
 
         // Check if the name exists
         const exist = await Category._doesCategoryExist(newName);
-        if (exist === true){
+        if (exist === true) {
             throw new MyError(`${newName} category already exists`);
         }
 
         return "Name is valid!";
     }
 
-    static async _updateNameinDb (category_id, newName) {
+    static async _updateNameinDb(category_id, newName) {
         // Run command
         try {
             await pool.query(categoryTable.updateCategoryName, [newName, category_id]);
-        }catch(err){
+        } catch (err) {
             throw new MyError("Could not update category name");
         }
     }
@@ -130,7 +138,7 @@ class Category {
         console.log(`old is ${oldName} and new is ${newName}`);
         // Verify newName
         const isValid = await Category.verifyCategoryName(newName);
-        
+
         const category_id = await Category._getCategoryID(oldName);
 
         // Update database
@@ -140,7 +148,7 @@ class Category {
     static async verifyFolder(id) {
         // Verifies a folder ID
         // Test if folder ID is an int
-        if (!Number.isInteger(id)){
+        if (!Number.isInteger(id)) {
             throw new MyError("Invalid Folder");
         }
 
@@ -151,11 +159,11 @@ class Category {
     }
 
     static async _updateFolderinDB(category_id, newID) {
-        try{
+        try {
             console.log(typeof newID, newID);
             console.log(typeof category_id, category_id);
             await pool.query(categoryTable.updateFolderID, [newID, category_id]);
-        }catch(err){
+        } catch (err) {
             console.log(err);
             throw new MyError("Could not update category folder");
         }
@@ -182,24 +190,24 @@ class Category {
             if (depValue) {
                 throw new MyError("There should be no depreciation value");
             }
-        }else if (depType === "Written Down Value" || depType === "Straight Line"){
+        } else if (depType === "Written Down Value" || depType === "Straight Line") {
             utility.checkIfNumberisGreaterThanZero(depValue, "Invalid Depreciation Percentage");
         }
     }
 
-    static async _updateDepreciationTypeInDB(category_id, depType){
+    static async _updateDepreciationTypeInDB(category_id, depType) {
         // Update the depreciation type in category table
         try {
             await pool.query(categoryTable.updateDepreciationType, [depType, category_id]);
-        }catch(err){
+        } catch (err) {
             throw new MyError("Could not update Depreciation Type");
         }
     }
 
     static async _insertDepreciationPercentInDb(category_id, percent) {
-        try{
+        try {
             await pool.query(categoryTable.insertDepreciationPercent, [category_id, percent]);
-        }catch(err){
+        } catch (err) {
             throw new MyError("Could not insert depreciation percentage");
         }
     }
@@ -207,12 +215,12 @@ class Category {
     static async _deleteDepreciationPercentInDb(category_id) {
         try {
             await pool.query(categoryTable.deleteDepreciationPercent, [category_id]);
-        }catch(err){
+        } catch (err) {
             throw new MyError("Could not delete depreciation percentage entry");
         }
     }
 
-    static async _updateDepreciationType(depType, value, categoryName){
+    static async _updateDepreciationType(depType, value, categoryName) {
         // Verify Depreciation Details
         Category.verifyDepreciationDetails(depType, value);
 
@@ -226,7 +234,7 @@ class Category {
         await Category._deleteDepreciationPercentInDb(category_id);
 
         // Insert DepreciationPerYear of DepreciationPercent
-        if (depType === "Written Down Value"){
+        if (depType === "Written Down Value") {
             await Category._insertDepreciationPercentInDb(category_id, value);
         }
     }
@@ -238,16 +246,16 @@ class Category {
         Each key contains the new info to use to update that property of a category.
         The depreciation key contains another object that has depreciation type and value
         */
-       console.log(1);
+        console.log(1);
         if ("name" in updateJSON) {
             await Category._updateCategoryName(updateJSON.name, categoryName);
         }
         console.log(2);
-        if("parentFolder" in updateJSON){
+        if ("parentFolder" in updateJSON) {
             await Category._updateCategoryFolder(updateJSON.parentFolder, categoryName);
         }
         console.log(3);
-        if ("depreciation" in updateJSON){
+        if ("depreciation" in updateJSON) {
             await Category._updateDepreciationType(updateJSON.depreciation.type, updateJSON.depreciation.value, categoryName);
         }
         console.log(4);
@@ -257,33 +265,33 @@ class Category {
     // Deleting a category would involve deleting the depreiciation details of all the assets under the category which
     // To me doesn't make alot of sense. So I've decided to not add this functionality for now
 
-    static async _doesCategoryIDExist(categoryID){
+    static async _doesCategoryIDExist(categoryID) {
         let fetchResult;
 
-        try{
+        try {
             fetchResult = await pool.query(categoryTable.doesCategoryIDExist, [categoryID]);
-        }catch(err){
+        } catch (err) {
             throw new MyError("Could Not Confirm If Category Exists");
         }
 
-        if (fetchResult.rowCount === 0){
+        if (fetchResult.rowCount === 0) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
 
-    static async _getCategoryDepreciationType(categoryID){
+    static async _getCategoryDepreciationType(categoryID) {
         let fetchResult;
 
         // Check if Category Exists
-        if (!await Category._doesCategoryIDExist(categoryID)){
+        if (!await Category._doesCategoryIDExist(categoryID)) {
             throw new MyError("Category Does Not Exist");
         }
 
-        try{
+        try {
             fetchResult = await pool.query(categoryTable.getCategoryDepreciationType, [categoryID]);
-        }catch(err){
+        } catch (err) {
             throw new MyError("Could Not Get Category Depreciation Type");
         }
 
@@ -293,23 +301,23 @@ class Category {
         return depreciaitionType;
     }
 
-    static async _getCategoryDepreciationPercent(categoryID){
+    static async _getCategoryDepreciationPercent(categoryID) {
         let fetchResult;
         let depreciationPercentage;
 
-        if (!await Category._doesCategoryIDExist(categoryID)){
+        if (!await Category._doesCategoryIDExist(categoryID)) {
             throw new MyError("Category Does Not Exist");
         }
 
-        if(await Category._getCategoryDepreciationType(categoryID) === "Written Down Value"){
-            try{
+        if (await Category._getCategoryDepreciationType(categoryID) === "Written Down Value") {
+            try {
                 fetchResult = await pool.query(categoryTable.getDepreciationPercent, [categoryID]);
-            }catch(err){
+            } catch (err) {
                 throw new MyError("Could Not Get Depreciation Percentage")
             }
 
             depreciationPercentage = fetchResult.rows[0].percentage;
-        }else{
+        } else {
             depreciationPercentage = null;
         }
 
@@ -317,7 +325,7 @@ class Category {
     }
 
     // View Category Details
-    static async viewDetails(categoryName){
+    static async viewDetails(categoryName) {
         let categoryExist = await Category._doesCategoryExist(categoryName);
         if (!categoryExist) {
             throw new MyError("Category Does Not Exist");

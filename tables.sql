@@ -43,12 +43,21 @@ CREATE TABLE Location (
 CREATE TABLE Category (
   ID serial,
   name varchar(50) NOT NULL UNIQUE,
-  parentFolderID int,
   depreciationType varchar(50) NOT NULL,
   PRIMARY KEY (ID),
   CONSTRAINT "FK_Category.parentFolderID"
     FOREIGN KEY (parentFolderID)
       REFERENCES Folder(ID)
+);
+
+CREATE TABLE parentChildCategory(
+  parentID int,
+  childID int,
+  PRIMARY KEY(parentID, childID),
+  CONSTRAINT "FK_Category.parentID"
+    FOREIGN KEY (parentID) REFERENCES Category(ID),
+  CONSTRAINT "FK_Category.childID"
+    FOREIGN KEY (childID) REFERENCES Category(ID)
 );
 
 CREATE TABLE DepreciationPercent (

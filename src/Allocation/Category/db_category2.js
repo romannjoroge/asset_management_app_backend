@@ -1,4 +1,4 @@
-const addCategory = 'INSERT into Category (name, parentFolderID, depreciationType) VALUES($1, $2, $3)'
+const addCategory = 'INSERT into Category (name, depreciationType) VALUES($1, $2)'
 const getCategoryID = 'SELECT ID FROM Category WHERE name = $1'
 const addWrittenValueDepreciationEntry = 'INSERT INTO DepreciationPercent (categoryID, percentage) VALUES ($1, $2)'
 const updateCategoryName = "UPDATE Category SET name = $1 WHERE id = $2";
@@ -13,6 +13,7 @@ const doesCategoryIDExist = "SELECT name FROM Category WHERE ID = $1";
 const getAllCategories = 'SELECT name FROM Category';
 const getCategory = `SELECT c.name, c.depreciationtype, f.name AS parentfolder FROM Category AS c JOIN Folder as f ON 
                     c.parentfolderid = f.id WHERE c.name=$1`;
+const addChild = "INSERT INTO parentChildCategory (parentID, childID) VALUES ($1, $2)"
 
 let categoryTable = {
     add: addCategory,
@@ -28,7 +29,8 @@ let categoryTable = {
     getDepreciationPercent: getDepreciationPercent,
     doesCategoryIDExist,
     getAllCategories,
-    getCategory
+    getCategory,
+    addChild
 }
 
 export default categoryTable;
