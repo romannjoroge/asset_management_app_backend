@@ -5,3 +5,4 @@ coverage
 .nycrc.json
 oldCode
 .vscode
+routes/tags.log
