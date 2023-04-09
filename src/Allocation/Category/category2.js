@@ -127,6 +127,7 @@ class Category {
     }
 
     static async _updateCategoryName(newName, oldName) {
+        console.log(`old is ${oldName} and new is ${newName}`);
         // Verify newName
         const isValid = await Category.verifyCategoryName(newName);
         
@@ -151,8 +152,11 @@ class Category {
 
     static async _updateFolderinDB(category_id, newID) {
         try{
+            console.log(typeof newID, newID);
+            console.log(typeof category_id, category_id);
             await pool.query(categoryTable.updateFolderID, [newID, category_id]);
         }catch(err){
+            console.log(err);
             throw new MyError("Could not update category folder");
         }
     }
@@ -162,7 +166,7 @@ class Category {
         await Category.verifyFolder(newFolderID);
 
         // Get category ID from categoryName
-        const categoryID = Category._getCategoryID(categoryName);
+        const categoryID = await Category._getCategoryID(categoryName);
 
         // Update details in DB
         await Category._updateFolderinDB(categoryID, newFolderID);
@@ -174,11 +178,11 @@ class Category {
         utility.checkIfInList(Category.depTypes, depType, "Invalid Depreciation Type");
 
         // Make sure deptype depvalue pair is valid
-        if (depType === "Double Declining Balance" || depType === "Straight Line") {
+        if (depType === "Double Declining Balance") {
             if (depValue) {
-                throw new MyError("There should be no depreciation percentage");
+                throw new MyError("There should be no depreciation value");
             }
-        }else if (depType === "Written Down Value"){
+        }else if (depType === "Written Down Value" || depType === "Straight Line"){
             utility.checkIfNumberisGreaterThanZero(depValue, "Invalid Depreciation Percentage");
         }
     }
@@ -213,7 +217,7 @@ class Category {
         Category.verifyDepreciationDetails(depType, value);
 
         // Get category ID
-        const category_id = Category._getCategoryID(categoryName);
+        const category_id = await Category._getCategoryID(categoryName);
 
         // Update Depreciation Type Entry in Category Table
         await Category._updateDepreciationTypeInDB(category_id, depType);
@@ -234,17 +238,19 @@ class Category {
         Each key contains the new info to use to update that property of a category.
         The depreciation key contains another object that has depreciation type and value
         */
+       console.log(1);
         if ("name" in updateJSON) {
             await Category._updateCategoryName(updateJSON.name, categoryName);
         }
-        
+        console.log(2);
         if("parentFolder" in updateJSON){
             await Category._updateCategoryFolder(updateJSON.parentFolder, categoryName);
         }
-
+        console.log(3);
         if ("depreciation" in updateJSON){
             await Category._updateDepreciationType(updateJSON.depreciation.type, updateJSON.depreciation.value, categoryName);
         }
+        console.log(4);
     }
 
     // Delete Category

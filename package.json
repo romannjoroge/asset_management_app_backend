@@ -7,6 +7,7 @@
     "test": "export NODE_ENV=test && mocha",
     "coverage": "nyc --reporter=lcov --reporter=text npm run test",
     "start": "npx nodemon node app.js",
+    "start-windows": "npx nodemon 'set NODE_ENV=windows node app.js'",
     "start-dev": "export NODE_ENV=test && npx nodemon node app.js",
     "test-windows": "set NODE_ENV=windows && mocha",
     "debug": "npx nodemon 'set NODE_ENV=windows && mocha'",
@@ -26,6 +27,7 @@
   },
   "dependencies": {
     "@apollo/server": "^4.4.0",
+    "bcrypt": "^5.1.0",
     "convert-array-to-csv": "^2.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
@@ -34,8 +36,10 @@
     "express-oauth2-jwt-bearer": "^1.1.0",
     "express-openid-connect": "^2.8.0",
     "express-promise-router": "^4.1.1",
+    "express-validator": "^6.15.0",
     "graphql": "^16.6.0",
     "jose": "^4.8.3",
+    "jsonwebtoken": "^9.0.0",
     "jwks-rsa": "^2.1.4",
     "multer": "^1.4.5-lts.1",
     "pg": "^8.7.3"

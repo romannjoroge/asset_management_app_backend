@@ -7,7 +7,7 @@ CREATE TABLE User2 (
   fname varchar(50) NOT NULL,
   lname varchar(50) NOT NULL,
   email varchar(50) NOT NULL,
-  password varchar(50) NOT NULL,
+  password text NOT NULL,
   username varchar(50),
   companyName varchar(50) NOT NULL,
   PRIMARY KEY (username),
@@ -198,6 +198,19 @@ CREATE TABLE DepreciationSchedule (
     FOREIGN KEY (assetTag)
       REFERENCES Asset(assetTag),
   PRIMARY KEY (year, assetTag)
+);
+
+CREATE TABLE Tags(
+  id serial,
+  scannedTime timestamp with time zone DEFAULT NOW(),
+  commandCode varchar(50) NOT NULL,
+  hardwareKey varchar(50) NOT NULL,
+  tagRecNums varchar(50) NOT NULL,
+  antNo varchar(50) NOT NULL,
+  pc varchar(50) NOT NULL,
+  epcID varchar(50) NOT NULL,
+  crc varchar(50) NOT NULL,
+  PRIMARY KEY (id)
 );
 
 -- Creates the home folder when the database is created. This is the topmost folder in the system

@@ -4,6 +4,15 @@ import Asset from '../src/Allocation/Asset/asset2.js';
 import { Errors, Succes } from '../utility/constants.js';
 import pool from '../db2.js';
 import assetTable from '../src/Allocation/Asset/db_assets.js';
+import checkifAuthorized from '../middleware/checkifAuthorized.js';
+import checkifAuthenticated from '../middleware/checkifAuthenticated.js';
+import { convertArrayToCSV } from 'convert-array-to-csv';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // const {
 //     addItem,
@@ -19,7 +28,7 @@ import assetTable from '../src/Allocation/Asset/db_assets.js';
 // Test to see if the route is reachable
 
 // router.get('/', test)
-router.post('/add', (req, res) => {
+router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     // Get asset values from request
     let {
         fixed,
@@ -64,7 +73,7 @@ router.post('/add', (req, res) => {
 })
 // router.put('/update', updateItem)
 // router.delete('/remove', removeItem)
-router.get('/view', (req, res) => {
+router.get('/view', checkifAuthenticated,  checkifAuthorized('Asset Administrator'), (req, res) => {
     Asset.displayAllAssetTags().then(data => {
         res.status(200).json(data);
     }).catch(e => {
@@ -75,7 +84,7 @@ router.get('/view', (req, res) => {
     });
 })
 
-router.get('/view/:id', (req, res) => {
+router.get('/view/:id', checkifAuthenticated, checkifAuthorized('Asset User'), (req, res) => {
     // Get asset tag from request params
     let assetTag = req.params.id;
 
@@ -94,6 +103,55 @@ router.get('/view/:id', (req, res) => {
         })
     });
 });
+
+router.post('/tags', (req, res) => {
+    console.log(req.body);
+    // Get values from req.body
+    let {
+        commandCode, 
+        hardwareKey,
+        tagRecNums,
+        tagRecords
+    } = req.body;
+    // Add tag to database
+    for (var i in tagRecords) {
+        let tag = tagRecords[i];
+        console.log(tag);
+        pool.query(assetTable.insertAssetTag, [commandCode, hardwareKey, tagRecNums, tag.antNo, tag.pc, tag.epcID, tag.crc]).then(_ => {
+            // Add an entry to log.csv file
+            let csvData = [{
+                commandCode,
+                hardwareKey,
+                tagRecNums,
+                antNo: tag.antNo,
+                pc: tag.pc,
+                epcID: tag.epcID,
+                crc: tag.crc
+            }];
+            let csvFromData = convertArrayToCSV(csvData);
+            fs.appendFile(path.join(__dirname, 'tags.log'), `${new Date().toISOString()},${commandCode},${hardwareKey},${tagRecNums},${tag.antNo},${tag.pc},${tag.epcID},${tag.crc}\n`).then(_ => {
+                
+            }).catch(e => {
+                console.log(e);
+                return res.status(500).json({
+                    message: Errors[9],
+                })
+            });
+        }).catch(e => {
+            console.log(e);
+            return res.status(500).json({message: Errors[9]})
+        })
+    }
+    res.send("Done");
+})
+
+// 192.168.0.180:80
+
+router.post('/heartBeats', (req, res) => {
+    console.log("Heart Beat...");
+    console.log(req);
+    res.send("Done");
+})
 // router.route('*', (req, res) => {
 //     res.status(404).json({ data: 'Resource not found' })
 // })
