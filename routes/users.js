@@ -95,16 +95,28 @@ router.post('/addUser', (req, res) => {
         // Add user if doesn't exist
         pool.query(userTable.addUser, [fname, lname, email, password, username, companyName]).then(_ => {
             // Add user roles
-            roles.forEach(role => {
-                pool.query(userTable.addUser, [role]).catch(err => {
-                    return res.status(501).json({message: Errors[9]});
-                })
-            });
-            res.json({message: Succes[4]});
+            
+            for (var i = 0; i < roles.length; i++) {
+                if (i == roles.length - 1) {
+                    pool.query(userTable.addUserRole, [username, roles[i]]).then(_ => {
+                        return res.json({message: "User Created"});
+                    }).catch(err => {
+                        console.log(err);
+                        return res.status(501).json({message: Errors[9]});
+                    }) 
+                }else {
+                    pool.query(userTable.addUserRole, [username, roles[i]]).catch(err => {
+                        console.log(err);
+                        return res.status(501).json({message: Errors[9]});
+                    }) 
+                }
+            }
         }).catch(err => {
+            console.log(err);
             return res.status(501).json({message: Errors[9]});
         })
     }).catch(err => {
+        console.log(err);
         return res.status(501).json({message: Errors[9]});
     })
 });
