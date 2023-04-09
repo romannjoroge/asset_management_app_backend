@@ -38,7 +38,6 @@ app.use('/reports',  reports)
 app.use('/users', checkifAuthenticated, checkifAuthorized('User Manager'), users)
 
 app.get('/', (req, res) => {
-    console.log(req.oidc.isAuthenticated())
     res.status(200).json({ success: true, msg: 'Secured resource' })
 })
 
