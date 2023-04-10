@@ -294,20 +294,38 @@ class Asset {
         }
     }
 
-    static async _insertDepreciationSchedule(assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation) {
-        await pool.query(assetTable.insertDepreciationSchedule, [year, openBookValue, depreciationExpense, accumulatedDepreciation, assetTag]);
+    static _insertDepreciationSchedule(assetTag, year, openBookValue, depreciationExpense, closingBookValue, accumulatedDepreciation) {
+        return new Promise((res, rej) => {
+            pool.query(assetTable.insertDepreciationSchedule, [year, openBookValue, depreciationExpense, accumulatedDepreciation, closingBookValue, assetTag]).then(_ => {
+                res("Done")
+            }).catch(err => {
+                console.log(err);
+                rej(err)
+            })
+        })
     }
 
-    static async _getCloseBookValue(assetTag, year) {
-        let fetchResult = await pool.query(assetTable.getCloseBookValue, [assetTag, year]);
-        utility.verifyDatabaseFetchResults(fetchResult, "No Closing Book Value for specified year");
-        return fetchResult.rows[0].closingBookValue;
+    static _getCloseBookValue(assetTag, year) {
+        return new Promise((res, rej) => {
+            pool.query(assetTable.getCloseBookValue, [assetTag, year]).then(fetchresult => {
+                if(fetchresult.rowCount <= 0) {
+                    return rej(new MyError("No Close Book Value For Asset"))
+                }
+                var closingBookVal = fetchresult.rows[0].closingbookvalue
+                return res(closingBookVal)
+            })
+        })
     }
 
     static async _getAccumulatedDepreciation(assetTag) {
-        let fetchResult = await pool.query(assetTable.getAccumulatedDepreciation, [assetTag]);
-        utility.verifyDatabaseFetchResults(fetchResult, "Could not sum previous depreciation expenses");
-        return fetchResult.rows[0].accumulatedDepreciation;
+        return new Promise((res, rej) => {
+            pool.query(assetTable.getAccumulatedDepreciation, [assetTag]).then(fetchResult => {
+                if(fetchResult.rowCount <= 0) {
+                    return rej(new MyError("Could Not Get Accumulated Depreciation"))
+                }
+                return res(fetchResult.rows[0]['sum'])
+            })
+        })
     }
 
     static async createDepreciationSchedule(depreciationType, assetTag, assetLifeSpan, acquisitionCost, acquisitionDate, residualValue, depreciationPercentage) {
@@ -319,36 +337,126 @@ class Asset {
         let openBookValue;
         let depreciationExpense;
         let accumulatedDepreciation;
+        let closingBookValue;
 
-        for (let i = 0; i < assetLifeSpan; i++) {
-            year = acquisitionDate.getFullYear() + i;
-
-            if (i === 0) {
-                openBookValue = acquisitionCost;
-                accumulatedDepreciation = depreciationExpense;
-            } else {
-                openBookValue = utility.addErrorHandlingToAsyncFunction(Asset._getCloseBookValue, "No close book value",
-                    assetTag, year);
-                accumulatedDepreciation = utility.addErrorHandlingToAsyncFunction(Asset._getAccumulatedDepreciation, "Could Not Get Accumulated Depreciation",
-                    assetTag);
-            }
-
-            if (depreciationType === "Straight Line") {
-                depreciationExpense = ((acquisitionCost - residualValue) / assetLifeSpan);
-
-            } else if (depreciationType === "Double Declining Balance") {
-                depreciationExpense = 2 * (1 / assetLifeSpan) * openBookValue;
-
-            } else if (depreciationType === "Written Down Value") {
-                depreciationExpense = openBookValue * (depreciationPercentage / 100);
-
-            } else {
-                throw new MyError("Depreciation Type is not supported");
-            }
-
-            utility.addErrorHandlingToAsyncFunction(Asset._insertDepreciationSchedule, "Invalid Depreciation Schedule Entry",
-                assetTag, openBookValue, year, openBookValue, depreciationExpense, accumulatedDepreciation);
+        const getOpenBookValue = (i, acquisitionCost, assetTag, year) => {
+            return new Promise((res, rej) => {
+                if (i == 0) {
+                    res(acquisitionCost)
+                } else {
+                    Asset._getCloseBookValue(assetTag, year).then(val => {
+                        res(val)
+                    }).catch(err => {
+                        console.log(`i is ${i}`)
+                        console.log(err);
+                        rej(new MyError("No close book value"));
+                    })
+                }
+            })
         }
+
+        const getDepreciationExpense = (depreciationType, acquisitionCost, residualValue, assetLifeSpan, openBookValue, depreciationPercentage) => {
+            return new Promise((res, rej) => {
+                if (depreciationType === "Straight Line") {
+                    return res((acquisitionCost - residualValue) / assetLifeSpan);
+    
+                } else if (depreciationType === "Double Declining Balance") {
+                    return res(2 * (1 / assetLifeSpan) * openBookValue);
+    
+                } else if (depreciationType === "Written Down Value") {
+                    return res(openBookValue * (depreciationPercentage / 100));
+    
+                } else {
+                    return rej(new MyError("Depreciation Type is not supported"));
+                }
+            })
+        }
+
+        const getAccumulatedDepreciation = (i, depreciationExpense, assetTag) => {
+            return new Promise((res, rej) => {
+                if (i == 0) {
+                    return res(depreciationExpense);
+                } else {
+                    Asset._getAccumulatedDepreciation(assetTag).then(val => {
+                        return res(val + depreciationExpense)
+                    }).catch(err => {
+                        console.log(err);
+                        return rej(new MyError("Could Not Get Accumulated Depreciation"));
+                    })
+                }
+            })
+        }
+
+        let i = 0;
+
+        function loop() {
+            if (i < assetLifeSpan) {
+                year = acquisitionDate.getFullYear() + i;
+                return getOpenBookValue(i, acquisitionCost, assetTag, year - 1).then(openBookValue => {
+                    return getDepreciationExpense(depreciationType, acquisitionCost, residualValue, assetLifeSpan, openBookValue, depreciationPercentage).then(depreciationExpense => {
+                        return getAccumulatedDepreciation(i, depreciationExpense, assetTag).then(accumulatedDepreciation => {
+                            closingBookValue = openBookValue - depreciationExpense;
+                            return Asset._insertDepreciationSchedule(assetTag, year, openBookValue, depreciationExpense, closingBookValue, accumulatedDepreciation).then(() => {
+                                i++;
+                                return loop();
+                            })
+                        })
+                    })
+                }).catch(err => {
+                    console.log(err)
+                    throw new MyError("Invalid Depreciation Schedule Entry")
+                })
+            } else {
+                Promise.resolve();
+            }
+        }
+
+        return loop();
+
+        // return new Promise((res, rej) => {
+        //     for(let i = 0; i < assetLifeSpan; i++) {
+        //         // Get openbookvalue
+        //         getOpenBookValue(i, acquisitionCost, assetTag, year).then(val1 => {
+        //             year = acquisitionDate.getFullYear() + i;
+        //             openBookValue = val1
+
+        //             // Get Depreciation Expense
+        //             getDepreciationExpense(depreciationType, acquisitionCost, residualValue, assetLifeSpan, openBookValue, depreciationPercentage).then(val2 => {
+        //                 depreciationExpense = val2;
+        //                 console.log("Done 1")
+
+        //                 // Get Accumulated Depreciation
+        //                 getAccumulatedDepreciation(i, depreciationExpense, assetTag).then(val3 => {
+        //                     accumulatedDepreciation = val3;
+        //                     console.log("Done 2")
+
+        //                     // Insert deprecition schedule
+        //                     closingBookValue = openBookValue - depreciationExpense;
+        //                     console.log(assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation, closingBookValue);
+        //                     Asset._insertDepreciationSchedule(assetTag, year, openBookValue, depreciationExpense, closingBookValue, accumulatedDepreciation).then(_ => {
+        //                         console.log("Depreciation Schedule Created");
+        //                     }).catch(err => {
+        //                         console.log(1)
+        //                         console.log(err);
+        //                         return rej(new MyError("Invalid Depreciation Schedule Entry"));
+        //                     })
+        //                 }).catch(err => {
+        //                     console.log(2)
+        //                     console.log(err);
+        //                     return rej(err);
+        //                 })
+        //             }).catch(err => {
+        //                 console.log(3)
+        //                 console.log(err)
+        //                 return rej(err)
+        //             })
+        //         }).catch(err => {
+        //             console.log(4)
+        //             console.log(err)
+        //             return rej(err)
+        //         })
+        //     }
+        // });
     }
 
     static async allocateAsset(assetTag, username) {

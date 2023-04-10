@@ -10,6 +10,7 @@ import { convertArrayToCSV } from 'convert-array-to-csv';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import Category from '../src/Allocation/Category/category2.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -60,9 +61,15 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
                             residualValue);
 
     asset.initialize().then(data => {
-        // Log new asset created
-        return res.status(201).json({
-            message: Succes[1],
+        // Get Depreciation Details
+        Category._getDepreciationDetails(categoryName).then(data => {
+            // Create Depreciation Schedule
+            Asset.createDepreciationSchedule(data.depType, asset.assetTag, asset.assetLifeSpan,asset.acquisitionCost,asset.acquisitionDate, asset.residualValue, data.perc).then(_ => {
+                return res.json({message: Succes[1]});
+            })
+        }).catch(er => {
+            console.log(er);
+            return res.status(500).json({message: Errors[9]});
         })
     }).catch(e => {
         console.log(e);

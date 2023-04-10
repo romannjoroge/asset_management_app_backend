@@ -16,8 +16,8 @@ const disposeAsset = "DELETE FROM Asset WHERE assettag = $1";
 const getAssetCategoryName = "SELECT name FROM Category WHERE ID = (SELECT categoryID from Asset WHERE assetTag = $1)";
 const updateAssetResidualValue = "UPDATE Asset SET residualValue = $1 WHERE assetTag = $2";
 const getCloseBookValue = "SELECT closingBookValue FROM DepreciationSchedule WHERE assetTag = $1 AND year = $2";
-const getAccumulatedDepreciation = "SELECT SUM(depreciationExpense) AS accumulatedDepreciation FROM DepreciationSchedule GROUP BY assetTag WHERE assetTag = $1";
-const insertDepreciationSchedule = "INSERT INTO DepreciationSchedule VALUES ($1, $2, $3, $4, $5)";
+const getAccumulatedDepreciation = "SELECT SUM(depreciationExpense) FROM DepreciationSchedule WHERE assettag = $1;";
+const insertDepreciationSchedule = "INSERT INTO DepreciationSchedule VALUES ($1, $2, $3, $4, $5, $6)";
 const getAssetDetails = `
     SELECT a.makeandmodelno, a.isfixed, a.serialnumber, a.acquisitiondate, a.status, 
     a.custodianname, a.acquisitioncost, a.insurancevalue, a.residualvalue, a.assetlifespan, 
@@ -48,7 +48,8 @@ const assetTable = {
     getAccumulatedDepreciation,
     getAssetDetails,
     insertAssetTag,
-    unallocate
+    unallocate,
+    insertDepreciationSchedule
 }
 
 export default assetTable;

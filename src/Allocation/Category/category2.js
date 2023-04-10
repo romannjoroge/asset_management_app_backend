@@ -324,6 +324,21 @@ class Category {
         return depreciationPercentage;
     }
 
+    static async _getDepreciationDetails(categoryName) {
+        return new Promise((res, rej) => {
+            Category._getCategoryID(categoryName).then(categoryID => {
+                Category._getCategoryDepreciationType(categoryID).then(depType => {
+                    Category._getCategoryDepreciationPercent(categoryID).then(perc => {
+                        res({ depType, perc });
+                    })
+                })
+            }).catch(err => {
+                console.log(err);
+                rej(Errors[9]);
+            })
+        })
+    }
+
     // View Category Details
     static async viewDetails(categoryName) {
         let categoryExist = await Category._doesCategoryExist(categoryName);
