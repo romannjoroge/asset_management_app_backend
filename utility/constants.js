@@ -30,12 +30,16 @@ export const Errors = {
     '28': "Not Authorized",
     '29': "Asset Does Not Exist",
     '30': "User Does Not Exist",
-    '31': "Could Not Get Company"
+    '31': "Could Not Get Company",
+    '32': "Location Already Exists",
+    '33': "Site Already Exists",
 }
 
 export const Succes = {
     '1': 'Asset Created Successfuly',
     '2': "Reports Sent Successfully",
     '3': "Asset Allocated",
-    '4': "User Created"
+    '4': "User Created",
+    '5': "Location Created",
+    '6': "Site Created"
 }

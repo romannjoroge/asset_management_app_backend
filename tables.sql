@@ -26,18 +26,31 @@ CREATE TABLE Folder (
   PRIMARY KEY (ID)
 );
 
+CREATE TABLE Site(
+  ID serial,
+  name varchar(50) NOT NULL,
+  county varchar(50) NOT NULL,
+  city varchar(50) NOT NULL,
+  address varchar(100) NOT NULL,
+  companyName varchar(50) NOT NULL,
+  CONSTRAINT "FK_Folder.companyName"
+    FOREIGN KEY (companyName)
+      REFERENCES Company(name),
+  PRIMARY KEY(ID)
+);
+
 CREATE TABLE Location (
   ID serial,
   name varchar(50) NOT NULL,
-  parentFolderID int NOT NULL,
+  site int NOT NULL,
   companyName varchar(50) NOT NULL,
   PRIMARY KEY (ID),
   CONSTRAINT "FK_Location.companyName"
     FOREIGN KEY (companyName)
       REFERENCES Company(name),
-  CONSTRAINT "FK_Location.parentFolderID"
-    FOREIGN KEY (parentFolderID)
-      REFERENCES Folder(ID)
+  CONSTRAINT "FK_Location.site"
+    FOREIGN KEY (site)
+      REFERENCES Site(ID)
 );
 
 CREATE TABLE Category (
