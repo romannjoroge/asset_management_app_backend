@@ -23,18 +23,32 @@ router.get('/getLocations', (req, res) => {
 })
 
 router.get('/view/:item', (req, res) => {
-    const item = req.params.item
+    const item = req.params.item;
+
+    let query;
+    let queryArguements;
+    let errorMessage;
 
     if (item == 'location') {
-        // Get All Locations And Their Sites
-        pool.query(locationTable.getLocationSites, []).then(fetchResult => {
-            if (fetchResult.rowCount <= 0) {
-                return res.status(400).json({message: Errors[13]})
-            }
-
-            return res.json(fetchResult.rows)
-        })
+        query = locationTable.getLocationSites;
+        queryArguements = [];
+        errorMessage = Errors[13]
+    } else if(item == 'site') {
+        query = locationTable.getSites;
+        queryArguements = [];
+        errorMessage = Errors[34];
+    }else {
+        return res.status(400).json({message: Errors[0]})
     }
+
+    // Get All Locations And Their Sites
+    pool.query(query, queryArguements).then(fetchResult => {
+        if (fetchResult.rowCount <= 0) {
+            return res.status(400).json({message: errorMessage})
+        }
+
+        return res.json(fetchResult.rows)
+    })
 })
 
 // Route for creating locations or sites

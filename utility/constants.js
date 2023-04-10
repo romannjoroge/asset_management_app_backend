@@ -33,6 +33,7 @@ export const Errors = {
     '31': "Could Not Get Company",
     '32': "Location Already Exists",
     '33': "Site Already Exists",
+    '34': "Could Not Get Sites"
 }
 
 export const Succes = {
