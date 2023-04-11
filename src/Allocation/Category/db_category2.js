@@ -14,6 +14,11 @@ const getAllCategories = 'SELECT name, ID FROM Category';
 const getCategory = `SELECT c.name, c.depreciationtype, f.name AS parentfolder FROM Category AS c JOIN Folder as f ON 
                     c.parentfolderid = f.id WHERE c.name=$1`;
 const addChild = "INSERT INTO parentChildCategory (parentID, childID) VALUES ($1, $2)"
+const getAllCategories2 = `
+                        SELECT c.name AS category, c.depreciationtype, d.percentage, (SELECT name AS parent FROM Category WHERE id = p.parentid) 
+                        FROM Category c FULL JOIN DepreciationPercent d ON d.categoryID = c.id FULL JOIN parentChildCategory 
+                        p ON c.id = p.childID
+`
 
 let categoryTable = {
     add: addCategory,
@@ -30,7 +35,8 @@ let categoryTable = {
     doesCategoryIDExist,
     getAllCategories,
     getCategory,
-    addChild
+    addChild,
+    getAllCategories2
 }
 
 export default categoryTable;

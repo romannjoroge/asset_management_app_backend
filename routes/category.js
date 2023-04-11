@@ -40,6 +40,16 @@ router.get('/view', (req, res) => {
     })
 });
 
+router.get('/get', (req, res) => {
+    // Return all categories and their info
+    pool.query(categoryTable.getAllCategories2, []).then(fetchResult => {
+        if(fetchResult.rowCount <= 0) {
+            return res.status(400).json({message: Errors[10]})
+        }
+        return res.json(fetchResult.rows)
+    })
+})
+
 router.post('/add', (req, res) => {
     // Get Category details from request body
     let {
