@@ -169,6 +169,7 @@ app.post('/login', (req, res) => {
     });
 });
 
-app.listen(4000, () => {
-    console.log('Server is listening on port 4000..')
+const port = 4500;
+app.listen(port, () => {
+    console.log(`Server is listening on port ${port}..`)
 })

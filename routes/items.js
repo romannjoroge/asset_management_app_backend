@@ -111,6 +111,22 @@ router.get('/view/:id', checkifAuthenticated, checkifAuthorized('Asset User'), (
     });
 });
 
+router.get('/get/:item', (req, res) => {
+    let item = req.params.item;
+
+    if (item === "assetCategory") {
+        // Return category name with the number of assets in it
+        pool.query(assetTable.assetCategories, []).then(fetchResult => {
+            if(fetchResult.rowCount <= 0) {
+                return res.status(400).json({message: Errors[22]})
+            }
+            return res.json(fetchResult.rows)
+        })
+    } else {
+        return res.status(400).json({message: Errors[0]})
+    }
+})
+
 router.post('/tags', (req, res) => {
     console.log(req.body);
     // Get values from req.body
