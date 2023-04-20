@@ -13,7 +13,7 @@ import userTable from './src/Users/db_users.js';
 import JWT from 'jsonwebtoken';
 
 // Reading JSON data from forms and JS respectively
-app.use(cors());
+app.use(cors({origin: '*'}));
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
