@@ -13,7 +13,10 @@ import userTable from './src/Users/db_users.js';
 import JWT from 'jsonwebtoken';
 
 // Reading JSON data from forms and JS respectively
-app.use(cors());
+app.use(cors({
+    credentials: true,
+    origin: '*'
+}));
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
@@ -36,6 +39,13 @@ app.use('/tracking', checkifAuthenticated, tracking)
 app.use('/gatepass', checkifAuthenticated, gatepass)
 app.use('/reports',  reports)
 app.use('/users', checkifAuthenticated, checkifAuthorized('User Manager'), users)
+app.use((req, res, next) => {
+    res.on('finish', () => {
+        console.log(`req url is ${req.originalUrl}`);
+        console.log(res.getHeaders())
+    })
+    next();
+})
 
 app.get('/', (req, res) => {
     res.status(200).json({ success: true, msg: 'Secured resource' })
