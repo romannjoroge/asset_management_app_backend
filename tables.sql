@@ -16,6 +16,18 @@ CREATE TABLE User2 (
       REFERENCES Company(name)
 );
 
+CREATE TABLE BuildingOffice(
+  officeID int NOT NULL,
+  buildingID int NOT NULL,
+  CONSTRAINT "FK_SiteBuilding.officeID"
+    FOREIGN KEY (officeID)
+      REFERENCES Office(ID),
+  CONSTRAINT "FK_SiteBuilding.buildingID"
+    FOREIGN KEY (buildingID)
+      REFERENCES Building(ID),
+  PRIMARY KEY(officeID, buildingID)
+);
+
 CREATE TABLE Folder (
   ID serial,
   name varchar(50) NOT NULL,
@@ -39,18 +51,28 @@ CREATE TABLE Site(
   PRIMARY KEY(ID)
 );
 
+CREATE TABLE Office(
+  ID serial,
+  name varchar(50) NOT NULL,
+  companyName varchar(50) NOT NULL,
+  CONSTRAINT "FK_Building.companyName"
+    FOREIGN KEY (companyName)
+      REFERENCES Company(name),
+  PRIMARY KEY(ID)
+);
+
 CREATE TABLE Location (
   ID serial,
   name varchar(50) NOT NULL,
-  site int NOT NULL,
   companyName varchar(50) NOT NULL,
+  parentLocationID int,
   PRIMARY KEY (ID),
   CONSTRAINT "FK_Location.companyName"
     FOREIGN KEY (companyName)
       REFERENCES Company(name),
-  CONSTRAINT "FK_Location.site"
-    FOREIGN KEY (site)
-      REFERENCES Site(ID)
+  CONSTRAINT "FK_Location.parentLocationID"
+    FOREIGN KEY (parentLocationID)
+      REFERENCES Location(ID)
 );
 
 CREATE TABLE Category (
@@ -166,7 +188,7 @@ CREATE TABLE StockTakeAssets (
       REFERENCES StockTake(ID)
 );
 
-CREATE TABLE "GatePass Asset" (
+CREATE TABLE "GatePass_Asset" (
   "gatePassID" int,
   "assetTag" varchar(50),
   PRIMARY KEY ("gatePassID", "assetTag"),

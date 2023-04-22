@@ -15,19 +15,6 @@ import Category from '../src/Allocation/Category/category2.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// const {
-//     addItem,
-//     removeItem,
-//     updateItem,
-//     getItem,
-//     getItems,
-//     calculateNewPrice
-// } = require('../logic/items')
-
-// const {test} = require('../test/routes_test') 
-// const { route } = require('./tracking')
-// Test to see if the route is reachable
-
 // router.get('/', test)
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     // Get asset values from request
@@ -113,18 +100,29 @@ router.get('/view/:id', checkifAuthenticated, checkifAuthorized('Asset User'), (
 
 router.get('/get/:item', (req, res) => {
     let item = req.params.item;
+    let query;
+    let arguements;
+    let errorMessage;
 
     if (item === "assetCategory") {
-        // Return category name with the number of assets in it
-        pool.query(assetTable.assetCategories, []).then(fetchResult => {
-            if(fetchResult.rowCount <= 0) {
-                return res.status(400).json({message: Errors[22]})
-            }
-            return res.json(fetchResult.rows)
-        })
+        query = assetTable.assetCategories;
+        arguements = [];
+        errorMessage = Errors[22];
+    } else if (item === "assets") {
+        query = assetTable.getAllAssets;
+        arguements = [];
+        errorMessage = Errors[8];
     } else {
         return res.status(400).json({message: Errors[0]})
     }
+
+    // Return category name with the number of assets in it
+    pool.query(query, arguements).then(fetchResult => {
+        if(fetchResult.rowCount <= 0) {
+            return res.status(400).json({message: errorMessage})
+        }
+        return res.json(fetchResult.rows)
+    })
 })
 
 router.post('/tags', (req, res) => {
