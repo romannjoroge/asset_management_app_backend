@@ -122,6 +122,21 @@ router.get('/get/:item', (req, res) => {
             return res.status(400).json({message: errorMessage})
         }
         return res.json(fetchResult.rows)
+    }).catch(err => {
+        console.log(err);
+        return res.status(500).json({message: Errors[9]})
+    })
+})
+
+router.delete('/delete/:barcode', (req, res) => {
+    let barcode = req.params.barcode
+
+    // Run query
+    pool.query(assetTable.deleteAsset, [barcode]).then(fetchResult => {
+        return res.json({message: Succes[7]})
+    }).catch(err => {
+        console.log(err);
+        return res.status(500).json({message: Errors[9]})
     })
 })
 

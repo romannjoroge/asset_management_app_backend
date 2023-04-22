@@ -28,6 +28,8 @@ const insertAssetTag = `INSERT INTO Tags(commandCode, hardwareKey, tagRecNums, a
 const unallocate = `UPDATE Asset SET custodianname = null WHERE assettag = $1`;
 const getAllAssets= "SELECT a.barcode, a.assetID, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id";
 const assetCategories = 'SELECT c.name, COUNT(*) FROM Asset a JOIN Category c ON c.id = a.categoryid GROUP BY c.id';
+const deleteAsset = "DELETE FROM Assets WHERE barcode = $1"
+
 
 const assetTable = {
     doesAssetTagExist,
@@ -53,7 +55,8 @@ const assetTable = {
     unallocate,
     insertDepreciationSchedule,
     assetCategories,
-    getAllAssets
+    getAllAssets,
+    deleteAsset
 }
 
 export default assetTable;
