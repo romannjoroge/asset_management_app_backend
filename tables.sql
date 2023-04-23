@@ -104,6 +104,17 @@ CREATE TABLE DepreciationPercent (
       REFERENCES Category(ID)
 );
 
+CREATE TABLE AssetValuationHistory(
+  ID serial,
+  assetID int,
+  valuationValue float,
+  valuationDate date,
+  PRIMARY KEY (ID),
+  CONSTRAINT "FK_AssetValuationHistory.assetID"
+    FOREIGN KEY (assetID)
+      REFERENCES Asset(assetID)
+);
+
 CREATE TABLE "GatePass" (
   "ID" serial,
   "expectedTime" timestamptz,
