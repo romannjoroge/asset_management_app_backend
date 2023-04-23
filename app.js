@@ -22,6 +22,7 @@ app.use(express.json())
 
 // Importing routes
 import allocate from './routes/allocation.js';
+import deleteRoute from './routes/delete.js';
 import items from './routes/items.js';
 import category from './routes/category.js';
 import tracking from './routes/tracking.js';
@@ -39,6 +40,7 @@ app.use('/tracking', checkifAuthenticated, tracking)
 app.use('/gatepass', checkifAuthenticated, gatepass)
 app.use('/reports',  reports)
 app.use('/users', checkifAuthenticated, checkifAuthorized('User Manager'), users)
+app.use('/delete', deleteRoute);
 app.use((req, res, next) => {
     res.on('finish', () => {
         console.log(`req url is ${req.originalUrl}`);
@@ -46,6 +48,7 @@ app.use((req, res, next) => {
     })
     next();
 })
+
 
 app.get('/', (req, res) => {
     res.status(200).json({ success: true, msg: 'Secured resource' })
