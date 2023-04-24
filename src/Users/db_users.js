@@ -8,6 +8,7 @@ const doesUserExist = "SELECT * FROM User2 WHERE email = $1 OR username = $2"
 const addUserRole = "INSERT INTO UserRole VALUES($1, (SELECT id FROM Role WHERE name = $2));"
 const doesUsernameExist = "SELECT * FROM User2 WHERE username=$1";
 const getCompany = "SELECT companyName FROM User2 WHERE username=$1";
+const getNumberOfUsers = "SELECT COUNT(*) AS noUsers FROM User2";
 
 let userTable = {
     checkIfUserInDB,
@@ -19,7 +20,8 @@ let userTable = {
     doesUserExist,
     addUserRole,
     doesUsernameExist,
-    getCompany
+    getCompany,
+    getNumberOfUsers
 }
 
 export default userTable;

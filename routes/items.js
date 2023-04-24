@@ -11,6 +11,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Category from '../src/Allocation/Category/category2.js';
+import userTable from '../src/Users/db_users.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -122,6 +123,45 @@ router.get('/get/:item', (req, res) => {
             return res.status(400).json({message: errorMessage})
         }
         return res.json(fetchResult.rows)
+    }).catch(err => {
+        console.log(err);
+        return res.status(500).json({message: Errors[9]})
+    })
+});
+
+router.get('/assetData', (req, res) => {
+    // Fetch asset net value and total number of assets
+    pool.query(assetTable.getAssetNetAndTotal).then(fetchResult => {
+        if(fetchResult.rowCount <= 0) {
+            return res.status(400).json({message: Errors[8]})
+        }
+        let netValTotal = fetchResult.rows[0];
+        // Fetch number of assets added in the last 12 months
+        pool.query(assetTable.getAssetAddedInLast12Months).then(fetchResult2 => {
+            if(fetchResult2.rowCount <= 0) {
+                return res.status(400).json({message: Errors[8]})
+            }
+            let assetsAdded = fetchResult2.rows[0];
+            
+            // Get number of users
+            pool.query(userTable.getNumberOfUsers).then(fetchResult3 => {
+                if(fetchResult3.rowCount <= 0) {
+                    return res.status(400).json({message: Errors[8]})
+                }
+                let users = fetchResult3.rows[0];
+                // Combine all data
+                let data = {...netValTotal, ...assetsAdded, ...users};
+                console.log(data);
+                res.json(data);
+            }).catch(err => {
+                console.log(err);
+                return res.status(500).json({message: Errors[9]})
+            })
+        }).catch(err => {
+            console.log(err);
+            return res.status(500).json({message: Errors[9]})
+        });
+        
     }).catch(err => {
         console.log(err);
         return res.status(500).json({message: Errors[9]})

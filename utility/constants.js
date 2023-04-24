@@ -43,5 +43,5 @@ export const Succes = {
     '4': "User Created",
     '5': "Location Created",
     '6': "Site Created",
-    '7': "Asset Deleted"
+    '7': "Asset Deleted",
 }

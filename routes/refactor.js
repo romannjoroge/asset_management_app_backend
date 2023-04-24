@@ -1,12 +1,7 @@
-/*
-    This route deals with deleting items in the database
-*/
 import express from 'express';
-import pool from '../db2.js';
 const router = express.Router();
-import { Errors, Succes } from '../utility/constants.js';
 
-router.delete('/delete/:item', (req, res) => {
+router.get('/get/:item', (req, res) => {
     let item = req.params.item;
     let {id} = req.body;
     id = Number.parseInt(id);
@@ -92,7 +87,9 @@ router.delete('/delete/:item', (req, res) => {
         console.log(err);
         return res.status(500).json({message: Errors[9]})
     });
-})
+});
+
+
+
 
 export default router;
-
