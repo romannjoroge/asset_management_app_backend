@@ -36,30 +36,30 @@ class Category {
 
     // Function that saves category in the database
     static async _saveCategoryInDb(categoryName, parentCategoryID, depreciationType, depreciationPercentage) {
-        // Categories of all depreciation types have a name, parent folder and a depreciation type
-        // Add Entry To Category Folder
-        pool.query(categoryTable.add, [categoryName, depreciationType]).then(_ => {
-            // Get ID of created category
-            Category._getCategoryID(categoryName).then(ID => {
-                // Add category as child of parent category
-                pool.query(categoryTable.addChild, [parentCategoryID, ID]).then(_ => {
-                    // Only written down value depreciation uses a custom depreciation percentage that needs to be stored in the system
-                    if (depreciationType === "Written Down Value") {
-                        Category._getCategoryID(categoryName).then(Name => {
-                            pool.query(categoryTable.addWritten, [ID, depreciationPercentage])
-                        }).catch(err => {
-                            throw new MyError("Could Not Add Entry to DepreciationPercentage table");
-                        })
-                    }
-                })
-            }).catch(err => {
-                console.log(err);
-                throw new MyError(Errors[12]);
-            })
+        // Create category
+        pool.query(categoryTable.add, [categoryName, depreciationType, parentCategoryID]).then(_ => {
+            if (depreciationPercentage) {
+                // Add depreciaition percentage to database
+
+                // Get ID of created category
+                Category._getCategoryID(categoryName).then(ID => {
+
+                    // Add depreciation percentage to database
+                    pool.query(categoryTable.addWritten, [ID, depreciationPercentage]).then(_ => {
+
+                    }).catch(err => {
+                        throw new MyError("Could Not Add Entry to DepreciationPercentage table");
+                    });
+                }).catch(err => {
+                    console.log(err);
+                    throw new MyError(Errors[12]);
+                });
+            }
+            
         }).catch(err => {
             console.log(err);
-            throw new MyError(Errors[12]);
-        })
+            throw new MyError(Errors[9]);
+        });
     }
 
     async initialize() {
