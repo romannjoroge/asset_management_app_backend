@@ -6,7 +6,6 @@ import { Errors, Succes } from '../utility/constants.js';
 
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
-    console.log("I have entered the request");
     pool.query(locationTable.getLocations, []).then((data) => {
         if (data.rowCount <= 0){
             return res.status(404).json({
