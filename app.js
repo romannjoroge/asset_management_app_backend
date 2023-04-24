@@ -15,7 +15,7 @@ import JWT from 'jsonwebtoken';
 // Reading JSON data from forms and JS respectively
 app.use(cors({
     credentials: true,
-    origin: '197.232.251.154:44743'
+    origin: '*'
 }));
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
