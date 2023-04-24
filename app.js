@@ -41,13 +41,6 @@ app.use('/gatepass', checkifAuthenticated, gatepass)
 app.use('/reports',  reports)
 app.use('/users', checkifAuthenticated, checkifAuthorized('User Manager'), users)
 app.use('/delete', deleteRoute);
-app.use((req, res, next) => {
-    res.on('finish', () => {
-        console.log(`req url is ${req.originalUrl}`);
-        console.log(res.getHeaders())
-    })
-    next();
-})
 
 
 app.get('/', (req, res) => {
