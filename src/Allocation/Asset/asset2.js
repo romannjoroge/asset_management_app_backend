@@ -16,9 +16,9 @@ import { Errors } from '../../../utility/constants.js';
 class Asset {
     static assetStatusOptions = ['good', 'excellent', 'fair'];
 
-    constructor(fixed, assetLifeSpan, acquisitionDate, locationID, status, custodianName,
-        acquisitionCost, insuranceValue, categoryName, attachments, assetTag, makeAndModelNo,
-        serialNumber, residualValue) {
+    constructor(barCode, assetLifeSpan, acquisitionDate, locationID, status, custodianName,
+        acquisitionCost, insuranceValue, categoryName, attachments, noInBuilding, makeAndModelNo,
+        serialNumber, residualValue, code, description, depreciaitionType, depreciationPercent) {
         utility.checkIfBoolean(fixed, "Invalid Fixed Status");
         this.fixed = fixed;
 
@@ -42,6 +42,19 @@ class Asset {
 
         utility.checkIfNumberisPositive(insuranceValue, "Invalid insurance value");
         this.insuranceValue = insuranceValue;
+
+        utility.checkIfString(description, "Invalid Description");
+        this.description = description;
+        utility.checkIfString(code, "Invalid Code");
+        this.code = code;
+        utility.checkIfString(barCode, "Invalid Barcode");
+        this.barCode = barCode;
+        utility.checkIfNumberisPositive(noInBuilding, "Invalid Number in Building");
+        this.noInBuilding = noInBuilding;
+        utility.checkIfString(depreciaitionType, "Invalid Depreciation Type");
+        this.depreciaitionType = depreciaitionType;
+        utility.checkIfNumberisPositive(depreciationPercent, "Invalid Depreciation Percent");
+        this.depreciationPercent = depreciationPercent;
 
         this.categoryName = categoryName;
 
