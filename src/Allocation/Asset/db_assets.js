@@ -1,6 +1,6 @@
 const doesAssetTagExist = "SELECT isFixed FROM Asset WHERE assetTag = $1";
-const addAssetToAssetRegister =`INSERT INTO Asset (assetTag, makeAndModelNo, isFixed, serialNumber, acquisitionDate, locationID,
-    status, custodianName, acquisitionCost, insuranceValue, categoryID, assetLifeSpan) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`;
+const addAssetToAssetRegister =`INSERT INTO Asset (barcode, noInBuilding, code, description, serialNumber, acquisitionDate, locationID, residualValue,
+    condition, responsibleUsername, acquisitionCost, categoryID, usefulLife, depreciationType, depreciationPercent) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`;
 const addAssetFileAttachment = "INSERT INTO Asset_File (assetTag, attachment) VALUES ($1, $2)";
 const updateAssetFixedStatus = "UPDATE Asset SET isFixed = $1 WHERE assetTag = $2";
 const updateAssetLifeSpan = "UPDATE Asset SET assetLifeSpan = $1 WHERE assetTag = $2";
@@ -31,6 +31,7 @@ const assetCategories = 'SELECT c.name, COUNT(*) FROM Asset a JOIN Category c ON
 const deleteAsset = "DELETE FROM Assets WHERE barcode = $1";
 const getAssetNetAndTotal = "SELECT SUM(acquisitionCost) AS netValue, COUNT(*) AS total FROM Asset";
 const getAssetAddedInLast12Months = "SELECT COUNT(*) AS last12mths FROM Asset WHERE acquisitionDate > (NOW() - INTERVAL '1 YEAR')";
+const doesBarCodeExist = "SELECT * FROM Asset WHERE barcode = $1";
 
 
 const assetTable = {
@@ -60,7 +61,8 @@ const assetTable = {
     getAllAssets,
     deleteAsset,
     getAssetNetAndTotal,
-    getAssetAddedInLast12Months
+    getAssetAddedInLast12Months,
+    doesBarCodeExist
 }
 
 export default assetTable;

@@ -34,8 +34,23 @@ function checkIfNumberisGreaterThanZero(x, errorMessage){
     } 
 }
 
+function checkIfString(x, errorMessage){
+    if (typeof x !== "string"){
+        throw new MyError(errorMessage);
+    }
+}
+
 function checkIfValidDate(x, errorMessage){
-    let splitDate = x.split('/');
+    let splitDate;
+    if (x.includes('.')) {
+        splitDate = x.split('.');
+    } else if (x.includes('-')) {
+        splitDate = x.split('-');
+    } else if (x.includes('/')) {
+        splitDate = x.split('/');
+    } else {
+        throw new MyError(errorMessage);
+    }
     let month = splitDate[0];
     let day = splitDate[1];
     let year = splitDate[2];
@@ -170,7 +185,8 @@ const utility = {
     assertThatAsyncFunctionReturnsNull,
     isFetchResultEmpty,
     assertThatFunctionWorks,
-    returnFetchedResultsFromDatabase
+    returnFetchedResultsFromDatabase,
+    checkIfString
 }
 
 export default utility;

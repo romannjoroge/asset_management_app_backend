@@ -17,16 +17,17 @@ class Asset {
     static assetStatusOptions = ['good', 'excellent', 'fair'];
 
     constructor(barCode, assetLifeSpan, acquisitionDate, locationID, status, custodianName,
-        acquisitionCost, insuranceValue, categoryName, attachments, noInBuilding, makeAndModelNo,
+        acquisitionCost, categoryName, attachments, noInBuilding, 
         serialNumber, residualValue, code, description, depreciaitionType, depreciationPercent) {
-        utility.checkIfBoolean(fixed, "Invalid Fixed Status");
-        this.fixed = fixed;
+        // utility.checkIfBoolean(fixed, "Invalid Fixed Status");
+        // this.fixed = fixed;
 
         utility.checkIfNumberisPositive(assetLifeSpan, "Invalid asset life span");
         this.assetLifeSpan = assetLifeSpan;
 
         this.acquisitionDate = utility.checkIfValidDate(acquisitionDate, "Invalid acquisition date");
 
+        utility.checkIfNumberisPositive(locationID, "Invalid location ID");
         this.locationID = locationID;
 
         if (!status instanceof String) {
@@ -40,19 +41,24 @@ class Asset {
         utility.checkIfNumberisPositive(acquisitionCost, "Invalid acquisition cost");
         this.acquisitionCost = acquisitionCost;
 
-        utility.checkIfNumberisPositive(insuranceValue, "Invalid insurance value");
-        this.insuranceValue = insuranceValue;
+        // utility.checkIfNumberisPositive(insuranceValue, "Invalid insurance value");
+        // this.insuranceValue = insuranceValue;
 
         utility.checkIfString(description, "Invalid Description");
         this.description = description;
+
         utility.checkIfString(code, "Invalid Code");
         this.code = code;
+
         utility.checkIfString(barCode, "Invalid Barcode");
         this.barCode = barCode;
+
         utility.checkIfNumberisPositive(noInBuilding, "Invalid Number in Building");
         this.noInBuilding = noInBuilding;
+
         utility.checkIfString(depreciaitionType, "Invalid Depreciation Type");
         this.depreciaitionType = depreciaitionType;
+
         utility.checkIfNumberisPositive(depreciationPercent, "Invalid Depreciation Percent");
         this.depreciationPercent = depreciationPercent;
 
@@ -70,12 +76,15 @@ class Asset {
             }
         }
         this.attachments = attachments;
-        this.assetTag = assetTag;
-        this.makeAndModelNo = makeAndModelNo;
+        // this.makeAndModelNo = makeAndModelNo;
         this.serialNumber = serialNumber;
 
-        utility.checkIfNumberisPositive(residualValue, "Invalid Residual Value");
-        this.residualValue = residualValue;
+        if (residualValue) {
+            utility.checkIfNumberisPositive(residualValue, "Invalid Residual Value");
+            this.residualValue = residualValue;
+        } else {
+            this.residualValue = null;
+        }
     }
     // Since the constructor cannot make asynchronous calls a seprate initialize function is needed to initialize
     // asynchronous values
@@ -93,7 +102,7 @@ class Asset {
             throw new MyError(Errors[3]);
         }
         await User.checkIfUserExists(this.custodianName, "Invalid custodian");
-        if (await Asset._doesAssetTagExist(this.assetTag)) {
+        if (await Asset._doesBarCodeExist(this.assetTag)) {
             throw new MyError(Errors[7]);
         }
         let depreciaitionType = Category._getCategoryDepreciationType(this.categoryID);
@@ -121,11 +130,26 @@ class Asset {
         }
     }
 
+    static _doesBarCodeExist(barCode) {
+        return new Promise((res, rej) => {
+            pool.query(assetTable.doesBarCodeExist, [barCode]).then(fetchResult => {
+                if (utility.isFetchResultEmpty(fetchResult)) {
+                    res(false);
+                } else {
+                    res(true);
+                }
+            }).catch(err => {
+                console.log(err);
+                rej(new MyError(Errors[36]));
+            });
+        })
+    }
+
     async _storeAssetInAssetRegister() {
         try {
-            await pool.query(assetTable.addAssetToAssetRegister, [this.assetTag, this.makeAndModelNo, this.fixed, this.serialNumber,
-            this.acquisitionDate, this.locationID, this.status, this.custodianName, this.acquisitionCost, this.insuranceValue, this.categoryID,
-            this.assetLifeSpan]);
+            await pool.query(assetTable.addAssetToAssetRegister, [this.barCode ,this.noInBuilding, this.description, this.code, this.serialNumber,
+            this.acquisitionDate, this.locationID, this.residualValue, this.status, this.custodianName, this.acquisitionCost, this.categoryID,
+            this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent]);
             await Asset._insertAssetAttachments(this.assetTag, this.attachments);
         } catch (err) {
             console.log(err);

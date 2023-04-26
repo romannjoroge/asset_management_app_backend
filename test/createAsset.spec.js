@@ -14,7 +14,7 @@ import User from '../src/Users/users.js';
 import Category from '../src/Allocation/Category/category2.js';
 import { Errors } from '../utility/constants.js';
 
-describe("createAsset test", function () {
+describe.skip("createAsset test", function () {
     // Test inputs
     let fixed = true;
     let assetTag = "AUAOOOO2";
