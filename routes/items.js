@@ -20,33 +20,38 @@ const __dirname = path.dirname(__filename);
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     // Get asset values from request
     let {
-        fixed,
-        assetLifeSpan,
-        acquisitionDate,
+        barcode,
         locationID,
-        status,
-        custodianName,
-        acquisitionCost,
-        insuranceValue,
+        noInBuilding,
+        code,
+        description,
         categoryName,
-        attachments,
-        assetTag,
-        makeAndModelNo,
+        usefulLife,
         serialNumber,
-        residualValue
+        condition,
+        responsibleUsername,
+        acquisitionDate,
+        acquisitionCost,
+        residualValue,
+        depreciationType,
+        depreciationPercent,
+        attachments
     } = req.body;
 
     // Convert values to right type
-    fixed = (fixed === 'true');
-    assetLifeSpan = Number.parseInt(assetLifeSpan);
+    noInBuilding = Number.parseInt(noInBuilding);
+    usefulLife = Number.parseInt(usefulLife);
     acquisitionCost = Number.parseFloat(acquisitionCost);
-    insuranceValue = Number.parseFloat(insuranceValue);
-    residualValue = Number.parseFloat(residualValue)
+    
+    if (depreciationPercent) {
+        depreciationPercent = Number.parseFloat(depreciationPercent);
+    }
 
-    let asset = new Asset(fixed, assetLifeSpan, acquisitionDate, locationID, 
-                            status, custodianName, acquisitionCost, insuranceValue, 
-                            categoryName, attachments, assetTag, makeAndModelNo, serialNumber, 
-                            residualValue);
+    let asset = new Asset(
+        barcode,usefulLife, acquisitionDate, locationID, condition, responsibleUsername,
+        acquisitionCost, categoryName, attachments, noInBuilding, serialNumber, residualValue,
+        code, description, depreciationType, depreciationPercent
+    )
 
     asset.initialize().then(data => {
         // Get Depreciation Details
