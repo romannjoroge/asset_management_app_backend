@@ -38,6 +38,7 @@ export const Errors = {
     '36': "Could Not Verify Barcode",
     '37': "Invalid Date Given",
     '38': "Could Not Get Scanned Assets",
+    '39': "Reader Already Exists",
 }
 
 export const Succes = {
@@ -49,4 +50,5 @@ export const Succes = {
     '6': "Site Created",
     '7': "Asset Deleted",
     '8': "Category Created",
+    '9': "RFID Reader Created",
 }

@@ -87,7 +87,23 @@ router.post('/create/:item', (req, res) => {
         createItemQuery = locationTable.createSite
         createItemParams = [name, county, city, address, companyName]
         successMessage = Succes[6]
-    }else {
+    } else if (item == 'reader'){
+        let {
+          address,
+          locationID,
+          name  
+        } = req.body;
+        address = Number.parseInt(address);
+        locationID = Number.parseInt(locationID);
+
+        itemExistParams = [name, locationID];
+        itemExistQuery = locationTable.doesReaderExist;
+        ExistErrorMessage = Errors[39];
+        createItemQuery = locationTable.createReader;
+        createItemParams = [address, locationID, name];
+        successMessage = Succes[9];
+    }
+    else {
         return res.status(400).json({message: Errors[0]})
     }
 
