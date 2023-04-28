@@ -39,6 +39,7 @@ export const Errors = {
     '37': "Invalid Date Given",
     '38': "Could Not Get Scanned Assets",
     '39': "Reader Already Exists",
+    '40': "Antennae Already Exists",
 }
 
 export const Succes = {
@@ -51,4 +52,5 @@ export const Succes = {
     '7': "Asset Deleted",
     '8': "Category Created",
     '9': "RFID Reader Created",
+    '10': "Antennae Created",
 }
