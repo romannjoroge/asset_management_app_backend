@@ -268,6 +268,31 @@ CREATE TABLE Tags(
   PRIMARY KEY (id)
 );
 
+CREATE TABLE RFIDReader(
+  id serial,
+  address int NOT NULL,
+  locationID int NOT NULL,
+  deleted boolean NOT NULL DEFAULT false,
+  name varchar(50) NOT NULL,
+  CONSTRAINT "FK_RFIDReader.locationID"
+    FOREIGN KEY (locationID)
+      REFERENCES Location(ID),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE Antennae(
+  id serial,
+  readerID int NOT NULL,
+  name varchar(50) NOT NULL,
+  entry boolean NOT NULL,
+  deleted boolean NOT NULL DEFAULT false,
+  CONSTRAINT "FK_Antennae.readerID"
+    FOREIGN KEY (readerID)
+      REFERENCES RFIDReader(ID),
+  PRIMARY KEY (id)
+);
+
+
 -- Creates the home folder when the database is created. This is the topmost folder in the system
 INSERT INTO Folder(name) VALUES('home');
 

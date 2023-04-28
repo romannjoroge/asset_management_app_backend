@@ -36,6 +36,8 @@ export const Errors = {
     '34': "Could Not Get Sites",
     '35': "Barcode Already Exists",
     '36': "Could Not Verify Barcode",
+    '37': "Invalid Date Given",
+    '38': "Could Not Get Scanned Assets",
 }
 
 export const Succes = {
