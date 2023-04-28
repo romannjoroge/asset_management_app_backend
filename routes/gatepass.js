@@ -25,7 +25,7 @@ router.get('/movements', (req, res) => {
         if (data.rowCount <= 0) {
             return res.status(400).json({message: Errors[38]})
         }
-        return res.status(200).json(data.rows);
+        return res.json(data.rows);
     }).catch(err => {
         console.log(err);
         return res.status(400).json({message: Errors[9]})
