@@ -79,10 +79,18 @@ router.delete('/delete/:item', (req, res) => {
         arguements = [assetID, gatePassID];
     } else if (item == "location") {
         table = "Location";
-        query = `UPDATE ${table} SET deleted = true WHERE id = 1`;
-        arguements = [id];0
-
-    }else {
+        query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
+        arguements = [id];
+    } else if (item == "reader") {
+        table = "RFIDReader";
+        query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
+        arguements = [id];
+    } else if (item == "antennae") {
+        table = "Antennae";
+        query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
+        arguements  = [id];
+    }
+    else {
         return res.status(404).json({message: Errors[0]})
     }
 
