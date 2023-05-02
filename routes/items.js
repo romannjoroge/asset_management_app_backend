@@ -238,10 +238,10 @@ router.get('/search', (req, res) => {
     let returned_data = [];
 
     // Search based on search field
-    if ("serialno" in req.body) {
+    if ("serialno" in req.query) {
         let {
             serialno
-        } = req.body;
+        } = req.query;
 
         // Search for asset with given serial number
         pool.query(assetTable.searchBySerialNo, [serialno]).then(fetchResult => {
