@@ -32,6 +32,7 @@ const deleteAsset = "DELETE FROM Assets WHERE barcode = $1";
 const getAssetNetAndTotal = "SELECT SUM(acquisitionCost) AS netValue, COUNT(*) AS total FROM Asset";
 const getAssetAddedInLast12Months = "SELECT COUNT(*) AS last12mths FROM Asset WHERE acquisitionDate > (NOW() - INTERVAL '1 YEAR')";
 const doesBarCodeExist = "SELECT * FROM Asset WHERE barcode = $1";
+const searchBySerialNo = "SELECT a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.serialNumber = $1";
 
 
 const assetTable = {
@@ -62,7 +63,8 @@ const assetTable = {
     deleteAsset,
     getAssetNetAndTotal,
     getAssetAddedInLast12Months,
-    doesBarCodeExist
+    doesBarCodeExist,
+    searchBySerialNo
 }
 
 export default assetTable;

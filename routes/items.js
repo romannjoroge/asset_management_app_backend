@@ -232,9 +232,38 @@ router.post('/heartBeats', (req, res) => {
     console.log("Heart Beat...");
     console.log(req);
     res.send("Done");
+});
+
+router.get('/search', (req, res) => {
+    let returned_data = [];
+
+    // Search based on search field
+    if ("serialno" in req.body) {
+        let {
+            serialno
+        } = req.body;
+
+        // Search for asset with given serial number
+        pool.query(assetTable.searchBySerialNo, [serialno]).then(fetchResult => {
+            if(fetchResult.rowCount <= 0) {
+                return res.status(400).json({message: Errors[41]})
+            }
+            returned_data = fetchResult.rows;
+            return res.json(returned_data);
+        }).catch(e => {
+            console.log(e);
+            return res.status(500).json({message: Errors[9]})
+        });
+    } else {
+        return res.status(400).json({message: Errors[42]})
+    }
+
+    // Return the final result
+});
+
+
+router.route('*', (req, res) => {
+    res.status(404).json({ data: 'Resource not found' })
 })
-// router.route('*', (req, res) => {
-//     res.status(404).json({ data: 'Resource not found' })
-// })
 
 export default router;

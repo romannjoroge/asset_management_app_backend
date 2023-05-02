@@ -40,6 +40,8 @@ export const Errors = {
     '38': "Could Not Get Scanned Assets",
     '39': "Reader Already Exists",
     '40': "Antennae Already Exists",
+    '41': "Asset With Search Field Does Not Exist",
+    '42': "Invalid Search Term",
 }
 
 export const Succes = {
