@@ -33,6 +33,7 @@ const getAssetNetAndTotal = "SELECT SUM(acquisitionCost) AS netValue, COUNT(*) A
 const getAssetAddedInLast12Months = "SELECT COUNT(*) AS last12mths FROM Asset WHERE acquisitionDate > (NOW() - INTERVAL '1 YEAR')";
 const doesBarCodeExist = "SELECT * FROM Asset WHERE barcode = $1";
 const searchBySerialNo = "SELECT a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.serialNumber = $1";
+const updateAsset = "UPDATE Asset SET $1 = $2 WHERE assetid = $3";
 
 
 const assetTable = {
@@ -64,7 +65,8 @@ const assetTable = {
     getAssetNetAndTotal,
     getAssetAddedInLast12Months,
     doesBarCodeExist,
-    searchBySerialNo
+    searchBySerialNo,
+    updateAsset
 }
 
 export default assetTable;

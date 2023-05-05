@@ -42,6 +42,7 @@ export const Errors = {
     '40': "Antennae Already Exists",
     '41': "Asset With Search Field Does Not Exist",
     '42': "Invalid Search Term",
+    '43': "Invalid Item To Update",
 }
 
 export const Succes = {
@@ -55,4 +56,5 @@ export const Succes = {
     '8': "Category Created",
     '9': "RFID Reader Created",
     '10': "Antennae Created",
+    '11': "Asset Updated",
 }

@@ -70,9 +70,37 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
             message: Errors[1],
         })
     });
-})
-// router.put('/update', updateItem)
-// router.delete('/remove', removeItem)
+});
+
+router.put('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
+    // Get barcode from request
+    let assetID = req.params.id;
+
+    const updatableItems = ["barcode", "locationID", "noInBuilding", "code", "description", "categoryID", "usefulLife", "serialNumber", "condition", "responsibleUsername",
+        "acquisitionDate", "acquisitionCost", "residualValue", "depreciationType"]
+    const requestParams = Object.keys(req.body);
+
+    // Loop through the keys of request body to get aspects of item to update
+    for (var i in requestParams) {
+        // Check if item is a valid parameter to update
+        if (updatableItems.includes(requestParams[i])) {
+            // Run update query
+            pool.query(`UPDATE Asset SET ${requestParams[i]} = $1 WHERE assetID = $2`, [req.body[requestParams[i]], assetID]).then(fetchResult => {
+                
+            }).catch(err => {
+                console.log(err);
+                return res.status(500).json({message: Errors[9]})
+            });
+        }else {
+            // What to do if item not in possible items to update
+            return res.status(404).json({message: Errors[43]})
+        }
+    }
+
+    return res.json({message: Succes[11]})
+});
+
+
 router.get('/view', checkifAuthenticated,  checkifAuthorized('Asset Administrator'), (req, res) => {
     Asset.displayAllAssetTags().then(data => {
         res.status(200).json(data);
