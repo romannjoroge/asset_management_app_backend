@@ -13,6 +13,7 @@ router.delete('/delete/:item', (req, res) => {
     let table;
     let query;
     let arguements;
+    console.log("Asset Is Being Deleted");
 
     if (item == "DepreciationPercent") {
         table = "DepreciationPercent";
