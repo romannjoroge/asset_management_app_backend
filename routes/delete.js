@@ -59,6 +59,8 @@ router.delete('/delete/:item', (req, res) => {
         query = `UPDATE ${table} SET deleted = true WHERE assetid = $1`;
         let {assetID} = req.body;
         arguements = [assetID];
+
+        console.log("This asset is being deleted");
     } else if (item == "user") {
         table = "User2";
         query = `UPDATE ${table} SET deleted = true WHERE username = $1`;
