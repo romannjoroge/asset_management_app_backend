@@ -8,7 +8,7 @@ import { Errors, Succes } from '../utility/constants.js';
 
 router.delete('/delete/:item', (req, res) => {
     let item = req.params.item;
-    let {id} = req.body;
+    let {id} = req.query;
     id = Number.parseInt(id);
     let table;
     let query;
@@ -22,12 +22,12 @@ router.delete('/delete/:item', (req, res) => {
     } else if (item == "StockTakeAssets") {
         table = "StockTakeAssets"
         query = `UPDATE ${table} SET deleted = true WHERE assetID = $1 AND stockTakeID = $2`;
-        let {assetID, stockTakeID} = req.body;
+        let {assetID, stockTakeID} = req.query;
         arguements = [assetID, stockTakeID];
     } else if (item == "assetAttachment") {
         table = "Asset_File";
         query = `UPDATE ${table} SET deleted = true WHERE assetID = $1 AND stockTakeID = $2`;
-        let {assetID, attachment} = req.body;
+        let {assetID, attachment} = req.query;
         arguements = [assetID, attachment];
     } else if (item == "category") {
         table = "Category";
@@ -40,7 +40,7 @@ router.delete('/delete/:item', (req, res) => {
     } else if (item == "userrole") {
         table = "UserRole";
         query = `UPDATE ${table} SET deleted = true WHERE roleID = $1 AND username = $2`;
-        let {roleID, username} = req.body;
+        let {roleID, username} = req.query;
         arguements = [roleID, username];
     } else if (item == "tag") {
         table = "Tags";
@@ -49,7 +49,7 @@ router.delete('/delete/:item', (req, res) => {
     } else if (item == "depreciationSchedule") {
         table = "DepreciationSchedule";
         query = `UPDATE ${table} SET deleted = true WHERE assetID = $1 AND year = $2`;
-        let {assetID, year} = req.body;
+        let {assetID, year} = req.query;
         arguements = [assetID, year];
     } else if (item == "stocktake") {
         table = "StockTake";
@@ -58,14 +58,14 @@ router.delete('/delete/:item', (req, res) => {
     } else if (item == "asset") {
         table = "Asset";
         query = `UPDATE ${table} SET deleted = true WHERE assetid = $1`;
-        let {assetID} = req.body;
+        let {assetID} = req.query;
         arguements = [assetID];
 
         console.log("This asset is being deleted");
     } else if (item == "user") {
         table = "User2";
         query = `UPDATE ${table} SET deleted = true WHERE username = $1`;
-        let {username} = req.body;
+        let {username} = req.query;
         arguements = [username];
     } else if (item == "log") {
         table = "Log";
@@ -78,7 +78,7 @@ router.delete('/delete/:item', (req, res) => {
     } else if (item == "gatepassAsset") {
         table = "GatePass_Asset";
         query = `UPDATE ${table} SET deleted = true WHERE assetID = $1 AND gatePassID = 2`;
-        let {assetID, gatePassID} = req.body;
+        let {assetID, gatePassID} = req.query;
         arguements = [assetID, gatePassID];
     } else if (item == "location") {
         table = "Location";
