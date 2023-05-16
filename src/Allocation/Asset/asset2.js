@@ -105,10 +105,12 @@ class Asset {
         if (await Asset._doesBarCodeExist(this.assetTag)) {
             throw new MyError(Errors[7]);
         }
-        let depreciaitionType = Category._getCategoryDepreciationType(this.categoryID);
-        if (depreciaitionType !== "Straight Line") {
-            if (this.residualValue) {
-                throw new MyError("Invalid Residual Value for Depreciation Type");
+        if (this.depreciaitionType == null) {
+            let depreciaitionType = Category._getCategoryDepreciationType(this.categoryID);
+            if (depreciaitionType !== "Straight Line") {
+                if (this.residualValue) {
+                    throw new MyError("Invalid Residual Value for Depreciation Type");
+                }
             }
         }
 
