@@ -19,10 +19,10 @@ const getCloseBookValue = "SELECT closingBookValue FROM DepreciationSchedule WHE
 const getAccumulatedDepreciation = "SELECT SUM(depreciationExpense) FROM DepreciationSchedule WHERE assettag = $1;";
 const insertDepreciationSchedule = "INSERT INTO DepreciationSchedule VALUES ($1, $2, $3, $4, $5, $6)";
 const getAssetDetails = `
-    SELECT a.makeandmodelno, a.isfixed, a.serialnumber, a.acquisitiondate, a.status, 
-    a.custodianname, a.acquisitioncost, a.insurancevalue, a.residualvalue, a.assetlifespan, 
+    SELECT a.barcode, a.noInBuilding, a.code, a.description, a.serialnumber, a.acquisitiondate, a.condition, 
+    a.responsibleUsername, a.acquisitioncost, a.residualvalue, a.usefulLife, a.depreciationtype, a.depreciationpercent,
     l.name as locationname, c.name as categoryname FROM Asset as a JOIN Location as l ON a.locationid = l.id 
-    JOIN Category as c ON a.categoryid = c.id WHERE a.assettag = $1;
+    JOIN Category as c ON a.categoryid = c.id WHERE a.assetID = $1;
 `
 const insertAssetTag = `INSERT INTO Tags(commandCode, hardwareKey, tagRecNums, antNo, pc, epcID, crc) VALUES ($1, $2, $3, $4, $5, $6, $7)`;
 const unallocate = `UPDATE Asset SET custodianname = null WHERE assettag = $1`;
