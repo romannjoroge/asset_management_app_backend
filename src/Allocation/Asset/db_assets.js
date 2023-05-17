@@ -34,6 +34,7 @@ const getAssetAddedInLast12Months = "SELECT COUNT(*) AS last12mths FROM Asset WH
 const doesBarCodeExist = "SELECT * FROM Asset WHERE barcode = $1";
 const searchBySerialNo = "SELECT a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.serialNumber = $1";
 const updateAsset = "UPDATE Asset SET $1 = $2 WHERE assetid = $3";
+const searchForAsset = "SELECT a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.textsearchable_index_col @@ to_tsquery($1)"
 
 
 const assetTable = {
@@ -66,7 +67,8 @@ const assetTable = {
     getAssetAddedInLast12Months,
     doesBarCodeExist,
     searchBySerialNo,
-    updateAsset
+    updateAsset,
+    searchForAsset
 }
 
 export default assetTable;

@@ -43,6 +43,7 @@ export const Errors = {
     '41': "Asset With Search Field Does Not Exist",
     '42': "Invalid Search Term",
     '43': "Invalid Item To Update",
+    '44': "No Asset Matches Search Term",
 }
 
 export const Succes = {
