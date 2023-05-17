@@ -292,13 +292,12 @@ router.get('/search', (req, res) => {
         if(fetchResult.rowCount <= 0) {
             return res.status(400).json({message: Errors[44]})
         }
+        console.log(fetchResult.rows);
         return res.json(fetchResult.rows)
     }).catch(err => {
         console.log(err);
         return res.status(500).json({message: Errors[9]})
     });
-    
-    res.send(queryString);
 });
 
 
