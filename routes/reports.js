@@ -245,7 +245,68 @@ router.get('/location/:report/:id', (req, res) => {
                         reject(Errors[9])
                     });
 
-                } else {
+                }
+                    // Asset Acquistion Report
+                else if (reportType == 'acquisition') {
+                    // Get to and from dates
+                    let to = utility.checkIfValidDate(req.query.to, "Invalid To Date");
+                    let from = utility.checkIfValidDate(req.query.from, "Invalid From Date");
+
+                    function getAccumulatedAcquisitionCost(locationID) {
+                        return new Promise((res, rej) => {
+                            // Get name of location
+                            pool.query(locationTable.getLocation, [locationID]).then(data => {
+                                let locationName = data.rows[0].name;
+                                // Get total acquisition for each location
+                                pool.query(reportsTable.getAccumulatedAcquisitionCost, [locationID, from, to]).then(data => {
+                                    // Stored sum
+                                    let sum;
+                                    if (data.rowCount <= 0) {
+                                        sum = "No Assets In This Location"
+                                    } else {
+                                        sum = data.rows[0].sum;
+                                    }
+
+                                    res({ [locationName]: sum });
+                                }).catch(err => {
+                                    console.log('Error 1');
+                                    console.log(err);
+                                    rej(Errors[9]);
+                                });
+                            }).catch(err => {
+                                console.log('Error 2');
+                                console.log(err);
+                                rej(Errors[9])
+                            });
+                        });
+                    }
+
+                    // Get acquisition details for all locations
+                    let promises = [];
+
+                    for (var i in locations) {
+                        promises.push(getAccumulatedAcquisitionCost(locations[i]));
+                    }
+
+                    let returnedObject = {};
+                    Promise.all(promises).then(data => {
+                        let name = ''
+                        for (var i in data) {
+                            if (i == 0) {
+                                name = Object.keys(data[i])[0];
+                                returnedObject[name] = data[i][name];
+                            } else {
+                                returnedObject[name] += Object.values(data[i])[0];
+                            }
+                        }
+                        resolve(returnedObject);
+                    }).catch(err => {
+                        console.log(err);
+                        reject(Errors[9])
+                    });
+                }
+                // Missing assets report
+                else {
                     // Get the stock take that is the closest to chosen date for each location
                     let date = utility.checkIfValidDate(req.query.date, "Invalid Date");
                     let stockTakes = [];
@@ -334,6 +395,10 @@ router.get('/location/:report/:id', (req, res) => {
     }
     // Category Report
     else if (reportType == 'category'){
+        stockTakesQuery = '';
+    }
+    // Acquisition Report
+    else if (reportType == 'acquisition'){
         stockTakesQuery = '';
     }
     else {
