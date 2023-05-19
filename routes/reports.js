@@ -102,7 +102,7 @@ router.get('/report/:type', (req, res) => {
     });
 });
 
-router.get('/missing/:id', (req, res) => {
+router.get('/location/:report/:id', (req, res) => {
     // Repeat for all locations with the parent location of id
     function getNumberOfMissingItemsForEachLocation(id) {
         return new Promise((resolve, reject) => {
@@ -205,14 +205,22 @@ router.get('/missing/:id', (req, res) => {
 
     // Get location id from request params
     let id = Number.parseInt(req.params.id);
+    let reportType = req.params.report;
     let databaseQuery;
     let arguements;
-    if(id == 0) {
-        databaseQuery = 'SELECT name, id FROM Location WHERE parentLocationID IS NULL';
-        arguements = [];
+
+    if (reportType === "missing") {
+        if(id == 0) {
+            databaseQuery = 'SELECT name, id FROM Location WHERE parentLocationID IS NULL';
+            arguements = [];
+        } else {
+            databaseQuery = reportsTable.getChildLocations;
+            arguements = [id];
+        }
     } else {
-        databaseQuery = reportsTable.getChildLocations;
-        arguements = [id];
+        return res.status(404).json({
+            message: Errors[0]
+        });
     }
 
     // Get all locations with parent id of id
