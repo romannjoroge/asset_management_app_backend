@@ -12,6 +12,7 @@ import userTable from '../src/Users/db_users.js';
 import checkifAuthenticated from '../middleware/checkifAuthenticated.js';
 import checkifAuthorized from '../middleware/checkifAuthorized.js';
 import utility from '../utility/utility.js';
+import locationTable from '../src/Tracking/db_location.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,7 +29,7 @@ router.get('/report/:type', (req, res) => {
     } else if (reportType == "movement") {
         query = reportsTable.movements
         inputs = [req.query.assettag];
-    } else if(reportType == 'category') {
+    } else if (reportType == 'category') {
         query = reportsTable.categoryCount;
         inputs = []
     } else if (reportType == 'audit') {
@@ -62,7 +63,7 @@ router.get('/report/:type', (req, res) => {
                 message: Errors[22]
             })
         }
-        
+
         // Create a csv file from returned data
         let csvData = data.rows;
         let csvFromData = convertArrayToCSV(csvData);
@@ -102,101 +103,154 @@ router.get('/report/:type', (req, res) => {
 });
 
 router.get('/missing/:id', (req, res) => {
-    // Get location id from request params
-    let id = Number.parseInt(req.params.id);
+    // Repeat for all locations with the parent location of id
+    function getNumberOfMissingItemsForEachLocation(id) {
+        return new Promise((resolve, reject) => {
+            // Get all locations that are in the location id
+            let locationIDs = [];
+            if (id) {
+                locationIDs.push(id);
+            }
 
-    // Get all locations that are in the location id
-    let locationIDs = [];
-    if (id){
-        locationIDs.push(id);
-    }
+            // Find all child locations
+            function findChildLocations(id) {
+                return new Promise((res, rej) => {
+                    // Get the child locations of the location with id ID
+                    pool.query(reportsTable.getChildLocations, [id]).then(data => {
+                        if (data.rowCount > 0) {
+                            // Add each location to locationIDs and call findChildLocations on each location
+                            for (let i in data.rows) {
+                                locationIDs.push(data.rows[i]['id']);
 
-    // Find all child locations
-    function findChildLocations(id) {
-        return new Promise((res, rej) => {
-            // Get the child locations of the location with id ID
-            pool.query(reportsTable.getChildLocations, [id]).then(data => {
-                if (data.rowCount > 0) {
-                    // Add each location to locationIDs and call findChildLocations on each location
-                    for (let i in data.rows) {
-                        locationIDs.push(data.rows[i]['id']);
+                                // Resolve so that recursive call can end
+                                res(findChildLocations(data.rows[i]['id']));
+                            }
+                        }
+                        // Base Case, function should do nothing if location has no children 
+                        else {
+                            res(locationIDs);
+                        }
+                    }).catch(err => {
+                        console.log(err);
+                        rej(Errors[9]);
+                    })
+                });
+            }
 
-                        // Resolve so that recursive call can end
-                        res(findChildLocations(data.rows[i]['id']));
+            // Call findChildLocations on the location id
+            findChildLocations(id).then(locations => {
+                // Get the stock take that is the closest to chosen date for each location
+                let date = utility.checkIfValidDate(req.query.date, "Invalid Date");
+                let stockTakes = [];
+                let promises = [];
+
+                // Function returns a stock take id if one is found
+                function getStockTakes(location) {
+                    return new Promise((res, rej) => {
+                        pool.query(reportsTable.getClosestStockTake, [date, location]).then(data => {
+                            if (data.rowCount > 0) {
+                                res(data.rows[0].id)
+                            } else {
+                                res(0)
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                            rej(Errors[9]);
+                        })
+                    });
+                }
+
+                // Creates a list of promises that need to be all evaluated
+                for (var i in locations) {
+                    promises.push(getStockTakes(locations[i]));
+                }
+
+                Promise.all(promises).then(data => {
+                    // Filtering out repeats and 0 from the returned stockTakes
+                    stockTakes = data.filter((value, index, arr) => arr.indexOf(value) === index && value != 0);
+
+                    if (stockTakes.length == 0) {
+                        let missing = "No Stock Takes Found";
+                        pool.query(locationTable.getLocation, [id]).then(data => {
+                            resolve({ [data.rows[0].name]: missing });
+                        }).catch(err => {
+                            console.log(err);
+                            reject(Errors[9])
+                        });
                     }
-                }
-                // Base Case, function should do nothing if location has no children 
-                else {
-                    res(locationIDs);
-                }
+
+                    // Get the assets that are in the asset register but not in the stock takes
+                    pool.query(reportsTable.getAssetsInStockTakes, [stockTakes]).then(data => {
+                        let missing = data.rows[0].missing;
+                        pool.query(locationTable.getLocation, [id]).then(data => {
+                            resolve({ [data.rows[0].name]: missing });
+                        }).catch(err => {
+                            console.log(err);
+                            reject(Errors[9])
+                        });
+                    }).catch(err => {
+                        console.log(err);
+                        reject(Errors[9])
+                    });
+                }).catch(err => {
+                    console.log(err);
+                    reject(Errors[9])
+                });
+
             }).catch(err => {
-                console.log(err);
-                rej(Errors[9]);
-            })
+                reject(Errors[9])
+            });
         });
     }
 
-    // Call findChildLocations on the location id
-    findChildLocations(id).then(locations => {
-        // Get the stock take that is the closest to chosen date for each location
-        let date = utility.checkIfValidDate(req.query.date, "Invalid Date");
-        let stockTakes = [];
-        let promises = [];
+    // Get location id from request params
+    let id = Number.parseInt(req.params.id);
+    let databaseQuery;
+    let arguements;
+    if(id == 0) {
+        databaseQuery = 'SELECT name, id FROM Location WHERE parentLocationID IS NULL';
+        arguements = [];
+    } else {
+        databaseQuery = reportsTable.getChildLocations;
+        arguements = [id];
+    }
 
-        // Function returns a stock take id if one is found
-        function getStockTakes(location) {
-            return new Promise((res, rej) => {
-                pool.query(reportsTable.getClosestStockTake, [date, location]).then(data => {
-                    if (data.rowCount > 0) {
-                        res(data.rows[0].id)
-                    } else {
-                        res(0)
-                    }
-                }).catch(err => {
-                    console.log(err);
-                    rej(Errors[9]);
-                })
-            });
-        }
-
-        // Creates a list of promises that need to be all evaluated
-        for (var i in locations) {
-            promises.push(getStockTakes(locations[i]));
-        }
-
-        Promise.all(promises).then(data => {
-            // Filtering out repeats and 0 from the returned stockTakes
-            stockTakes = data.filter((value, index, arr) => arr.indexOf(value) === index && value != 0);
-
-            if (stockTakes.length == 0) {
-                return res.status(404).json({
-                    message: Errors[45]
-                })
-            }
-
-            // Get the assets that are in the asset register but not in the stock takes
-            pool.query(reportsTable.getAssetsInStockTakes, [stockTakes]).then(data => {
-                res.send(data.rows[0].missing);
+    // Get all locations with parent id of id
+    pool.query(databaseQuery, arguements).then(childLocations => {
+        let returnedResponse = {};
+        // If there are no children locations, do nothing
+        if(childLocations.rowCount == 0) {
+            getNumberOfMissingItemsForEachLocation(id).then(data => {
+                return res.json(data);
             }).catch(err => {
                 console.log(err);
                 return res.status(500).json({
-                    message: Errors[9]
+                    message: err
                 })
             });
-        }).catch(err => {
-            console.log(err);
-            return res.status(500).json({
-                message: Errors[9]
-            })
-        });
+        } else {
+            let promises = [];
 
+            for (var i in childLocations.rows) {
+                promises.push(getNumberOfMissingItemsForEachLocation(childLocations.rows[i].id));
+                returnedResponse[childLocations.rows[i].name] = 0;
+            }
+
+            Promise.all(promises).then(data => {
+                return res.json(data);
+            }).catch(err => {
+                console.log(err);
+                return res.status(500).json({
+                    message: err
+                })
+            });
+        }
     }).catch(err => {
+        console.log(err);
         return res.status(500).json({
             message: err
         })
     });
-      
-    // Return the assets
 })
 
 
@@ -207,7 +261,7 @@ router.get("/data/:data", checkifAuthenticated, checkifAuthorized('Company Admin
 
     if (dataType == "stocktake") {
         query = reportsTable.getStockTakes;
-    } else if (dataType == "username"){
+    } else if (dataType == "username") {
         query = userTable.getUsers;
     } else {
         return res.status(404).json({

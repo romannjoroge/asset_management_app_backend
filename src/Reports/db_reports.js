@@ -10,7 +10,7 @@ const categoryCount = `SELECT c.name, COUNT(a.assettag) FROM Asset a JOIN Catego
 const getStockTakes = `SELECT s.date, s.id, l.name AS "Location"  FROM Stocktake s JOIN Location l ON l.id = s.locationid`;
 const acquisitionReport = `SELECT a.assettag, l.name AS "Location", a.acquisitioncost FROM Asset a JOIN Location l ON l.id = a.locationid WHERE a.acquisitiondate BETWEEN $1 AND $2`
 const depreciationReport = `SELECT year, openingbookvalue FROM DepreciationSchedule WHERE assetTag = $1`;
-const getChildLocations = 'SELECT id FROM Location WHERE parentLocationID = $1';
+const getChildLocations = 'SELECT name, id FROM Location WHERE parentLocationID = $1';
 const getStockTakesInLocations = 'SELECT id FROM StockTake WHERE locationID = ANY($1)';
 const getClosestStockTake = 'SELECT id FROM StockTake WHERE date <= $1 AND locationID = $2 ORDER BY date DESC LIMIT 1';
 const getAssetsInStockTakes = 'SELECT COUNT(assetID) - (SELECT COUNT(assetID) FROM StockTakeAssets WHERE stockTakeID = ALL($1)) AS missing FROM Asset';
