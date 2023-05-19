@@ -104,7 +104,7 @@ router.get('/report/:type', (req, res) => {
 
 router.get('/location/:report/:id', (req, res) => {
     // Repeat for all locations with the parent location of id
-    function getNumberOfMissingItemsForEachLocation(id) {
+    function getNumberOfMissingItemsForEachLocation(id, stockTakesQuery) {
         return new Promise((resolve, reject) => {
             // Get all locations that are in the location id
             let locationIDs = [];
@@ -180,7 +180,7 @@ router.get('/location/:report/:id', (req, res) => {
                     }
 
                     // Get the assets that are in the asset register but not in the stock takes
-                    pool.query(reportsTable.getAssetsInStockTakes, [stockTakes]).then(data => {
+                    pool.query(stockTakesQuery, [stockTakes]).then(data => {
                         let missing = data.rows[0].missing;
                         pool.query(locationTable.getLocation, [id]).then(data => {
                             resolve({ [data.rows[0].name]: missing });
@@ -208,8 +208,11 @@ router.get('/location/:report/:id', (req, res) => {
     let reportType = req.params.report;
     let databaseQuery;
     let arguements;
+    let stockTakesQuery;
 
+    // Missing assets report
     if (reportType === "missing") {
+        stockTakesQuery = reportsTable.getAssetsInStockTakes;
         if(id == 0) {
             databaseQuery = 'SELECT name, id FROM Location WHERE parentLocationID IS NULL';
             arguements = [];
@@ -228,7 +231,7 @@ router.get('/location/:report/:id', (req, res) => {
         let returnedResponse = {};
         // If there are no children locations, do nothing
         if(childLocations.rowCount == 0) {
-            getNumberOfMissingItemsForEachLocation(id).then(data => {
+            getNumberOfMissingItemsForEachLocation(id, stockTakesQuery).then(data => {
                 return res.json(data);
             }).catch(err => {
                 console.log(err);
@@ -240,7 +243,7 @@ router.get('/location/:report/:id', (req, res) => {
             let promises = [];
 
             for (var i in childLocations.rows) {
-                promises.push(getNumberOfMissingItemsForEachLocation(childLocations.rows[i].id));
+                promises.push(getNumberOfMissingItemsForEachLocation(childLocations.rows[i].id, stockTakesQuery));
                 returnedResponse[childLocations.rows[i].name] = 0;
             }
 
