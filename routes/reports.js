@@ -220,7 +220,20 @@ router.get('/location/:report/:id', (req, res) => {
             databaseQuery = reportsTable.getChildLocations;
             arguements = [id];
         }
-    } else {
+    } 
+    // Physical Report
+    else if (reportType === "physical") {
+        stockTakesQuery = reportsTable.numOfAssetsInStockTakes;
+        if (id == 0){
+            databaseQuery = 'SELECT name, id FROM Location WHERE parentLocationID IS NULL';
+            arguements = [];
+        } else {
+            databaseQuery = reportsTable.getChildLocations;
+            arguements = [id];
+        }
+    }
+    
+    else {
         return res.status(404).json({
             message: Errors[0]
         });
