@@ -294,7 +294,11 @@ router.get('/location/:report/:id', (req, res) => {
                         for (var i in data) {
                             if (i == 0) {
                                 returnedObject.name = data[i].name;
-                                returnedObject.sum = data[i].sum;
+                                if (data[i].sum) {
+                                    returnedObject.sum = data[i].sum;
+                                } else {
+                                    returnedObject.sum = 0;
+                                }
                             } else {
                                 returnedObject.sum += data[i].sum;
                             }
