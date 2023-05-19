@@ -341,7 +341,11 @@ router.get('/location/:report/:id', (req, res) => {
                         if (stockTakes.length == 0) {
                             let missing = "No Stock Takes Found";
                             pool.query(locationTable.getLocation, [id]).then(data => {
-                                resolve({ [data.rows[0].name]: missing });
+                                // resolve({ [data.rows[0].name]: missing });
+                                resolve({
+                                    name: data.rows[0].name,
+                                    missing: missing
+                                })
                             }).catch(err => {
                                 console.log(err);
                                 reject(Errors[9])
@@ -352,7 +356,11 @@ router.get('/location/:report/:id', (req, res) => {
                         pool.query(stockTakesQuery, [stockTakes]).then(data => {
                             let missing = data.rows[0].missing;
                             pool.query(locationTable.getLocation, [id]).then(data => {
-                                resolve({ [data.rows[0].name]: missing });
+                                // resolve({ [data.rows[0].name]: missing });
+                                resolve({
+                                    name: data.rows[0].name,
+                                    missing: missing
+                                })
                             }).catch(err => {
                                 console.log('Error 4');
                                 console.log(err);
