@@ -288,12 +288,13 @@ router.get('/location/:report/:id', (req, res) => {
                         promises.push(getAccumulatedAcquisitionCost(locations[i]));
                     }
 
-                    let returnedObject = {name: '', sum: 0};
+                    let returnedObject = {};
                     Promise.all(promises).then(data => {
                         let name = ''
                         for (var i in data) {
                             if (i == 0) {
                                 returnedObject.name = data[i].name;
+                                returnedObject.sum = data[i].sum;
                             } else {
                                 returnedObject.sum += data[i].sum;
                             }
