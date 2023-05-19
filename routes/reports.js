@@ -229,10 +229,10 @@ router.get('/location/:report/:id', (req, res) => {
     // Get all locations with parent id of id
     pool.query(databaseQuery, arguements).then(childLocations => {
         let returnedResponse = {};
-        // If there are no children locations, do nothing
+        // If there are no children locations, return data for said location and a flag that indicates that there are no children
         if(childLocations.rowCount == 0) {
             getNumberOfMissingItemsForEachLocation(id, stockTakesQuery).then(data => {
-                return res.json(data);
+                return res.json({...data, children: false});
             }).catch(err => {
                 console.log(err);
                 return res.status(500).json({
