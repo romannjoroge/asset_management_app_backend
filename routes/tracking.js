@@ -47,8 +47,7 @@ router.get('/view/:item', (req, res) => {
         errorMessage = Errors[13]
     } else if(item == 'site') {
         query = locationTable.getSites;
-        let id = req.query.id;
-        queryArguements = [id];
+        queryArguements = [];
         errorMessage = Errors[34];
     }else {
         return res.status(400).json({message: Errors[0]})
