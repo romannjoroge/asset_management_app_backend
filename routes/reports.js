@@ -25,16 +25,25 @@ router.get('/report/:type', (req, res) => {
 
     if (reportType == "chain") {
         query = reportsTable.chainOfCustody;
-        inputs = [req.query.assettag];
+        inputs = [req.query.barcode];
     } else if (reportType == "movement") {
         query = reportsTable.movements
-        inputs = [req.query.assettag];
+        inputs = [req.query.barcode];
     } else if (reportType == 'category') {
         query = reportsTable.categoryCount;
         inputs = []
     } else if (reportType == 'audit') {
-        query = logTable.selectUserLogs;
-        inputs = [req.query.username];
+        try{
+            query = logTable.selectUserLogs;
+            let username = req.query.username;
+            let to = utility.checkIfValidDate(req.query.to, "Invalid To Date");
+            let from = utility.checkIfValidDate(req.query.from, "Invalid From Date");
+            let eventtype = req.query.eventtype;
+            inputs = [username, from, to, eventtype];
+        }catch(err) {
+            console.log(err);
+            return res.status(400).json({message: Errors[9]})
+        }
     } else if (reportType == "missing") {
         query = reportsTable.missingAssets;
         inputs = [req.query.stockTake];
@@ -57,7 +66,6 @@ router.get('/report/:type', (req, res) => {
 
     // Get all log entries that have asset tag and allocate asset event
     pool.query(query, inputs).then(data => {
-        console.log(inputs);
         if (data.rowCount <= 0) {
             return res.status(404).json({
                 message: Errors[22]

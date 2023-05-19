@@ -4,7 +4,7 @@ const physical_valuation = `SELECT a.assetTag AS "Asset Tag", a.serialnumber AS 
                             StockTakeAssets WHERE stockTakeID = $1)`;
 const missingAssets = `SELECT assettag FROM Asset WHERE assettag NOT IN (SELECT assettag FROM StockTakeAssets WHERE stocktakeid = $1)`;
 const movements = `SELECT timestamp, username FROM Log WHERE logdescription ~* $1 AND eventtype = 'Movement' ORDER BY timestamp`;
-const chainOfCustody = `SELECT timestamp, username, logdescription FROM Log WHERE logdescription ~* $1 AND eventtype = 'Allocate Asset' 
+const chainOfCustody = `SELECT timestamp, logdescription FROM Log WHERE logdescription ~* $1 AND eventtype = 'Allocate Asset' 
                         ORDER BY timestamp;`;
 const categoryCount = `SELECT c.name, COUNT(a.assettag) FROM Asset a JOIN Category c ON c.id = a.categoryid GROUP BY c.name`;
 const getStockTakes = `SELECT s.date, s.id, l.name AS "Location"  FROM Stocktake s JOIN Location l ON l.id = s.locationid`;
