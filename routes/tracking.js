@@ -3,6 +3,7 @@ const router = express.Router();
 import pool from '../db2.js';
 import locationTable from '../src/Tracking/db_location.js';
 import { Errors, Succes } from '../utility/constants.js';
+import reportsTable from '../src/Reports/db_reports.js';
 
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
@@ -19,7 +20,19 @@ router.get('/getLocations', (req, res) => {
             message: Errors[9]
         })
     })
-})
+});
+
+router.get('/children/:id', (req, res) => {
+    let locationID = req.params.id;
+
+    // Get all children of a location
+    pool.query(reportsTable.getChildLocations, [locationID]).then(data => {
+        return res.json(data.rows);
+    }).catch(err => {
+        console.log(err);
+        return res.status(500).json({message: Errors[9]})
+    })
+});
 
 router.get('/view/:item', (req, res) => {
     const item = req.params.item;
