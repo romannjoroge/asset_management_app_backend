@@ -71,37 +71,37 @@ router.get('/report/:type', (req, res) => {
                 message: Errors[22]
             })
         }
+        return res.json(data.rows);
+        // // Create a csv file from returned data
+        // let csvData = data.rows;
+        // let csvFromData = convertArrayToCSV(csvData);
+        // fs.writeFile(path.join(__dirname, 'output.csv'), csvFromData).then(data => {
+        //     const options = {
+        //         root: path.join(__dirname),
+        //     }
+        //     res.sendFile('output.csv', options, err => {
+        //         if (err) {
+        //             console.log(err);
+        //             return res.status(500).json({
+        //                 message: Errors[17],
+        //             });
+        //         }
 
-        // Create a csv file from returned data
-        let csvData = data.rows;
-        let csvFromData = convertArrayToCSV(csvData);
-        fs.writeFile(path.join(__dirname, 'output.csv'), csvFromData).then(data => {
-            const options = {
-                root: path.join(__dirname),
-            }
-            res.sendFile('output.csv', options, err => {
-                if (err) {
-                    console.log(err);
-                    return res.status(500).json({
-                        message: Errors[17],
-                    });
-                }
-
-                fs.unlink(path.join(__dirname, 'output.csv'), err => {
-                    if (err) {
-                        console.log(err);
-                        return res.status(500).json({
-                            message: Errors[23],
-                        })
-                    }
-                })
-            })
-        }).catch(e => {
-            console.log(e);
-            return res.status(500).json({
-                message: Errors[16],
-            })
-        });
+        //         fs.unlink(path.join(__dirname, 'output.csv'), err => {
+        //             if (err) {
+        //                 console.log(err);
+        //                 return res.status(500).json({
+        //                     message: Errors[23],
+        //                 })
+        //             }
+        //         })
+        //     })
+        // }).catch(e => {
+        //     console.log(e);
+        //     return res.status(500).json({
+        //         message: Errors[16],
+        //     })
+        // });
     }).catch(err => {
         console.log(err);
         return res.status(500).json({
