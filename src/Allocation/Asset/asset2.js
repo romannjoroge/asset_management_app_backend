@@ -368,10 +368,6 @@ class Asset {
     }
 
     static async createDepreciationSchedule(depreciationType, assetTag, assetLifeSpan, acquisitionCost, acquisitionDate, residualValue, depreciationPercentage) {
-        if (!await Asset._doesAssetTagExist(assetTag)) {
-            throw new MyError("Asset Does Not Exist");
-        }
-
         let year;
         let openBookValue;
         let depreciationExpense;
@@ -406,6 +402,7 @@ class Asset {
                     return res(openBookValue * (depreciationPercentage / 100));
     
                 } else {
+                    console.log(depreciationType)
                     return rej(new MyError("Depreciation Type is not supported"));
                 }
             })

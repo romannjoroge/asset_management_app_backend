@@ -11,7 +11,7 @@ class Location {
     constructor (){}
 
     static async verifyLocationID(id){
-        // Throws an error if location doesn't exist and returns it's name if it does exist
+        // Returns true if locationID exists in the database, false otherwise
         let fetchResult;
         try{
             fetchResult = await pool.query(locationTable.getLocation, [id]);

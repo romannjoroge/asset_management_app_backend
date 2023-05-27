@@ -329,12 +329,12 @@ class Category {
             Category._getCategoryID(categoryName).then(categoryID => {
                 Category._getCategoryDepreciationType(categoryID).then(depType => {
                     Category._getCategoryDepreciationPercent(categoryID).then(perc => {
-                        res({ depType, perc });
+                        res({ "depType": depType, "perc": perc });
                     })
                 })
             }).catch(err => {
                 console.log(err);
-                rej(Errors[9]);
+                rej(MyError(Errors[9]));
             })
         })
     }
