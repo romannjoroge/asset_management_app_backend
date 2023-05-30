@@ -196,14 +196,16 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
 router.put('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     // Get barcode from request
     let assetID = req.params.id;
-    console.log(req.query);
+    console.log(req.body);
 
     const updatableItems = ["barcode", "locationID", "noInBuilding", "code", "description", "categoryID", "usefulLife", "serialNumber", "condition", "responsibleUsername",
         "acquisitionDate", "acquisitionCost", "residualValue", "depreciationType"]
     const requestParams = Object.keys(req.body);
+    console.log("THE REQUEST PARAMS: ", requestParams);
 
     // Loop through the keys of request body to get aspects of item to update
     for (var i in requestParams) {
+        console.log("Loop entered")
         // Check if item is a valid parameter to update
         if (updatableItems.includes(requestParams[i])) {
             // Run update query
