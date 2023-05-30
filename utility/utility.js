@@ -30,6 +30,7 @@ function checkIfNumberisPositive(x, errorMessage){
 
 function checkIfNumberisGreaterThanZero(x, errorMessage){
     if (!Number.isInteger(x) || x <= 0){
+        console.log(x);
         throw new MyError(errorMessage);
     } 
 }
