@@ -196,7 +196,7 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
 router.put('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     // Get barcode from request
     let assetID = req.params.id;
-    console.log(req.body);
+    console.log(req);
 
     const updatableItems = ["barcode", "locationID", "noInBuilding", "code", "description", "categoryID", "usefulLife", "serialNumber", "condition", "responsibleUsername",
         "acquisitionDate", "acquisitionCost", "residualValue", "depreciationType"]
