@@ -57,6 +57,31 @@ router.get('/report/:type', (req, res) => {
     } else if (reportType == 'depreciationreport') {
         query = reportsTable.getDepreciationDetails;
         inputs = [];
+    } else if (reportType == 'depSchedule') {
+        query = reportsTable.depSchedule;
+        console.log("This is wierd");
+        pool.query("SELECT assetID FROM Asset WHERE barcode = $1", ['AUA5004']).then(data => {
+            inputs = [data.rows[0].assetid];
+
+            pool.query(query, inputs).then(data => {
+                if (data.rowCount <= 0) {
+                    return res.status(404).json({
+                        message: Errors[22]
+                    })
+                }
+                return res.json(data.rows);
+            }).catch(err => {
+                console.log(err);
+                return res.status(500).json({
+                    message: Errors[9]
+                })
+            });
+        }).catch(err => {
+            console.log(err);
+            return res.status(500).json({
+                message: Errors[9]
+            })
+        });
     }
     else {
         return res.status(404).json({
@@ -72,6 +97,35 @@ router.get('/report/:type', (req, res) => {
             })
         }
         return res.json(data.rows);
+    }).catch(err => {
+        console.log(err);
+        return res.status(500).json({
+            message: Errors[9]
+        })
+    });
+});
+
+router.get('/depSchedule/:barcode', (req, res) => {
+    let barcode = req.params.barcode;
+
+    let query = reportsTable.depSchedule;
+    console.log("This is wierd");
+    pool.query("SELECT assetID FROM Asset WHERE barcode = $1", [barcode]).then(data => {
+        let inputs = [data.rows[0].assetid];
+
+        pool.query(query, inputs).then(data => {
+            if (data.rowCount <= 0) {
+                return res.status(404).json({
+                    message: Errors[22]
+                })
+            }
+            return res.json(data.rows);
+        }).catch(err => {
+            console.log(err);
+            return res.status(500).json({
+                message: Errors[9]
+            })
+        });
     }).catch(err => {
         console.log(err);
         return res.status(500).json({
