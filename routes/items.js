@@ -200,13 +200,14 @@ router.put('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Adminis
 
     const updatableItems = ["barcode", "locationID", "noInBuilding", "code", "description", "categoryID", "usefulLife", "serialNumber", "condition", "responsibleUsername",
         "acquisitionDate", "acquisitionCost", "residualValue", "depreciationType"]
-    const requestParams = Object.keys(req.query);
+    const requestParams = Object.keys(req.body);
 
     // Loop through the keys of request body to get aspects of item to update
     for (var i in requestParams) {
         // Check if item is a valid parameter to update
         if (updatableItems.includes(requestParams[i])) {
             // Run update query
+            console.log(`UPDATE Asset SET ${requestParams[i]} = $1 WHERE assetID = $2`);
             pool.query(`UPDATE Asset SET ${requestParams[i]} = $1 WHERE assetID = $2`, [req.body[requestParams[i]], assetID]).then(fetchResult => {
                 
             }).catch(err => {
