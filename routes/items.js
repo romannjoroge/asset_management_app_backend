@@ -22,59 +22,6 @@ const __dirname = path.dirname(__filename);
 
 // router.get('/', test)
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
-    // // Get asset values from request
-    // let {
-    //     barcode,
-    //     locationID,
-    //     noInBuilding,
-    //     code,
-    //     description,
-    //     categoryName,
-    //     usefulLife,
-    //     serialNumber,
-    //     condition,
-    //     responsibleUsername,
-    //     acquisitionDate,
-    //     acquisitionCost,
-    //     residualValue,
-    //     depreciationType,
-    //     depreciationPercent,
-    //     attachments
-    // } = req.body;
-
-    // // Convert values to right type
-    // noInBuilding = Number.parseInt(noInBuilding);
-    // usefulLife = Number.parseInt(usefulLife);
-    // acquisitionCost = Number.parseFloat(acquisitionCost);
-    
-    // if (depreciationPercent) {
-    //     depreciationPercent = Number.parseFloat(depreciationPercent);
-    // }
-
-    // let asset = new Asset(
-    //     barcode,usefulLife, acquisitionDate, locationID, condition, responsibleUsername,
-    //     acquisitionCost, categoryName, attachments, noInBuilding, serialNumber, residualValue,
-    //     code, description, depreciationType, depreciationPercent
-    // )
-
-    // asset.initialize().then(data => {
-    //     // Get Depreciation Details
-    //     Category._getDepreciationDetails(categoryName).then(data => {
-    //         // Create Depreciation Schedule
-    //         Asset.createDepreciationSchedule(data.depType, asset.assetTag, asset.assetLifeSpan,asset.acquisitionCost,asset.acquisitionDate, asset.residualValue, data.perc).then(_ => {
-    //             return res.json({message: Succes[1]});
-    //         })
-    //     }).catch(er => {
-    //         console.log(er);
-    //         return res.status(500).json({message: Errors[9]});
-    //     })
-    // }).catch(e => {
-    //     console.log(e);
-    //     return res.status(500).json({
-    //         message: Errors[1],
-    //     })
-    // });
-
     // Get asset values from request
     let {
         barcode,
