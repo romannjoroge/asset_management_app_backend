@@ -45,7 +45,8 @@ export const Errors = {
     '43': "Invalid Item To Update",
     '44': "No Asset Matches Search Term",
     '45': "There Are No Stock Takes For The Chosen Location",
-    '46': "There Are No More Child Locations"
+    '46': "There Are No More Child Locations",
+    '47': "Could Not Get Depreciation Details"
 }
 
 export const Succes = {

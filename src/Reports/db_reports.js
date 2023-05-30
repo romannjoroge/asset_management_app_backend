@@ -17,7 +17,8 @@ const getAssetsInStockTakes = 'SELECT COUNT(assetID) - (SELECT COUNT(assetID) FR
 const numOfAssetsInStockTakes = "SELECT COUNT(assetID) AS missing FROM StockTakeAssets WHERE stockTakeID = ALL($1)"
 const getAssetsInLocations = "SELECT COUNT(assetID) AS missing FROM Asset WHERE locationID = ANY($1)";
 const assetsInLocationByCategory = `SELECT c.name, foo.count FROM Category c FULL JOIN (SELECT COUNT(*), c.name FROM Asset a JOIN Category c ON c.id = a.categoryid WHERE a.locationID = $1 GROUP BY c.name) AS foo ON foo.name = c.name`;
-const getAccumulatedAcquisitionCost = "SELECT SUM(acquisitionCost) FROM Asset WHERE locationID = $1 AND acquisitionDate BETWEEN $2 AND $3"
+const getAccumulatedAcquisitionCost = "SELECT SUM(acquisitionCost) FROM Asset WHERE locationID = $1 AND acquisitionDate BETWEEN $2 AND $3";
+const getDepreciationDetails = "SELECT c.name, c.depreciationtype, d.percentage FROM Category c FULL Join DepreciationPercent d ON c.id = d.categoryid";
 
 export default {
     physical_valuation,
@@ -35,5 +36,6 @@ export default {
     numOfAssetsInStockTakes,
     assetsInLocationByCategory,
     getAssetsInLocations,
-    getAccumulatedAcquisitionCost
+    getAccumulatedAcquisitionCost,
+    getDepreciationDetails
 }

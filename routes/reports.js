@@ -55,8 +55,8 @@ router.get('/report/:type', (req, res) => {
         var year = Number.parseInt(req.query.year);
         inputs = [new Date(year, 0, 1), new Date(year + 1, 0, 1)];
     } else if (reportType == 'depreciationreport') {
-        query = reportsTable.depreciationReport;
-        inputs = [req.query.assettag];
+        query = reportsTable.getDepreciationDetails;
+        inputs = [];
     }
     else {
         return res.status(404).json({
@@ -72,36 +72,6 @@ router.get('/report/:type', (req, res) => {
             })
         }
         return res.json(data.rows);
-        // // Create a csv file from returned data
-        // let csvData = data.rows;
-        // let csvFromData = convertArrayToCSV(csvData);
-        // fs.writeFile(path.join(__dirname, 'output.csv'), csvFromData).then(data => {
-        //     const options = {
-        //         root: path.join(__dirname),
-        //     }
-        //     res.sendFile('output.csv', options, err => {
-        //         if (err) {
-        //             console.log(err);
-        //             return res.status(500).json({
-        //                 message: Errors[17],
-        //             });
-        //         }
-
-        //         fs.unlink(path.join(__dirname, 'output.csv'), err => {
-        //             if (err) {
-        //                 console.log(err);
-        //                 return res.status(500).json({
-        //                     message: Errors[23],
-        //                 })
-        //             }
-        //         })
-        //     })
-        // }).catch(e => {
-        //     console.log(e);
-        //     return res.status(500).json({
-        //         message: Errors[16],
-        //     })
-        // });
     }).catch(err => {
         console.log(err);
         return res.status(500).json({
@@ -461,8 +431,7 @@ router.get('/location/:report/:id', (req, res) => {
             message: err
         })
     });
-})
-
+});
 
 router.get("/data/:data", checkifAuthenticated, checkifAuthorized('Company Administrator'), (req, res) => {
     let dataType = req.params.data;
