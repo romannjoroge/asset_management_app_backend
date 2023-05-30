@@ -13,6 +13,7 @@ const depreciationReport = `SELECT year, openingbookvalue FROM DepreciationSched
 const getChildLocations = 'SELECT name, id FROM Location WHERE parentLocationID = $1';
 const getStockTakesInLocations = 'SELECT id FROM StockTake WHERE locationID = ANY($1)';
 const getClosestStockTake = 'SELECT id FROM StockTake WHERE date <= $1 AND locationID = $2 ORDER BY date DESC LIMIT 1';
+const getClosestStockTakeM = 'SELECT id FROM StockTake WHERE date BETWEEN $1 AND $2 AND locationID = $3 ORDER BY date DESC LIMIT 1';
 const getAssetsInStockTakes = 'SELECT COUNT(assetID) - (SELECT COUNT(assetID) FROM StockTakeAssets WHERE stockTakeID = ALL($1)) AS missing FROM Asset';
 const numOfAssetsInStockTakes = "SELECT COUNT(assetID) AS missing FROM StockTakeAssets WHERE stockTakeID = ALL($1)"
 const getAssetsInLocations = "SELECT COUNT(assetID) AS missing FROM Asset WHERE locationID = ANY($1)";
@@ -34,6 +35,7 @@ export default {
     getClosestStockTake,
     getAssetsInStockTakes,
     numOfAssetsInStockTakes,
+    getClosestStockTakeM,
     assetsInLocationByCategory,
     getAssetsInLocations,
     getAccumulatedAcquisitionCost,

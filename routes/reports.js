@@ -282,14 +282,15 @@ router.get('/location/:report/:id', (req, res) => {
                 // Missing assets report
                 else {
                     // Get the stock take that is the closest to chosen date for each location
-                    let date = utility.checkIfValidDate(req.query.date, "Invalid Date");
+                    let from = utility.checkIfValidDate(req.query.from, "Invalid Date");
+                    let to = utility.checkIfValidDate(req.query.to, "Invalid Date");
                     let stockTakes = [];
                     let promises = [];
 
                     // Function returns a stock take id if one is found
                     function getStockTakes(location) {
                         return new Promise((res, rej) => {
-                            pool.query(reportsTable.getClosestStockTake, [date, location]).then(data => {
+                            pool.query(reportsTable.getClosestStockTakeM, [from, to, location]).then(data => {
                                 if (data.rowCount > 0) {
                                     res(data.rows[0].id)
                                 } else {
@@ -329,11 +330,12 @@ router.get('/location/:report/:id', (req, res) => {
                         // Get the assets that are in the asset register but not in the stock takes
                         pool.query(stockTakesQuery, [stockTakes]).then(data => {
                             let missing = data.rows[0].missing;
+                            let amount = data.rows[0].amount; 
                             pool.query(locationTable.getLocation, [id]).then(data => {
                                 // resolve({ [data.rows[0].name]: missing });
                                 resolve({
                                     name: data.rows[0].name,
-                                    missing: missing
+                                    missing: missing,
                                 })
                             }).catch(err => {
                                 console.log('Error 4');
