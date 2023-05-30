@@ -193,7 +193,7 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
     });
 });
 
-router.put('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
+router.post('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     // Get barcode from request
     let assetID = req.params.id;
     console.log(req);
