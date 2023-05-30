@@ -190,7 +190,7 @@ class Category {
             if (depValue) {
                 throw new MyError("There should be no depreciation value");
             }
-        } else if (depType === "Written Down Value" || depType === "Straight Line") {
+        } else if (depType === "Written Down Value") {
             utility.checkIfNumberisGreaterThanZero(depValue, "Invalid Depreciation Percentage");
         }
     }
