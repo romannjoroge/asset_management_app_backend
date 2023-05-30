@@ -3,7 +3,7 @@ const physical_valuation = `SELECT a.assetTag AS "Asset Tag", a.serialnumber AS 
                             ON a.categoryid = c.id JOIN Location l ON l.id = a.locationid WHERE a.assettag IN (SELECT assetTag FROM 
                             StockTakeAssets WHERE stockTakeID = $1)`;
 const missingAssets = `SELECT assettag FROM Asset WHERE assettag NOT IN (SELECT assettag FROM StockTakeAssets WHERE stocktakeid = $1)`;
-const movements = `SELECT timestamp, description FROM Log WHERE logdescription ~* $1 AND eventtype = 'Movement' ORDER BY timestamp`;
+const movements = `SELECT timestamp, logdescription FROM Log WHERE logdescription ~* $1 AND eventtype = 'Movement' ORDER BY timestamp`;
 const chainOfCustody = `SELECT timestamp, logdescription, username FROM Log WHERE logdescription ~* $1 AND eventtype = 'Allocate Asset' 
                         ORDER BY timestamp;`;
 const categoryCount = `SELECT c.name, foo.count FROM Category c FULL JOIN (SELECT COUNT(*), c.name FROM Asset a JOIN Category c ON c.id = a.categoryid WHERE a.locationID = $1 GROUP BY c.name) AS foo ON foo.name = c.name`;
