@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "build": "tsc -w",
     "test": "export NODE_ENV=test && mocha",
     "coverage": "nyc --reporter=lcov --reporter=text npm run test",
     "start": "npx nodemon node app.js",
@@ -18,6 +19,9 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@types/mocha": "^10.0.1",
+    "@types/pg": "^8.10.2",
+    "@types/sinon": "^10.0.15",
     "chai": "^4.3.7",
     "chai-http": "^4.3.0",
     "mocha": "^10.2.0",

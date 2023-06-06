@@ -1,18 +1,14 @@
-// Import database pool
 import pool from '../db2.js';
 
 // Import testing libraries
 import { assert } from 'chai';
-import Sinon from 'sinon';
 
 // Import classes
-import MyError from '../utility/myError.js';
-import utility from '../utility/utility.js';
-import Asset from '../src/Allocation/Asset/asset2.js';
-import Location from '../src/Tracking/location.js';
-import User from '../src/Users/users.js';
-import Category from '../src/Allocation/Category/category2.js';
-import { Errors } from '../utility/constants.js';
+import MyError from '../built/utility/myError.js';
+import Asset from '../built/Allocation/Asset/asset2.js';
+import { Errors } from '../built/utility/constants.js';
+import { createAsset, createTemporaryTable, dropTemporaryTable } from './commonTestFunctions.js';
+import utility from '../built/utility/utility.js';
 
 describe.skip("createAsset test", function () {
     // Test inputs
@@ -213,3 +209,74 @@ describe.skip("createAsset test", function () {
         }
     });
 })
+
+
+describe.skip("Create Asset Test", () => {
+    let expectedDetails = {
+        barcode: "AUA7000",
+        assetLifeSpan: 10,
+        acquisitionDate:"05-11-2021",
+        locationID: 1,
+        condition: "Good",
+        custodianName: "GreatestDetective",
+        acquisitionCost: 10000,
+        categoryName: "NewCategory",
+        attachments: [],
+        noInBuilding: 1,
+        serialNumber: "ISBN 978-24343",
+        code: "CODE 12312",
+        description: "This is a test asset",
+        residualValue: 0,
+    }
+    
+
+
+    beforeEach(async function() {
+        try {
+            await createTemporaryTable("Asset");
+        } catch(err) {
+            console.log(err);
+            assert(false, "Could Not Create Asset Table");
+        }
+    });
+
+    async function createAsset() {
+        let asset = new Asset(expectedDetails.barcode, expectedDetails.assetLifeSpan, expectedDetails.acquisitionDate, expectedDetails.locationID, 
+            expectedDetails.condition, expectedDetails.custodianName, expectedDetails.acquisitionCost, expectedDetails.categoryName, expectedDetails.attachments, 
+            expectedDetails.noInBuilding, expectedDetails.serialNumber, expectedDetails.code, expectedDetails.description, expectedDetails.residualValue);
+        await asset.initialize()
+    }
+
+    it("should populate asset table with correct details", async () => {
+        try {
+            await createAsset();
+
+            // Get asset from database
+            let fetchResult = await pool.query("SELECT barcode, locationID, usefullife FROM Asset WHERE barcode = $1", [expectedDetails.barcode]);
+            utility.verifyDatabaseFetchResults(fetchResult, "Invalid Asset Details");
+            let assetDetails = {
+                barcode: fetchResult.rows[0].barcode,
+                assetLifeSpan: fetchResult.rows[0].usefullife,
+                locationID: fetchResult.rows[0].locationid,
+            };
+
+            assert.deepEqual(assetDetails, {
+                barcode: expectedDetails.barcode,
+                assetLifeSpan: expectedDetails.assetLifeSpan,
+                locationID: expectedDetails.locationID
+            }, `Wrong Details Returned ${assetDetails}`);
+        } catch(err) {
+            console.log(err);
+            assert(false, "No Error Meant To Be Thrown")
+        }
+    });
+
+    afterEach(async function() {
+        try {
+            await dropTemporaryTable("Asset");
+        } catch(err) {
+            console.log(err);
+            assert(false, "Could Not Drop Temporary Tables")
+        }
+    })
+});

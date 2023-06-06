@@ -7,9 +7,9 @@ import dotenv from 'dotenv';
 dotenv.config()  // Brings varaibles from .env file
 import { body, validationResult } from 'express-validator'
 import pool from './db2.js';
-import { Errors } from './utility/constants.js';
+import {Errors}  from './built/utility/constants.js';
 import bcrypt from 'bcrypt';
-import userTable from './src/Users/db_users.js';
+import userTable from './built/Users/db_users.js';
 import JWT from 'jsonwebtoken';
 
 // Reading JSON data from forms and JS respectively
@@ -21,14 +21,14 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 // Importing routes
-import allocate from './routes/allocation.js';
-import deleteRoute from './routes/delete.js';
-import items from './routes/items.js';
-import category from './routes/category.js';
-import tracking from './routes/tracking.js';
-import gatepass from './routes/gatepass.js';
-import reports from './routes/reports.js';
-import users from './routes/users.js';
+import allocate from './built/routes/allocation.js';
+import deleteRoute from './built/routes/delete.js';
+import items from './built/routes/items.js';
+import category from './built/routes/category.js';
+import tracking from './built/routes/tracking.js';
+import gatepass from './built/routes/gatepass.js';
+import reports from './built/routes/reports.js';
+import users from './built/routes/users.js';
 import checkifAuthenticated from './middleware/checkifAuthenticated.js';
 import checkifAuthorized from './middleware/checkifAuthorized.js';
 

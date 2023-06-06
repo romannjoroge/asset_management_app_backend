@@ -1,9 +1,8 @@
 // Importing modules used to write tests
 import {assert} from 'chai';
 import sinon from 'sinon';
-import Category from '../src/Allocation/Category/category2.js';
-import MyError from '../utility/myError.js';
-import Folder from '../src/Allocation/Folder/folder.js';
+import Category from '../built/Allocation/Category/category2.js';
+import MyError from '../built/utility/myError.js';
 
 // Creating the test suite
 describe.skip("addCategory Test", function () {

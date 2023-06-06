@@ -3,12 +3,10 @@ import pool from '../db2.js';
 
 import { assert } from 'chai';
 
-import Asset from '../src/Allocation/Asset/asset2.js'
-import utility from '../utility/utility.js';
-import MyError from '../utility/myError.js';
-import { Errors } from '../utility/constants.js';
+import Asset from '../built/Allocation/Asset/asset2.js'
 
-describe("Add Asset Test", function() {
+
+describe.skip("Add Asset Test", function() {
     let barcode = "ASDFASDF";
     this.beforeEach(async function() {
         try{

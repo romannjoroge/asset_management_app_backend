@@ -3,8 +3,8 @@ import pool from '../db2.js';
 
 import { assert } from 'chai';
 
-import Asset from '../src/Allocation/Asset/asset2.js'
-import utility from '../utility/utility.js';
+import Asset from '../built/Allocation/Asset/asset2.js'
+import utility from '../built/utility/utility.js';
 
 describe.skip("Allocate Asset To User Test", function(){
     let assetTag;

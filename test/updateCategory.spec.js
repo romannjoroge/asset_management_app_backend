@@ -1,14 +1,10 @@
-// Import database pool
-import pool from '../db2.js';
-
 // Importing testing packages
 import Sinon from 'sinon';
 import { assert } from 'chai';
 
 // Importing classes used in tests
-import Category from '../src/Allocation/Category/category2.js';
-import MyError from '../utility/myError.js';
-import Folder from '../src/Allocation/Folder/folder.js';
+import Category from '../built/Allocation/Category/category2.js';
+import MyError from '../built/utility/myError.js';
 
 describe.skip("updateCategory Test", function () {
     it("should update depreciation type is double declining, value is 0 and the other details are valid", async function () {
