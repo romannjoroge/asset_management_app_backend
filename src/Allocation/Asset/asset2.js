@@ -4,13 +4,13 @@ import fs from 'fs';
 import pool from '../../../db2.js';
 
 // Importing custom classes
-import MyError from '../../../utility/myError.js';
-import utility from '../../../utility/utility.js';
+import MyError from '../../utility/myError.js';
+import utility from '../../utility/utility.js';
 import Location from '../../Tracking/location.js';
 import User from '../../Users/users.js';
 import Category from '../Category/category2.js';
 import assetTable from './db_assets.js';
-import { Errors } from '../../../utility/constants.js';
+import { Errors } from '../../utility/constants.js';
 
 
 class Asset {

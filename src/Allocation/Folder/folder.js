@@ -1,6 +1,6 @@
 import folderTable from './db_folder.js';
 import pool from '../../../db2.js';
-import MyError from '../../../utility/myError.js';
+import MyError from '../../utility/myError.js';
 
 class Folder {
     constructor (_name, _companyName) {

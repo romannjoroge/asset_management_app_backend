@@ -5,10 +5,10 @@ import pool from '../../../db2.js';
 import categoryTable from './db_category2.js';
 
 // Importing custom MyError class
-import MyError from '../../../utility/myError.js';
+import MyError from '../../utility/myError.js';
 import Folder from '../Folder/folder.js';
-import utility from '../../../utility/utility.js';
-import { Errors } from '../../../utility/constants.js';
+import utility from '../../utility/utility.js';
+import { Errors } from '../../utility/constants.js';
 
 class Category {
     // Constructor

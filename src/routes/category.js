@@ -2,7 +2,7 @@ import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
 import Category from '../Allocation/Category/category2.js'
-import { Errors, Succes } from '../../utility/constants.js';
+import { Errors, Succes } from '../utility/constants.js';
 import categoryTable from '../Allocation/Category/db_category2.js';
 
 // View a specific category

@@ -2,7 +2,7 @@ import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
 import reportsTable from '../Reports/db_reports.js';
-import { Errors, Succes } from '../../utility/constants.js';
+import { Errors, Succes } from '../utility/constants.js';
 import { convertArrayToCSV } from 'convert-array-to-csv';
 import fs from 'fs/promises';
 import path from 'path';
@@ -11,7 +11,7 @@ import logTable from '../Log/db_log.js';
 import userTable from '../Users/db_users.js';
 import checkifAuthenticated from '../../middleware/checkifAuthenticated.js';
 import checkifAuthorized from '../../middleware/checkifAuthorized.js';
-import utility from '../../utility/utility.js';
+import utility from '../utility/utility.js';
 import locationTable from '../Tracking/db_location.js';
 
 const __filename = fileURLToPath(import.meta.url);

@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import Asset from '../Allocation/Asset/asset2.js';
-import { Errors, Succes } from '../../utility/constants.js';
+import { Errors, Succes } from '../utility/constants.js';
 import pool from '../../db2.js';
 import assetTable from '../Allocation/Asset/db_assets.js';
 import checkifAuthorized from '../../middleware/checkifAuthorized.js';
@@ -13,9 +13,9 @@ import { fileURLToPath } from 'url';
 import Category from '../Allocation/Category/category2.js';
 import userTable from '../Users/db_users.js';
 import Location from '../Tracking/location.js';
-import MyError from '../../utility/myError.js';
+import MyError from '../utility/myError.js';
 import User from '../Users/users.js';
-import utility from '../../utility/utility.js';
+import utility from '../utility/utility.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

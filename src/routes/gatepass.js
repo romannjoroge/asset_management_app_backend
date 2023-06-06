@@ -1,6 +1,6 @@
 import express from 'express';
-import utility from '../../utility/utility.js';
-import { Errors } from '../../utility/constants.js';
+import utility from '../utility/utility.js';
+import { Errors } from '../utility/constants.js';
 const router = express.Router();
 import gatepass from '../Tracking/db_location.js';
 import pool from '../../db2.js';

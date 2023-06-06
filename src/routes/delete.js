@@ -4,7 +4,7 @@
 import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
-import { Errors, Succes } from '../../utility/constants.js';
+import { Errors, Succes } from '../utility/constants.js';
 
 router.delete('/delete/:item', (req, res) => {
     let item = req.params.item;

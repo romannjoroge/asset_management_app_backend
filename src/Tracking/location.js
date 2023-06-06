@@ -2,9 +2,9 @@
 import pool from '../../db2.js';
 
 // Importing custom classes
-import MyError from '../../utility/myError.js';
+import MyError from '../utility/myError.js';
 import Folder from '../Allocation/Folder/folder.js';
-import utility from '../../utility/utility.js';
+import utility from '../utility/utility.js';
 import locationTable from './db_location.js';
 
 class Location {

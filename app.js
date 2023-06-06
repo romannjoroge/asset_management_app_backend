@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 dotenv.config()  // Brings varaibles from .env file
 import { body, validationResult } from 'express-validator'
 import pool from './db2.js';
-import { Errors } from './utility/constants.js';
+import { Errors } from './src/utility/constants.js';
 import bcrypt from 'bcrypt';
 import userTable from './src/Users/db_users.js';
 import JWT from 'jsonwebtoken';

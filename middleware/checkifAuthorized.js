@@ -1,5 +1,5 @@
 import userTable from "../src/Users/db_users.js";
-import { Errors } from "../utility/constants.js";
+import { Errors } from "../src/utility/constants.js";
 import pool from "../db2.js";
 
 export default (role) => {

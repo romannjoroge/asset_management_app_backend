@@ -2,8 +2,8 @@
 import pool from '../../db2.js';
 
 // Importing custom classes
-import MyError from '../../utility/myError.js';
-import utility from '../../utility/utility.js';
+import MyError from '../utility/myError.js';
+import utility from '../utility/utility.js';
 import userTable from './db_users.js'
 
 class User {

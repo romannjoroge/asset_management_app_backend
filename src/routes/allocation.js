@@ -1,9 +1,9 @@
 import express, { json } from 'express';
 const router = express.Router();
 import Asset from '../Allocation/Asset/asset2.js';
-import { Errors, Succes } from '../../utility/constants.js';
+import { Errors, Succes } from '../utility/constants.js';
 import User from '../Users/users.js';
-import MyError from '../../utility/myError.js';
+import MyError from '../utility/myError.js';
 import pool from '../../db2.js';
 import { convertArrayToCSV } from 'convert-array-to-csv';
 import fs from 'fs/promises';
