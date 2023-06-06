@@ -1,4 +1,4 @@
-const doesAssetTagExist = "SELECT isFixed FROM Asset WHERE assetTag = $1";
+const doesAssetIDExist = "SELECT barcode FROM Asset WHERE assetID = $1";
 const addAssetToAssetRegister =`INSERT INTO Asset (barcode, noInBuilding, code, description, serialNumber, acquisitionDate, locationID, residualValue,
     condition, responsibleUsername, acquisitionCost, categoryID, usefulLife, depreciationType, depreciationPercent) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`;
 const addAssetFileAttachment = "INSERT INTO Asset_File (assetTag, attachment) VALUES ($1, $2)";
@@ -17,7 +17,7 @@ const getAssetCategoryName = "SELECT name FROM Category WHERE ID = (SELECT categ
 const updateAssetResidualValue = "UPDATE Asset SET residualValue = $1 WHERE assetTag = $2";
 const getCloseBookValue = "SELECT closingBookValue FROM DepreciationSchedule WHERE assetid = $1 AND year = $2";
 const getAccumulatedDepreciation = "SELECT SUM(depreciationExpense) FROM DepreciationSchedule WHERE assetid = $1;";
-const insertDepreciationSchedule = "INSERT INTO DepreciationSchedule (year, openingbookvalue, depreciationexpense, accumulateddepreciation, closingbookvalue, assetid) VALUES ($1, $2, $3, $4, $5, $6)";
+const insertDepreciationSchedule = "INSERT INTO DepreciationSchedule (year, assetID, openingbookvalue, depreciationexpense, accumulateddepreciation, closingbookvalue) VALUES ($1, $2, $3, $4, $5, $6)";
 const getAssetDetails = `
     SELECT a.barcode, a.noInBuilding, a.code, a.description, a.serialnumber, a.acquisitiondate, a.condition, 
     a.responsibleUsername, a.acquisitioncost, a.residualvalue, a.usefulLife, a.depreciationtype, a.depreciationpercent,
@@ -35,10 +35,12 @@ const doesBarCodeExist = "SELECT * FROM Asset WHERE barcode = $1";
 const searchBySerialNo = "SELECT a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.serialNumber = $1";
 const updateAsset = "UPDATE Asset SET $1 = $2 WHERE assetid = $3";
 const searchForAsset = "SELECT a.assetid, a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.textsearchable_index_col @@ websearch_to_tsquery($1)"
-const getAssetID = "SELECT assetid FROM Asset WHERE barcode = $1"
+const getAssetID = "SELECT assetid FROM Asset WHERE barcode = $1";
+const getDepreciationDetails = `SELECT a.usefulLife, a.acquisitionDate, a.acquisitionCost, d.percentage 
+                                FROM Asset a JOIN DepreciationPercent d ON d.categoryID = a.categoryID WHERE assetID = $1`;
 
 const assetTable = {
-    doesAssetTagExist,
+    doesAssetTagExist: doesAssetIDExist,
     addAssetToAssetRegister,
     addAssetFileAttachment,
     updateAssetFixedStatus,

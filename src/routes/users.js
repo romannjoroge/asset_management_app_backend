@@ -1,9 +1,9 @@
 import express from 'express';
 const router = express.Router();
-import userTable from '../src/Users/db_users.js';
-import Asset from '../src/Allocation/Asset/asset2.js';
-import { Errors, Succes } from '../utility/constants.js';
-import pool from '../db2.js';
+import userTable from '../Users/db_users.js';
+import Asset from '../Allocation/Asset/asset2.js';
+import { Errors, Succes } from '../../utility/constants.js';
+import pool from '../../db2.js';
 
 router.get('/getUsers', (req, res) => {
     pool.query(userTable.getUsers, []).then(data => {

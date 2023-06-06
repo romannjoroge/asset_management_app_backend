@@ -46,7 +46,8 @@ export const Errors = {
     '44': "No Asset Matches Search Term",
     '45': "There Are No Stock Takes For The Chosen Location",
     '46': "There Are No More Child Locations",
-    '47': "Could Not Get Depreciation Details"
+    '47': "Could Not Get Depreciation Details",
+    '48': "Could Not Create Depreciation Schedule",
 }
 
 export const Succes = {

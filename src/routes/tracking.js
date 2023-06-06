@@ -1,9 +1,9 @@
 import express from 'express';
 const router = express.Router();
-import pool from '../db2.js';
-import locationTable from '../src/Tracking/db_location.js';
-import { Errors, Succes } from '../utility/constants.js';
-import reportsTable from '../src/Reports/db_reports.js';
+import pool from '../../db2.js';
+import locationTable from '../Tracking/db_location.js';
+import { Errors, Succes } from '../../utility/constants.js';
+import reportsTable from '../Reports/db_reports.js';
 
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {

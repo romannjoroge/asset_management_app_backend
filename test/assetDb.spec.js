@@ -24,14 +24,14 @@ describe.skip("_doesAssetTagExist Test", function(){
         // Test Inputs
         assetTag = 'Does Not Exist';
 
-        await utility.assertThatAsyncFunctionReturnsRightThing(Asset._doesAssetTagExist, false, assetTag);
+        await utility.assertThatAsyncFunctionReturnsRightThing(Asset._doesAssetIDExist, false, assetTag);
     });
 
     it("should return true if asset tag exists", async function(){
         // Test Inputs
         assetTag = 'AUA0003';
 
-        await utility.assertThatAsyncFunctionReturnsRightThing(Asset._doesAssetTagExist, true, assetTag);
+        await utility.assertThatAsyncFunctionReturnsRightThing(Asset._doesAssetIDExist, true, assetTag);
     });
 
     this.afterEach(async function(){

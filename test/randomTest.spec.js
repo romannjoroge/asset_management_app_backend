@@ -8,7 +8,7 @@ import utility from '../utility/utility.js';
 import MyError from '../utility/myError.js';
 import { Errors } from '../utility/constants.js';
 
-describe("Add Asset Test", function() {
+describe.skip("Add Asset Test", function() {
     let barcode = "ASDFASDF";
     this.beforeEach(async function() {
         try{

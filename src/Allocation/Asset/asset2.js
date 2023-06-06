@@ -117,10 +117,10 @@ class Asset {
         await this._storeAssetInAssetRegister();
     }
 
-    static async _doesAssetTagExist(assetTag) {
+    static async _doesAssetIDExist(assetID) {
         let fetchResult;
         try {
-            fetchResult = await pool.query(assetTable.doesAssetTagExist, [assetTag]);
+            fetchResult = await pool.query(assetTable.doesAssetTagExist, [assetID]);
         } catch (err) {
             throw new MyError("Could Not Verify Asset Tag");
         }
@@ -162,7 +162,7 @@ class Asset {
     static async _getAssetCategoryName(assetTag) {
         let fetchResult;
 
-        if (! await Asset._doesAssetTagExist(assetTag)) {
+        if (! await Asset._doesAssetIDExist(assetTag)) {
             throw new MyError("Asset Does Not Exist");
         } else {
             try {
@@ -225,7 +225,7 @@ class Asset {
 
     static async updateAsset(updateAssetDict, assetTag) {
         // Throw an error if no asset with asset tag exists
-        if (!await Asset._doesAssetTagExist(assetTag)) {
+        if (!await Asset._doesAssetIDExist(assetTag)) {
             throw new MyError("Asset Does Not Exist");
         }
 
@@ -496,7 +496,7 @@ class Asset {
     }
 
     static async allocateAsset(assetTag, username) {
-        if (!await Asset._doesAssetTagExist(assetTag)) {
+        if (!await Asset._doesAssetIDExist(assetTag)) {
             throw new MyError("Asset Does Not Exist");
         }
 

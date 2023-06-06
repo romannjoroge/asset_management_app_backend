@@ -1,18 +1,18 @@
 import express from 'express';
-import pool from '../db2.js';
+import pool from '../../db2.js';
 const router = express.Router();
-import reportsTable from '../src/Reports/db_reports.js';
-import { Errors, Succes } from '../utility/constants.js';
+import reportsTable from '../Reports/db_reports.js';
+import { Errors, Succes } from '../../utility/constants.js';
 import { convertArrayToCSV } from 'convert-array-to-csv';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import logTable from '../src/Log/db_log.js';
-import userTable from '../src/Users/db_users.js';
-import checkifAuthenticated from '../middleware/checkifAuthenticated.js';
-import checkifAuthorized from '../middleware/checkifAuthorized.js';
-import utility from '../utility/utility.js';
-import locationTable from '../src/Tracking/db_location.js';
+import logTable from '../Log/db_log.js';
+import userTable from '../Users/db_users.js';
+import checkifAuthenticated from '../../middleware/checkifAuthenticated.js';
+import checkifAuthorized from '../../middleware/checkifAuthorized.js';
+import utility from '../../utility/utility.js';
+import locationTable from '../Tracking/db_location.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

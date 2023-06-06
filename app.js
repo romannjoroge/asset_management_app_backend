@@ -21,14 +21,14 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 // Importing routes
-import allocate from './routes/allocation.js';
-import deleteRoute from './routes/delete.js';
-import items from './routes/items.js';
-import category from './routes/category.js';
-import tracking from './routes/tracking.js';
-import gatepass from './routes/gatepass.js';
-import reports from './routes/reports.js';
-import users from './routes/users.js';
+import allocate from './src/routes/allocation.js';
+import deleteRoute from './src/routes/delete.js';
+import items from './src/routes/items.js';
+import category from './src/routes/category.js';
+import tracking from './src/routes/tracking.js';
+import gatepass from './src/routes/gatepass.js';
+import reports from './src/routes/reports.js';
+import users from './src/routes/users.js';
 import checkifAuthenticated from './middleware/checkifAuthenticated.js';
 import checkifAuthorized from './middleware/checkifAuthorized.js';
 

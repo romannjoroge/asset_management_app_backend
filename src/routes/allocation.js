@@ -1,15 +1,15 @@
 import express, { json } from 'express';
 const router = express.Router();
-import Asset from '../src/Allocation/Asset/asset2.js';
-import { Errors, Succes } from '../utility/constants.js';
-import User from '../src/Users/users.js';
-import MyError from '../utility/myError.js';
-import pool from '../db2.js';
+import Asset from '../Allocation/Asset/asset2.js';
+import { Errors, Succes } from '../../utility/constants.js';
+import User from '../Users/users.js';
+import MyError from '../../utility/myError.js';
+import pool from '../../db2.js';
 import { convertArrayToCSV } from 'convert-array-to-csv';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import assetTable from '../src/Allocation/Asset/db_assets.js';
+import assetTable from '../Allocation/Asset/db_assets.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
