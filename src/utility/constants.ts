@@ -48,6 +48,10 @@ export const Errors = {
     '46': "There Are No More Child Locations",
     '47': "Could Not Get Depreciation Details",
     '48': "Could Not Create Depreciation Schedule",
+    '49': "Invalid Asset Condition",
+    '50': "Invalid Depreciation Details",
+    '51': "Invalid Attachments",
+    '52': "Invalid Residual Value",
 }
 
 export const Succes = {

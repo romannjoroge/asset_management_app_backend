@@ -79,23 +79,23 @@ class Category {
     static depTypes = ['Straight Line', 'Double Declining Balance', 'Written Down Value'];
 
     // Function that gets Category ID from name
-    static async _getCategoryID(categoryName) {
+    static async _getCategoryID(categoryName: string): Promise<number | never> {
         let fetchResult;
         let categoryID;
 
         try {
             fetchResult = await pool.query(categoryTable.getID, [categoryName]);
         } catch (err) {
-            throw new MyError("Could Not Get Category ID From System");
+            throw new MyError(Errors[5]);
         }
 
-        utility.verifyDatabaseFetchResults(fetchResult, "Category Does Not Exist");
+        utility.verifyDatabaseFetchResults(fetchResult, Errors[5]);
 
         categoryID = fetchResult.rows[0].id;
         return categoryID;
     }
 
-    static async _doesCategoryExist(categoryName) {
+    static async _doesCategoryExist(categoryName: string): Promise<boolean> {
         try {
             const exist = await Category._getCategoryID(categoryName);
             return true;

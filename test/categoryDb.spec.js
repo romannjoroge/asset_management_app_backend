@@ -3,8 +3,8 @@ import pool from '../db2.js';
 
 import { assert } from 'chai';
 
-import Category from '../src/Allocation/Category/category2.js';
-import utility from '../utility/utility.js';
+import Category from '../built/Allocation/Category/category2.js';
+import utility from '../built/utility/utility.js';
 
 describe.skip("_getCategoryID Tests", function(){
     let categoryName;

@@ -20,9 +20,7 @@ import utility from '../utility/utility.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// router.get('/', test)
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
-    // Get asset values from request
     let {
         barcode,
         locationID,
@@ -41,10 +39,7 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
         depreciationPercent,
         attachments
     } = req.body;
-    console.log(`DEP 1: ${depreciationType}`);
 
-    let depTypeToAdd;
-    let percToAdd;
 
     // Convert values to right type
     noInBuilding = Number.parseInt(noInBuilding);
@@ -56,140 +51,13 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
         depreciationPercent = Number.parseFloat(depreciationPercent);
     }
 
-    let acquisitionDateToAdd;
-
-    // Validate inputs
-    // Check if location exists
-    Location.verifyLocationID(locationID).then(data => {
-        // If location does not exist return error
-        if (!data) {
-            return res.status(400).json({message: Errors[3]});
-        } 
-
-        // Validate acquisition date
-        acquisitionDateToAdd = utility.checkIfValidDate(acquisitionDate, Errors[37]);
-
-        // Check if category exists
-        Category._doesCategoryExist(categoryName).then(doesExist => {
-            if (doesExist) {
-                // Get ID of category
-                Category._getCategoryID(categoryName).then(categoryID => {
-                    // Check if user exists
-                    User.checkIfUserExists(responsibleUsername, Errors[30]).then(_ => {
-                        console.log(`DEP 2: ${depreciationType}`);
-                        // Validate depreciation type if exists
-                        if (depreciationType) {
-                            Category.verifyDepreciationDetails(depreciationType, depreciationPercent).then(_ => {
-                                // Set values of depreciation details to add
-                                depTypeToAdd = depreciationType;
-                                percToAdd = depreciationPercent;
-                            }).catch(e => {
-                                if (e instanceof MyError) {
-                                    return res.status(400).json({message: e.message});
-                                } else {
-                                    console.log(e);
-                                    return res.status(500).json({message: Errors[9]});
-                                }
-                            });
-                        } else {
-                            depTypeToAdd = null;
-                            percToAdd = null;
-                        }
-                        console.log(`DEP 3: ${depTypeToAdd}`);
-                        // Create Asset
-                        pool.query(assetTable.addAssetToAssetRegister, [barcode, noInBuilding, code, description, serialNumber, 
-                            acquisitionDateToAdd, locationID, residualValue, condition, responsibleUsername, acquisitionCost, categoryID, usefulLife, 
-                            depTypeToAdd, percToAdd]).then(_ => {
-                                // Get id of created asset
-                                pool.query(assetTable.getAssetID, [barcode]).then(data => {
-                                    if (data.rowCount <= 0) {
-                                        return res.status(400).json({message: Errors[1]});
-                                    }
-                                    let assetID = data.rows[0].assetid;
-                                    let depType;
-                                    let perc;
-                                    // Get Depreciation Details
-                                    if (depTypeToAdd === null || depTypeToAdd === undefined) {
-                                        Category._getDepreciationDetails(categoryName).then(data => {
-                                            console.log(data)
-                                            depType = data.depType;
-                                            perc = data.perc;
-
-                                            // Create Asset Depreciation Schedule
-                                            Asset.createDepreciationSchedule(depType, assetID, usefulLife, acquisitionCost, acquisitionDateToAdd, residualValue, perc).then(_ => {
-                                                return res.json({message: Succes[1]});
-                                            }).catch(e => {
-                                                if (e instanceof MyError) {
-                                                    return res.status(400).json({message: e.message});
-                                                } else {
-                                                    console.log(e);
-                                                    return res.status(500).json({message: Errors[9]});
-                                                }
-                                            });
-                                        }).catch(er => {
-                                            console.log(er);
-                                            return res.status(500).json({message: Errors[9]});
-                                        })
-                                    } else {
-                                        depType = depTypeToAdd;
-                                        perc = percToAdd;
-
-                                        console.log(`DEP 4: ${depType}`);
-                                        // Create Asset Depreciation Schedule
-                                        Asset.createDepreciationSchedule(depType, assetID, usefulLife, acquisitionCost, acquisitionDateToAdd, residualValue, perc).then(_ => {
-                                            return res.json({message: Succes[1]});
-                                        }).catch(e => {
-                                            if (e instanceof MyError) {
-                                                return res.status(400).json({message: e.message});
-                                            } else {
-                                                console.log(e);
-                                                return res.status(500).json({message: Errors[9]});
-                                            }
-                                        });
-                                    }
-                                    
-                                    }).catch(e => {
-                                        if (e instanceof MyError) {
-                                            return res.status(400).json({message: e.message});
-                                        } else {
-                                            console.log(e);
-                                            return res.status(500).json({message: Errors[9]});
-                                        }
-                                    });
-                            }).catch(e => {
-                                console.log(e);
-                                return res.status(500).json({message: Errors[9]});
-                            });
-                    }).catch(e => {
-                        if (e instanceof MyError) {
-                            return res.status(400).json({message: e.message});
-                        } else {
-                            console.log(e);
-                            return res.status(500).json({message: Errors[9]});
-                        }
-                    });
-                }).catch(e => {
-                    if (e instanceof MyError) {
-                        return res.status(400).json({message: e.message});
-                    } else {
-                        console.log(e);
-                        return res.status(500).json({message: Errors[9]});
-                    }
-                });
-            } else {
-                return res.status(400).json({message: Errors[5]});
-            }
-        }).catch(e => {
-            if (e instanceof MyError) {
-                return res.status(400).json({message: e.message});
-            } else {
-                console.log(e);
-                return res.status(500).json({message: Errors[9]});
-            }
-        });
+    let asset = new Asset(barcode, usefulLife, acquisitionDate, locationID, condition, responsibleUsername, acquisitionCost, categoryName, 
+        attachments, noInBuilding, serialNumber, code, description, residualValue, depreciationType, depreciationPercent);
+    asset.initialize().then(_ => {
+        return res.send(Succes[1]);
     }).catch(e => {
         console.log(e);
-        return res.status(500).json({message: Errors[9]});
+        return res.status(500).json({message: Errors[9]})
     });
 });
 

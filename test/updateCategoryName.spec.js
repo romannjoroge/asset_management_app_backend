@@ -3,8 +3,8 @@ import { assert } from 'chai';
 import Sinon from 'sinon';
 
 // Import classes
-import Category from '../src/Allocation/Category/category2.js';
-import MyError from '../utility/myError.js';
+import Category from '../built/Allocation/Category/category2.js';
+import MyError from '../built/utility/myError.js';
 
 describe.skip("verifyCategoryName test", function () {
     it("should deny a category name that is not a string", async function (){

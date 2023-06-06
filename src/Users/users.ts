@@ -2,20 +2,29 @@
 import pool from '../../db2.js';
 
 // Importing custom classes
-import MyError from '../../utility/myError.js';
-import utility from '../../utility/utility.js';
 import userTable from './db_users.js'
+
+interface UserInDB {
+    username: string,
+}
+
 
 class User {
     constructor(){}
 
-    static async checkIfUserExists(username, errorMessage) {
-        try{
-            let fetchResults = await pool.query(userTable.checkIfUserInDB, [username]);
-            utility.verifyDatabaseFetchResults(fetchResults, errorMessage);
-        }catch(err){
-            throw new MyError(errorMessage);
-        }
+    static async checkIfUserExists(username: string): Promise<boolean> {
+        return new Promise((res, rej) => {
+            pool.query(userTable.checkIfUserInDB, [username]).then(data => {
+                if (data.rowCount > 0) {
+                    res(true);
+                } else {
+                    res(false);
+                }
+            }).catch(err => {
+                console.log(err);
+                res(false);
+            });
+        });
     }
 }
 

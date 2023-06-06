@@ -10,20 +10,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 // Importing the database bool from db2.js. This will allow me to connect to the database
 import pool from '../../db2.js';
 // Importing custom classes
-import MyError from '../../utility/myError.js';
-import utility from '../../utility/utility.js';
 import userTable from './db_users.js';
 class User {
     constructor() { }
-    static checkIfUserExists(username, errorMessage) {
+    static checkIfUserExists(username) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                let fetchResults = yield pool.query(userTable.checkIfUserInDB, [username]);
-                utility.verifyDatabaseFetchResults(fetchResults, errorMessage);
-            }
-            catch (err) {
-                throw new MyError(errorMessage);
-            }
+            return new Promise((res, rej) => {
+                pool.query(userTable.checkIfUserInDB, [username]).then(data => {
+                    if (data.rowCount > 0) {
+                        res(true);
+                    }
+                    else {
+                        res(false);
+                    }
+                }).catch(err => {
+                    console.log(err);
+                    res(false);
+                });
+            });
         });
     }
 }

@@ -18,8 +18,20 @@ import User from '../../Users/users.js';
 import Category from '../Category/category2.js';
 import assetTable from './db_assets.js';
 import { Errors } from '../../utility/constants.js';
+export var DepreciationTypes;
+(function (DepreciationTypes) {
+    DepreciationTypes["StraightLine"] = "Straight Line";
+    DepreciationTypes["DoubleDecliningBalance"] = "Double Declining Balance";
+    DepreciationTypes["WrittenDownValue"] = "Written Down Value";
+})(DepreciationTypes || (DepreciationTypes = {}));
+var assetStatusOptions;
+(function (assetStatusOptions) {
+    assetStatusOptions["Good"] = "Good";
+    assetStatusOptions["Excellent"] = "Excellent";
+    assetStatusOptions["Fair"] = "Fair";
+})(assetStatusOptions || (assetStatusOptions = {}));
 class Asset {
-    constructor(barCode, assetLifeSpan, acquisitionDate, locationID, status, custodianName, acquisitionCost, categoryName, attachments, noInBuilding, serialNumber, residualValue, code, description, depreciaitionType, depreciationPercent) {
+    constructor(barCode, assetLifeSpan, acquisitionDate, locationID, condition, custodianName, acquisitionCost, categoryName, attachments, noInBuilding, serialNumber, code, description, residualValue, depreciaitionType, depreciationPercent) {
         // utility.checkIfBoolean(fixed, "Invalid Fixed Status");
         // this.fixed = fixed;
         utility.checkIfNumberisPositive(assetLifeSpan, "Invalid asset life span");
@@ -27,31 +39,38 @@ class Asset {
         this.acquisitionDate = utility.checkIfValidDate(acquisitionDate, "Invalid acquisition date");
         utility.checkIfNumberisPositive(locationID, "Invalid location ID");
         this.locationID = locationID;
-        if (!status instanceof String) {
-            throw new MyError("Invalid status");
+        if (Object.values(assetStatusOptions).includes(condition) == true) {
+            this.condition = condition;
         }
-        utility.checkIfInList(Asset.assetStatusOptions, status.toLowerCase(), "Invalid status");
-        this.status = status;
+        else {
+            throw new MyError(Errors[49]);
+        }
         this.custodianName = custodianName;
         utility.checkIfNumberisPositive(acquisitionCost, "Invalid acquisition cost");
         this.acquisitionCost = acquisitionCost;
-        // utility.checkIfNumberisPositive(insuranceValue, "Invalid insurance value");
-        // this.insuranceValue = insuranceValue;
         utility.checkIfString(description, "Invalid Description");
         this.description = description;
         utility.checkIfString(code, "Invalid Code");
         this.code = code;
         utility.checkIfString(barCode, "Invalid Barcode");
-        this.barCode = barCode;
+        this.barcode = barCode;
         utility.checkIfNumberisPositive(noInBuilding, "Invalid Number in Building");
         this.noInBuilding = noInBuilding;
-        utility.checkIfString(depreciaitionType, "Invalid Depreciation Type");
-        this.depreciaitionType = depreciaitionType;
-        utility.checkIfNumberisPositive(depreciationPercent, "Invalid Depreciation Percent");
-        this.depreciationPercent = depreciationPercent;
+        if (depreciaitionType) {
+            if (Object.values(DepreciationTypes).includes(depreciaitionType) == true) {
+                this.depreciaitionType = depreciaitionType;
+            }
+            else {
+                throw new MyError(Errors[50]);
+            }
+        }
+        if (depreciationPercent) {
+            utility.checkIfNumberisPositive(depreciationPercent, Errors[50]);
+            this.depreciationPercent = depreciationPercent;
+        }
         this.categoryName = categoryName;
         if (!Array.isArray(attachments)) {
-            throw new MyError("Attachments is not array");
+            throw new MyError(Errors[51]);
         }
         else {
             if (attachments.length) {
@@ -63,46 +82,53 @@ class Asset {
             }
         }
         this.attachments = attachments;
-        // this.makeAndModelNo = makeAndModelNo;
         this.serialNumber = serialNumber;
         if (residualValue) {
-            utility.checkIfNumberisPositive(residualValue, "Invalid Residual Value");
+            utility.checkIfNumberisPositive(residualValue, Errors[52]);
             this.residualValue = residualValue;
         }
-        else {
-            this.residualValue = null;
-        }
+        this.categoryID = 0;
     }
     // Since the constructor cannot make asynchronous calls a seprate initialize function is needed to initialize
     // asynchronous values
     initialize() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!(yield Category._doesCategoryExist(this.categoryName))) {
-                throw new MyError(Errors[5]);
-            }
-            try {
-                this.categoryID = yield Category._getCategoryID(this.categoryName);
-            }
-            catch (err) {
-                console.log(err);
-                throw new MyError(Errors[6]);
-            }
-            if (!(yield Location.verifyLocationID(this.locationID))) {
-                throw new MyError(Errors[3]);
-            }
-            yield User.checkIfUserExists(this.custodianName, "Invalid custodian");
-            if (yield Asset._doesBarCodeExist(this.assetTag)) {
-                throw new MyError(Errors[7]);
-            }
-            if (this.depreciaitionType == null) {
-                let depreciaitionType = Category._getCategoryDepreciationType(this.categoryID);
-                if (depreciaitionType !== "Straight Line") {
-                    if (this.residualValue) {
-                        throw new MyError("Invalid Residual Value for Depreciation Type");
+        return new Promise((res, rej) => {
+            // Get category ID
+            Category._getCategoryID(this.categoryName).then(categoryID => {
+                this.categoryID = categoryID;
+                console.log(1);
+                // Check that location exists
+                Location.verifyLocationID(this.locationID).then(doesExist => {
+                    if (!doesExist) {
+                        rej(new MyError(Errors[3]));
                     }
-                }
-            }
-            yield this._storeAssetInAssetRegister();
+                    console.log(2);
+                    // Check if user exists
+                    User.checkIfUserExists(this.custodianName).then(doesUserExist => {
+                        if (!doesUserExist) {
+                            console.log(4);
+                            rej(new MyError(Errors[30]));
+                        }
+                        console.log(3);
+                        this._storeAssetInAssetRegister().then(_ => {
+                            console.log("Asset Stored In Asset Register");
+                            res();
+                        }).catch(err => {
+                            console.log(err);
+                            rej(new MyError(Errors[6]));
+                        });
+                    }).catch(err => {
+                        console.log(err);
+                        rej(new MyError(Errors[6]));
+                    });
+                }).catch(err => {
+                    console.log(err);
+                    rej(new MyError(Errors[6]));
+                });
+            }).catch(err => {
+                console.log(err);
+                rej(new MyError(Errors[6]));
+            });
         });
     }
     static _doesAssetIDExist(assetID) {
@@ -139,16 +165,16 @@ class Asset {
     }
     _storeAssetInAssetRegister() {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                yield pool.query(assetTable.addAssetToAssetRegister, [this.barCode, this.noInBuilding, this.description, this.code, this.serialNumber,
-                    this.acquisitionDate, this.locationID, this.residualValue, this.status, this.custodianName, this.acquisitionCost, this.categoryID,
-                    this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent]);
-                yield Asset._insertAssetAttachments(this.assetTag, this.attachments);
-            }
-            catch (err) {
-                console.log(err);
-                throw new MyError("Could not add asset to asset Register");
-            }
+            return new Promise((res, rej) => {
+                pool.query(assetTable.addAssetToAssetRegister, [this.barcode, this.noInBuilding, this.code, this.description,
+                    this.serialNumber, this.acquisitionDate, this.locationID, this.residualValue, this.condition, this.custodianName, this.acquisitionCost, this.categoryID,
+                    this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent]).catch(err => {
+                    console.log(err);
+                    throw new MyError(Errors[6]);
+                }).then(_ => {
+                    res();
+                });
+            });
         });
     }
     static _getAssetCategoryName(assetTag) {
@@ -496,6 +522,5 @@ class Asset {
         });
     }
 }
-Asset.assetStatusOptions = ['good', 'excellent', 'fair'];
 export default Asset;
 //# sourceMappingURL=asset2.js.map

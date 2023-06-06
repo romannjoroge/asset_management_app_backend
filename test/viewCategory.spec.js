@@ -3,8 +3,8 @@ import { assert } from 'chai';
 import Sinon from 'sinon';
 
 // Import classes
-import Category from '../src/Allocation/Category/category2.js';
-import MyError from '../utility/myError.js';
+import Category from '../built/Allocation/Category/category2.js';
+import MyError from '../built/utility/myError.js';
 
 describe.skip("Category.view test", function () {
     it("should return an error when a category that doesn't exist is given", async function () {

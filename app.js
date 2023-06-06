@@ -7,9 +7,9 @@ import dotenv from 'dotenv';
 dotenv.config()  // Brings varaibles from .env file
 import { body, validationResult } from 'express-validator'
 import pool from './db2.js';
-import {Errors}  from './built/src/utility/constants.js';
+import {Errors}  from './built/utility/constants.js';
 import bcrypt from 'bcrypt';
-import userTable from './built/src/Users/db_users.js';
+import userTable from './built/Users/db_users.js';
 import JWT from 'jsonwebtoken';
 
 // Reading JSON data from forms and JS respectively
@@ -21,16 +21,16 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 // Importing routes
-import allocate from './built/src/routes/allocation.js';
-import deleteRoute from './built/src/routes/delete.js';
-import items from './built/src/routes/items.js';
-import category from './built/src/routes/category.js';
-import tracking from './built/src/routes/tracking.js';
-import gatepass from './built/src/routes/gatepass.js';
-import reports from './built/src/routes/reports.js';
-import users from './built/src/routes/users.js';
-import checkifAuthenticated from './built/middleware/checkifAuthenticated.js';
-import checkifAuthorized from './built/middleware/checkifAuthorized.js';
+import allocate from './built/routes/allocation.js';
+import deleteRoute from './built/routes/delete.js';
+import items from './built/routes/items.js';
+import category from './built/routes/category.js';
+import tracking from './built/routes/tracking.js';
+import gatepass from './built/routes/gatepass.js';
+import reports from './built/routes/reports.js';
+import users from './built/routes/users.js';
+import checkifAuthenticated from './middleware/checkifAuthenticated.js';
+import checkifAuthorized from './middleware/checkifAuthorized.js';
 
 // Routers to use for different modules
 app.use('/allocation', checkifAuthenticated, checkifAuthorized('Asset Administrator'), allocate)

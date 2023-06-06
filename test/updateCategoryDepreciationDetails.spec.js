@@ -3,9 +3,9 @@ import { assert } from 'chai';
 import Sinon from 'sinon';
 
 // Importing classes
-import Category from '../src/Allocation/Category/category2.js';
-import MyError from '../utility/myError.js';
-import utility from '../utility/utility.js';
+import Category from '../built/Allocation/Category/category2.js';
+import MyError from '../built/utility/myError.js';
+import utility from '../built/utility/utility.js';
 
 describe.skip("verifyDepreciationDetails Test", function () {
     it("should accept when depType is Double Depreciation and value is 0", function () {

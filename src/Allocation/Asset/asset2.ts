@@ -12,13 +12,41 @@ import Category from '../Category/category2.js';
 import assetTable from './db_assets.js';
 import { Errors } from '../../utility/constants.js';
 
+export enum DepreciationTypes {
+    StraightLine = "Straight Line",
+    DoubleDecliningBalance = "Double Declining Balance",
+    WrittenDownValue = "Written Down Value"
+}
+
+enum assetStatusOptions {
+    Good = "Good",
+    Excellent = "Excellent",
+    Fair = "Fair"
+}
+
 
 class Asset {
-    static assetStatusOptions = ['good', 'excellent', 'fair'];
+    barcode: string;
+    assetLifeSpan: number;
+    acquisitionDate: Date;
+    locationID: number;
+    condition: assetStatusOptions;
+    custodianName: string;
+    acquisitionCost: number;
+    categoryName: string;
+    categoryID: number;
+    attachments: string[];
+    noInBuilding: number;
+    serialNumber: string;
+    residualValue?: number;
+    code: string;
+    description: string;
+    depreciaitionType?: DepreciationTypes;
+    depreciationPercent?: number;
 
-    constructor(barCode, assetLifeSpan, acquisitionDate, locationID, status, custodianName,
-        acquisitionCost, categoryName, attachments, noInBuilding, 
-        serialNumber, residualValue, code, description, depreciaitionType, depreciationPercent) {
+    constructor(barCode: string, assetLifeSpan: number, acquisitionDate: string | Date, locationID: number, condition: assetStatusOptions, custodianName: string,
+        acquisitionCost: number, categoryName: string, attachments: string[], noInBuilding: number,
+        serialNumber: string, code: string, description: string, residualValue?: number, depreciaitionType?: DepreciationTypes, depreciationPercent?: number) {
         // utility.checkIfBoolean(fixed, "Invalid Fixed Status");
         // this.fixed = fixed;
 
@@ -30,19 +58,16 @@ class Asset {
         utility.checkIfNumberisPositive(locationID, "Invalid location ID");
         this.locationID = locationID;
 
-        if (!status instanceof String) {
-            throw new MyError("Invalid status");
+        if (Object.values(assetStatusOptions).includes(condition) == true) {
+            this.condition = condition;
+        } else {
+            throw new MyError(Errors[49])
         }
-        utility.checkIfInList(Asset.assetStatusOptions, status.toLowerCase(), "Invalid status");
-        this.status = status;
 
         this.custodianName = custodianName;
 
         utility.checkIfNumberisPositive(acquisitionCost, "Invalid acquisition cost");
         this.acquisitionCost = acquisitionCost;
-
-        // utility.checkIfNumberisPositive(insuranceValue, "Invalid insurance value");
-        // this.insuranceValue = insuranceValue;
 
         utility.checkIfString(description, "Invalid Description");
         this.description = description;
@@ -51,21 +76,28 @@ class Asset {
         this.code = code;
 
         utility.checkIfString(barCode, "Invalid Barcode");
-        this.barCode = barCode;
+        this.barcode = barCode;
 
         utility.checkIfNumberisPositive(noInBuilding, "Invalid Number in Building");
         this.noInBuilding = noInBuilding;
 
-        utility.checkIfString(depreciaitionType, "Invalid Depreciation Type");
-        this.depreciaitionType = depreciaitionType;
+        if (depreciaitionType) {
+            if (Object.values(DepreciationTypes).includes(depreciaitionType) == true) {
+                this.depreciaitionType = depreciaitionType;
+            } else {
+                throw new MyError(Errors[50])
+            }
+        }
 
-        utility.checkIfNumberisPositive(depreciationPercent, "Invalid Depreciation Percent");
-        this.depreciationPercent = depreciationPercent;
+        if (depreciationPercent) {
+            utility.checkIfNumberisPositive(depreciationPercent, Errors[50]);
+            this.depreciationPercent = depreciationPercent;
+        }
 
         this.categoryName = categoryName;
 
         if (!Array.isArray(attachments)) {
-            throw new MyError("Attachments is not array")
+            throw new MyError(Errors[51])
         } else {
             if (attachments.length) {
                 for (let i = 0; i < attachments.length; i++) {
@@ -76,45 +108,57 @@ class Asset {
             }
         }
         this.attachments = attachments;
-        // this.makeAndModelNo = makeAndModelNo;
+
         this.serialNumber = serialNumber;
 
         if (residualValue) {
-            utility.checkIfNumberisPositive(residualValue, "Invalid Residual Value");
+            utility.checkIfNumberisPositive(residualValue, Errors[52]);
             this.residualValue = residualValue;
-        } else {
-            this.residualValue = null;
         }
+
+        this.categoryID = 0;
     }
     // Since the constructor cannot make asynchronous calls a seprate initialize function is needed to initialize
     // asynchronous values
-    async initialize() {
-        if (!await Category._doesCategoryExist(this.categoryName)) {
-            throw new MyError(Errors[5]);
-        }
-        try {
-            this.categoryID = await Category._getCategoryID(this.categoryName);
-        } catch (err) {
-            console.log(err);
-            throw new MyError(Errors[6]);
-        }
-        if (! await Location.verifyLocationID(this.locationID)) {
-            throw new MyError(Errors[3]);
-        }
-        await User.checkIfUserExists(this.custodianName, "Invalid custodian");
-        if (await Asset._doesBarCodeExist(this.assetTag)) {
-            throw new MyError(Errors[7]);
-        }
-        if (this.depreciaitionType == null) {
-            let depreciaitionType = Category._getCategoryDepreciationType(this.categoryID);
-            if (depreciaitionType !== "Straight Line") {
-                if (this.residualValue) {
-                    throw new MyError("Invalid Residual Value for Depreciation Type");
-                }
-            }
-        }
-
-        await this._storeAssetInAssetRegister();
+    initialize(): Promise<void | never> {
+        return new Promise((res, rej) => {
+            // Get category ID
+            Category._getCategoryID(this.categoryName).then(categoryID => {
+                this.categoryID = categoryID;
+                console.log(1);
+                // Check that location exists
+                Location.verifyLocationID(this.locationID).then(doesExist => {
+                    if (!doesExist) {
+                        rej(new MyError(Errors[3]));
+                    }
+                    console.log(2);
+                    // Check if user exists
+                    User.checkIfUserExists(this.custodianName).then(doesUserExist => {
+                        if (!doesUserExist) {
+                            console.log(4);
+                            rej(new MyError(Errors[30]));
+                        }
+                        console.log(3);
+                        this._storeAssetInAssetRegister().then(_ => {
+                            console.log("Asset Stored In Asset Register");
+                            res();
+                        }).catch(err => {
+                            console.log(err);
+                            rej(new MyError(Errors[6]));
+                        });
+                    }).catch(err => {
+                        console.log(err);
+                        rej(new MyError(Errors[6]));
+                    });
+                }).catch(err => {
+                    console.log(err);
+                    rej(new MyError(Errors[6]));
+                });
+            }).catch(err => {
+                console.log(err);
+                rej(new MyError(Errors[6]));
+            });
+        })
     }
 
     static async _doesAssetIDExist(assetID) {
@@ -132,7 +176,7 @@ class Asset {
         }
     }
 
-    static _doesBarCodeExist(barCode) {
+    static _doesBarCodeExist(barCode: string): Promise<boolean> {
         return new Promise((res, rej) => {
             pool.query(assetTable.doesBarCodeExist, [barCode]).then(fetchResult => {
                 if (utility.isFetchResultEmpty(fetchResult)) {
@@ -147,19 +191,20 @@ class Asset {
         })
     }
 
-    async _storeAssetInAssetRegister() {
-        try {
-            await pool.query(assetTable.addAssetToAssetRegister, [this.barCode ,this.noInBuilding, this.description, this.code, this.serialNumber,
-            this.acquisitionDate, this.locationID, this.residualValue, this.status, this.custodianName, this.acquisitionCost, this.categoryID,
-            this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent]);
-            await Asset._insertAssetAttachments(this.assetTag, this.attachments);
-        } catch (err) {
-            console.log(err);
-            throw new MyError("Could not add asset to asset Register");
-        }
+    async _storeAssetInAssetRegister(): Promise<void> {
+        return new Promise((res, rej) => {
+            pool.query(assetTable.addAssetToAssetRegister, [this.barcode, this.noInBuilding, this.code, this.description,
+                this.serialNumber, this.acquisitionDate, this.locationID, this.residualValue, this.condition, this.custodianName, this.acquisitionCost, this.categoryID,
+                this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent]).catch(err => {
+                    console.log(err);
+                    throw new MyError(Errors[6]);
+                }).then(_ => {
+                    res();
+                })
+        });
     }
 
-    static async _getAssetCategoryName(assetTag) {
+    static async _getAssetCategoryName(assetTag: string) {
         let fetchResult;
 
         if (! await Asset._doesAssetIDExist(assetTag)) {
@@ -347,7 +392,7 @@ class Asset {
     static _getCloseBookValue(assetTag, year) {
         return new Promise((res, rej) => {
             pool.query(assetTable.getCloseBookValue, [assetTag, year]).then(fetchresult => {
-                if(fetchresult.rowCount <= 0) {
+                if (fetchresult.rowCount <= 0) {
                     return rej(new MyError("No Close Book Value For Asset"))
                 }
                 var closingBookVal = fetchresult.rows[0].closingbookvalue
@@ -359,7 +404,7 @@ class Asset {
     static async _getAccumulatedDepreciation(assetTag) {
         return new Promise((res, rej) => {
             pool.query(assetTable.getAccumulatedDepreciation, [assetTag]).then(fetchResult => {
-                if(fetchResult.rowCount <= 0) {
+                if (fetchResult.rowCount <= 0) {
                     return rej(new MyError("Could Not Get Accumulated Depreciation"))
                 }
                 return res(fetchResult.rows[0]['sum'])
@@ -394,13 +439,13 @@ class Asset {
             return new Promise((res, rej) => {
                 if (depreciationType === "Straight Line") {
                     return res((acquisitionCost - residualValue) / assetLifeSpan);
-    
+
                 } else if (depreciationType === "Double Declining Balance") {
                     return res(2 * (1 / assetLifeSpan) * openBookValue);
-    
+
                 } else if (depreciationType === "Written Down Value") {
                     return res(openBookValue * (depreciationPercentage / 100));
-    
+
                 } else {
                     console.log(depreciationType)
                     return rej(new MyError("Depreciation Type is not supported"));

@@ -6,11 +6,11 @@ import { assert } from 'chai';
 import Sinon from 'sinon';
 
 // Import classes
-import MyError from '../utility/myError.js';
-import Asset from '../src/Allocation/Asset/asset2.js';
-import Location from '../src/Tracking/location.js';
-import User from '../src/Users/users.js';
-import Category from '../src/Allocation/Category/category2.js';
+import MyError from '../built/utility/myError.js';
+import Asset from '../built/Allocation/Asset/asset2.js';
+import Location from '../built/Tracking/location.js';
+import User from '../built/Users/users.js';
+import Category from '../built/Allocation/Category/category2.js';
 
 describe.skip("updateAsset test cases", function (){
     async function updateAssetShouldThrowError(updateAssetDict, errorMessage){

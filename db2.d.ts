@@ -1,2 +1,2 @@
 export default pool;
-declare let pool: any;
+declare let pool: pg.Pool;

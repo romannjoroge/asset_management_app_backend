@@ -82,9 +82,9 @@ class Category {
                 fetchResult = yield pool.query(categoryTable.getID, [categoryName]);
             }
             catch (err) {
-                throw new MyError("Could Not Get Category ID From System");
+                throw new MyError(Errors[5]);
             }
-            utility.verifyDatabaseFetchResults(fetchResult, "Category Does Not Exist");
+            utility.verifyDatabaseFetchResults(fetchResult, Errors[5]);
             categoryID = fetchResult.rows[0].id;
             return categoryID;
         });
