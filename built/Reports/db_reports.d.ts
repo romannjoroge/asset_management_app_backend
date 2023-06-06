@@ -1,0 +1,22 @@
+declare const _default: {
+    physical_valuation: string;
+    depSchedule: string;
+    missingAssets: string;
+    chainOfCustody: string;
+    movements: string;
+    categoryCount: string;
+    getStockTakes: string;
+    acquisitionReport: string;
+    depreciationReport: string;
+    getChildLocations: string;
+    getStockTakesInLocations: string;
+    getClosestStockTake: string;
+    getAssetsInStockTakes: string;
+    numOfAssetsInStockTakes: string;
+    getClosestStockTakeM: string;
+    assetsInLocationByCategory: string;
+    getAssetsInLocations: string;
+    getAccumulatedAcquisitionCost: string;
+    getDepreciationDetails: string;
+};
+export default _default;

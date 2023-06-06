@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,33 +7,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
 // Importing the database bool from db2.js. This will allow me to connect to the database
-const db2_js_1 = __importDefault(require("../../../db2.js"));
+import pool from '../../../db2.js';
 // Importing SQL commands involving categories
-const db_category2_js_1 = __importDefault(require("./db_category2.js"));
+import categoryTable from './db_category2.js';
 // Importing custom MyError class
-const myError_js_1 = __importDefault(require("../../utility/myError.js"));
-const folder_js_1 = __importDefault(require("../Folder/folder.js"));
-const utility_js_1 = __importDefault(require("../../utility/utility.js"));
-const constants_js_1 = require("../../utility/constants.js");
+import MyError from '../../utility/myError.js';
+import utility from '../../utility/utility.js';
+import { Errors } from '../../utility/constants.js';
 class Category {
     // Constructor
     constructor(categoryName, parentCategoryID, depreciationType, depreciationPercentage) {
-        if (utility_js_1.default.isAnyEmpty([categoryName, parentCategoryID, depreciationType])) {
-            throw new myError_js_1.default("Missing Information");
+        if (utility.isAnyEmpty([categoryName, parentCategoryID, depreciationType])) {
+            throw new MyError("Missing Information");
         }
         if (typeof categoryName === "string") {
             this.categoryName = categoryName;
         }
         else {
-            throw new myError_js_1.default("Invalid Category Name");
+            throw new MyError("Invalid Category Name");
         }
         if (!Number.isInteger(parentCategoryID)) {
-            throw new myError_js_1.default("Invalid parent category");
+            throw new MyError("Invalid parent category");
         }
         else {
             this.parentCategoryID = parentCategoryID;
@@ -47,36 +41,36 @@ class Category {
     static _saveCategoryInDb(categoryName, parentCategoryID, depreciationType, depreciationPercentage) {
         return __awaiter(this, void 0, void 0, function* () {
             // Create category
-            db2_js_1.default.query(db_category2_js_1.default.add, [categoryName, depreciationType, parentCategoryID]).then(_ => {
+            pool.query(categoryTable.add, [categoryName, depreciationType, parentCategoryID]).then(_ => {
                 if (depreciationPercentage) {
                     // Add depreciaition percentage to database
                     // Get ID of created category
                     Category._getCategoryID(categoryName).then(ID => {
                         // Add depreciation percentage to database
-                        db2_js_1.default.query(db_category2_js_1.default.addWritten, [ID, depreciationPercentage]).then(_ => {
+                        pool.query(categoryTable.addWritten, [ID, depreciationPercentage]).then(_ => {
                         }).catch(err => {
-                            throw new myError_js_1.default("Could Not Add Entry to DepreciationPercentage table");
+                            throw new MyError("Could Not Add Entry to DepreciationPercentage table");
                         });
                     }).catch(err => {
                         console.log(err);
-                        throw new myError_js_1.default(constants_js_1.Errors[12]);
+                        throw new MyError(Errors[12]);
                     });
                 }
             }).catch(err => {
                 console.log(err);
-                throw new myError_js_1.default(constants_js_1.Errors[9]);
+                throw new MyError(Errors[9]);
             });
         });
     }
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
             if (yield Category._doesCategoryExist(this.categoryName)) {
-                throw new myError_js_1.default("Category Already Exists");
+                throw new MyError("Category Already Exists");
             }
             if (!(yield Category._doesCategoryIDExist(this.parentCategoryID))) {
-                throw new myError_js_1.default("Parent Category Does Not Exist");
+                throw new MyError("Parent Category Does Not Exist");
             }
-            utility_js_1.default.addErrorHandlingToAsyncFunction(Category._saveCategoryInDb, "Could not add category to system", this.categoryName, this.parentCategoryID, this.depreciaitionType, this.depreciationPercentage);
+            utility.addErrorHandlingToAsyncFunction(Category._saveCategoryInDb, "Could not add category to system", this.categoryName, this.parentCategoryID, this.depreciaitionType, this.depreciationPercentage);
         });
     }
     // Function that gets Category ID from name
@@ -85,12 +79,12 @@ class Category {
             let fetchResult;
             let categoryID;
             try {
-                fetchResult = yield db2_js_1.default.query(db_category2_js_1.default.getID, [categoryName]);
+                fetchResult = yield pool.query(categoryTable.getID, [categoryName]);
             }
             catch (err) {
-                throw new myError_js_1.default("Could Not Get Category ID From System");
+                throw new MyError("Could Not Get Category ID From System");
             }
-            utility_js_1.default.verifyDatabaseFetchResults(fetchResult, "Category Does Not Exist");
+            utility.verifyDatabaseFetchResults(fetchResult, "Category Does Not Exist");
             categoryID = fetchResult.rows[0].id;
             return categoryID;
         });
@@ -112,16 +106,16 @@ class Category {
             // Verify the new name
             if (typeof newName !== "string") {
                 // If not a string throw an error
-                throw new myError_js_1.default("Category Name is of invalid type");
+                throw new MyError("Category Name is of invalid type");
             }
             else if (newName.length > 50) {
                 // Throw an error for a name that's too long
-                throw new myError_js_1.default("Category Name is too long");
+                throw new MyError("Category Name is too long");
             }
             // Check if the name exists
             const exist = yield Category._doesCategoryExist(newName);
             if (exist === true) {
-                throw new myError_js_1.default(`${newName} category already exists`);
+                throw new MyError(`${newName} category already exists`);
             }
             return "Name is valid!";
         });
@@ -130,10 +124,10 @@ class Category {
         return __awaiter(this, void 0, void 0, function* () {
             // Run command
             try {
-                yield db2_js_1.default.query(db_category2_js_1.default.updateCategoryName, [newName, category_id]);
+                yield pool.query(categoryTable.updateCategoryName, [newName, category_id]);
             }
             catch (err) {
-                throw new myError_js_1.default("Could not update category name");
+                throw new MyError("Could not update category name");
             }
         });
     }
@@ -152,11 +146,11 @@ class Category {
             // Verifies a folder ID
             // Test if folder ID is an int
             if (!Number.isInteger(id)) {
-                throw new myError_js_1.default("Invalid Folder");
+                throw new MyError("Invalid Folder");
             }
-            const exist = folder_js_1.default.doesFolderExist(id);
+            const exist = Folder.doesFolderExist(id);
             if (!exist) {
-                throw new myError_js_1.default("Folder does not exist");
+                throw new MyError("Folder does not exist");
             }
         });
     }
@@ -165,11 +159,11 @@ class Category {
             try {
                 console.log(typeof newID, newID);
                 console.log(typeof category_id, category_id);
-                yield db2_js_1.default.query(db_category2_js_1.default.updateFolderID, [newID, category_id]);
+                yield pool.query(categoryTable.updateFolderID, [newID, category_id]);
             }
             catch (err) {
                 console.log(err);
-                throw new myError_js_1.default("Could not update category folder");
+                throw new MyError("Could not update category folder");
             }
         });
     }
@@ -186,45 +180,45 @@ class Category {
     static verifyDepreciationDetails(depType, depValue) {
         // Verifies that depreciation details are valid
         // Make sure that depType is valid
-        utility_js_1.default.checkIfInList(Category.depTypes, depType, "Invalid Depreciation Type");
+        utility.checkIfInList(Category.depTypes, depType, "Invalid Depreciation Type");
         // Make sure deptype depvalue pair is valid
         if (depType === "Double Declining Balance") {
             if (depValue) {
-                throw new myError_js_1.default("There should be no depreciation value");
+                throw new MyError("There should be no depreciation value");
             }
         }
         else if (depType === "Written Down Value") {
-            utility_js_1.default.checkIfNumberisGreaterThanZero(depValue, "Invalid Depreciation Percentage");
+            utility.checkIfNumberisGreaterThanZero(depValue, "Invalid Depreciation Percentage");
         }
     }
     static _updateDepreciationTypeInDB(category_id, depType) {
         return __awaiter(this, void 0, void 0, function* () {
             // Update the depreciation type in category table
             try {
-                yield db2_js_1.default.query(db_category2_js_1.default.updateDepreciationType, [depType, category_id]);
+                yield pool.query(categoryTable.updateDepreciationType, [depType, category_id]);
             }
             catch (err) {
-                throw new myError_js_1.default("Could not update Depreciation Type");
+                throw new MyError("Could not update Depreciation Type");
             }
         });
     }
     static _insertDepreciationPercentInDb(category_id, percent) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield db2_js_1.default.query(db_category2_js_1.default.insertDepreciationPercent, [category_id, percent]);
+                yield pool.query(categoryTable.insertDepreciationPercent, [category_id, percent]);
             }
             catch (err) {
-                throw new myError_js_1.default("Could not insert depreciation percentage");
+                throw new MyError("Could not insert depreciation percentage");
             }
         });
     }
     static _deleteDepreciationPercentInDb(category_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield db2_js_1.default.query(db_category2_js_1.default.deleteDepreciationPercent, [category_id]);
+                yield pool.query(categoryTable.deleteDepreciationPercent, [category_id]);
             }
             catch (err) {
-                throw new myError_js_1.default("Could not delete depreciation percentage entry");
+                throw new MyError("Could not delete depreciation percentage entry");
             }
         });
     }
@@ -274,10 +268,10 @@ class Category {
         return __awaiter(this, void 0, void 0, function* () {
             let fetchResult;
             try {
-                fetchResult = yield db2_js_1.default.query(db_category2_js_1.default.doesCategoryIDExist, [categoryID]);
+                fetchResult = yield pool.query(categoryTable.doesCategoryIDExist, [categoryID]);
             }
             catch (err) {
-                throw new myError_js_1.default("Could Not Confirm If Category Exists");
+                throw new MyError("Could Not Confirm If Category Exists");
             }
             if (fetchResult.rowCount === 0) {
                 return false;
@@ -292,15 +286,15 @@ class Category {
             let fetchResult;
             // Check if Category Exists
             if (!(yield Category._doesCategoryIDExist(categoryID))) {
-                throw new myError_js_1.default("Category Does Not Exist");
+                throw new MyError("Category Does Not Exist");
             }
             try {
-                fetchResult = yield db2_js_1.default.query(db_category2_js_1.default.getCategoryDepreciationType, [categoryID]);
+                fetchResult = yield pool.query(categoryTable.getCategoryDepreciationType, [categoryID]);
             }
             catch (err) {
-                throw new myError_js_1.default("Could Not Get Category Depreciation Type");
+                throw new MyError("Could Not Get Category Depreciation Type");
             }
-            utility_js_1.default.verifyDatabaseFetchResults(fetchResult, "Error Querying Database");
+            utility.verifyDatabaseFetchResults(fetchResult, "Error Querying Database");
             let depreciaitionType = fetchResult.rows[0].depreciationtype;
             return depreciaitionType;
         });
@@ -310,14 +304,14 @@ class Category {
             let fetchResult;
             let depreciationPercentage;
             if (!(yield Category._doesCategoryIDExist(categoryID))) {
-                throw new myError_js_1.default("Category Does Not Exist");
+                throw new MyError("Category Does Not Exist");
             }
             if ((yield Category._getCategoryDepreciationType(categoryID)) === "Written Down Value") {
                 try {
-                    fetchResult = yield db2_js_1.default.query(db_category2_js_1.default.getDepreciationPercent, [categoryID]);
+                    fetchResult = yield pool.query(categoryTable.getDepreciationPercent, [categoryID]);
                 }
                 catch (err) {
-                    throw new myError_js_1.default("Could Not Get Depreciation Percentage");
+                    throw new MyError("Could Not Get Depreciation Percentage");
                 }
                 depreciationPercentage = fetchResult.rows[0].percentage;
             }
@@ -338,7 +332,7 @@ class Category {
                     });
                 }).catch(err => {
                     console.log(err);
-                    rej((0, myError_js_1.default)(constants_js_1.Errors[9]));
+                    rej(MyError(Errors[9]));
                 });
             });
         });
@@ -348,7 +342,7 @@ class Category {
         return __awaiter(this, void 0, void 0, function* () {
             let categoryExist = yield Category._doesCategoryExist(categoryName);
             if (!categoryExist) {
-                throw new myError_js_1.default("Category Does Not Exist");
+                throw new MyError("Category Does Not Exist");
             }
             let categoryID = yield Category._getCategoryID(categoryName);
             let depreciationType = yield Category._getCategoryDepreciationType(categoryID);
@@ -363,4 +357,4 @@ class Category {
 }
 // Static fields
 Category.depTypes = ['Straight Line', 'Double Declining Balance', 'Written Down Value'];
-exports.default = Category;
+export default Category;

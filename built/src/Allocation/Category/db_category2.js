@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const addCategory = 'INSERT into Category (name, depreciationType, parentCategoryID) VALUES($1, $2, $3)';
 const getCategoryID = 'SELECT ID FROM Category WHERE name = $1';
 const addWrittenValueDepreciationEntry = 'INSERT INTO DepreciationPercent (categoryID, percentage) VALUES ($1, $2)';
@@ -38,4 +36,4 @@ let categoryTable = {
     addChild,
     getAllCategories2
 };
-exports.default = categoryTable;
+export default categoryTable;

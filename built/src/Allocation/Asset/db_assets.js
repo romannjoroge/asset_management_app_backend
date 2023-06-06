@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const doesAssetIDExist = "SELECT barcode FROM Asset WHERE assetID = $1";
 const addAssetToAssetRegister = `INSERT INTO Asset (barcode, noInBuilding, code, description, serialNumber, acquisitionDate, locationID, residualValue,
     condition, responsibleUsername, acquisitionCost, categoryID, usefulLife, depreciationType, depreciationPercent) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`;
@@ -74,4 +72,4 @@ const assetTable = {
     searchForAsset,
     getAssetID
 };
-exports.default = assetTable;
+export default assetTable;

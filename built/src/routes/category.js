@@ -1,51 +1,46 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const db2_js_1 = __importDefault(require("../../db2.js"));
-const router = express_1.default.Router();
-const category2_js_1 = __importDefault(require("../Allocation/Category/category2.js"));
-const constants_js_1 = require("../utility/constants.js");
-const db_category2_js_1 = __importDefault(require("../Allocation/Category/db_category2.js"));
+import express from 'express';
+import pool from '../../db2.js';
+const router = express.Router();
+import Category from '../Allocation/Category/category2.js';
+import { Errors } from '../utility/constants.js';
+import categoryTable from '../Allocation/Category/db_category2.js';
 // View a specific category
 router.get('/view/:name', (req, res) => {
     let name = req.params.name;
-    db2_js_1.default.query(db_category2_js_1.default.getCategory, [name]).then(data => {
+    pool.query(categoryTable.getCategory, [name]).then(data => {
         // Check if something was returned from database
         if (data.rowCount === 0) {
             return res.status(404).json({
-                message: constants_js_1.Errors[11],
+                message: Errors[11],
             });
         }
         return res.status(200).json(data.rows[0]);
     }).catch(e => {
         return res.status(501).json({
-            message: constants_js_1.Errors[9]
+            message: Errors[9]
         });
     });
 });
 router.get('/view', (req, res) => {
     // Get all categories from database and return
-    db2_js_1.default.query(db_category2_js_1.default.getAllCategories).then(data => {
+    pool.query(categoryTable.getAllCategories).then(data => {
         if (data.rowCount === 0) {
             return res.status(404).json({
-                message: constants_js_1.Errors[10],
+                message: Errors[10],
             });
         }
         return res.status(200).json(data.rows);
     }).catch(e => {
         return res.status(500).json({
-            message: constants_js_1.Errors[9],
+            message: Errors[9],
         });
     });
 });
 router.get('/get', (req, res) => {
     // Return all categories and their info
-    db2_js_1.default.query(db_category2_js_1.default.getAllCategories2, []).then(fetchResult => {
+    pool.query(categoryTable.getAllCategories2, []).then(fetchResult => {
         if (fetchResult.rowCount <= 0) {
-            return res.status(400).json({ message: constants_js_1.Errors[10] });
+            return res.status(400).json({ message: Errors[10] });
         }
         return res.json(fetchResult.rows);
     });
@@ -57,7 +52,7 @@ router.post('/add', (req, res) => {
     parentCategoryID = Number.parseInt(parentCategoryID);
     depreciationPercentage = Number.parseFloat(depreciationPercentage);
     // Call database query
-    let categ = new category2_js_1.default(categoryName, parentCategoryID, depreciationType, depreciationPercentage);
+    let categ = new Category(categoryName, parentCategoryID, depreciationType, depreciationPercentage);
     categ.initialize().then(data => {
         return res.status(201).json({
             message: 'Category Created'
@@ -65,7 +60,7 @@ router.post('/add', (req, res) => {
     }).catch(e => {
         console.log(e);
         return res.status(500).json({
-            message: constants_js_1.Errors[12],
+            message: Errors[12],
         });
     });
 });
@@ -74,11 +69,11 @@ router.post('/update', (req, res) => {
     updateBody.parentFolder = Number.parseInt(updateBody.parentFolder);
     updateBody.depreciation.value = Number.parseFloat(updateBody.depreciation.value);
     // Update items based on what is there
-    category2_js_1.default.updateCategory(updateBody, name).then(_ => {
+    Category.updateCategory(updateBody, name).then(_ => {
         return res.send("Category Updated");
     }).catch(e => {
         console.log(e);
-        return res.status(500).json({ message: constants_js_1.Errors[9] });
+        return res.status(500).json({ message: Errors[9] });
     });
 });
-exports.default = router;
+export default router;

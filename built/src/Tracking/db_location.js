@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 let getLocation = "SELECT name FROM Location WHERE id = $1";
 let getLocations = "SELECT name, id FROM Location";
 const doesLocationExist = "SELECT * FROM Location WHERE name = $1 AND parentLocationID IN (SELECT id FROM Location WHERE name = $2 AND companyName = $3)";
@@ -30,4 +28,4 @@ let locationTable = {
     doesAntennaeExist,
     createAntennae
 };
-exports.default = locationTable;
+export default locationTable;

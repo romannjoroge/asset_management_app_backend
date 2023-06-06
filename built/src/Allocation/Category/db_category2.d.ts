@@ -1,0 +1,35 @@
+export default categoryTable;
+declare namespace categoryTable {
+    export { addCategory as add };
+    export { getCategoryID as getID };
+    export { addWrittenValueDepreciationEntry as addWritten };
+    export { updateCategoryName };
+    export { updateFolderID };
+    export { updateDepreciationType };
+    export { insertDepreciationPercent };
+    export { deleteDepreciationPerYear };
+    export { deleteDepreciationPercent };
+    export { getCategoryDepreciationType };
+    export { getDepreciationPercent };
+    export { doesCategoryIDExist };
+    export { getAllCategories };
+    export { getCategory };
+    export { addChild };
+    export { getAllCategories2 };
+}
+declare const addCategory: "INSERT into Category (name, depreciationType, parentCategoryID) VALUES($1, $2, $3)";
+declare const getCategoryID: "SELECT ID FROM Category WHERE name = $1";
+declare const addWrittenValueDepreciationEntry: "INSERT INTO DepreciationPercent (categoryID, percentage) VALUES ($1, $2)";
+declare const updateCategoryName: "UPDATE Category SET name = $1 WHERE id = $2";
+declare const updateFolderID: "UPDATE Category SET parentFolderID = $1 WHERE id = $2";
+declare const updateDepreciationType: "UPDATE Category SET depreciationType = $1 WHERE id = $2";
+declare const insertDepreciationPercent: "INSERT INTO DepreciationPercent (categoryID, percentage) VALUES ($1, $2)";
+declare const deleteDepreciationPerYear: "DELETE FROM DepreciationPerYear WHERE categoryID = $1";
+declare const deleteDepreciationPercent: "DELETE FROM DepreciationPercent WHERE categoryID = $1";
+declare const getCategoryDepreciationType: "SELECT depreciationType FROM Category WHERE ID = $1";
+declare const getDepreciationPercent: "SELECT percentage FROM DepreciationPercent WHERE categoryID = $1";
+declare const doesCategoryIDExist: "SELECT name FROM Category WHERE ID = $1";
+declare const getAllCategories: "SELECT name, ID FROM Category";
+declare const getCategory: "SELECT c.name, c.depreciationtype, f.name AS parentfolder FROM Category AS c JOIN Folder as f ON \n                    c.parentfolderid = f.id WHERE c.name=$1";
+declare const addChild: "INSERT INTO parentChildCategory (parentID, childID) VALUES ($1, $2)";
+declare const getAllCategories2: "\n                        SELECT c.name AS category, c.depreciationtype, d.percentage, (SELECT name AS parent FROM Category WHERE id = c.parentCategoryID) \n                        FROM Category c FULL JOIN DepreciationPercent d ON d.categoryID = c.id\n";

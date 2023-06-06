@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,26 +7,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createDeprecaitonSchedule = void 0;
-const constants_js_1 = require("../../../utility/constants.js");
-const myError_js_1 = __importDefault(require("../../../utility/myError.js"));
-const asset2_js_1 = __importDefault(require("./asset2.js"));
-const db_assets_js_1 = __importDefault(require("./db_assets.js"));
-const createDeprecaitonSchedule = (assetID) => {
+import { Errors } from '../../utility/constants.js';
+import MyError from '../../utility/myError.js';
+import Asset from './asset2.js';
+import assetTable from './db_assets.js';
+export const createDeprecaitonSchedule = (assetID) => {
     return new Promise((res, rej) => {
         // Reject if asset does not exist
-        asset2_js_1.default._doesAssetIDExist(assetID).then((doesExist) => {
+        Asset._doesAssetIDExist(assetID).then((doesExist) => {
             if (doesExist == false) {
-                rej(new myError_js_1.default(constants_js_1.Errors[29]));
+                rej(new MyError(Errors[29]));
             }
             // Get assets lifespan, acqusitionDate, depreciationPercentage and acquisitionCost
-            pool.query(db_assets_js_1.default.getDepreciationDetails, [assetID]).then((fetchResults) => {
+            pool.query(assetTable.getDepreciationDetails, [assetID]).then((fetchResults) => {
                 if (fetchResults.rowCount == 0) {
-                    rej(new myError_js_1.default(constants_js_1.Errors[8]));
+                    rej(new MyError(Errors[8]));
                 }
                 let { usefullife, acquisitiondate, acquisitioncost } = fetchResults.rows[0];
                 let year = acquisitiondate.getFullYear();
@@ -48,20 +42,19 @@ const createDeprecaitonSchedule = (assetID) => {
                 }
             }).catch(err => {
                 console.log(err);
-                rej(new myError_js_1.default(constants_js_1.Errors[48]));
+                rej(new MyError(Errors[48]));
             });
         });
     });
 };
-exports.createDeprecaitonSchedule = createDeprecaitonSchedule;
 function insertDepreciationSchedule(props) {
     return __awaiter(this, void 0, void 0, function* () {
         // Inserts data in props into the depreciation schedule table
-        pool.query(db_assets_js_1.default.insertDepreciationSchedule, [props.year, props.assetID,
+        pool.query(assetTable.insertDepreciationSchedule, [props.year, props.assetID,
             props.openingBookValue, props.depreciationExpense, props.accumulatedDepreciation,
             props.closingBookValue]).catch(err => {
             console.log(err);
-            throw new myError_js_1.default(constants_js_1.Errors[48]);
+            throw new MyError(Errors[48]);
         });
     });
 }

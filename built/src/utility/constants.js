@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Succes = exports.Errors = void 0;
-exports.Errors = {
+export const Errors = {
     '0': "Route Does Not Exist",
     '1': 'Could Not Create Asset',
     '2': 'Could Not Display Assets',
@@ -52,7 +49,7 @@ exports.Errors = {
     '47': "Could Not Get Depreciation Details",
     '48': "Could Not Create Depreciation Schedule",
 };
-exports.Succes = {
+export const Succes = {
     '1': 'Asset Created Successfuly',
     '2': "Reports Sent Successfully",
     '3': "Asset Allocated",

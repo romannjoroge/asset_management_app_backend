@@ -1,141 +1,134 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const db2_js_1 = __importDefault(require("../../db2.js"));
-const router = express_1.default.Router();
-const db_reports_js_1 = __importDefault(require("../Reports/db_reports.js"));
-const constants_js_1 = require("../utility/constants.js");
-const convert_array_to_csv_1 = require("convert-array-to-csv");
-const promises_1 = __importDefault(require("fs/promises"));
-const path_1 = __importDefault(require("path"));
-const url_1 = require("url");
-const db_log_js_1 = __importDefault(require("../Log/db_log.js"));
-const db_users_js_1 = __importDefault(require("../Users/db_users.js"));
-const checkifAuthenticated_js_1 = __importDefault(require("../../middleware/checkifAuthenticated.js"));
-const checkifAuthorized_js_1 = __importDefault(require("../../middleware/checkifAuthorized.js"));
-const utility_js_1 = __importDefault(require("../utility/utility.js"));
-const db_location_js_1 = __importDefault(require("../Tracking/db_location.js"));
-const __filename = (0, url_1.fileURLToPath)(import.meta.url);
-const __dirname = path_1.default.dirname(__filename);
+import express from 'express';
+import pool from '../../db2.js';
+const router = express.Router();
+import reportsTable from '../Reports/db_reports.js';
+import { Errors } from '../utility/constants.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import logTable from '../Log/db_log.js';
+import userTable from '../Users/db_users.js';
+import checkifAuthenticated from '../../middleware/checkifAuthenticated.js';
+import checkifAuthorized from '../../middleware/checkifAuthorized.js';
+import utility from '../utility/utility.js';
+import locationTable from '../Tracking/db_location.js';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 router.get('/report/:type', (req, res) => {
     // Get report type from request params
     let reportType = req.params.type;
     let query;
     let inputs;
     if (reportType == "chain") {
-        query = db_reports_js_1.default.chainOfCustody;
+        query = reportsTable.chainOfCustody;
         inputs = [req.query.barcode];
     }
     else if (reportType == "movement") {
-        query = db_reports_js_1.default.movements;
+        query = reportsTable.movements;
         inputs = [req.query.barcode];
     }
     else if (reportType == 'category') {
-        query = db_reports_js_1.default.categoryCount;
+        query = reportsTable.categoryCount;
         inputs = [];
     }
     else if (reportType == 'audit') {
         try {
-            query = db_log_js_1.default.selectUserLogs;
+            query = logTable.selectUserLogs;
             let username = req.query.username;
-            let to = utility_js_1.default.checkIfValidDate(req.query.to, "Invalid To Date");
-            let from = utility_js_1.default.checkIfValidDate(req.query.from, "Invalid From Date");
+            let to = utility.checkIfValidDate(req.query.to, "Invalid To Date");
+            let from = utility.checkIfValidDate(req.query.from, "Invalid From Date");
             let eventtype = req.query.eventtype;
             inputs = [username, from, to, eventtype];
         }
         catch (err) {
             console.log(err);
-            return res.status(400).json({ message: constants_js_1.Errors[9] });
+            return res.status(400).json({ message: Errors[9] });
         }
     }
     else if (reportType == "missing") {
-        query = db_reports_js_1.default.missingAssets;
+        query = reportsTable.missingAssets;
         inputs = [req.query.stockTake];
     }
     else if (reportType == 'physical') {
-        query = db_reports_js_1.default.physical_valuation;
+        query = reportsTable.physical_valuation;
         inputs = [req.query.stockTake];
     }
     else if (reportType == 'acquisition') {
-        query = db_reports_js_1.default.acquisitionReport;
+        query = reportsTable.acquisitionReport;
         var year = Number.parseInt(req.query.year);
         inputs = [new Date(year, 0, 1), new Date(year + 1, 0, 1)];
     }
     else if (reportType == 'depreciationreport') {
-        query = db_reports_js_1.default.getDepreciationDetails;
+        query = reportsTable.getDepreciationDetails;
         inputs = [];
     }
     else if (reportType == 'depSchedule') {
-        query = db_reports_js_1.default.depSchedule;
+        query = reportsTable.depSchedule;
         console.log("This is wierd");
-        db2_js_1.default.query("SELECT assetID FROM Asset WHERE barcode = $1", ['AUA5004']).then(data => {
+        pool.query("SELECT assetID FROM Asset WHERE barcode = $1", ['AUA5004']).then(data => {
             inputs = [data.rows[0].assetid];
-            db2_js_1.default.query(query, inputs).then(data => {
+            pool.query(query, inputs).then(data => {
                 if (data.rowCount <= 0) {
                     return res.status(404).json({
-                        message: constants_js_1.Errors[22]
+                        message: Errors[22]
                     });
                 }
                 return res.json(data.rows);
             }).catch(err => {
                 console.log(err);
                 return res.status(500).json({
-                    message: constants_js_1.Errors[9]
+                    message: Errors[9]
                 });
             });
         }).catch(err => {
             console.log(err);
             return res.status(500).json({
-                message: constants_js_1.Errors[9]
+                message: Errors[9]
             });
         });
     }
     else {
         return res.status(404).json({
-            message: constants_js_1.Errors[0]
+            message: Errors[0]
         });
     }
     // Get all log entries that have asset tag and allocate asset event
-    db2_js_1.default.query(query, inputs).then(data => {
+    pool.query(query, inputs).then(data => {
         if (data.rowCount <= 0) {
             return res.status(404).json({
-                message: constants_js_1.Errors[22]
+                message: Errors[22]
             });
         }
         return res.json(data.rows);
     }).catch(err => {
         console.log(err);
         return res.status(500).json({
-            message: constants_js_1.Errors[9]
+            message: Errors[9]
         });
     });
 });
 router.get('/depSchedule/:barcode', (req, res) => {
     let barcode = req.params.barcode;
-    let query = db_reports_js_1.default.depSchedule;
+    let query = reportsTable.depSchedule;
     console.log("This is wierd");
-    db2_js_1.default.query("SELECT assetID FROM Asset WHERE barcode = $1", [barcode]).then(data => {
+    pool.query("SELECT assetID FROM Asset WHERE barcode = $1", [barcode]).then(data => {
         let inputs = [data.rows[0].assetid];
-        db2_js_1.default.query(query, inputs).then(data => {
+        pool.query(query, inputs).then(data => {
             if (data.rowCount <= 0) {
                 return res.status(404).json({
-                    message: constants_js_1.Errors[22]
+                    message: Errors[22]
                 });
             }
             return res.json(data.rows);
         }).catch(err => {
             console.log(err);
             return res.status(500).json({
-                message: constants_js_1.Errors[9]
+                message: Errors[9]
             });
         });
     }).catch(err => {
         console.log(err);
         return res.status(500).json({
-            message: constants_js_1.Errors[9]
+            message: Errors[9]
         });
     });
 });
@@ -156,7 +149,7 @@ router.get('/location/:report/:id', (req, res) => {
                 return new Promise((res, rej) => {
                     console.log(3);
                     // Get the child locations of the location with id ID
-                    db2_js_1.default.query(db_reports_js_1.default.getChildLocations, [id]).then(data => {
+                    pool.query(reportsTable.getChildLocations, [id]).then(data => {
                         console.log(`THE CHILDREN OF LOCATION ${id} ARE:`);
                         console.log(data.rows);
                         console.log(4);
@@ -177,7 +170,7 @@ router.get('/location/:report/:id', (req, res) => {
                     }).catch(err => {
                         console.log(7);
                         console.log(err);
-                        rej(constants_js_1.Errors[9]);
+                        rej(Errors[9]);
                     });
                 });
             }
@@ -191,11 +184,11 @@ router.get('/location/:report/:id', (req, res) => {
                         return new Promise((res, rej) => {
                             let returnData = {};
                             // Get name of location
-                            db2_js_1.default.query(db_location_js_1.default.getLocation, [locationID]).then(data => {
+                            pool.query(locationTable.getLocation, [locationID]).then(data => {
                                 console.log(11);
                                 // Group assets in location by category
                                 let locationName = data.rows[0].name;
-                                db2_js_1.default.query(db_reports_js_1.default.assetsInLocationByCategory, [locationID]).then(data => {
+                                pool.query(reportsTable.assetsInLocationByCategory, [locationID]).then(data => {
                                     console.log(12);
                                     console.log(`THE FOUND GROUPINGS FOR LOCATION ${locationID} ARE:`);
                                     console.log(data.rows);
@@ -223,12 +216,12 @@ router.get('/location/:report/:id', (req, res) => {
                                 }).catch(err => {
                                     console.log('Error 1');
                                     console.log(err);
-                                    rej(constants_js_1.Errors[9]);
+                                    rej(Errors[9]);
                                 });
                             }).catch(err => {
                                 console.log('Error 2');
                                 console.log(err);
-                                rej(constants_js_1.Errors[9]);
+                                rej(Errors[9]);
                             });
                         });
                     }
@@ -269,21 +262,21 @@ router.get('/location/:report/:id', (req, res) => {
                     }).catch(err => {
                         console.log(11);
                         console.log(err);
-                        reject(constants_js_1.Errors[9]);
+                        reject(Errors[9]);
                     });
                 }
                 // Asset Acquistion Report
                 else if (reportType == 'acquisition') {
                     // Get to and from dates
-                    let to = utility_js_1.default.checkIfValidDate(req.query.to, "Invalid To Date");
-                    let from = utility_js_1.default.checkIfValidDate(req.query.from, "Invalid From Date");
+                    let to = utility.checkIfValidDate(req.query.to, "Invalid To Date");
+                    let from = utility.checkIfValidDate(req.query.from, "Invalid From Date");
                     function getAccumulatedAcquisitionCost(locationID) {
                         return new Promise((res, rej) => {
                             // Get name of location
-                            db2_js_1.default.query(db_location_js_1.default.getLocation, [locationID]).then(data => {
+                            pool.query(locationTable.getLocation, [locationID]).then(data => {
                                 let locationName = data.rows[0].name;
                                 // Get total acquisition for each location
-                                db2_js_1.default.query(db_reports_js_1.default.getAccumulatedAcquisitionCost, [locationID, from, to]).then(data => {
+                                pool.query(reportsTable.getAccumulatedAcquisitionCost, [locationID, from, to]).then(data => {
                                     // Stored sum
                                     let sum;
                                     if (data.rowCount <= 0) {
@@ -296,12 +289,12 @@ router.get('/location/:report/:id', (req, res) => {
                                 }).catch(err => {
                                     console.log('Error 1');
                                     console.log(err);
-                                    rej(constants_js_1.Errors[9]);
+                                    rej(Errors[9]);
                                 });
                             }).catch(err => {
                                 console.log('Error 2');
                                 console.log(err);
-                                rej(constants_js_1.Errors[9]);
+                                rej(Errors[9]);
                             });
                         });
                     }
@@ -330,20 +323,20 @@ router.get('/location/:report/:id', (req, res) => {
                         resolve(returnedObject);
                     }).catch(err => {
                         console.log(err);
-                        reject(constants_js_1.Errors[9]);
+                        reject(Errors[9]);
                     });
                 }
                 // Missing assets report
                 else {
                     // Get the stock take that is the closest to chosen date for each location
-                    let from = utility_js_1.default.checkIfValidDate(req.query.from, "Invalid Date");
-                    let to = utility_js_1.default.checkIfValidDate(req.query.to, "Invalid Date");
+                    let from = utility.checkIfValidDate(req.query.from, "Invalid Date");
+                    let to = utility.checkIfValidDate(req.query.to, "Invalid Date");
                     let stockTakes = [];
                     let promises = [];
                     // Function returns a stock take id if one is found
                     function getStockTakes(location) {
                         return new Promise((res, rej) => {
-                            db2_js_1.default.query(db_reports_js_1.default.getClosestStockTakeM, [from, to, location]).then(data => {
+                            pool.query(reportsTable.getClosestStockTakeM, [from, to, location]).then(data => {
                                 if (data.rowCount > 0) {
                                     res(data.rows[0].id);
                                 }
@@ -353,7 +346,7 @@ router.get('/location/:report/:id', (req, res) => {
                             }).catch(err => {
                                 console.log('Error 3');
                                 console.log(err);
-                                rej(constants_js_1.Errors[9]);
+                                rej(Errors[9]);
                             });
                         });
                     }
@@ -366,7 +359,7 @@ router.get('/location/:report/:id', (req, res) => {
                         stockTakes = data.filter((value, index, arr) => arr.indexOf(value) === index && value != 0);
                         if (stockTakes.length == 0) {
                             let missing = "No Stock Takes Found";
-                            db2_js_1.default.query(db_location_js_1.default.getLocation, [id]).then(data => {
+                            pool.query(locationTable.getLocation, [id]).then(data => {
                                 // resolve({ [data.rows[0].name]: missing });
                                 resolve({
                                     name: data.rows[0].name,
@@ -374,14 +367,14 @@ router.get('/location/:report/:id', (req, res) => {
                                 });
                             }).catch(err => {
                                 console.log(err);
-                                reject(constants_js_1.Errors[9]);
+                                reject(Errors[9]);
                             });
                         }
                         // Get the assets that are in the asset register but not in the stock takes
-                        db2_js_1.default.query(stockTakesQuery, [stockTakes]).then(data => {
+                        pool.query(stockTakesQuery, [stockTakes]).then(data => {
                             let missing = data.rows[0].missing;
                             let amount = data.rows[0].amount;
-                            db2_js_1.default.query(db_location_js_1.default.getLocation, [id]).then(data => {
+                            pool.query(locationTable.getLocation, [id]).then(data => {
                                 // resolve({ [data.rows[0].name]: missing });
                                 resolve({
                                     name: data.rows[0].name,
@@ -390,23 +383,23 @@ router.get('/location/:report/:id', (req, res) => {
                             }).catch(err => {
                                 console.log('Error 4');
                                 console.log(err);
-                                reject(constants_js_1.Errors[9]);
+                                reject(Errors[9]);
                             });
                         }).catch(err => {
                             console.log('Error 5');
                             console.log(err);
-                            reject(constants_js_1.Errors[9]);
+                            reject(Errors[9]);
                         });
                     }).catch(err => {
                         console.log('Error 6');
                         console.log(err);
-                        reject(constants_js_1.Errors[9]);
+                        reject(Errors[9]);
                     });
                 }
             }).catch(err => {
                 console.log('Error 7');
                 console.log(err);
-                reject(constants_js_1.Errors[9]);
+                reject(Errors[9]);
             });
         });
     }
@@ -418,11 +411,11 @@ router.get('/location/:report/:id', (req, res) => {
     let stockTakesQuery;
     // Missing assets report
     if (reportType === "missing") {
-        stockTakesQuery = db_reports_js_1.default.getAssetsInStockTakes;
+        stockTakesQuery = reportsTable.getAssetsInStockTakes;
     }
     // Physical Report
     else if (reportType === "physical") {
-        stockTakesQuery = db_reports_js_1.default.numOfAssetsInStockTakes;
+        stockTakesQuery = reportsTable.numOfAssetsInStockTakes;
     }
     // Category Report
     else if (reportType == 'category') {
@@ -434,7 +427,7 @@ router.get('/location/:report/:id', (req, res) => {
     }
     else {
         return res.status(404).json({
-            message: constants_js_1.Errors[0]
+            message: Errors[0]
         });
     }
     if (id == 0) {
@@ -442,11 +435,11 @@ router.get('/location/:report/:id', (req, res) => {
         arguements = [];
     }
     else {
-        databaseQuery = db_reports_js_1.default.getChildLocations;
+        databaseQuery = reportsTable.getChildLocations;
         arguements = [id];
     }
     // Get all locations with parent id of id
-    db2_js_1.default.query(databaseQuery, arguements).then(childLocations => {
+    pool.query(databaseQuery, arguements).then(childLocations => {
         // If there are no children locations, return data for said location and a flag that indicates that there are no children
         if (childLocations.rowCount == 0) {
             getNumberOfMissingItemsForEachLocation(id, stockTakesQuery).then(data => {
@@ -479,25 +472,25 @@ router.get('/location/:report/:id', (req, res) => {
         });
     });
 });
-router.get("/data/:data", checkifAuthenticated_js_1.default, (0, checkifAuthorized_js_1.default)('Company Administrator'), (req, res) => {
+router.get("/data/:data", checkifAuthenticated, checkifAuthorized('Company Administrator'), (req, res) => {
     let dataType = req.params.data;
     let query;
     let inputs = [];
     if (dataType == "stocktake") {
-        query = db_reports_js_1.default.getStockTakes;
+        query = reportsTable.getStockTakes;
     }
     else if (dataType == "username") {
-        query = db_users_js_1.default.getUsers;
+        query = userTable.getUsers;
     }
     else {
         return res.status(404).json({
-            message: constants_js_1.Errors[0]
+            message: Errors[0]
         });
     }
-    db2_js_1.default.query(query, inputs).then(data => {
+    pool.query(query, inputs).then(data => {
         if (data.rowCount == 0) {
             return res.status(404).json({
-                message: constants_js_1.Errors[22]
+                message: Errors[22]
             });
         }
         return res.status(200).json(data.rows);
@@ -506,4 +499,4 @@ router.get("/data/:data", checkifAuthenticated_js_1.default, (0, checkifAuthoriz
 router.route('*', (req, res) => {
     res.status(404).json({ data: 'Resource not found' });
 });
-exports.default = router;
+export default router;

@@ -1,30 +1,25 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const router = express_1.default.Router();
-const asset2_js_1 = __importDefault(require("../Allocation/Asset/asset2.js"));
-const constants_js_1 = require("../utility/constants.js");
-const db2_js_1 = __importDefault(require("../../db2.js"));
-const db_assets_js_1 = __importDefault(require("../Allocation/Asset/db_assets.js"));
-const checkifAuthorized_js_1 = __importDefault(require("../../middleware/checkifAuthorized.js"));
-const checkifAuthenticated_js_1 = __importDefault(require("../../middleware/checkifAuthenticated.js"));
-const convert_array_to_csv_1 = require("convert-array-to-csv");
-const promises_1 = __importDefault(require("fs/promises"));
-const path_1 = __importDefault(require("path"));
-const url_1 = require("url");
-const category2_js_1 = __importDefault(require("../Allocation/Category/category2.js"));
-const db_users_js_1 = __importDefault(require("../Users/db_users.js"));
-const location_js_1 = __importDefault(require("../Tracking/location.js"));
-const myError_js_1 = __importDefault(require("../utility/myError.js"));
-const users_js_1 = __importDefault(require("../Users/users.js"));
-const utility_js_1 = __importDefault(require("../utility/utility.js"));
-const __filename = (0, url_1.fileURLToPath)(import.meta.url);
-const __dirname = path_1.default.dirname(__filename);
+import express from 'express';
+const router = express.Router();
+import Asset from '../Allocation/Asset/asset2.js';
+import { Errors, Succes } from '../utility/constants.js';
+import pool from '../../db2.js';
+import assetTable from '../Allocation/Asset/db_assets.js';
+import checkifAuthorized from '../../middleware/checkifAuthorized.js';
+import checkifAuthenticated from '../../middleware/checkifAuthenticated.js';
+import { convertArrayToCSV } from 'convert-array-to-csv';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import Category from '../Allocation/Category/category2.js';
+import userTable from '../Users/db_users.js';
+import Location from '../Tracking/location.js';
+import MyError from '../utility/myError.js';
+import User from '../Users/users.js';
+import utility from '../utility/utility.js';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 // router.get('/', test)
-router.post('/add', checkifAuthenticated_js_1.default, (0, checkifAuthorized_js_1.default)('Asset Administrator'), (req, res) => {
+router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     // Get asset values from request
     let { barcode, locationID, noInBuilding, code, description, categoryName, usefulLife, serialNumber, condition, responsibleUsername, acquisitionDate, acquisitionCost, residualValue, depreciationType, depreciationPercent, attachments } = req.body;
     console.log(`DEP 1: ${depreciationType}`);
@@ -41,34 +36,34 @@ router.post('/add', checkifAuthenticated_js_1.default, (0, checkifAuthorized_js_
     let acquisitionDateToAdd;
     // Validate inputs
     // Check if location exists
-    location_js_1.default.verifyLocationID(locationID).then(data => {
+    Location.verifyLocationID(locationID).then(data => {
         // If location does not exist return error
         if (!data) {
-            return res.status(400).json({ message: constants_js_1.Errors[3] });
+            return res.status(400).json({ message: Errors[3] });
         }
         // Validate acquisition date
-        acquisitionDateToAdd = utility_js_1.default.checkIfValidDate(acquisitionDate, constants_js_1.Errors[37]);
+        acquisitionDateToAdd = utility.checkIfValidDate(acquisitionDate, Errors[37]);
         // Check if category exists
-        category2_js_1.default._doesCategoryExist(categoryName).then(doesExist => {
+        Category._doesCategoryExist(categoryName).then(doesExist => {
             if (doesExist) {
                 // Get ID of category
-                category2_js_1.default._getCategoryID(categoryName).then(categoryID => {
+                Category._getCategoryID(categoryName).then(categoryID => {
                     // Check if user exists
-                    users_js_1.default.checkIfUserExists(responsibleUsername, constants_js_1.Errors[30]).then(_ => {
+                    User.checkIfUserExists(responsibleUsername, Errors[30]).then(_ => {
                         console.log(`DEP 2: ${depreciationType}`);
                         // Validate depreciation type if exists
                         if (depreciationType) {
-                            category2_js_1.default.verifyDepreciationDetails(depreciationType, depreciationPercent).then(_ => {
+                            Category.verifyDepreciationDetails(depreciationType, depreciationPercent).then(_ => {
                                 // Set values of depreciation details to add
                                 depTypeToAdd = depreciationType;
                                 percToAdd = depreciationPercent;
                             }).catch(e => {
-                                if (e instanceof myError_js_1.default) {
+                                if (e instanceof MyError) {
                                     return res.status(400).json({ message: e.message });
                                 }
                                 else {
                                     console.log(e);
-                                    return res.status(500).json({ message: constants_js_1.Errors[9] });
+                                    return res.status(500).json({ message: Errors[9] });
                                 }
                             });
                         }
@@ -78,38 +73,38 @@ router.post('/add', checkifAuthenticated_js_1.default, (0, checkifAuthorized_js_
                         }
                         console.log(`DEP 3: ${depTypeToAdd}`);
                         // Create Asset
-                        db2_js_1.default.query(db_assets_js_1.default.addAssetToAssetRegister, [barcode, noInBuilding, code, description, serialNumber,
+                        pool.query(assetTable.addAssetToAssetRegister, [barcode, noInBuilding, code, description, serialNumber,
                             acquisitionDateToAdd, locationID, residualValue, condition, responsibleUsername, acquisitionCost, categoryID, usefulLife,
                             depTypeToAdd, percToAdd]).then(_ => {
                             // Get id of created asset
-                            db2_js_1.default.query(db_assets_js_1.default.getAssetID, [barcode]).then(data => {
+                            pool.query(assetTable.getAssetID, [barcode]).then(data => {
                                 if (data.rowCount <= 0) {
-                                    return res.status(400).json({ message: constants_js_1.Errors[1] });
+                                    return res.status(400).json({ message: Errors[1] });
                                 }
                                 let assetID = data.rows[0].assetid;
                                 let depType;
                                 let perc;
                                 // Get Depreciation Details
                                 if (depTypeToAdd === null || depTypeToAdd === undefined) {
-                                    category2_js_1.default._getDepreciationDetails(categoryName).then(data => {
+                                    Category._getDepreciationDetails(categoryName).then(data => {
                                         console.log(data);
                                         depType = data.depType;
                                         perc = data.perc;
                                         // Create Asset Depreciation Schedule
-                                        asset2_js_1.default.createDepreciationSchedule(depType, assetID, usefulLife, acquisitionCost, acquisitionDateToAdd, residualValue, perc).then(_ => {
-                                            return res.json({ message: constants_js_1.Succes[1] });
+                                        Asset.createDepreciationSchedule(depType, assetID, usefulLife, acquisitionCost, acquisitionDateToAdd, residualValue, perc).then(_ => {
+                                            return res.json({ message: Succes[1] });
                                         }).catch(e => {
-                                            if (e instanceof myError_js_1.default) {
+                                            if (e instanceof MyError) {
                                                 return res.status(400).json({ message: e.message });
                                             }
                                             else {
                                                 console.log(e);
-                                                return res.status(500).json({ message: constants_js_1.Errors[9] });
+                                                return res.status(500).json({ message: Errors[9] });
                                             }
                                         });
                                     }).catch(er => {
                                         console.log(er);
-                                        return res.status(500).json({ message: constants_js_1.Errors[9] });
+                                        return res.status(500).json({ message: Errors[9] });
                                     });
                                 }
                                 else {
@@ -117,68 +112,68 @@ router.post('/add', checkifAuthenticated_js_1.default, (0, checkifAuthorized_js_
                                     perc = percToAdd;
                                     console.log(`DEP 4: ${depType}`);
                                     // Create Asset Depreciation Schedule
-                                    asset2_js_1.default.createDepreciationSchedule(depType, assetID, usefulLife, acquisitionCost, acquisitionDateToAdd, residualValue, perc).then(_ => {
-                                        return res.json({ message: constants_js_1.Succes[1] });
+                                    Asset.createDepreciationSchedule(depType, assetID, usefulLife, acquisitionCost, acquisitionDateToAdd, residualValue, perc).then(_ => {
+                                        return res.json({ message: Succes[1] });
                                     }).catch(e => {
-                                        if (e instanceof myError_js_1.default) {
+                                        if (e instanceof MyError) {
                                             return res.status(400).json({ message: e.message });
                                         }
                                         else {
                                             console.log(e);
-                                            return res.status(500).json({ message: constants_js_1.Errors[9] });
+                                            return res.status(500).json({ message: Errors[9] });
                                         }
                                     });
                                 }
                             }).catch(e => {
-                                if (e instanceof myError_js_1.default) {
+                                if (e instanceof MyError) {
                                     return res.status(400).json({ message: e.message });
                                 }
                                 else {
                                     console.log(e);
-                                    return res.status(500).json({ message: constants_js_1.Errors[9] });
+                                    return res.status(500).json({ message: Errors[9] });
                                 }
                             });
                         }).catch(e => {
                             console.log(e);
-                            return res.status(500).json({ message: constants_js_1.Errors[9] });
+                            return res.status(500).json({ message: Errors[9] });
                         });
                     }).catch(e => {
-                        if (e instanceof myError_js_1.default) {
+                        if (e instanceof MyError) {
                             return res.status(400).json({ message: e.message });
                         }
                         else {
                             console.log(e);
-                            return res.status(500).json({ message: constants_js_1.Errors[9] });
+                            return res.status(500).json({ message: Errors[9] });
                         }
                     });
                 }).catch(e => {
-                    if (e instanceof myError_js_1.default) {
+                    if (e instanceof MyError) {
                         return res.status(400).json({ message: e.message });
                     }
                     else {
                         console.log(e);
-                        return res.status(500).json({ message: constants_js_1.Errors[9] });
+                        return res.status(500).json({ message: Errors[9] });
                     }
                 });
             }
             else {
-                return res.status(400).json({ message: constants_js_1.Errors[5] });
+                return res.status(400).json({ message: Errors[5] });
             }
         }).catch(e => {
-            if (e instanceof myError_js_1.default) {
+            if (e instanceof MyError) {
                 return res.status(400).json({ message: e.message });
             }
             else {
                 console.log(e);
-                return res.status(500).json({ message: constants_js_1.Errors[9] });
+                return res.status(500).json({ message: Errors[9] });
             }
         });
     }).catch(e => {
         console.log(e);
-        return res.status(500).json({ message: constants_js_1.Errors[9] });
+        return res.status(500).json({ message: Errors[9] });
     });
 });
-router.post('/update/:id', checkifAuthenticated_js_1.default, (0, checkifAuthorized_js_1.default)('Asset Administrator'), (req, res) => {
+router.post('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     // Get barcode from request
     let assetID = req.params.id;
     console.log(req.body);
@@ -193,37 +188,37 @@ router.post('/update/:id', checkifAuthenticated_js_1.default, (0, checkifAuthori
         if (updatableItems.includes(requestParams[i])) {
             // Run update query
             console.log(`UPDATE Asset SET ${requestParams[i]} = $1 WHERE assetID = $2`);
-            db2_js_1.default.query(`UPDATE Asset SET ${requestParams[i]} = $1 WHERE assetID = $2`, [req.body[requestParams[i]], assetID]).then(fetchResult => {
+            pool.query(`UPDATE Asset SET ${requestParams[i]} = $1 WHERE assetID = $2`, [req.body[requestParams[i]], assetID]).then(fetchResult => {
             }).catch(err => {
                 console.log(err);
-                return res.status(500).json({ message: constants_js_1.Errors[9] });
+                return res.status(500).json({ message: Errors[9] });
             });
         }
         else {
             // What to do if item not in possible items to update
-            return res.status(404).json({ message: constants_js_1.Errors[43] });
+            return res.status(404).json({ message: Errors[43] });
         }
     }
-    return res.json({ message: constants_js_1.Succes[11] });
+    return res.json({ message: Succes[11] });
 });
-router.get('/view', checkifAuthenticated_js_1.default, (0, checkifAuthorized_js_1.default)('Asset Administrator'), (req, res) => {
-    asset2_js_1.default.displayAllAssetTags().then(data => {
+router.get('/view', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
+    Asset.displayAllAssetTags().then(data => {
         res.status(200).json(data);
     }).catch(e => {
         console.log(e);
         res.status(500).json({
-            message: constants_js_1.Errors[2],
+            message: Errors[2],
         });
     });
 });
-router.get('/view/:id', checkifAuthenticated_js_1.default, (0, checkifAuthorized_js_1.default)('Asset User'), (req, res) => {
+router.get('/view/:id', checkifAuthenticated, checkifAuthorized('Asset User'), (req, res) => {
     // Get asset tag from request params
     let assetTag = req.params.id;
     // Query database for details of asset with given assettag
-    db2_js_1.default.query(db_assets_js_1.default.getAssetDetails, [assetTag]).then(fetchResult => {
+    pool.query(assetTable.getAssetDetails, [assetTag]).then(fetchResult => {
         if (fetchResult.rowCount <= 0) {
             res.status(404).json({
-                message: constants_js_1.Errors[8],
+                message: Errors[8],
             });
         }
         else {
@@ -231,7 +226,7 @@ router.get('/view/:id', checkifAuthenticated_js_1.default, (0, checkifAuthorized
         }
     }).catch(e => {
         res.status(500).json({
-            message: constants_js_1.Errors[9]
+            message: Errors[9]
         });
     });
 });
@@ -241,46 +236,46 @@ router.get('/get/:item', (req, res) => {
     let arguements;
     let errorMessage;
     if (item === "assetCategory") {
-        query = db_assets_js_1.default.assetCategories;
+        query = assetTable.assetCategories;
         arguements = [];
-        errorMessage = constants_js_1.Errors[22];
+        errorMessage = Errors[22];
     }
     else if (item === "assets") {
-        query = db_assets_js_1.default.getAllAssets;
+        query = assetTable.getAllAssets;
         arguements = [];
-        errorMessage = constants_js_1.Errors[8];
+        errorMessage = Errors[8];
     }
     else {
-        return res.status(400).json({ message: constants_js_1.Errors[0] });
+        return res.status(400).json({ message: Errors[0] });
     }
     // Return category name with the number of assets in it
-    db2_js_1.default.query(query, arguements).then(fetchResult => {
+    pool.query(query, arguements).then(fetchResult => {
         if (fetchResult.rowCount <= 0) {
             return res.status(400).json({ message: errorMessage });
         }
         return res.json(fetchResult.rows);
     }).catch(err => {
         console.log(err);
-        return res.status(500).json({ message: constants_js_1.Errors[9] });
+        return res.status(500).json({ message: Errors[9] });
     });
 });
 router.get('/assetData', (req, res) => {
     // Fetch asset net value and total number of assets
-    db2_js_1.default.query(db_assets_js_1.default.getAssetNetAndTotal).then(fetchResult => {
+    pool.query(assetTable.getAssetNetAndTotal).then(fetchResult => {
         if (fetchResult.rowCount <= 0) {
-            return res.status(400).json({ message: constants_js_1.Errors[8] });
+            return res.status(400).json({ message: Errors[8] });
         }
         let netValTotal = fetchResult.rows[0];
         // Fetch number of assets added in the last 12 months
-        db2_js_1.default.query(db_assets_js_1.default.getAssetAddedInLast12Months).then(fetchResult2 => {
+        pool.query(assetTable.getAssetAddedInLast12Months).then(fetchResult2 => {
             if (fetchResult2.rowCount <= 0) {
-                return res.status(400).json({ message: constants_js_1.Errors[8] });
+                return res.status(400).json({ message: Errors[8] });
             }
             let assetsAdded = fetchResult2.rows[0];
             // Get number of users
-            db2_js_1.default.query(db_users_js_1.default.getNumberOfUsers).then(fetchResult3 => {
+            pool.query(userTable.getNumberOfUsers).then(fetchResult3 => {
                 if (fetchResult3.rowCount <= 0) {
-                    return res.status(400).json({ message: constants_js_1.Errors[8] });
+                    return res.status(400).json({ message: Errors[8] });
                 }
                 let users = fetchResult3.rows[0];
                 // Combine all data
@@ -289,25 +284,25 @@ router.get('/assetData', (req, res) => {
                 res.json(data);
             }).catch(err => {
                 console.log(err);
-                return res.status(500).json({ message: constants_js_1.Errors[9] });
+                return res.status(500).json({ message: Errors[9] });
             });
         }).catch(err => {
             console.log(err);
-            return res.status(500).json({ message: constants_js_1.Errors[9] });
+            return res.status(500).json({ message: Errors[9] });
         });
     }).catch(err => {
         console.log(err);
-        return res.status(500).json({ message: constants_js_1.Errors[9] });
+        return res.status(500).json({ message: Errors[9] });
     });
 });
 router.delete('/delete/:barcode', (req, res) => {
     let barcode = req.params.barcode;
     // Run query
-    db2_js_1.default.query(db_assets_js_1.default.deleteAsset, [barcode]).then(fetchResult => {
-        return res.json({ message: constants_js_1.Succes[7] });
+    pool.query(assetTable.deleteAsset, [barcode]).then(fetchResult => {
+        return res.json({ message: Succes[7] });
     }).catch(err => {
         console.log(err);
-        return res.status(500).json({ message: constants_js_1.Errors[9] });
+        return res.status(500).json({ message: Errors[9] });
     });
 });
 router.post('/tags', (req, res) => {
@@ -318,7 +313,7 @@ router.post('/tags', (req, res) => {
     for (var i in tagRecords) {
         let tag = tagRecords[i];
         console.log(tag);
-        db2_js_1.default.query(db_assets_js_1.default.insertAssetTag, [commandCode, hardwareKey, tagRecNums, tag.antNo, tag.pc, tag.epcID, tag.crc]).then(_ => {
+        pool.query(assetTable.insertAssetTag, [commandCode, hardwareKey, tagRecNums, tag.antNo, tag.pc, tag.epcID, tag.crc]).then(_ => {
             // Add an entry to log.csv file
             let csvData = [{
                     commandCode,
@@ -329,17 +324,17 @@ router.post('/tags', (req, res) => {
                     epcID: tag.epcID,
                     crc: tag.crc
                 }];
-            let csvFromData = (0, convert_array_to_csv_1.convertArrayToCSV)(csvData);
-            promises_1.default.appendFile(path_1.default.join(__dirname, 'tags.log'), `${new Date().toISOString()},${commandCode},${hardwareKey},${tagRecNums},${tag.antNo},${tag.pc},${tag.epcID},${tag.crc}\n`).then(_ => {
+            let csvFromData = convertArrayToCSV(csvData);
+            fs.appendFile(path.join(__dirname, 'tags.log'), `${new Date().toISOString()},${commandCode},${hardwareKey},${tagRecNums},${tag.antNo},${tag.pc},${tag.epcID},${tag.crc}\n`).then(_ => {
             }).catch(e => {
                 console.log(e);
                 return res.status(500).json({
-                    message: constants_js_1.Errors[9],
+                    message: Errors[9],
                 });
             });
         }).catch(e => {
             console.log(e);
-            return res.status(500).json({ message: constants_js_1.Errors[9] });
+            return res.status(500).json({ message: Errors[9] });
         });
     }
     res.send("Done");
@@ -382,17 +377,17 @@ router.get('/search', (req, res) => {
     // });
     const query = req.query.query;
     // Search database with query
-    db2_js_1.default.query(db_assets_js_1.default.searchForAsset, [query]).then(fetchResult => {
+    pool.query(assetTable.searchForAsset, [query]).then(fetchResult => {
         if (fetchResult.rowCount <= 0) {
-            return res.status(400).json({ message: constants_js_1.Errors[44] });
+            return res.status(400).json({ message: Errors[44] });
         }
         return res.json(fetchResult.rows);
     }).catch(err => {
         console.log(err);
-        return res.status(500).json({ message: constants_js_1.Errors[9] });
+        return res.status(500).json({ message: Errors[9] });
     });
 });
 router.route('*', (req, res) => {
     res.status(404).json({ data: 'Resource not found' });
 });
-exports.default = router;
+export default router;

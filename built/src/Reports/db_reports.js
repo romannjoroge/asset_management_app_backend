@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const physical_valuation = `SELECT a.assetTag AS "Asset Tag", a.serialnumber AS "Serial Number", a.makeandmodelno AS 
                             "Make And Model Number", c.name AS "Category", l.name AS "Location" FROM Asset a JOIN Category c 
                             ON a.categoryid = c.id JOIN Location l ON l.id = a.locationid WHERE a.assettag IN (SELECT assetTag FROM 
@@ -23,7 +21,7 @@ const assetsInLocationByCategory = `SELECT c.name, foo.count FROM Category c FUL
 const getAccumulatedAcquisitionCost = "SELECT SUM(acquisitionCost) FROM Asset WHERE locationID = $1 AND acquisitionDate BETWEEN $2 AND $3";
 const getDepreciationDetails = "SELECT c.name, c.depreciationtype, d.percentage FROM Category c FULL Join DepreciationPercent d ON c.id = d.categoryid";
 const depSchedule = "SELECT year, openingBookValue FROM DepreciationSchedule WHERE assetID = $1 ORDER BY year ASC";
-exports.default = {
+export default {
     physical_valuation,
     depSchedule,
     missingAssets,

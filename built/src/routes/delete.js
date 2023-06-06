@@ -1,15 +1,10 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
 /*
     This route deals with deleting items in the database
 */
-const express_1 = __importDefault(require("express"));
-const db2_js_1 = __importDefault(require("../../db2.js"));
-const router = express_1.default.Router();
-const constants_js_1 = require("../utility/constants.js");
+import express from 'express';
+import pool from '../../db2.js';
+const router = express.Router();
+import { Errors } from '../utility/constants.js';
 router.delete('/delete/:item', (req, res) => {
     let item = req.params.item;
     let { id } = req.query;
@@ -112,13 +107,13 @@ router.delete('/delete/:item', (req, res) => {
         arguements = [id];
     }
     else {
-        return res.status(404).json({ message: constants_js_1.Errors[0] });
+        return res.status(404).json({ message: Errors[0] });
     }
-    db2_js_1.default.query(query, arguements).then(fetchResult => {
+    pool.query(query, arguements).then(fetchResult => {
         return res.json({ message: `${item} deleted successfully` });
     }).catch(err => {
         console.log(err);
-        return res.status(500).json({ message: constants_js_1.Errors[9] });
+        return res.status(500).json({ message: Errors[9] });
     });
 });
-exports.default = router;
+export default router;

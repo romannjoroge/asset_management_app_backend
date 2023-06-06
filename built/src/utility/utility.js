@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,12 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const chai_1 = require("chai");
-const myError_js_1 = __importDefault(require("./myError.js"));
+import { assert } from "chai";
+import MyError from "./myError.js";
 function isAnyEmpty(arr) {
     /*
         arr - arr is an array of variables of any type
@@ -30,23 +25,23 @@ function isAnyEmpty(arr) {
 }
 function checkIfBoolean(x, errorMessage) {
     if (typeof x !== "boolean") {
-        throw new myError_js_1.default(errorMessage);
+        throw new MyError(errorMessage);
     }
 }
 function checkIfNumberisPositive(x, errorMessage) {
     if (!Number.isInteger(x) || x < 0) {
-        throw new myError_js_1.default(errorMessage);
+        throw new MyError(errorMessage);
     }
 }
 function checkIfNumberisGreaterThanZero(x, errorMessage) {
     if (!Number.isInteger(x) || x <= 0) {
         console.log(x);
-        throw new myError_js_1.default(errorMessage);
+        throw new MyError(errorMessage);
     }
 }
 function checkIfString(x, errorMessage) {
     if (typeof x !== "string") {
-        throw new myError_js_1.default(errorMessage);
+        throw new MyError(errorMessage);
     }
 }
 function checkIfValidDate(x, errorMessage) {
@@ -61,7 +56,7 @@ function checkIfValidDate(x, errorMessage) {
         splitDate = x.split('/');
     }
     else {
-        throw new myError_js_1.default(errorMessage);
+        throw new MyError(errorMessage);
     }
     let month = splitDate[0];
     let day = splitDate[1];
@@ -71,23 +66,23 @@ function checkIfValidDate(x, errorMessage) {
     if (Object.prototype.toString.call(dateFromX) === "[object Date]") {
         // x is an instance of date
         if (isNaN(dateFromX)) {
-            throw new myError_js_1.default(errorMessage);
+            throw new MyError(errorMessage);
         }
         else {
             return dateFromX;
         }
     }
     else {
-        throw new myError_js_1.default(errorMessage);
+        throw new MyError(errorMessage);
     }
 }
 function verifyDatabaseFetchResults(fetchResult, errorMessage) {
     if (!'rowCount' in fetchResult) {
-        throw new myError_js_1.default("rowCount is not in fetchResult");
+        throw new MyError("rowCount is not in fetchResult");
     }
     else {
         if (fetchResult.rowCount === 0) {
-            throw new myError_js_1.default(errorMessage);
+            throw new MyError(errorMessage);
         }
     }
 }
@@ -102,7 +97,7 @@ function isFetchResultEmpty(fetchResult) {
 function checkIfInList(list, item, errorMessage) {
     // This function throws an error containing errorMessage if item is not in list
     if (!list.includes(item)) {
-        throw new myError_js_1.default(errorMessage);
+        throw new MyError(errorMessage);
     }
 }
 function addErrorHandlingToAsyncFunction(func, errorMessage, ...params) {
@@ -111,7 +106,7 @@ function addErrorHandlingToAsyncFunction(func, errorMessage, ...params) {
             return yield func(...params);
         }
         catch (err) {
-            throw new myError_js_1.default(errorMessage);
+            throw new MyError(errorMessage);
         }
     });
 }
@@ -119,15 +114,15 @@ function assertThatAsynchronousFunctionFails(func, errorMessage, ...params) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield func(...params);
-            (0, chai_1.assert)(false, "Error Should Have Been Thrown");
+            assert(false, "Error Should Have Been Thrown");
         }
         catch (err) {
-            if (err instanceof myError_js_1.default && err.message === errorMessage) {
-                (0, chai_1.assert)(true);
+            if (err instanceof MyError && err.message === errorMessage) {
+                assert(true);
             }
             else {
                 console.log(err);
-                (0, chai_1.assert)(false, "Wrong Error Thrown");
+                assert(false, "Wrong Error Thrown");
             }
         }
     });
@@ -140,12 +135,12 @@ function assertThatAsyncFunctionReturnsRightThing(func, itemToReturn, ...params)
         }
         catch (err) {
             console.log(err);
-            throw new myError_js_1.default(`${func.name} Did Not Run`);
+            throw new MyError(`${func.name} Did Not Run`);
         }
         if (returnedItem === null || returnedItem === 'undefined') {
-            (0, chai_1.assert)(false, "Nothing Was Returned");
+            assert(false, "Nothing Was Returned");
         }
-        chai_1.assert.equal(returnedItem, itemToReturn, "Returned Item Is Different");
+        assert.equal(returnedItem, itemToReturn, "Returned Item Is Different");
     });
 }
 function assertThatAsyncFunctionReturnsNull(func, ...params) {
@@ -156,9 +151,9 @@ function assertThatAsyncFunctionReturnsNull(func, ...params) {
         }
         catch (err) {
             console.log(err);
-            throw new myError_js_1.default(`${func.name} Did Not Run`);
+            throw new MyError(`${func.name} Did Not Run`);
         }
-        chai_1.assert.equal(returnedItem, null, "Returned Item Is Different");
+        assert.equal(returnedItem, null, "Returned Item Is Different");
     });
 }
 function assertThatFunctionWorks(func, ...params) {
@@ -168,7 +163,7 @@ function assertThatFunctionWorks(func, ...params) {
         }
         catch (err) {
             console.log(err);
-            (0, chai_1.assert)(false, `${func.name} did not run`);
+            assert(false, `${func.name} did not run`);
         }
     });
 }
@@ -179,7 +174,7 @@ function returnFetchedResultsFromDatabase(query, arguements, valueWanted) {
             fetchResult = yield pool.query(query, arguements);
         }
         catch (err) {
-            throw new myError_js_1.default(`Could Not Get ${valueWanted} From Database`);
+            throw new MyError(`Could Not Get ${valueWanted} From Database`);
         }
         return fetchResult;
     });
@@ -203,4 +198,4 @@ const utility = {
     returnFetchedResultsFromDatabase,
     checkIfString
 };
-exports.default = utility;
+export default utility;
