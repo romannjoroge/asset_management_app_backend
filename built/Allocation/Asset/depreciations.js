@@ -12,6 +12,26 @@ import MyError from '../../utility/myError.js';
 import Asset, { DepreciationTypes } from './asset2.js';
 import assetTable from './db_assets.js';
 import pool from '../../../db2.js';
+export const createDepreciationSchedules = (assetID) => __awaiter(void 0, void 0, void 0, function* () {
+    return new Promise((res, rej) => {
+        createDeprecaitonScheduleEntries(assetID).then((depreciationScheduleEntries) => {
+            // Insert Depreciation Schedule Entries
+            let promises = [];
+            for (let i = 0; i < depreciationScheduleEntries.length; i++) {
+                promises.push(insertDepreciationSchedule(depreciationScheduleEntries[i]));
+            }
+            Promise.all(promises).then(_ => {
+                return res();
+            }).catch(err => {
+                console.log(err);
+                return rej(new MyError(Errors[48]));
+            });
+        }).catch(err => {
+            console.log(err);
+            return rej(err);
+        });
+    });
+});
 export const createDeprecaitonScheduleEntries = (assetID) => {
     return new Promise((res, rej) => {
         // Reject if asset does not exist

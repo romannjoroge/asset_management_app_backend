@@ -27,6 +27,28 @@ interface DepreciationTypeFetchResults{
     rowCount: number
     rows: DepreciationType[]
 }
+export const createDepreciationSchedules = async (assetID: number): Promise<void | never> => {
+    return new Promise((res, rej) => {
+        createDeprecaitonScheduleEntries(assetID).then((depreciationScheduleEntries: DepreciaitionScheduleEntry[]) => {
+            // Insert Depreciation Schedule Entries
+            let promises: Promise<void>[] = [];
+            for (let i = 0; i < depreciationScheduleEntries.length; i++) {
+                promises.push(insertDepreciationSchedule(depreciationScheduleEntries[i]));
+            }
+
+            Promise.all(promises).then(_ => {
+                return res(); 
+            }).catch(err => {
+                console.log(err);
+                return rej(new MyError(Errors[48]));
+            });
+        }).catch(err => {
+            console.log(err);
+            return rej(err);
+        });
+    });
+}
+
 
 export const createDeprecaitonScheduleEntries = (assetID: number): Promise<DepreciaitionScheduleEntry[] | never> => {
     return new Promise((res, rej) => {
