@@ -27,24 +27,30 @@ interface DepreciationTypeFetchResults{
     rowCount: number
     rows: DepreciationType[]
 }
-export const createDepreciationSchedules = async (assetID: number): Promise<void | never> => {
+export const createDepreciationSchedules = async (barcode: string): Promise<void | never> => {
     return new Promise((res, rej) => {
-        createDeprecaitonScheduleEntries(assetID).then((depreciationScheduleEntries: DepreciaitionScheduleEntry[]) => {
-            // Insert Depreciation Schedule Entries
-            let promises: Promise<void>[] = [];
-            for (let i = 0; i < depreciationScheduleEntries.length; i++) {
-                promises.push(insertDepreciationSchedule(depreciationScheduleEntries[i]));
-            }
+        // Get assetID from barcode
+        Asset._getAssetID(barcode).then((assetID) => {
+            // Get Depreciation Schedule Entries
+            createDeprecaitonScheduleEntries(assetID).then((depreciationScheduleEntries) => {
+                let promises: Promise<void>[] = [];
+                for (var i in depreciationScheduleEntries) {
+                    promises.push(insertDepreciationSchedule(depreciationScheduleEntries[i]));
+                }
 
-            Promise.all(promises).then(_ => {
-                return res(); 
+                Promise.all(promises).then(_ => {
+                    return res();
+                }).catch(err => {
+                    console.log(err);
+                    return rej(new MyError(Errors[48]));
+                });
             }).catch(err => {
                 console.log(err);
                 return rej(new MyError(Errors[48]));
             });
         }).catch(err => {
             console.log(err);
-            return rej(err);
+            return rej(new MyError(Errors[29]));
         });
     });
 }
@@ -270,9 +276,9 @@ interface DepreciaitionScheduleEntry {
 async function insertDepreciationSchedule(props: DepreciaitionScheduleEntry): Promise<void | never>{
     return new Promise((res, rej) => {
         // Inserts data in props into the depreciation schedule table
-        pool.query(assetTable.insertDepreciationSchedule, [props.year, props.assetID, 
-            props.openingBookValue, props.depreciationExpense, props.accumulatedDepreciation, 
-            props.closingBookValue]).then(_ => {
+        pool.query(assetTable.insertDepreciationSchedule, [props.year, props.assetid, 
+            props.openingbookvalue, props.depreciationexpense, props.accumulateddepreciation, 
+            props.closingbookvalue]).then(_ => {
                 res();
             }).catch(err => {
             console.log(err);

@@ -18,6 +18,7 @@ import User from '../../Users/users.js';
 import Category from '../Category/category2.js';
 import assetTable from './db_assets.js';
 import { Errors } from '../../utility/constants.js';
+import { createDepreciationSchedules } from './depreciations.js';
 export var DepreciationTypes;
 (function (DepreciationTypes) {
     DepreciationTypes["StraightLine"] = "Straight Line";
@@ -152,14 +153,14 @@ class Asset {
         return new Promise((res, rej) => {
             pool.query(assetTable.doesBarCodeExist, [barCode]).then(fetchResult => {
                 if (utility.isFetchResultEmpty(fetchResult)) {
-                    res(false);
+                    return res(false);
                 }
                 else {
-                    res(true);
+                    return res(true);
                 }
             }).catch(err => {
                 console.log(err);
-                rej(new MyError(Errors[36]));
+                return rej(new MyError(Errors[36]));
             });
         });
     }
@@ -170,9 +171,15 @@ class Asset {
                     this.serialNumber, this.acquisitionDate, this.locationID, this.residualValue, this.condition, this.custodianName, this.acquisitionCost, this.categoryID,
                     this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent]).catch(err => {
                     console.log(err);
-                    throw new MyError(Errors[6]);
+                    return rej(new MyError(Errors[6]));
                 }).then(_ => {
-                    res();
+                    // Create depreciation schedules
+                    createDepreciationSchedules(this.barcode).then(_ => {
+                        return res();
+                    }).catch(err => {
+                        console.log(err);
+                        return rej(new MyError(Errors[1]));
+                    });
                 });
             });
         });
@@ -193,6 +200,19 @@ class Asset {
                 utility.verifyDatabaseFetchResults(fetchResult, "Nothing Was Returned From Database");
                 return fetchResult.rows[0].name;
             }
+        });
+    }
+    static _getAssetID(barcode) {
+        return new Promise((res, rej) => {
+            pool.query(assetTable.getAssetID, [barcode]).then(fetchResult => {
+                if (fetchResult.rowCount <= 0) {
+                    return rej(new MyError("Asset Does Not Exist"));
+                }
+                return res(fetchResult.rows[0].assetid);
+            }).catch(err => {
+                console.log(err);
+                return rej(new MyError("Could Not Get Asset ID"));
+            });
         });
     }
     static _updateAssetAcquisitionDate(assetTag, newDate) {
