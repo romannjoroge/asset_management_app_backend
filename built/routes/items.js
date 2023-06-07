@@ -207,41 +207,9 @@ router.post('/heartBeats', (req, res) => {
     res.send("Done");
 });
 router.get('/search', (req, res) => {
-    // // Get arguements from request
-    // let query = req.query.query;
-    // // Split query term into individual words
-    // let queryTerms = query.split(",");
-    // console.log(queryTerms);
-    // // Removing all items that have a space
-    // for (var i in queryTerms) {
-    //     // Check if ith item has a space
-    //     if(queryTerms[i].includes(" ")) {
-    //         // Split item by the space and add to the list
-    //         let newTerms = queryTerms[i].split(" ");
-    //         queryTerms.push(...newTerms);
-    //         // Remove the split item from list to avoid having duplicates
-    //         queryTerms.splice(i, 1);
-    //     } 
-    // }
-    // // Create query term from query terms
-    // let queryString = queryTerms.join(" & ");
-    // // Search database with query
-    // pool.query(assetTable.searchForAsset, [queryString]).then(fetchResult => {
-    //     if(fetchResult.rowCount <= 0) {
-    //         return res.status(400).json({message: Errors[44]})
-    //     }
-    //     console.log(fetchResult.rows);
-    //     return res.json(fetchResult.rows)
-    // }).catch(err => {
-    //     console.log(err);
-    //     return res.status(500).json({message: Errors[9]})
-    // });
     const query = req.query.query;
     // Search database with query
     pool.query(assetTable.searchForAsset, [query]).then(fetchResult => {
-        if (fetchResult.rowCount <= 0) {
-            return res.status(400).json({ message: Errors[44] });
-        }
         return res.json(fetchResult.rows);
     }).catch(err => {
         console.log(err);
