@@ -19,7 +19,7 @@ export enum DepreciationTypes {
     WrittenDownValue = "Written Down Value"
 }
 
-enum assetStatusOptions {
+export enum assetStatusOptions {
     Good = "Good",
     Excellent = "Excellent",
     Fair = "Fair"

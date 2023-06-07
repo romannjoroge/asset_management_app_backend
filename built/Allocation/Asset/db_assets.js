@@ -39,7 +39,19 @@ const getAssetID = "SELECT assetid FROM Asset WHERE barcode = $1 ORDER BY acquis
 const getDepreciationDetails = `SELECT a.usefulLife, a.acquisitionDate, a.acquisitionCost, d.percentage, a,residualvalue 
                                 FROM Asset a FULL JOIN DepreciationPercent d ON d.categoryID = a.categoryID WHERE assetID = $1`;
 const getDepreciationType = `SELECT a.depreciationType AS assetDep, c.depreciationType AS categDep FROM Asset a JOIN Category c ON c.id = a.categoryID WHERE assetID = $1`;
+const filterAssetsByLocation = `SELECT a.assetid, a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a 
+                                FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.assetid IS NOT NULL AND a.deleted = false
+                                AND a.locationid = $1`;
+const filterAssetsByCategory = `SELECT a.assetid, a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a 
+                                FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.assetid IS NOT NULL AND a.deleted = false
+                                AND a.categoryid = $1`;
+const filterAssetsByLocationAndCategory = `SELECT a.assetid, a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a 
+                                        FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.assetid IS NOT NULL AND a.deleted = false
+                                        AND a.categoryid = $1 AND a.locationid = $2`;
 const assetTable = {
+    filterAssetsByLocationAndCategory,
+    filterAssetsByLocation,
+    filterAssetsByCategory,
     getDepreciationType,
     getDepreciationDetails,
     doesAssetTagExist: doesAssetIDExist,

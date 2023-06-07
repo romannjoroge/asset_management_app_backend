@@ -25,7 +25,7 @@ export var DepreciationTypes;
     DepreciationTypes["DoubleDecliningBalance"] = "Double Declining Balance";
     DepreciationTypes["WrittenDownValue"] = "Written Down Value";
 })(DepreciationTypes || (DepreciationTypes = {}));
-var assetStatusOptions;
+export var assetStatusOptions;
 (function (assetStatusOptions) {
     assetStatusOptions["Good"] = "Good";
     assetStatusOptions["Excellent"] = "Excellent";

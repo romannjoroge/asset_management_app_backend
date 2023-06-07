@@ -11,6 +11,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import userTable from '../Users/db_users.js';
+import { filterAssetByDetails } from '../Allocation/Asset/filter.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
@@ -242,6 +243,25 @@ router.get('/search', (req, res) => {
         return res.json(fetchResult.rows);
     }).catch(err => {
         console.log(err);
+        return res.status(500).json({ message: Errors[9] });
+    });
+});
+router.get('/filter', (req, res) => {
+    // Get arguements from request
+    let location = req.query.locationID;
+    let category = req.query.categoryID;
+    let locationID;
+    let categoryID;
+    if (location && typeof location === "string") {
+        locationID = Number.parseInt(location);
+    }
+    if (category && typeof category === "string") {
+        categoryID = Number.parseInt(category);
+    }
+    filterAssetByDetails({ locationID, categoryID }).then(data => {
+        return res.json(data);
+    }).catch(e => {
+        console.log(e);
         return res.status(500).json({ message: Errors[9] });
     });
 });

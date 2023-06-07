@@ -16,6 +16,7 @@ import Location from '../Tracking/location.js';
 import MyError from '../utility/myError.js';
 import User from '../Users/users.js';
 import utility from '../utility/utility.js';
+import { filterAssetByDetails } from '../Allocation/Asset/filter.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -306,6 +307,28 @@ router.get('/search', (req, res) => {
     });
 });
 
+router.get('/filter', (req, res) => {
+    // Get arguements from request
+    let location = req.query.locationID;
+    let category = req.query.categoryID;
+
+    let locationID: number | undefined;
+    let categoryID: number | undefined;
+
+    if(location && typeof location === "string") {
+        locationID = Number.parseInt(location);
+    }
+    if(category && typeof category === "string") {
+        categoryID = Number.parseInt(category);
+    }
+
+    filterAssetByDetails({locationID, categoryID}).then(data => {
+        return res.json(data);
+    }).catch(e => {
+        console.log(e);
+        return res.status(500).json({message: Errors[9]})
+    });
+});
 
 router.route('*', (req, res) => {
     res.status(404).json({ data: 'Resource not found' })

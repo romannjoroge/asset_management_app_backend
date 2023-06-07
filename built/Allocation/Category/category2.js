@@ -266,19 +266,19 @@ class Category {
     // To me doesn't make alot of sense. So I've decided to not add this functionality for now
     static _doesCategoryIDExist(categoryID) {
         return __awaiter(this, void 0, void 0, function* () {
-            let fetchResult;
-            try {
-                fetchResult = yield pool.query(categoryTable.doesCategoryIDExist, [categoryID]);
-            }
-            catch (err) {
-                throw new MyError("Could Not Confirm If Category Exists");
-            }
-            if (fetchResult.rowCount === 0) {
-                return false;
-            }
-            else {
-                return true;
-            }
+            return new Promise((res, rej) => {
+                pool.query(categoryTable.doesCategoryIDExist, [categoryID]).then(fetchResult => {
+                    if (fetchResult.rowCount === 0) {
+                        return res(false);
+                    }
+                    else {
+                        return res(true);
+                    }
+                }).catch(err => {
+                    console.log(err);
+                    return rej(new MyError(Errors[9]));
+                });
+            });
         });
     }
     static _getCategoryDepreciationType(categoryID) {

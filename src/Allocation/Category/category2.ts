@@ -264,20 +264,19 @@ class Category {
     // Deleting a category would involve deleting the depreiciation details of all the assets under the category which
     // To me doesn't make alot of sense. So I've decided to not add this functionality for now
 
-    static async _doesCategoryIDExist(categoryID) {
-        let fetchResult;
-
-        try {
-            fetchResult = await pool.query(categoryTable.doesCategoryIDExist, [categoryID]);
-        } catch (err) {
-            throw new MyError("Could Not Confirm If Category Exists");
-        }
-
-        if (fetchResult.rowCount === 0) {
-            return false;
-        } else {
-            return true;
-        }
+    static async _doesCategoryIDExist(categoryID: number): Promise<boolean | never> {
+        return new Promise((res, rej) => {
+            pool.query(categoryTable.doesCategoryIDExist, [categoryID]).then(fetchResult => {
+                if (fetchResult.rowCount === 0) {
+                    return res(false);
+                } else {
+                    return res (true);
+                }
+            }).catch(err => {
+                console.log(err);
+                return rej(new MyError(Errors[9]))
+            });
+        })
     }
 
     static async _getCategoryDepreciationType(categoryID) {
