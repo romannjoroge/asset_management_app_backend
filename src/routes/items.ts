@@ -41,7 +41,9 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
         attachments
     } = req.body;
 
-
+    // Temporary attachements fix
+    attachments = [];
+    
     // Convert values to right type
     noInBuilding = Number.parseInt(noInBuilding);
     usefulLife = Number.parseInt(usefulLife);

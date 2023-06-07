@@ -35,7 +35,7 @@ class Asset {
     acquisitionCost: number;
     categoryName: string;
     categoryID: number;
-    attachments: string[];
+    attachments?: string[];
     noInBuilding: number;
     serialNumber: string;
     residualValue?: number;

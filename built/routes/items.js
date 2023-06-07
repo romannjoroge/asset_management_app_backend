@@ -16,6 +16,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     let { barcode, locationID, noInBuilding, code, description, categoryName, usefulLife, serialNumber, condition, responsibleUsername, acquisitionDate, acquisitionCost, residualValue, depreciationType, depreciationPercent, attachments } = req.body;
+    // Temporary attachements fix
+    attachments = [];
     // Convert values to right type
     noInBuilding = Number.parseInt(noInBuilding);
     usefulLife = Number.parseInt(usefulLife);
