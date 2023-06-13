@@ -52,6 +52,8 @@ export const Errors = {
     '50': "Invalid Depreciation Details",
     '51': "Invalid Attachments",
     '52': "Invalid Residual Value",
+    '53': "Invalid Category Details",
+    '54': "Category Already Exists",
 }
 
 export const Succes = {
@@ -66,4 +68,5 @@ export const Succes = {
     '9': "RFID Reader Created",
     '10': "Antennae Created",
     '11': "Asset Updated",
+    '12': 'Category Updated',
 }

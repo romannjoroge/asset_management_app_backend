@@ -4,6 +4,8 @@ const router = express.Router();
 import Category from '../Allocation/Category/category2.js'
 import { Errors, Succes } from '../utility/constants.js';
 import categoryTable from '../Allocation/Category/db_category2.js';
+import updateCategory from '../Allocation/Category/updateCategory.js';
+import { UpdateCategoryJSON } from '../Allocation/Category/updateCategory.js';
 
 // View a specific category
 router.get('/view/:name', (req, res) => {
@@ -77,19 +79,47 @@ router.post('/add', (req, res) => {
     });
 })
 
-router.post('/update', (req, res) => {
-    let {updateBody, name} = req.body
+interface UpdateCategoryFromJSON {
+    name?: string;
+    depreciationtype?: DepreciationFROMJSON;
+    parentcategoryid?: string;
+}
 
-    updateBody.parentFolder = Number.parseInt(updateBody.parentFolder);
-    updateBody.depreciation.value = Number.parseFloat(updateBody.depreciation.value);
+interface DepreciationFROMJSON {
+    type: string;
+    value?: string;
+}
+
+router.put('/update', (req, res) => {
+    let updateBody: UpdateCategoryJSON = {};
+    let updateBodyFromJSON: UpdateCategoryFromJSON = req.body.updateBody;
+    let id: number = Number.parseInt(req.body.id);
+
+    if(updateBodyFromJSON.depreciationtype) {
+        updateBody.depreciationtype = {type: updateBodyFromJSON.depreciationtype.type};
+        if(updateBodyFromJSON.depreciationtype.value) {
+            updateBody.depreciationtype.value = Number.parseFloat(updateBodyFromJSON.depreciationtype.value);
+        }
+    }
+
+    if(updateBodyFromJSON.parentcategoryid) {
+        updateBody.parentcategoryid = Number.parseInt(updateBodyFromJSON.parentcategoryid);
+    }
+
+    if(updateBodyFromJSON.name) {
+        updateBody.name = updateBodyFromJSON.name;
+    }
     
-    // Update items based on what is there
-    Category.updateCategory(updateBody, name).then(_ => {
-        return res.send("Category Updated");
-    }).catch(e => {
-        console.log(e);
-        return res.status(500).json({message:Errors[9]});
-    })
+    
+    updateCategory(id, updateBody).then(() => {
+        return res.json({
+            message: Succes[12],
+        })
+    }).catch(err => {
+        return res.status(500).json({
+            message: err.message,
+        });
+    });
 })
 
 export default router;

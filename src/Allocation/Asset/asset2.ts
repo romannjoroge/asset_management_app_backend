@@ -58,7 +58,7 @@ class Asset {
         utility.checkIfNumberisPositive(locationID, "Invalid location ID");
         this.locationID = locationID;
 
-        if (Object.values(assetStatusOptions).includes(condition) == true) {
+        if (Object.values(assetStatusOptions).includes(condition) === true) {
             this.condition = condition;
         } else {
             throw new MyError(Errors[49])

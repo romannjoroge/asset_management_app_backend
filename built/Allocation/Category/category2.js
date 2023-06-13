@@ -15,6 +15,7 @@ import categoryTable from './db_category2.js';
 import MyError from '../../utility/myError.js';
 import utility from '../../utility/utility.js';
 import { Errors } from '../../utility/constants.js';
+import { DepreciationTypes } from '../Asset/asset2.js';
 class Category {
     // Constructor
     constructor(categoryName, parentCategoryID, depreciationType, depreciationPercentage) {
@@ -102,105 +103,46 @@ class Category {
     }
     // Update Category
     static verifyCategoryName(newName) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return new Promise((res, rej) => {
             // Verify the new name
             if (typeof newName !== "string") {
                 // If not a string throw an error
-                throw new MyError("Category Name is of invalid type");
+                return rej(new MyError(Errors[53]));
             }
             else if (newName.length > 50) {
                 // Throw an error for a name that's too long
-                throw new MyError("Category Name is too long");
+                return rej(new MyError(Errors[53]));
             }
             // Check if the name exists
-            const exist = yield Category._doesCategoryExist(newName);
-            if (exist === true) {
-                throw new MyError(`${newName} category already exists`);
-            }
-            return "Name is valid!";
+            Category._doesCategoryExist(newName).then(exist => {
+                if (exist === true) {
+                    return rej(new MyError(Errors[54]));
+                }
+                return res();
+            }).catch(err => {
+                return rej(new MyError(Errors[9]));
+            });
         });
     }
-    static _updateNameinDb(category_id, newName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Run command
-            try {
-                yield pool.query(categoryTable.updateCategoryName, [newName, category_id]);
-            }
-            catch (err) {
-                throw new MyError("Could not update category name");
-            }
-        });
-    }
-    static _updateCategoryName(newName, oldName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log(`old is ${oldName} and new is ${newName}`);
-            // Verify newName
-            const isValid = yield Category.verifyCategoryName(newName);
-            const category_id = yield Category._getCategoryID(oldName);
-            // Update database
-            yield Category._updateNameinDb(category_id, newName);
-        });
-    }
-    static verifyFolder(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Verifies a folder ID
-            // Test if folder ID is an int
-            if (!Number.isInteger(id)) {
-                throw new MyError("Invalid Folder");
-            }
-            const exist = Folder.doesFolderExist(id);
-            if (!exist) {
-                throw new MyError("Folder does not exist");
-            }
-        });
-    }
-    static _updateFolderinDB(category_id, newID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                console.log(typeof newID, newID);
-                console.log(typeof category_id, category_id);
-                yield pool.query(categoryTable.updateFolderID, [newID, category_id]);
-            }
-            catch (err) {
-                console.log(err);
-                throw new MyError("Could not update category folder");
-            }
-        });
-    }
-    static _updateCategoryFolder(newFolderID, categoryName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Verify new folder ID
-            yield Category.verifyFolder(newFolderID);
-            // Get category ID from categoryName
-            const categoryID = yield Category._getCategoryID(categoryName);
-            // Update details in DB
-            yield Category._updateFolderinDB(categoryID, newFolderID);
-        });
-    }
-    static verifyDepreciationDetails(depType, depValue) {
+    static verifyDepreciationDetails(props) {
         // Verifies that depreciation details are valid
         // Make sure that depType is valid
-        utility.checkIfInList(Category.depTypes, depType, "Invalid Depreciation Type");
+        if (Object.values(DepreciationTypes).includes(props.type) === false) {
+            throw new MyError(Errors[50]);
+        }
         // Make sure deptype depvalue pair is valid
-        if (depType === "Double Declining Balance") {
-            if (depValue) {
-                throw new MyError("There should be no depreciation value");
+        if (props.type === DepreciationTypes.WrittenDownValue) {
+            if (props.value) {
+                if (props.value <= 0) {
+                    throw new MyError(Errors[50]);
+                }
             }
         }
-        else if (depType === "Written Down Value") {
-            utility.checkIfNumberisGreaterThanZero(depValue, "Invalid Depreciation Percentage");
+        else {
+            if (props.value !== null) {
+                throw new MyError(Errors[50]);
+            }
         }
-    }
-    static _updateDepreciationTypeInDB(category_id, depType) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Update the depreciation type in category table
-            try {
-                yield pool.query(categoryTable.updateDepreciationType, [depType, category_id]);
-            }
-            catch (err) {
-                throw new MyError("Could not update Depreciation Type");
-            }
-        });
     }
     static _insertDepreciationPercentInDb(category_id, percent) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -220,45 +162,6 @@ class Category {
             catch (err) {
                 throw new MyError("Could not delete depreciation percentage entry");
             }
-        });
-    }
-    static _updateDepreciationType(depType, value, categoryName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Verify Depreciation Details
-            Category.verifyDepreciationDetails(depType, value);
-            // Get category ID
-            const category_id = yield Category._getCategoryID(categoryName);
-            // Update Depreciation Type Entry in Category Table
-            yield Category._updateDepreciationTypeInDB(category_id, depType);
-            // Delete Depreciation Type and Depreciation Per Year in category table
-            yield Category._deleteDepreciationPercentInDb(category_id);
-            // Insert DepreciationPerYear of DepreciationPercent
-            if (depType === "Written Down Value") {
-                yield Category._insertDepreciationPercentInDb(category_id, value);
-            }
-        });
-    }
-    static updateCategory(updateJSON, categoryName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Update whatever item is specified in json
-            /*
-            json: an object that could have the following keys: name, parentFolder or depreciaiton
-            Each key contains the new info to use to update that property of a category.
-            The depreciation key contains another object that has depreciation type and value
-            */
-            console.log(1);
-            if ("name" in updateJSON) {
-                yield Category._updateCategoryName(updateJSON.name, categoryName);
-            }
-            console.log(2);
-            if ("parentFolder" in updateJSON) {
-                yield Category._updateCategoryFolder(updateJSON.parentFolder, categoryName);
-            }
-            console.log(3);
-            if ("depreciation" in updateJSON) {
-                yield Category._updateDepreciationType(updateJSON.depreciation.type, updateJSON.depreciation.value, categoryName);
-            }
-            console.log(4);
         });
     }
     // Delete Category

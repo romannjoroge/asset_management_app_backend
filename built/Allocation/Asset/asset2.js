@@ -40,7 +40,7 @@ class Asset {
         this.acquisitionDate = utility.checkIfValidDate(acquisitionDate, "Invalid acquisition date");
         utility.checkIfNumberisPositive(locationID, "Invalid location ID");
         this.locationID = locationID;
-        if (Object.values(assetStatusOptions).includes(condition) == true) {
+        if (Object.values(assetStatusOptions).includes(condition) === true) {
             this.condition = condition;
         }
         else {
