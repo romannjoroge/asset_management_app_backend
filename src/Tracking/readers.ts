@@ -8,6 +8,7 @@ interface ReaderFromDB {
     hardwarekey: string;
     locationid: number;
     deleted: boolean;
+    noantennae: number;
 }
 
 interface ReaderFetchResult {
@@ -15,7 +16,7 @@ interface ReaderFetchResult {
     rows: ReaderFromDB[];
 }
 
-export const createReader = function (hardwareKey: string, locationID: number): Promise<void | never> {
+export const createReader = function (hardwareKey: string, locationID: number, noantennae: number): Promise<void | never> {
     return new Promise((res, rej) => {
         // Check if reader already exists
         pool.query(locationTable.getReader, [hardwareKey]).then((result: ReaderFetchResult) => {
@@ -23,7 +24,7 @@ export const createReader = function (hardwareKey: string, locationID: number): 
                 return rej(new MyError(Errors[39]));
             } else {
                 // Create Reader
-                pool.query(locationTable.createReader, [locationID, hardwareKey]).then(_ => {
+                pool.query(locationTable.createReader, [locationID, hardwareKey, noantennae]).then(_ => {
                     return res();
                 }).catch(err => {
                     console.log(err);

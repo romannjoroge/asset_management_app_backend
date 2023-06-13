@@ -2,7 +2,7 @@ import pool from "../../db2.js";
 import locationTable from "./db_location.js";
 import MyError from "../utility/myError.js";
 import { Errors } from "../utility/constants.js";
-export const createReader = function (hardwareKey, locationID) {
+export const createReader = function (hardwareKey, locationID, noantennae) {
     return new Promise((res, rej) => {
         // Check if reader already exists
         pool.query(locationTable.getReader, [hardwareKey]).then((result) => {
@@ -11,7 +11,7 @@ export const createReader = function (hardwareKey, locationID) {
             }
             else {
                 // Create Reader
-                pool.query(locationTable.createReader, [locationID, hardwareKey]).then(_ => {
+                pool.query(locationTable.createReader, [locationID, hardwareKey, noantennae]).then(_ => {
                     return res();
                 }).catch(err => {
                     console.log(err);
