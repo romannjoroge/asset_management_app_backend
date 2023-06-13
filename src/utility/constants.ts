@@ -53,7 +53,8 @@ export const Errors = {
     '51': "Invalid Attachments",
     '52': "Invalid Residual Value",
     '53': "Invalid Category Details",
-    '54': "Category Already Exists",
+    '54': "Category Already Exists", 
+    '55': "Could Not Create Reader",
 }
 
 export const Succes = {

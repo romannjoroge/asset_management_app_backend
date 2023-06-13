@@ -29,3 +29,7 @@ export async function createTemporaryTable(table) {
 export async function dropTemporaryTable(table) {
     await pool.query(`DROP TABLE IF EXISTS pg_temp.${table}`);
 }
+
+export async function createTestReader(props) {
+    await pool.query(`INSERT INTO RFIDReader (hardwareKey, locationID, id) VALUES ($1, $2, $3)`, [props.hardwareKey, props.locationID, props.id]);
+}

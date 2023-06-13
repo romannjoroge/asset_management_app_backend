@@ -10,11 +10,13 @@ const getTags = `SELECT t.scannedtime, t.epcid AS barcode, r.name AS reader, l.n
                 FROM Tags t JOIN RFIDReader r ON r.id = t.readerid JOIN Location l ON l.id = r.locationid 
                 JOIN Antennae a ON a.id = t.antennae_id WHERE t.scannedtime BETWEEN $1 AND $2`;
 const doesReaderExist = "SELECT * FROM RFIDReader WHERE name = $1 AND locationid = $2";
-const createReader = "INSERT INTO RFIDReader (address, locationID, name) VALUES ($1, $2, $3)";
+const createReader = "INSERT INTO RFIDReader (locationID, hardwareKey) VALUES ($1, $2)";
 const doesAntennaeExist = "SELECT * FROM Antennae WHERE name = $1 AND readerID = $2";
 const createAntennae = "INSERT INTO Antennae (name, readerID, entry) VALUES ($1, $2, $3)";
+const getReader = "SELECT * FROM RFIDReader WHERE hardwareKey = $1";
 
 let locationTable = {
+    getReader,
     getLocation,
     getLocations,
     doesLocationExist,
