@@ -11,7 +11,7 @@ interface ReaderFromDB {
     noantennae: number;
 }
 
-interface ReaderFetchResult {
+export interface ReaderFetchResult {
     rowCount: number;
     rows: ReaderFromDB[];
 }

@@ -31,5 +31,9 @@ export async function dropTemporaryTable(table) {
 }
 
 export async function createTestReader(props) {
-    await pool.query(`INSERT INTO RFIDReader (hardwareKey, locationID, id) VALUES ($1, $2, $3)`, [props.hardwareKey, props.locationID, props.id]);
+    await pool.query(`INSERT INTO RFIDReader (hardwareKey, locationID, id, noAntennae) VALUES ($1, $2, $3, $4)`, [props.hardwareKey, props.locationID, props.id, props.noantennae]);
+}
+
+export async function createTestAntennae(props) {
+    await pool.query("INSERT INTO Antennae (readerID, antennaeno, entry, id) VALUES ($1, $2, $3, $4)", [props.readerid, props.antennaeno, props.entry, props.id]);
 }

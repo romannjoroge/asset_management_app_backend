@@ -55,6 +55,9 @@ export const Errors = {
     '53': "Invalid Category Details",
     '54': "Category Already Exists", 
     '55': "Could Not Create Reader",
+    '56': "Reader Does Not Exist",
+    '57': "Invalid Antennae Number",
+    '58': "Could Not Create Antennae",
 }
 
 export const Succes = {
