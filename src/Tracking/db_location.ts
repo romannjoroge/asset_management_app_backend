@@ -15,8 +15,12 @@ const doesAntennaeExist = "SELECT * FROM Antennae WHERE antennaeno = $1 AND read
 const createAntennae = "INSERT INTO Antennae (antennaeno, readerID, entry) VALUES ($1, $2, $3)";
 const getReader = "SELECT * FROM RFIDReader WHERE hardwareKey = $1";
 const getReaderFromID = "SELECT * FROM RFIDReader WHERE id = $1";
+const getMovementInfo = `SELECT hardwarekey, antno, entry FROM (SELECT t.hardwarekey, t.antno, t.epcid, r.id, a.entry, lag(a.entry) 
+                        OVER (PARTITION BY t.epcid ORDER BY t.scannedtime) AS prev_state FROM Tags t JOIN RFIDReader r ON r.hardwarekey = t.hardwarekey JOIN 
+                        Antennae a ON a.readerid = r.id AND a.antennaeno = t.antno) AS q WHERE entry IS DISTINCT FROM prev_state;`
 
 let locationTable = {
+    getMovementInfo,
     getReaderFromID,
     getReader,
     getLocation,
