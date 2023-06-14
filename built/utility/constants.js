@@ -58,6 +58,7 @@ export const Errors = {
     '56': "Reader Does Not Exist",
     '57': "Invalid Antennae Number",
     '58': "Could Not Create Antennae",
+    '59': "Invalid Leaving Date"
 };
 export const Succes = {
     '1': 'Asset Created Successfuly',
@@ -72,5 +73,6 @@ export const Succes = {
     '10': "Antennae Created",
     '11': "Asset Updated",
     '12': 'Category Updated',
+    '13': 'GatePass Created',
 };
 //# sourceMappingURL=constants.js.map

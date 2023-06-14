@@ -37,3 +37,8 @@ export async function createTestReader(props) {
 export async function createTestAntennae(props) {
     await pool.query("INSERT INTO Antennae (readerID, antennaeno, entry, id) VALUES ($1, $2, $3, $4)", [props.readerid, props.antennaeno, props.entry, props.id]);
 }
+
+export async function createTestUser(props) {
+    await pool.query("INSERT INTO User2 (username, email, password, fname, lname, userType, companyname) VALUES ($1, $2, $3, $4, $5, $6, $7)", [props.username, 
+    props.email, props.password, props.fname, props.lname, props.usertype, props.company])
+}
