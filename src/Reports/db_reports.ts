@@ -21,8 +21,12 @@ const assetsInLocationByCategory = `SELECT c.name, foo.count FROM Category c FUL
 const getAccumulatedAcquisitionCost = "SELECT SUM(acquisitionCost) FROM Asset WHERE locationID = $1 AND acquisitionDate BETWEEN $2 AND $3";
 const getDepreciationDetails = "SELECT c.name, c.depreciationtype, d.percentage FROM Category c FULL Join DepreciationPercent d ON c.id = d.categoryid";
 const depSchedule = "SELECT year, openingBookValue FROM DepreciationSchedule WHERE assetID = $1 ORDER BY year ASC";
+const getAssetRegister = `SELECT a.serialnumber, a.acquisitiondate, a.condition, a.responsibleusername, a.acquisitioncost, a.residualvalue, 
+                        c.name AS category, a.usefullife, a.barcode, a.code, a.noinbuilding, a.description, l.name AS location FROM Asset a FULL JOIN 
+                        Category c ON c.id = a.categoryid FULL JOIN Location l ON l.id = a.locationid`
 
 export default {
+    getAssetRegister,
     physical_valuation,
     depSchedule,
     missingAssets,

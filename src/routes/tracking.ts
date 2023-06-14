@@ -39,9 +39,9 @@ router.get('/children/:id', (req, res) => {
 router.get('/view/:item', (req, res) => {
     const item = req.params.item;
 
-    let query;
+    let query: string;
     let queryArguements;
-    let errorMessage;
+    let errorMessage: string;
 
     if (item == 'location') {
         query = locationTable.getLocationSites;
@@ -51,6 +51,10 @@ router.get('/view/:item', (req, res) => {
         query = locationTable.getSites;
         queryArguements = [];
         errorMessage = Errors[34];
+    } else if (item == 'reader'){
+        query = locationTable.viewReaders;
+        queryArguements = [];
+        errorMessage = Errors[22];
     }else {
         return res.status(400).json({message: Errors[0]})
     }

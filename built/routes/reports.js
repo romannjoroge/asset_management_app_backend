@@ -30,6 +30,10 @@ router.get('/report/:type', (req, res) => {
         query = reportsTable.categoryCount;
         inputs = [];
     }
+    else if (reportType == 'assetRegister') {
+        query = reportsTable.getAssetRegister;
+        inputs = [];
+    }
     else if (reportType == 'audit') {
         try {
             query = logTable.selectUserLogs;

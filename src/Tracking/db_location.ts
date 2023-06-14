@@ -17,9 +17,11 @@ const getReader = "SELECT * FROM RFIDReader WHERE hardwareKey = $1";
 const getReaderFromID = "SELECT * FROM RFIDReader WHERE id = $1";
 const getMovementInfo = `SELECT scannedtime, hardwarekey, antno, entry FROM (SELECT t.scannedtime, t.hardwarekey, t.antno, t.epcid, r.id, a.entry, lag(a.entry) 
                         OVER (PARTITION BY t.epcid ORDER BY t.scannedtime) AS prev_state FROM Tags t JOIN RFIDReader r ON r.hardwarekey = t.hardwarekey JOIN Antennae a 
-                        ON a.readerid = r.id AND a.antennaeno = t.antno) AS q WHERE entry IS DISTINCT FROM prev_state`
+                        ON a.readerid = r.id AND a.antennaeno = t.antno) AS q WHERE entry IS DISTINCT FROM prev_state`;;
+const viewReaders = "SELECT r.id, r.hardwarekey, r.noantennae, l.name AS location FROM RFIDReader r JOIN Location l ON l.id = r.locationid";
 
 let locationTable = {
+    viewReaders,
     getMovementInfo,
     getReaderFromID,
     getReader,

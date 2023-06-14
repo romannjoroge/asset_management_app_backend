@@ -47,6 +47,11 @@ router.get('/view/:item', (req, res) => {
         queryArguements = [];
         errorMessage = Errors[34];
     }
+    else if (item == 'reader') {
+        query = locationTable.viewReaders;
+        queryArguements = [];
+        errorMessage = Errors[22];
+    }
     else {
         return res.status(400).json({ message: Errors[0] });
     }
