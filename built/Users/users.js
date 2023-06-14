@@ -16,7 +16,7 @@ class User {
     static checkIfUserExists(username) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((res, rej) => {
-                pool.query(userTable.checkIfUserInDB, [username]).then(data => {
+                pool.query(userTable.checkIfUserInDB, [username]).then((data) => {
                     if (data.rowCount > 0) {
                         res(true);
                     }

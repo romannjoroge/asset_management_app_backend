@@ -115,16 +115,17 @@ CREATE TABLE AssetValuationHistory(
       REFERENCES Asset(assetID)
 );
 
-CREATE TABLE "GatePass" (
-  "ID" serial,
-  "expectedTime" timestamptz,
-  "entry" boolean,
-  "username" varchar(50),
-  "reason" text,
-  PRIMARY KEY ("ID"),
+CREATE TABLE GatePass (
+  ID serial,
+  expectedTime timestamptz,
+  entry boolean,
+  username varchar(50),
+  reason text,
+  deleted boolean DEFAULT false,
+  PRIMARY KEY (ID),
   CONSTRAINT "FK_GatePass.username"
-    FOREIGN KEY ("username")
-      REFERENCES "User2"("username")
+    FOREIGN KEY (username)
+      REFERENCES User2(username)
 );
 
 CREATE TABLE Asset (
@@ -151,6 +152,19 @@ CREATE TABLE Asset (
   CONSTRAINT "FK_Asset.custodianID"
     FOREIGN KEY (custodianName)
       REFERENCES User2(username)
+);
+
+CREATE TABLE GatePassAsset (
+  gatePassID int,
+  assetID int,
+  deleted boolean DEFAULT false,
+  PRIMARY KEY (gatePassID, assetID),
+  CONSTRAINT "FK_GatePassAsset.gatePassID"
+    FOREIGN KEY (gatePassID)
+      REFERENCES GatePass(ID),
+  CONSTRAINT "FK_GatePassAsset.assetTag"
+    FOREIGN KEY (assetID)
+      REFERENCES Asset(assetID)
 );
 
 CREATE TABLE Asset_File (

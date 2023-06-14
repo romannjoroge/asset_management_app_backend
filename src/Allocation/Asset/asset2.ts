@@ -25,6 +25,11 @@ export enum assetStatusOptions {
     Fair = "Fair"
 }
 
+interface DoesAssetExistFetchResult {
+    rowCount: number;
+    rows: string[];
+}
+
 class Asset {
     barcode: string;
     assetLifeSpan: number;
@@ -161,19 +166,17 @@ class Asset {
         })
     }
 
-    static async _doesAssetIDExist(assetID) {
-        let fetchResult;
-        try {
-            fetchResult = await pool.query(assetTable.doesAssetTagExist, [assetID]);
-        } catch (err) {
-            throw new MyError("Could Not Verify Asset Tag");
-        }
-
-        if (utility.isFetchResultEmpty(fetchResult)) {
-            return false;
-        } else {
-            return true;
-        }
+    static async _doesAssetIDExist(assetID: number): Promise<boolean | never> {
+        return new Promise((res, rej) => {
+            pool.query(assetTable.doesAssetTagExist, [assetID]).then((fetchResult: DoesAssetExistFetchResult) => {
+                if (fetchResult.rowCount <= 0) {
+                    return res(false);
+                }
+                return res(true);
+            }).catch(err => {
+                return rej(new MyError(Errors[9]));
+            });
+        });
     }
 
     static _doesBarCodeExist(barCode: string): Promise<boolean> {

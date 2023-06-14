@@ -4,9 +4,22 @@ import pool from '../../db2.js';
 // Importing custom classes
 import userTable from './db_users.js'
 
-interface UserInDB {
-    username: string,
+interface UserFromDB {
+    fname: string;
+    lname: string;
+    email: string;
+    password: string;
+    username: string;
+    companyname: string;
+    usertype: number;
+    delete: boolean
 }
+
+interface UserFetchResult {
+    rowCount: number;
+    rows: UserFromDB[]
+}
+
 
 
 class User {
@@ -14,7 +27,7 @@ class User {
 
     static async checkIfUserExists(username: string): Promise<boolean> {
         return new Promise((res, rej) => {
-            pool.query(userTable.checkIfUserInDB, [username]).then(data => {
+            pool.query(userTable.checkIfUserInDB, [username]).then((data: UserFetchResult) => {
                 if (data.rowCount > 0) {
                     res(true);
                 } else {

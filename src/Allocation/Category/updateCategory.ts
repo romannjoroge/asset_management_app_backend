@@ -44,7 +44,6 @@ export default function updateCategory(categoryID: number, updateJSON: UpdateCat
             function updateItems(props: UpdateCategoryJSON): Promise<void | never> {
                 return new Promise((res, rej) => {
                     if ("name" in props) {
-                        console.log("Name is here!")
                         if (props.name === undefined) {
                             return rej(new MyError(Errors[53]));
                         }
@@ -60,7 +59,6 @@ export default function updateCategory(categoryID: number, updateJSON: UpdateCat
                     }
         
                     if ("parentcategoryid" in props) {
-                        console.log("parent category id is here")
                         if (props.parentcategoryid === undefined) {
                             return rej(new MyError(Errors[53]));
                         }
@@ -106,7 +104,6 @@ function _updateDepreciationType(props: Depreciation, categoryID: number): Promi
 
             // Update Depreciation Type in Category Table
             _updateInDb(categoryID, {depreciationtype: props}).then(() => {
-                console.log("Depreciation type is done")
                 return res();
             }).catch(err => {
                 return rej(new MyError(Errors[9]));
@@ -126,7 +123,6 @@ function _updateParentCategory(newParentID: number, categoryID: number): Promise
             }
             // Update database
             _updateInDb(categoryID, {parentcategoryid: newParentID}).then(() => {
-                console.log("Parent category is done")
                 return res();
             }).catch(err => {
                 return rej(new MyError(Errors[9]));
@@ -143,7 +139,6 @@ function _updateCategoryName(newName: string, categoryID: number): Promise<void 
         Category.verifyCategoryName(newName).then(() => {
             // Update database
             _updateInDb(categoryID, {name: newName}).then(() => {
-                console.log("Name is done")
                 return res();
             }).catch(err => {
                 return rej(new MyError(Errors[9]));

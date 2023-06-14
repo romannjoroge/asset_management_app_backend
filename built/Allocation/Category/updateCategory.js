@@ -28,7 +28,6 @@ export default function updateCategory(categoryID, updateJSON) {
             function updateItems(props) {
                 return new Promise((res, rej) => {
                     if ("name" in props) {
-                        console.log("Name is here!");
                         if (props.name === undefined) {
                             return rej(new MyError(Errors[53]));
                         }
@@ -44,7 +43,6 @@ export default function updateCategory(categoryID, updateJSON) {
                         });
                     }
                     if ("parentcategoryid" in props) {
-                        console.log("parent category id is here");
                         if (props.parentcategoryid === undefined) {
                             return rej(new MyError(Errors[53]));
                         }
@@ -88,7 +86,6 @@ function _updateDepreciationType(props, categoryID) {
             Category.verifyDepreciationDetails(props);
             // Update Depreciation Type in Category Table
             _updateInDb(categoryID, { depreciationtype: props }).then(() => {
-                console.log("Depreciation type is done");
                 return res();
             }).catch(err => {
                 return rej(new MyError(Errors[9]));
@@ -108,7 +105,6 @@ function _updateParentCategory(newParentID, categoryID) {
             }
             // Update database
             _updateInDb(categoryID, { parentcategoryid: newParentID }).then(() => {
-                console.log("Parent category is done");
                 return res();
             }).catch(err => {
                 return rej(new MyError(Errors[9]));
@@ -124,7 +120,6 @@ function _updateCategoryName(newName, categoryID) {
         Category.verifyCategoryName(newName).then(() => {
             // Update database
             _updateInDb(categoryID, { name: newName }).then(() => {
-                console.log("Name is done");
                 return res();
             }).catch(err => {
                 return rej(new MyError(Errors[9]));
