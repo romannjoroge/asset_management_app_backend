@@ -4,6 +4,8 @@ import pool from '../../db2.js';
 import locationTable from '../Tracking/db_location.js';
 import { Errors, Succes } from '../utility/constants.js';
 import reportsTable from '../Reports/db_reports.js';
+import { createAntennae } from '../Tracking/antennae.js';
+import { createReader } from '../Tracking/readers.js';
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
     pool.query(locationTable.getLocations, []).then((data) => {
@@ -83,27 +85,6 @@ router.post('/create/:item', (req, res) => {
         createItemParams = [name, county, city, address, companyName];
         successMessage = Succes[6];
     }
-    else if (item == 'reader') {
-        let { address, locationID, name } = req.body;
-        address = Number.parseInt(address);
-        locationID = Number.parseInt(locationID);
-        itemExistParams = [name, locationID];
-        itemExistQuery = locationTable.doesReaderExist;
-        ExistErrorMessage = Errors[39];
-        createItemQuery = locationTable.createReader;
-        createItemParams = [address, locationID, name];
-        successMessage = Succes[9];
-    }
-    else if (item == 'antennae') {
-        let { readerID, name, entry } = req.body;
-        readerID = Number.parseInt(readerID);
-        itemExistParams = [name, readerID];
-        itemExistQuery = locationTable.doesAntennaeExist;
-        ExistErrorMessage = Errors[40];
-        createItemQuery = locationTable.createAntennae;
-        createItemParams = [name, readerID, entry];
-        successMessage = Succes[10];
-    }
     else {
         return res.status(400).json({ message: Errors[0] });
     }
@@ -123,6 +104,34 @@ router.post('/create/:item', (req, res) => {
     }).catch(err => {
         console.log(err);
         return res.status(500).json({ message: Errors[9] });
+    });
+});
+// Route for creating an antenna
+router.post('/createAntennae', (req, res) => {
+    // Get Data From Request
+    let antennaeno = Number.parseInt(req.body.antennaeno);
+    let readerID = Number.parseInt(req.body.readerID);
+    let entry = req.body.entry;
+    // Create Antennae
+    createAntennae(antennaeno, readerID, entry).then(_ => {
+        return res.json({ message: Succes[10] });
+    }).catch(err => {
+        console.log(err);
+        return res.status(400).json({ message: err.message });
+    });
+});
+// Route for creating a reader
+router.post('/createReader', (req, res) => {
+    // Get Data From Request
+    let hardwareKey = req.body.hardwareKey;
+    let locationID = Number.parseInt(req.body.locationID);
+    let noantennae = Number.parseInt(req.body.noantennae);
+    // Call Create Reader
+    createReader(hardwareKey, locationID, noantennae).then(_ => {
+        return res.json({ message: Succes[9] });
+    }).catch(err => {
+        console.log(err);
+        return res.status(400).json({ message: err.message });
     });
 });
 router.route('*', (req, res) => {

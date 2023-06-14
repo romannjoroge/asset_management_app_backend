@@ -134,16 +134,19 @@ class Asset {
     }
     static _doesAssetIDExist(assetID) {
         return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((res, rej) => {
-                pool.query(assetTable.doesAssetTagExist, [assetID]).then((fetchResult) => {
-                    if (fetchResult.rowCount <= 0) {
-                        return res(false);
-                    }
-                    return res(true);
-                }).catch(err => {
-                    return rej(new MyError(Errors[9]));
-                });
-            });
+            let fetchResult;
+            try {
+                fetchResult = yield pool.query(assetTable.doesAssetTagExist, [assetID]);
+            }
+            catch (err) {
+                throw new MyError("Could Not Verify Asset Tag");
+            }
+            if (utility.isFetchResultEmpty(fetchResult)) {
+                return false;
+            }
+            else {
+                return true;
+            }
         });
     }
     static _doesBarCodeExist(barCode) {

@@ -26,8 +26,10 @@ export const filterAssetByDetails = (prop) => {
         }
         // Return Nothing if category does not exist
         else if (categoryID) {
+            console.log(categoryID);
             // Return data for category
             pool.query(assetTable.filterAssetsByCategory, [categoryID]).then((data) => {
+                console.log(data.rows);
                 return res(data.rows);
             }).catch(err => {
                 console.log(err);
