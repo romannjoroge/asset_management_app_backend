@@ -15,7 +15,7 @@ const getCategory = `SELECT c.name, c.depreciationtype, f.name AS parentfolder F
                     c.parentfolderid = f.id WHERE c.name=$1`;
 const addChild = "INSERT INTO parentChildCategory (parentID, childID) VALUES ($1, $2)";
 const getAllCategories2 = `
-                        SELECT c.name AS category, c.depreciationtype, d.percentage, (SELECT name AS parent FROM Category WHERE id = c.parentCategoryID) 
+                        SELECT c.name AS category, c.id, c.depreciationtype, d.percentage, (SELECT name AS parent FROM Category WHERE id = c.parentCategoryID) 
                         FROM Category c FULL JOIN DepreciationPercent d ON d.categoryID = c.id
 `;
 let categoryTable = {
