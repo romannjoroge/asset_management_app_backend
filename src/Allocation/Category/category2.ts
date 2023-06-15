@@ -150,7 +150,7 @@ class Category {
                 }
             }
         } else {
-            if (props.value !== null) {
+            if (props.value) {
                 throw new MyError(Errors[50]);
             }
         }

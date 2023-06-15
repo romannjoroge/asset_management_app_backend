@@ -81,6 +81,7 @@ router.put('/update', (req, res) => {
     if (updateBodyFromJSON.name) {
         updateBody.name = updateBodyFromJSON.name;
     }
+    console.log(updateBody);
     updateCategory(id, updateBody).then(() => {
         return res.json({
             message: Succes[12],

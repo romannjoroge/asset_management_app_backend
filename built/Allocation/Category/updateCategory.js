@@ -58,6 +58,7 @@ export default function updateCategory(categoryID, updateJSON) {
                         });
                     }
                     if ("depreciationtype" in props) {
+                        console.log(props.depreciationtype);
                         if (props.depreciationtype === undefined) {
                             return rej(new MyError(Errors[53]));
                         }
@@ -178,6 +179,9 @@ function _updateInDb(categoryID, updateDetails) {
                             }).catch(err => {
                                 return rej(new MyError(Errors[9]));
                             });
+                        }
+                        else {
+                            return res();
                         }
                     }).catch(err => {
                         return rej(new MyError(Errors[9]));

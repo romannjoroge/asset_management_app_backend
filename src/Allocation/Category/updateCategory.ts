@@ -74,6 +74,7 @@ export default function updateCategory(categoryID: number, updateJSON: UpdateCat
                     }
 
                     if ("depreciationtype" in props) {
+                        console.log(props.depreciationtype)
                         if (props.depreciationtype === undefined) {
                             return rej(new MyError(Errors[53]));
                         }
@@ -101,7 +102,6 @@ function _updateDepreciationType(props: Depreciation, categoryID: number): Promi
         try {
             // Verify Depreciation Details
             Category.verifyDepreciationDetails(props);
-
             // Update Depreciation Type in Category Table
             _updateInDb(categoryID, {depreciationtype: props}).then(() => {
                 return res();
@@ -197,6 +197,8 @@ function _updateInDb(categoryID: number, updateDetails: UpdateCategoryJSON): Pro
                             }).catch(err => {
                                 return rej(new MyError(Errors[9]));
                             });
+                        } else {
+                            return res();
                         }
                     }).catch(err => {
                         return rej(new MyError(Errors[9]));
