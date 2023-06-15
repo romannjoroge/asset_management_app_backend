@@ -95,6 +95,12 @@ router.put('/update', (req, res) => {
     let updateBodyFromJSON: UpdateCategoryFromJSON = req.body.updateBody;
     let id: number = Number.parseInt(req.body.id);
 
+    console.log("\n\nRequest Body\n\n");
+    console.log(req.body);
+    console.log("\n\n");
+    console.log("\n\nUpdate Body\n\n");
+    console.log(updateBodyFromJSON);
+    console.log("\n\n");
     if(updateBodyFromJSON.depreciationtype) {
         updateBody.depreciationtype = {type: updateBodyFromJSON.depreciationtype.type};
         if(updateBodyFromJSON.depreciationtype.value) {
@@ -110,7 +116,6 @@ router.put('/update', (req, res) => {
         updateBody.name = updateBodyFromJSON.name;
     }
     
-    console.log(updateBody);
     updateCategory(id, updateBody).then(() => {
         return res.json({
             message: Succes[12],
