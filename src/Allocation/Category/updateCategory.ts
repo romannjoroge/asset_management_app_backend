@@ -26,6 +26,10 @@ export default function updateCategory(categoryID: number, updateJSON: UpdateCat
     
     // Return an error if categoryID doesn't exist
     return new Promise((res, rej) => {
+        console.log("\n\nCategory is being updated\n\n")
+        console.log(updateJSON);
+        console.log(categoryID);
+        console.log("\n\n");
         Category._doesCategoryIDExist(categoryID).then((doesCategExist) => {
             if (doesCategExist === false) {
                 return rej(new MyError(Errors[5]));
