@@ -34,7 +34,7 @@ class Category {
         else {
             this.parentCategoryID = parentCategoryID;
         }
-        Category.verifyDepreciationDetails(depreciationType, depreciationPercentage);
+        Category.verifyDepreciationDetails({ type: depreciationType, value: depreciationPercentage });
         this.depreciaitionType = depreciationType;
         this.depreciationPercentage = depreciationPercentage;
     }

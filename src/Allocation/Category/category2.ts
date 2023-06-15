@@ -13,8 +13,13 @@ import { Depreciation } from './updateCategory.js';
 
 
 class Category {
+    categoryName: string;
+    parentCategoryID: number;
+    depreciaitionType: string;
+    depreciationPercentage?: number;
+
     // Constructor
-    constructor(categoryName, parentCategoryID, depreciationType, depreciationPercentage) {
+    constructor(categoryName: string, parentCategoryID: number, depreciationType: string, depreciationPercentage: number) {
         if (utility.isAnyEmpty([categoryName, parentCategoryID, depreciationType])) {
             throw new MyError("Missing Information");
         }
@@ -31,13 +36,13 @@ class Category {
             this.parentCategoryID = parentCategoryID;
         }
 
-        Category.verifyDepreciationDetails(depreciationType, depreciationPercentage);
+        Category.verifyDepreciationDetails({type: depreciationType, value: depreciationPercentage});
         this.depreciaitionType = depreciationType;
         this.depreciationPercentage = depreciationPercentage;
     }
 
     // Function that saves category in the database
-    static async _saveCategoryInDb(categoryName, parentCategoryID, depreciationType, depreciationPercentage) {
+    static async _saveCategoryInDb(categoryName: string, parentCategoryID: number, depreciationType: string, depreciationPercentage: number) {
         // Create category
         pool.query(categoryTable.add, [categoryName, depreciationType, parentCategoryID]).then(_ => {
             if (depreciationPercentage) {
