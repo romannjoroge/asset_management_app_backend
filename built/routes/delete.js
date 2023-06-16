@@ -7,8 +7,7 @@ const router = express.Router();
 import { Errors } from '../utility/constants.js';
 router.delete('/delete/:item', (req, res) => {
     let item = req.params.item;
-    let { id } = req.query;
-    id = Number.parseInt(id);
+    let id = Number.parseInt(req.query.id);
     let table;
     let query;
     let arguements;

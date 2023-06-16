@@ -4,7 +4,7 @@ const doesLocationExist = "SELECT * FROM Location WHERE name = $1 AND parentLoca
 const createLocation = "INSERT INTO Location (name, companyname, parentLocationID) VALUES ($1, $2, (SELECT id FROM Location WHERE name = $3 AND companyName=$4))";
 const doesSiteExist = "SELECT * FROM Site WHERE name = $1 AND companyName = $2";
 const createSite = "INSERT INTO Site (name, county, city, address, companyname) VALUES ($1, $2, $3, $4, $5)";
-const getLocationSites = "SELECT l1.name AS location, l1.id AS locationid, l2.name AS parent, l2.id AS parentid FROM Location l1 LEFT JOIN Location l2 ON l1.parentlocationid = l2.id";
+const getLocationSites = "SELECT l1.name AS location, l1.id AS locationid, l2.name AS parent, l2.id AS parentid FROM Location l1 LEFT JOIN Location l2 ON l1.parentlocationid = l2.id WHERE l1.deleted = false";
 const getSites = "SELECT name, id FROM Location WHERE parentLocationID IS NULL";
 const getTags = `SELECT t.scannedtime, t.epcid AS barcode, r.name AS reader, l.name AS location, a.entry 
                 FROM Tags t JOIN RFIDReader r ON r.id = t.readerid JOIN Location l ON l.id = r.locationid 
