@@ -28,6 +28,17 @@ class Location {
             return (fetchResult.rowCount > 0);
         });
     }
+    static doesLocationNameExist(name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((res, rej) => {
+                pool.query(locationTable.doesLocationExist, [name]).then((result) => {
+                    return res(result.rowCount > 0);
+                }).catch(err => {
+                    return rej(new MyError(Errors[9]));
+                });
+            });
+        });
+    }
 }
 export default Location;
 //# sourceMappingURL=location.js.map

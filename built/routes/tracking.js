@@ -6,6 +6,7 @@ import { Errors, Succes } from '../utility/constants.js';
 import reportsTable from '../Reports/db_reports.js';
 import { createAntennae } from '../Tracking/antennae.js';
 import { createReader } from '../Tracking/readers.js';
+import { updateLocation } from '../Tracking/update.js';
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
     pool.query(locationTable.getLocations, []).then((data) => {
@@ -120,6 +121,26 @@ router.post('/createAntennae', (req, res) => {
     // Create Antennae
     createAntennae(antennaeno, readerID, entry).then(_ => {
         return res.json({ message: Succes[10] });
+    }).catch(err => {
+        console.log(err);
+        return res.status(400).json({ message: err.message });
+    });
+});
+router.put('/updateLocation', (req, res) => {
+    // Get Data From Request
+    let locationID = Number.parseInt(req.body.id);
+    let updateJSON = req.body.updateJSON;
+    // Verify data
+    let updateLocationJSON = {};
+    if (updateJSON.name) {
+        updateLocationJSON.name = updateJSON.name;
+    }
+    if (updateJSON.parentlocationid) {
+        updateLocationJSON.parentlocationid = Number.parseInt(updateJSON.parentlocationid);
+    }
+    // Update Location
+    updateLocation(locationID, updateLocationJSON).then(_ => {
+        return res.json({ message: Succes[14] });
     }).catch(err => {
         console.log(err);
         return res.status(400).json({ message: err.message });

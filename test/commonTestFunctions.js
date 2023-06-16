@@ -15,7 +15,7 @@ export async function createCategory(props) {
 }
 
 export async function createLocation(props) {
-    await pool.query(`INSERT INTO Location (id, name, parentlocationid, companyname) VALUES ($1, $2, $3, 'TestCompany')`, [props.id, props.name, props.parentLocationID]);
+    await pool.query(`INSERT INTO Location (id, name, parentlocationid, companyname) VALUES ($1, $2, $3, 'TestCompany')`, [props.id, props.name, props.parentlocationid]);
 }
 
 export async function createDepreciationPercent(props) {
