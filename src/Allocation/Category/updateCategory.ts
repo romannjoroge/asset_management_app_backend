@@ -41,8 +41,11 @@ export default function updateCategory(categoryID: number, updateJSON: UpdateCat
             Promise.all(promises).then(() => {
                 return res();
             }).catch(err => {
-                console.log(err);
-                return rej(new MyError(Errors[9]));
+                if (err instanceof MyError) {
+                    return rej(err);
+                } else {
+                    return rej(new MyError(Errors[9]));
+                }
             });
 
             function updateItems(props: UpdateCategoryJSON): Promise<void | never> {
