@@ -74,5 +74,6 @@ export const Succes = {
     '11': "Asset Updated",
     '12': 'Category Updated',
     '13': 'GatePass Created',
+    '14': 'Location Updated',
 };
 //# sourceMappingURL=constants.js.map
