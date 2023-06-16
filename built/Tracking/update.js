@@ -10,11 +10,23 @@ export function updateLocation(locationID, updateJSON) {
             if (exists === false) {
                 return rej(new MyError(Errors[3]));
             }
-            // Update each value in the updateJSON
+            // Verify each item in updateJSON
             let promises = [];
-            Object.entries(updateJSON).forEach(([key2, value]) => promises.push(updateItems({ [key2]: value })));
+            Object.entries(updateJSON).forEach(([key2, value]) => promises.push(_verify({ [key2]: value }, locationID)));
             Promise.all(promises).then(() => {
-                return res();
+                // Update Each item
+                let promises2 = [];
+                Object.entries(updateJSON).forEach(([key2, value]) => promises2.push(_updateInDb(locationID, { [key2]: value })));
+                Promise.all(promises2).then(() => {
+                    return res();
+                }).catch(err => {
+                    if (err instanceof MyError) {
+                        return rej(err);
+                    }
+                    else {
+                        return rej(new MyError(Errors[9]));
+                    }
+                });
             }).catch(err => {
                 if (err instanceof MyError) {
                     return rej(err);
@@ -23,60 +35,8 @@ export function updateLocation(locationID, updateJSON) {
                     return rej(new MyError(Errors[9]));
                 }
             });
-            function updateItems(props) {
-                return new Promise((res, rej) => {
-                    if ("name" in props) {
-                        if (props.name === undefined) {
-                            return rej(new MyError(Errors[53]));
-                        }
-                        _updateLocationName(props.name, locationID).then(() => {
-                            return res();
-                        }).catch(err => {
-                            if (err instanceof MyError) {
-                                return rej(err);
-                            }
-                            else {
-                                return rej(new MyError(Errors[9]));
-                            }
-                        });
-                    }
-                    if ("parentlocationid" in props) {
-                        if (props.parentlocationid === undefined) {
-                            return rej(new MyError(Errors[53]));
-                        }
-                        _updateParentLocation(props.parentlocationid, locationID).then(() => {
-                            return res();
-                        }).catch(err => {
-                            if (err instanceof MyError) {
-                                return rej(err);
-                            }
-                            else {
-                                return rej(new MyError(Errors[9]));
-                            }
-                        });
-                    }
-                });
-            }
         }).catch((err) => {
             return rej(err);
-        });
-    });
-}
-function _updateLocationName(name, locationID) {
-    return new Promise((res, rej) => {
-        // Check if location name already exists in the parent location
-        pool.query(locationTable.doesLocationNameExist, [name, locationID]).then((result) => {
-            if (result.rowCount > 0) {
-                return rej(new MyError(Errors[32]));
-            }
-            // Update location name
-            _updateInDb(locationID, { name }).then(() => {
-                return res();
-            }).catch(err => {
-                return rej(err);
-            });
-        }).catch(err => {
-            return rej(new MyError(Errors[9]));
         });
     });
 }
@@ -84,11 +44,11 @@ function _updateInDb(locationID, updateJSON) {
     return new Promise((res, rej) => {
         let updateQuery;
         let inputs;
-        if ('name' in updateJSON) {
+        if (updateJSON.name) {
             updateQuery = "UPDATE Location SET name = $1 WHERE id = $2";
             inputs = [updateJSON.name, locationID];
         }
-        else if ('parentlocationid' in updateJSON) {
+        else if (updateJSON.parentlocationid) {
             updateQuery = "UPDATE Location SET parentlocationid = $1 WHERE id = $2";
             inputs = [updateJSON.parentlocationid, locationID];
         }
@@ -103,22 +63,35 @@ function _updateInDb(locationID, updateJSON) {
         });
     });
 }
-function _updateParentLocation(parentLocationID, locationID) {
+function _verify(updateDetails, locationID) {
     return new Promise((res, rej) => {
-        // Check if parent location exists
-        Location.verifyLocationID(parentLocationID).then(exist => {
-            if (exist === false) {
-                return rej(new MyError(Errors[3]));
-            }
-            // Update database
-            _updateInDb(locationID, { parentlocationid: parentLocationID }).then(() => {
+        if (updateDetails.name) {
+            // Check if location name already exists in the parent location
+            pool.query(locationTable.doesLocationNameExist, [updateDetails.name, locationID]).then((result) => {
+                if (result.rowCount > 0) {
+                    return rej(new MyError(Errors[32]));
+                }
                 return res();
             }).catch(err => {
                 return rej(new MyError(Errors[9]));
             });
-        }).catch(err => {
-            return rej(new MyError(Errors[9]));
-        });
+        }
+        if (updateDetails.parentlocationid) {
+            // Check if parent location exists
+            Location.verifyLocationID(updateDetails.parentlocationid).then(exist => {
+                if (exist === false) {
+                    return rej(new MyError(Errors[3]));
+                }
+                return res();
+            }).catch(err => {
+                if (err instanceof MyError) {
+                    return rej(err);
+                }
+                else {
+                    return rej(new MyError(Errors[9]));
+                }
+            });
+        }
     });
 }
 //# sourceMappingURL=update.js.map

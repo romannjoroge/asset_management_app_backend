@@ -19,7 +19,7 @@ const getMovementInfo = `SELECT scannedtime, hardwarekey, antno, entry FROM (SEL
                         OVER (PARTITION BY t.epcid ORDER BY t.scannedtime) AS prev_state FROM Tags t JOIN RFIDReader r ON r.hardwarekey = t.hardwarekey JOIN Antennae a 
                         ON a.readerid = r.id AND a.antennaeno = t.antno) AS q WHERE entry IS DISTINCT FROM prev_state`;;
 const viewReaders = "SELECT r.id, r.hardwarekey, r.noantennae, l.name AS location FROM RFIDReader r JOIN Location l ON l.id = r.locationid";
-const doesLocationNameExist = "SELECT * FROM Location WHERE name = $1 AND parentLocationID = $2";
+const doesLocationNameExist = "SELECT * FROM Location WHERE name = $1 AND parentlocationid IN (SELECT parentlocationid FROM Location WHERE id = $2)";
 
 let locationTable = {
     doesLocationNameExist,
