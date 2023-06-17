@@ -4,6 +4,8 @@ import { Errors, Succes } from '../utility/constants.js';
 const router = express.Router();
 import pool from '../../db2.js';
 import { assignGatePass } from '../GatePass/assignGatepass.js';
+import Asset from '../Allocation/Asset/asset2.js';
+import MyError from '../utility/myError.js';
 
 router.get('/movements', (req, res) => {
     let {
@@ -34,7 +36,7 @@ router.get('/movements', (req, res) => {
 
 // Route for creating a gatepass
 router.post('/create', (req, res) => {
-    let assetIDs: string[] = req.body.assetIDs;
+    let barcodes: string[] = req.body.barcodes;
     let username: string = req.body.username;
     let reason: string = req.body.reason;
     let leavingTime: string = req.body.leavingTime;
@@ -46,21 +48,42 @@ router.post('/create', (req, res) => {
     let returnTimeToAdd: Date;
 
     try {
-        // Convert Types to valid types
-        assetIDsToAdd = assetIDs.map((elem) => parseInt(elem));
         leavingTimeToAdd = utility.checkIfValidDate(leavingTime, "Invalid Leaving Time");
         returnTimeToAdd = utility.checkIfValidDate(returnTime, "Invalid Return Time");
     } catch(err) {
         console.log(err);
-        return res.status(400).json({message: err.message});
+        if (err instanceof MyError) {
+            return res.status(400).json({message: err.message});
+        } else {
+            return res.status(400).json({message: Errors[9]});
+        }
     }
 
-    // Add GatePass
-    assignGatePass(assetIDsToAdd, username, reason, leavingTimeToAdd, returnTimeToAdd, entry).then(_ => {
-        return res.json({message: Succes[13]});
+    // Convert barcodes to assetIDs
+    let promises: Promise<number>[] = [];
+    barcodes.forEach(barcode => {
+        promises.push(Asset._getAssetID(barcode));
+    });
+
+    Promise.all(promises).then(data => {
+        assetIDsToAdd = data;
+        // Add GatePass
+        assignGatePass(assetIDsToAdd, username, reason, leavingTimeToAdd, returnTimeToAdd, entry).then(_ => {
+            return res.json({message: Succes[13]});
+        }).catch(err => {
+            console.log(err);
+            if (err instanceof MyError) {
+                return res.status(400).json({message: err.message});
+            } else {
+                return res.status(400).json({message: Errors[9]});
+            }
+        });
     }).catch(err => {
-        console.log(err);
-        return res.status(400).json({message: err.message});
+        if (err instanceof MyError) {
+            return res.status(400).json({message: err.message});
+        } else {
+            return res.status(400).json({message: Errors[9]});
+        }
     });
 });
 
