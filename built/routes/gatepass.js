@@ -6,6 +6,7 @@ import pool from '../../db2.js';
 import { assignGatePass } from '../GatePass/assignGatepass.js';
 import Asset from '../Allocation/Asset/asset2.js';
 import MyError from '../utility/myError.js';
+import locationTable from '../Tracking/db_location.js';
 router.get('/movements', (req, res) => {
     let { from, to } = req.query;
     // Check if they are valid dates
@@ -25,6 +26,14 @@ router.get('/movements', (req, res) => {
         return res.json(data.rows);
     }).catch(err => {
         console.log(err);
+        return res.status(400).json({ message: Errors[9] });
+    });
+});
+router.get('/getReaders', (req, res) => {
+    // Call DB to get all readers
+    pool.query(locationTable.viewReaders).then(data => {
+        return res.json(data.rows);
+    }).catch(err => {
         return res.status(400).json({ message: Errors[9] });
     });
 });

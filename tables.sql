@@ -306,6 +306,20 @@ CREATE TABLE Antennae(
   PRIMARY KEY (id)
 );
 
+CREATE TABLE GatePass (
+  id serial,
+  leavingtime timestamptz,
+  arrivingtime timestamptz,
+  entry boolean,
+  username varchar(50),
+  reason text,
+  deleted boolean DEFAULT false,
+  PRIMARY KEY (ID),
+  CONSTRAINT "FK_GatePass.username"
+    FOREIGN KEY (username)
+      REFERENCES User2(username)
+);
+
 
 -- Creates the home folder when the database is created. This is the topmost folder in the system
 INSERT INTO Folder(name) VALUES('home');
