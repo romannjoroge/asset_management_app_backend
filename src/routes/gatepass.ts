@@ -44,6 +44,15 @@ router.get('/getReaders', (req, res) => {
     });
 });
 
+router.get('/getAntennae', (req, res) => {
+    // Call DB to get all antennae
+    pool.query(locationTable.getAntennaes).then(data => {
+        return res.json(data.rows);
+    }).catch(err => {
+        return res.status(400).json({message: Errors[9]});
+    });
+});
+
 // Route for creating a gatepass
 router.post('/create', (req, res) => {
     let barcodes: string[] = req.body.barcodes;
