@@ -37,6 +37,14 @@ router.get('/getReaders', (req, res) => {
         return res.status(400).json({ message: Errors[9] });
     });
 });
+router.get('/readerIDs', (req, res) => {
+    // Call DB and return response
+    pool.query(locationTable.readerIDs).then(data => {
+        return res.json(data.rows);
+    }).catch(err => {
+        return res.status(400).json({ message: Errors[9] });
+    });
+});
 router.get('/getAntennae', (req, res) => {
     // Call DB to get all antennae
     pool.query(locationTable.getAntennaes).then(data => {
