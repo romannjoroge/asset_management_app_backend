@@ -90,7 +90,28 @@ function _verify(updateDetails, readerID) {
             });
         }
         if (updateDetails.noantennae) {
-            return res();
+            let antenaeno = updateDetails.noantennae;
+            pool.query(locationTable.getReaderFromID, [readerID]).then((result) => {
+                if (result.rowCount <= 0) {
+                    return rej(new MyError(Errors[56]));
+                }
+                if (antenaeno > result.rows[0].noantennae) {
+                    return rej(new MyError(Errors[57]));
+                }
+                // Check that it isn't already taken
+                pool.query(locationTable.checkIfAntennaeNumberTaken, [readerID, antenaeno]).then((result) => {
+                    if (result.rowCount > 0) {
+                        return rej(new MyError(Errors[40]));
+                    }
+                    return res();
+                }).catch(err => {
+                    console.log(err);
+                    return rej(new MyError(Errors[61]));
+                });
+            }).catch(err => {
+                console.log(err);
+                return rej(new MyError(Errors[61]));
+            });
         }
     });
 }
