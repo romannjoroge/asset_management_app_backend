@@ -17,6 +17,7 @@ describe("Create Reader Tests", function () {
 
     beforeEach(async function () {
         try{
+            await dropTemporaryTable("RFIDReader");
             await createTemporaryTable("RFIDReader");
             await createTestReader(existingReader);
         } catch (err) {

@@ -58,7 +58,10 @@ export const Errors = {
     '56': "Reader Does Not Exist",
     '57': "Invalid Antennae Number",
     '58': "Could Not Create Antennae",
-    '59': "Invalid Leaving Date"
+    '59': "Invalid Leaving Date",
+    '60': "Antennae Does Not Exist",
+    '61': "Could Not Verify Details",
+    '62': "Could Not Update Antennae",
 }
 
 export const Succes = {
@@ -76,4 +79,5 @@ export const Succes = {
     '12': 'Category Updated',
     '13': 'GatePass Created',
     '14': 'Location Updated',
+    '15': 'Antennae Updated',
 }

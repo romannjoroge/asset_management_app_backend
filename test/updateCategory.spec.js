@@ -35,7 +35,9 @@ describe("Update Category Test", function () {
 
     beforeEach(async function () {
         try {
+            await dropTemporaryTable('Category');
             await createTemporaryTable('Category');
+            await dropTemporaryTable('DepreciationPercent');
             await createTemporaryTable('DepreciationPercent');
             await createCategory({
                 id: oldCategory.id,
