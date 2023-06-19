@@ -108,7 +108,7 @@ describe("Update Antennae Tests", function () {
         noantennae: 4
     };
     let existingAntennae = {
-        id: 100,
+        id: 150,
         readerid: existingReader.id,
         deleted: false,
         antennaeno: existingReader.noantennae - 1,

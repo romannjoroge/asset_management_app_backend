@@ -8,6 +8,7 @@ import Asset from '../Allocation/Asset/asset2.js';
 import MyError from '../utility/myError.js';
 import locationTable from '../Tracking/db_location.js';
 import { AntennaeUpdateJSON, updateAntennae } from '../Tracking/antennae.js';
+import { updateReader, updateReaderJSON } from '../Tracking/readers.js';
 
 router.get('/movements', (req, res) => {
     let {
@@ -64,7 +65,7 @@ router.get('/getAntennae', (req, res) => {
 });
 
 router.put('/updateAntennae', (req, res) => {
-    let id: number = req.body.id;
+    let id: number = Number.parseInt(req.body.id);
     let readerID: string = req.body.readerID;
     let antennaeno: string = req.body.antennaeno;
     let entry: boolean = req.body.entry;
@@ -85,6 +86,38 @@ router.put('/updateAntennae', (req, res) => {
     // Update Antennae
     updateAntennae(id, updateJSONToUse).then(_ => {
         return res.json({message: Succes[15]});
+    }).catch(err => {
+        console.log(err);
+        if (err instanceof MyError) {
+            return res.status(400).json({message: err.message});
+        } else {
+            return res.status(400).json({message: Errors[9]});
+        }
+    });
+});
+
+router.put('/updateReader', (req, res) => {
+    let id: number = Number.parseInt(req.body.id);
+    let hardwarekey: string = req.body.hardwarekey;
+    let locationid: string = req.body.locationid;
+    let noantennae: string = req.body.noantennae;
+
+    // Verify details
+    let updateJSONToUse: updateReaderJSON = {};
+    if(hardwarekey) {
+        updateJSONToUse.hardwarekey = hardwarekey;
+    }
+    if(locationid) {
+        updateJSONToUse.locationid = parseInt(locationid);
+    }
+    if(noantennae) {
+        updateJSONToUse.noantennae = parseInt(noantennae);
+    }
+
+    // Update Reader
+    console.log(id);
+    updateReader(id, updateJSONToUse).then(_ => {
+        return res.json({message: Succes[16]});
     }).catch(err => {
         console.log(err);
         if (err instanceof MyError) {
