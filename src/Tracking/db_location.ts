@@ -11,10 +11,11 @@ const getTags = `SELECT t.scannedtime, t.epcid AS barcode, r.name AS reader, l.n
                 JOIN Antennae a ON a.id = t.antennae_id WHERE t.scannedtime BETWEEN $1 AND $2`;
 const doesReaderExist = "SELECT * FROM RFIDReader WHERE name = $1 AND locationid = $2";
 const createReader = "INSERT INTO RFIDReader (locationID, hardwareKey, noantennae) VALUES ($1, $2, $3)";
-const doesAntennaeExist = "SELECT * FROM Antennae WHERE antennaeno = $1 AND readerID = $2";
+const doesAntennaeExist = "SELECT * FROM Antennae WHERE antennaeno = $1 AND readerID = $2 AND deleted = false";
+const doesAntennaeIDExist = "SELECT * FROM Antennae WHERE id = $1 AND deleted = false";
 const createAntennae = "INSERT INTO Antennae (antennaeno, readerID, entry) VALUES ($1, $2, $3)";
 const getReader = "SELECT * FROM RFIDReader WHERE hardwareKey = $1";
-const getReaderFromID = "SELECT * FROM RFIDReader WHERE id = $1";
+const getReaderFromID = "SELECT * FROM RFIDReader WHERE id = $1 AND deleted = false";
 const getMovementInfo = `SELECT scannedtime, hardwarekey, antno, entry FROM (SELECT t.scannedtime, t.hardwarekey, t.antno, t.epcid, r.id, a.entry, lag(a.entry) 
                         OVER (PARTITION BY t.epcid ORDER BY t.scannedtime) AS prev_state FROM Tags t JOIN RFIDReader r ON r.hardwarekey = t.hardwarekey JOIN Antennae a 
                         ON a.readerid = r.id AND a.antennaeno = t.antno) AS q WHERE entry IS DISTINCT FROM prev_state`;;
@@ -22,8 +23,15 @@ const viewReaders = "SELECT r.id, r.hardwarekey AS name, r.noantennae, l.name AS
 const doesLocationNameExist = "SELECT * FROM Location WHERE name = $1 AND parentlocationid IN (SELECT parentlocationid FROM Location WHERE id = $2)";
 const getAntennaes = "SELECT a.id, a.antennaeno, r.hardwarekey, a.entry, l.name FROM Antennae a JOIN RFIDReader r ON r.id = a.readerid JOIN Location l ON l.id = r.locationid WHERE a.deleted = false";
 const readerIDs = "SELECT id, hardwarekey AS name FROM RFIDReader"
+const getNumberofAntennaes = "SELECT id, noAntennae FROM RFIDReader WHERE id IN (SELECT readerID FROM Antennae WHERE id = $1)";
+const checkIfAntennaeNumberTaken = "SELECT * FROM Antennae WHERE readerid = $1 AND antennaeno = $2";
+const getNumberofAntennaes2 = "SELECT noantennae, id FROM RFIDReader WHERE id = $1";
 
 let locationTable = {
+    getNumberofAntennaes2,
+    checkIfAntennaeNumberTaken,
+    getNumberofAntennaes,
+    doesAntennaeIDExist,
     readerIDs,
     getAntennaes,
     doesLocationNameExist,

@@ -7,6 +7,7 @@ import { assignGatePass } from '../GatePass/assignGatepass.js';
 import Asset from '../Allocation/Asset/asset2.js';
 import MyError from '../utility/myError.js';
 import locationTable from '../Tracking/db_location.js';
+import { AntennaeUpdateJSON, updateAntennae } from '../Tracking/antennae.js';
 
 router.get('/movements', (req, res) => {
     let {
@@ -59,6 +60,38 @@ router.get('/getAntennae', (req, res) => {
         return res.json(data.rows);
     }).catch(err => {
         return res.status(400).json({message: Errors[9]});
+    });
+});
+
+router.put('/updateAntennae', (req, res) => {
+    let id: number = req.body.id;
+    let readerID: string = req.body.readerID;
+    let antennaeno: string = req.body.antennaeno;
+    let entry: boolean = req.body.entry;
+
+    let updateJSONToUse: AntennaeUpdateJSON = {};
+
+    // Convert details to right type
+    if(readerID) {
+        updateJSONToUse.readerID = parseInt(readerID);
+    }
+    if(antennaeno) {
+        updateJSONToUse.antennaeno = parseInt(antennaeno);
+    }
+    if(entry) {
+        updateJSONToUse.entry = entry;
+    }
+
+    // Update Antennae
+    updateAntennae(id, updateJSONToUse).then(_ => {
+        return res.json({message: Succes[15]});
+    }).catch(err => {
+        console.log(err);
+        if (err instanceof MyError) {
+            return res.status(400).json({message: err.message});
+        } else {
+            return res.status(400).json({message: Errors[9]});
+        }
     });
 });
 
