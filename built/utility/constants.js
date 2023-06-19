@@ -62,6 +62,7 @@ export const Errors = {
     '60': "Antennae Does Not Exist",
     '61': "Could Not Verify Details",
     '62': "Could Not Update Antennae",
+    '63': "Could Not Update Reader",
 };
 export const Succes = {
     '1': 'Asset Created Successfuly',
@@ -79,5 +80,6 @@ export const Succes = {
     '13': 'GatePass Created',
     '14': 'Location Updated',
     '15': 'Antennae Updated',
+    '16': 'RFID Reader Updated',
 };
 //# sourceMappingURL=constants.js.map

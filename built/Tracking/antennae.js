@@ -156,6 +156,8 @@ function _verify(updateDetails, antennaeID, newReaderID) {
                         }
                         return res();
                     }).catch(err => {
+                        console.log(err);
+                        return rej(new MyError(Errors[61]));
                     });
                 }).catch(err => {
                     console.log(err);

@@ -12,7 +12,7 @@ interface AntennaeFromDB {
     deleted: boolean;
 }
 
-interface AntennaeFetchResult {
+export interface AntennaeFetchResult {
     rowCount: number;
     rows: AntennaeFromDB[];
 }
@@ -201,7 +201,8 @@ function _verify(updateDetails: AntennaeUpdateJSON, antennaeID: number ,newReade
                         }
                         return res();
                     }).catch(err => {
-
+                        console.log(err);
+                        return rej(new MyError(Errors[61]));
                     });
                 }).catch(err => {
                     console.log(err);
