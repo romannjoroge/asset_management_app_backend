@@ -42,7 +42,7 @@ router.get('/user/:id', (req, res) => {
     const username = req.params.id;
 
     // Get email of user
-    pool.query("SELECT email FROM User2 WHERE username=$1", [username]).then(data => {
+    pool.query("SELECT email FROM User2 WHERE username=$1 AND deleted = false", [username]).then(data => {
         // Return an error if data is empty
         if (data.rowCount == 0) {
             return res.status(400).json({ message: Errors[22] });
