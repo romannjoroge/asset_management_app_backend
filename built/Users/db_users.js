@@ -12,7 +12,9 @@ const getNumberOfUsers = "SELECT COUNT(*) AS noUsers FROM User2 WHERE deleted = 
 const checkIfEmailIsTaken = "SELECT * FROM User2 WHERE email = $1 AND deleted = false";
 const getRole = "SELECT * FROM Role WHERE name=$1 AND deleted = false";
 const deleteUserRoles = "DELETE FROM UserRole WHERE username=$1";
+const getNameEmail = "SELECT CONCAT(fname, ' ', lname) AS name, email FROM User2 WHERE username = $1 AND deleted = false";
 let userTable = {
+    getNameEmail,
     deleteUserRoles,
     getRole,
     checkIfEmailIsTaken,

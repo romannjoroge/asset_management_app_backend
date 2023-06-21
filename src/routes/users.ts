@@ -159,6 +159,19 @@ interface UpdateUserJSON {
     roles?: string[];
 }
 
+router.get('/getNameEmails/:username', (req, res) => {
+    let username = req.params.username;
+    pool.query(userTable.getNameEmail, [username]).then(data => {
+        if (data.rowCount <= 0) {
+            return res.status(404).json({ message: Errors[14] });
+        }
+        return res.status(200).json(data.rows);
+    }).catch(err => {   
+        console.log(err);
+        return res.status(501).json({ message: Errors[9] });
+    });
+});
+
 router.post('/update', (req, res) => {
     let body: UpdateUserJSON = req.body;
 
