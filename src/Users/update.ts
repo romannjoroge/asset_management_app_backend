@@ -6,8 +6,7 @@ import userTable from "./db_users.js";
 import bcrypt from 'bcrypt';
 
 export interface UpdateUser {
-    fname?: string;
-    lname?: string;
+    name?: string;
     email?: string;
     password?: string;
     roles?: string[];
@@ -84,15 +83,8 @@ export function updateUser(username: string, updateJSON: UpdateUser): Promise<vo
 
 function _verify(updateDetails: UpdateUser, username: string): Promise<void | never> {
     return new Promise((res, rej) => {
-        if(updateDetails.fname) {
-            if (updateDetails.fname.length > 50) {
-                return rej(new MyError(Errors[64]));
-            }
-            return res();
-        }
-
-        if(updateDetails.lname) {
-            if (updateDetails.lname.length > 50) {
+        if(updateDetails.name) {
+            if (updateDetails.name.length > 50) {
                 return rej(new MyError(Errors[64]));
             }
             return res();
@@ -147,19 +139,9 @@ function _verify(updateDetails: UpdateUser, username: string): Promise<void | ne
 function _updateInDb(username: string, updateDetails: UpdateUser): Promise<void | never> {
     return new Promise((res, rej) => {
         let updateQuery: string;
-        if(updateDetails.fname) {
+        if(updateDetails.name) {
             updateQuery = "UPDATE User2 SET fname = $1 WHERE username = $2";
-            pool.query(updateQuery, [updateDetails.fname, username]).then(_ => {
-                return res();
-            }).catch(err => {
-                console.log(err);
-                return rej(new MyError(Errors[65]));
-            });
-        }
-
-        if(updateDetails.lname) {
-            updateQuery = "UPDATE User2 SET lname = $1 WHERE username = $2";
-            pool.query(updateQuery, [updateDetails.lname, username]).then(_ => {
+            pool.query(updateQuery, [updateDetails.name, username]).then(_ => {
                 return res();
             }).catch(err => {
                 console.log(err);
