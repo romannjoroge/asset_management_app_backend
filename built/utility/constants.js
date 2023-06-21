@@ -63,6 +63,8 @@ export const Errors = {
     '61': "Could Not Verify Details",
     '62': "Could Not Update Antennae",
     '63': "Could Not Update Reader",
+    '64': "Invalid Details",
+    '65': "Could Not Update User"
 };
 export const Succes = {
     '1': 'Asset Created Successfuly',
@@ -81,5 +83,6 @@ export const Succes = {
     '14': 'Location Updated',
     '15': 'Antennae Updated',
     '16': 'RFID Reader Updated',
+    '17': "User Updated",
 };
 //# sourceMappingURL=constants.js.map

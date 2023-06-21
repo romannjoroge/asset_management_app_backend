@@ -104,7 +104,6 @@ app.post('/signup',
 
             // Hash the password
             bcrypt.hash(password, 10).then(hashedPasswd => {
-                console.log(hashedPasswd.length);
                 // Store user
                 pool.query(userTable.addUser, [fname, lname, email, hashedPasswd, username, companyName]).then(_ => {
                     // Send JWT Token

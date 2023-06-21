@@ -22,19 +22,19 @@ const getAssetDetails = `
     SELECT a.barcode, a.noInBuilding, a.code, a.description, a.serialnumber, a.acquisitiondate, a.condition, 
     a.responsibleUsername, a.acquisitioncost, a.residualvalue, a.usefulLife, a.depreciationtype, a.depreciationpercent,
     l.name as locationname, c.name as categoryname FROM Asset as a JOIN Location as l ON a.locationid = l.id 
-    JOIN Category as c ON a.categoryid = c.id WHERE a.assetID = $1;
+    JOIN Category as c ON a.categoryid = c.id WHERE a.assetID = $1 AND a.deleted = false;
 `;
 const insertAssetTag = `INSERT INTO Tags(commandCode, hardwareKey, tagRecNums, antNo, pc, epcID, crc) VALUES ($1, $2, $3, $4, $5, $6, $7)`;
 const unallocate = `UPDATE Asset SET custodianname = null WHERE assettag = $1`;
 const getAllAssets = "SELECT a.assetid, a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.assetid IS NOT NULL AND a.deleted = false";
-const assetCategories = 'SELECT c.name, COUNT(*) FROM Asset a JOIN Category c ON c.id = a.categoryid GROUP BY c.id';
+const assetCategories = 'SELECT c.name, COUNT(*) FROM Asset a JOIN Category c ON c.id = a.categoryid GROUP BY c.id WHERE a.deleted = false';
 const deleteAsset = "DELETE FROM Assets WHERE barcode = $1";
-const getAssetNetAndTotal = "SELECT SUM(acquisitionCost) AS netValue, COUNT(*) AS total FROM Asset";
-const getAssetAddedInLast12Months = "SELECT COUNT(*) AS last12mths FROM Asset WHERE acquisitionDate > (NOW() - INTERVAL '1 YEAR')";
+const getAssetNetAndTotal = "SELECT SUM(acquisitionCost) AS netValue, COUNT(*) AS total FROM Asset WHERE deleted = false";
+const getAssetAddedInLast12Months = "SELECT COUNT(*) AS last12mths FROM Asset WHERE acquisitionDate > (NOW() - INTERVAL '1 YEAR') AND deleted = false";
 const doesBarCodeExist = "SELECT * FROM Asset WHERE barcode = $1";
 const searchBySerialNo = "SELECT a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.serialNumber = $1";
 const updateAsset = "UPDATE Asset SET $1 = $2 WHERE assetid = $3";
-const searchForAsset = "SELECT a.assetid, a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.textsearchable_index_col @@ websearch_to_tsquery($1)";
+const searchForAsset = "SELECT a.assetid, a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.textsearchable_index_col @@ websearch_to_tsquery($1) AND WHERE a.deleted = false";
 const getAssetID = "SELECT assetid FROM Asset WHERE barcode = $1 ORDER BY acquisitiondate DESC LIMIT 1";
 const getDepreciationDetails = `SELECT a.usefulLife, a.acquisitionDate, a.acquisitionCost, d.percentage, a,residualvalue 
                                 FROM Asset a FULL JOIN DepreciationPercent d ON d.categoryID = a.categoryID WHERE assetID = $1`;

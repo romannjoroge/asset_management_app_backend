@@ -4,6 +4,8 @@ import userTable from '../Users/db_users.js';
 import Asset from '../Allocation/Asset/asset2.js';
 import { Errors, Succes } from '../utility/constants.js';
 import pool from '../../db2.js';
+import { updateUser, UpdateUser } from '../Users/update.js';
+import MyError from '../utility/myError.js';
 
 router.get('/getUsers', (req, res) => {
     pool.query(userTable.getUsers, []).then(data => {
@@ -145,8 +147,51 @@ router.get('/getCompany/:username', (req, res) => {
     }).catch(err => {
         console.log(err);
         return res.status(501).json({message: Errors[9]});
-    })
-    
-})
+    }) 
+});
+
+interface UpdateUserJSON {
+    username: string;
+    fname?: string;
+    lname?: string;
+    email?: string;
+    password?: string;
+    roles?: string[];
+}
+
+router.post('/update', (req, res) => {
+    let body: UpdateUserJSON = req.body;
+
+    let username = body.username;
+    let updateBody: UpdateUser = {};
+
+    if (body.fname) {
+        updateBody.fname = body.fname;
+    }
+    if (body.lname) {
+        updateBody.lname = body.lname;
+    }
+    if (body.email) {
+        updateBody.email = body.email;
+    }
+    if (body.password) {
+        updateBody.password = body.password;
+    }
+    if (body.roles) {
+        updateBody.roles = body.roles;
+    }
+
+    // Update user
+    updateUser(username, updateBody).then(_ => {
+        return res.json({message: Succes[17]});
+    }).catch(err => {
+        console.log(err);
+        if(err instanceof MyError) {
+            return res.status(501).json({message: err.message});
+        } else {
+            return res.status(501).json({message: Errors[9]});
+        }
+    });
+});
 
 export default router;

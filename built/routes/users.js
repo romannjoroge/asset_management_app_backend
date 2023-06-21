@@ -1,8 +1,10 @@
 import express from 'express';
 const router = express.Router();
 import userTable from '../Users/db_users.js';
-import { Errors } from '../utility/constants.js';
+import { Errors, Succes } from '../utility/constants.js';
 import pool from '../../db2.js';
+import { updateUser } from '../Users/update.js';
+import MyError from '../utility/myError.js';
 router.get('/getUsers', (req, res) => {
     pool.query(userTable.getUsers, []).then(data => {
         if (data.rowCount <= 0) {
@@ -36,7 +38,7 @@ router.get('/user/:id', (req, res) => {
     // Get username
     const username = req.params.id;
     // Get email of user
-    pool.query("SELECT email FROM User2 WHERE username=$1", [username]).then(data => {
+    pool.query("SELECT email FROM User2 WHERE username=$1 AND deleted = false", [username]).then(data => {
         // Return an error if data is empty
         if (data.rowCount == 0) {
             return res.status(400).json({ message: Errors[22] });
@@ -125,6 +127,38 @@ router.get('/getCompany/:username', (req, res) => {
     }).catch(err => {
         console.log(err);
         return res.status(501).json({ message: Errors[9] });
+    });
+});
+router.post('/update', (req, res) => {
+    let body = req.body;
+    let username = body.username;
+    let updateBody = {};
+    if (body.fname) {
+        updateBody.fname = body.fname;
+    }
+    if (body.lname) {
+        updateBody.lname = body.lname;
+    }
+    if (body.email) {
+        updateBody.email = body.email;
+    }
+    if (body.password) {
+        updateBody.password = body.password;
+    }
+    if (body.roles) {
+        updateBody.roles = body.roles;
+    }
+    // Update user
+    updateUser(username, updateBody).then(_ => {
+        return res.json({ message: Succes[17] });
+    }).catch(err => {
+        console.log(err);
+        if (err instanceof MyError) {
+            return res.status(501).json({ message: err.message });
+        }
+        else {
+            return res.status(501).json({ message: Errors[9] });
+        }
     });
 });
 export default router;
