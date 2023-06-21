@@ -130,18 +130,19 @@ router.get('/assetData', (req, res) => {
         // Fetch number of assets added in the last 12 months
         pool.query(assetTable.getAssetAddedInLast12Months).then(fetchResult2 => {
             if (fetchResult2.rowCount <= 0) {
+                console.log(5);
                 return res.status(400).json({ message: Errors[8] });
             }
             let assetsAdded = fetchResult2.rows[0];
             // Get number of users
             pool.query(userTable.getNumberOfUsers).then(fetchResult3 => {
                 if (fetchResult3.rowCount <= 0) {
+                    console.log(8);
                     return res.status(400).json({ message: Errors[8] });
                 }
                 let users = fetchResult3.rows[0];
                 // Combine all data
                 let data = Object.assign(Object.assign(Object.assign({}, netValTotal), assetsAdded), users);
-                console.log(data);
                 res.json(data);
             }).catch(err => {
                 console.log(err);
