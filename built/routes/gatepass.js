@@ -10,6 +10,7 @@ import { updateAntennae } from '../Tracking/antennae.js';
 import { updateReader } from '../Tracking/readers.js';
 import { getApprovers } from '../GatePass/getApprovers.js';
 import { getPastRequests } from '../GatePass/pastgatepasses.js';
+import { getRequestedGatePasses } from '../GatePass/requestedgatepasses.js';
 router.get('/movements', (req, res) => {
     let { from, to } = req.query;
     // Check if they are valid dates
@@ -129,6 +130,19 @@ router.put('/updateReader', (req, res) => {
 router.get('/getPastGatePasses', (req, res) => {
     // Send past requests
     getPastRequests(req.username).then(data => {
+        return res.json(data);
+    }).catch(err => {
+        if (err instanceof MyError) {
+            return res.status(400).json({ message: err.message });
+        }
+        else {
+            return res.status(400).json({ message: Errors[9] });
+        }
+    });
+});
+router.get('/requestedGatePasses', (req, res) => {
+    // Send requested requests
+    getRequestedGatePasses(req.username).then(data => {
         return res.json(data);
     }).catch(err => {
         if (err instanceof MyError) {
