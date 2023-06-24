@@ -126,7 +126,7 @@ router.post('/createAntennae', (req, res) => {
         return res.status(400).json({ message: err.message });
     });
 });
-router.put('/updateLocation', (req, res) => {
+router.post('/updateLocation', (req, res) => {
     // Get Data From Request
     let locationID = Number.parseInt(req.body.id);
     let updateJSON = req.body.updateJSON;

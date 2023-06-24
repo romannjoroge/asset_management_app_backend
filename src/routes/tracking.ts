@@ -148,7 +148,7 @@ router.post('/createAntennae', (req, res) => {
     });
 });
 
-router.put('/updateLocation', (req, res) => {
+router.post('/updateLocation', (req, res) => {
     // Get Data From Request
     let locationID: number = Number.parseInt(req.body.id);
     let updateJSON: {name?: string, parentlocationid?: string} = req.body.updateJSON;
