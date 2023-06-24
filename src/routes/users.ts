@@ -79,8 +79,7 @@ router.get('/user/:id', (req, res) => {
 router.post('/addUser', (req, res) => {
     // Get User Details And Roles From Frontend
     let {
-        fname,
-        lname,
+        name,
         email,
         password,
         username,
@@ -95,7 +94,7 @@ router.post('/addUser', (req, res) => {
             return res.status(400).json({message: Errors[24]});
         }
         // Add user if doesn't exist
-        pool.query(userTable.addUser, [fname, lname, email, password, username, companyName]).then(_ => {
+        pool.query(userTable.addUser, [name, email, password, username, companyName]).then(_ => {
             // Add user roles
             
             for (var i = 0; i < roles.length; i++) {

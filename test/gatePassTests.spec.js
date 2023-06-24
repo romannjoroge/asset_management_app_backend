@@ -49,8 +49,16 @@ describe("Assign Asset Gatepass test", function () {
     });
 
     it("should return an error if asset does not exist", async function () {
+        let gatepass = {
+            username: user.fname + " " + user.lname,
+            fromLocation: '',
+            toLocation: '',
+            date: '',
+            reason: '',
+            asset: 'Does Not Exist',
+        };
         try {
-            await assignGatePass([1001, asset.assetID], user.username, "Repairs", '11-11-2023', '11-15-2023');
+            await assignGatePass(gatepass);
             assert(false, "An Error Was Meant To Be Thrown");
         } catch(err) {
             assert(err instanceof MyError && err.message === Errors[29], err.message);
@@ -58,8 +66,16 @@ describe("Assign Asset Gatepass test", function () {
     });
 
     it("should return an error if user does not exist", async function () {
+        let gatepass = {
+            username: 'Does Not Exist',
+            fromLocation: '',
+            toLocation: '',
+            date: '',
+            reason: '',
+            asset: asset.barCode,
+        };
         try {
-            await assignGatePass([asset.assetID], "FakeUser", "Repairs", '11-11-2023', '11-15-2023');
+            await assignGatePass(gatepass);
             assert(false, "An Error Was Meant To Be Thrown");
         } catch(err) {
             assert(err instanceof MyError && err.message === Errors[30], err.message);

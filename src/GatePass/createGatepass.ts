@@ -12,7 +12,7 @@ interface GatePass {
     toLocation: string;
     date: Date;
     reason: string;
-    assets: string[];
+    asset: string;
 }
 
 export function createGatePass(gatePass: GatePass): Promise<void | never> {

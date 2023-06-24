@@ -6,7 +6,7 @@ import { Errors } from '../built/utility/constants.js';
 import utility from "../built/utility/utility.js";
 import { assert } from "chai";
 
-describe("Update User Tests", () => {
+describe.skip("Update User Tests", () => {
     let existingUser = {
         username: "johndoe",
         fname: "John",

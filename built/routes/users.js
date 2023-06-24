@@ -70,7 +70,7 @@ router.get('/user/:id', (req, res) => {
 // Route To Add A User To A Company
 router.post('/addUser', (req, res) => {
     // Get User Details And Roles From Frontend
-    let { fname, lname, email, password, username, companyName, roles } = req.body;
+    let { name, email, password, username, companyName, roles } = req.body;
     // Check if user with email already exists
     pool.query(userTable.doesUserExist, [email, username]).then(fetchResult => {
         // If the rows returned are not empty return an error
@@ -78,7 +78,7 @@ router.post('/addUser', (req, res) => {
             return res.status(400).json({ message: Errors[24] });
         }
         // Add user if doesn't exist
-        pool.query(userTable.addUser, [fname, lname, email, password, username, companyName]).then(_ => {
+        pool.query(userTable.addUser, [name, email, password, username, companyName]).then(_ => {
             // Add user roles
             for (var i = 0; i < roles.length; i++) {
                 if (i == roles.length - 1) {

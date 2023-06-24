@@ -1,5 +1,5 @@
 const checkIfUserInDB = "SELECT * FROM User2 WHERE username = $1 AND deleted = false";
-const addUser = "INSERT INTO User2 VALUES ($1, $2, $3, $4, $5, $6)";
+const addUser = "INSERT INTO User2 (name, email, password, username, companyName,) VALUES ($1, $2, $3, $4, $5)";
 const getUsers = "SELECT username FROM User2 WHERE deleted = false";
 const isUserAuthorized = "SELECT username FROM UserRole WHERE roleID=(SELECT id FROM Role WHERE name=$1) AND username=$2";
 const nameEmail = "SELECT username, email FROM User2 WHERE deleted = false";
@@ -12,7 +12,7 @@ const getNumberOfUsers = "SELECT COUNT(*) AS noUsers FROM User2 WHERE deleted = 
 const checkIfEmailIsTaken = "SELECT * FROM User2 WHERE email = $1 AND deleted = false";
 const getRole = "SELECT * FROM Role WHERE name=$1 AND deleted = false";
 const deleteUserRoles = "DELETE FROM UserRole WHERE username=$1";
-const getNameEmail = "SELECT CONCAT(fname, ' ', lname) AS name, email FROM User2 WHERE username = $1 AND deleted = false";
+const getNameEmail = "SELECT name, email FROM User2 WHERE username = $1 AND deleted = false";
 let userTable = {
     getNameEmail,
     deleteUserRoles,
