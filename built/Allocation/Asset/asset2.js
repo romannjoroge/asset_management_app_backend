@@ -203,12 +203,12 @@ class Asset {
         return new Promise((res, rej) => {
             pool.query(assetTable.getAssetID, [barcode]).then(fetchResult => {
                 if (fetchResult.rowCount <= 0) {
-                    return rej(new MyError("Asset Does Not Exist"));
+                    return rej(new MyError(Errors[29]));
                 }
                 return res(fetchResult.rows[0].assetid);
             }).catch(err => {
                 console.log(err);
-                return rej(new MyError("Could Not Get Asset ID"));
+                return rej(new MyError(Errors[29]));
             });
         });
     }
@@ -372,161 +372,6 @@ class Asset {
             catch (err) {
                 throw new MyError("Asset Could Not Be Deleted");
             }
-        });
-    }
-    static _insertDepreciationSchedule(assetTag, year, openBookValue, depreciationExpense, closingBookValue, accumulatedDepreciation) {
-        return new Promise((res, rej) => {
-            pool.query(assetTable.insertDepreciationSchedule, [year, openBookValue, depreciationExpense, accumulatedDepreciation, closingBookValue, assetTag]).then(_ => {
-                res("Done");
-            }).catch(err => {
-                console.log(err);
-                rej(err);
-            });
-        });
-    }
-    static _getCloseBookValue(assetTag, year) {
-        return new Promise((res, rej) => {
-            pool.query(assetTable.getCloseBookValue, [assetTag, year]).then(fetchresult => {
-                if (fetchresult.rowCount <= 0) {
-                    return rej(new MyError("No Close Book Value For Asset"));
-                }
-                var closingBookVal = fetchresult.rows[0].closingbookvalue;
-                return res(closingBookVal);
-            });
-        });
-    }
-    static _getAccumulatedDepreciation(assetTag) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((res, rej) => {
-                pool.query(assetTable.getAccumulatedDepreciation, [assetTag]).then(fetchResult => {
-                    if (fetchResult.rowCount <= 0) {
-                        return rej(new MyError("Could Not Get Accumulated Depreciation"));
-                    }
-                    return res(fetchResult.rows[0]['sum']);
-                });
-            });
-        });
-    }
-    static createDepreciationSchedule(depreciationType, assetTag, assetLifeSpan, acquisitionCost, acquisitionDate, residualValue, depreciationPercentage) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let year;
-            let openBookValue;
-            let depreciationExpense;
-            let accumulatedDepreciation;
-            let closingBookValue;
-            const getOpenBookValue = (i, acquisitionCost, assetTag, year) => {
-                return new Promise((res, rej) => {
-                    if (i == 0) {
-                        res(acquisitionCost);
-                    }
-                    else {
-                        Asset._getCloseBookValue(assetTag, year).then(val => {
-                            res(val);
-                        }).catch(err => {
-                            console.log(`i is ${i}`);
-                            console.log(err);
-                            rej(new MyError("No close book value"));
-                        });
-                    }
-                });
-            };
-            const getDepreciationExpense = (depreciationType, acquisitionCost, residualValue, assetLifeSpan, openBookValue, depreciationPercentage) => {
-                return new Promise((res, rej) => {
-                    if (depreciationType === "Straight Line") {
-                        return res((acquisitionCost - residualValue) / assetLifeSpan);
-                    }
-                    else if (depreciationType === "Double Declining Balance") {
-                        return res(2 * (1 / assetLifeSpan) * openBookValue);
-                    }
-                    else if (depreciationType === "Written Down Value") {
-                        return res(openBookValue * (depreciationPercentage / 100));
-                    }
-                    else {
-                        console.log(depreciationType);
-                        return rej(new MyError("Depreciation Type is not supported"));
-                    }
-                });
-            };
-            const getAccumulatedDepreciation = (i, depreciationExpense, assetTag) => {
-                return new Promise((res, rej) => {
-                    if (i == 0) {
-                        return res(depreciationExpense);
-                    }
-                    else {
-                        Asset._getAccumulatedDepreciation(assetTag).then(val => {
-                            return res(val + depreciationExpense);
-                        }).catch(err => {
-                            console.log(err);
-                            return rej(new MyError("Could Not Get Accumulated Depreciation"));
-                        });
-                    }
-                });
-            };
-            let i = 0;
-            function loop() {
-                if (i < assetLifeSpan) {
-                    year = acquisitionDate.getFullYear() + i;
-                    return getOpenBookValue(i, acquisitionCost, assetTag, year - 1).then(openBookValue => {
-                        return getDepreciationExpense(depreciationType, acquisitionCost, residualValue, assetLifeSpan, openBookValue, depreciationPercentage).then(depreciationExpense => {
-                            return getAccumulatedDepreciation(i, depreciationExpense, assetTag).then(accumulatedDepreciation => {
-                                closingBookValue = openBookValue - depreciationExpense;
-                                return Asset._insertDepreciationSchedule(assetTag, year, openBookValue, depreciationExpense, closingBookValue, accumulatedDepreciation).then(() => {
-                                    i++;
-                                    return loop();
-                                });
-                            });
-                        });
-                    }).catch(err => {
-                        console.log(err);
-                        throw new MyError("Invalid Depreciation Schedule Entry");
-                    });
-                }
-                else {
-                    Promise.resolve();
-                }
-            }
-            return loop();
-            // return new Promise((res, rej) => {
-            //     for(let i = 0; i < assetLifeSpan; i++) {
-            //         // Get openbookvalue
-            //         getOpenBookValue(i, acquisitionCost, assetTag, year).then(val1 => {
-            //             year = acquisitionDate.getFullYear() + i;
-            //             openBookValue = val1
-            //             // Get Depreciation Expense
-            //             getDepreciationExpense(depreciationType, acquisitionCost, residualValue, assetLifeSpan, openBookValue, depreciationPercentage).then(val2 => {
-            //                 depreciationExpense = val2;
-            //                 console.log("Done 1")
-            //                 // Get Accumulated Depreciation
-            //                 getAccumulatedDepreciation(i, depreciationExpense, assetTag).then(val3 => {
-            //                     accumulatedDepreciation = val3;
-            //                     console.log("Done 2")
-            //                     // Insert deprecition schedule
-            //                     closingBookValue = openBookValue - depreciationExpense;
-            //                     console.log(assetTag, year, openBookValue, depreciationExpense, accumulatedDepreciation, closingBookValue);
-            //                     Asset._insertDepreciationSchedule(assetTag, year, openBookValue, depreciationExpense, closingBookValue, accumulatedDepreciation).then(_ => {
-            //                         console.log("Depreciation Schedule Created");
-            //                     }).catch(err => {
-            //                         console.log(1)
-            //                         console.log(err);
-            //                         return rej(new MyError("Invalid Depreciation Schedule Entry"));
-            //                     })
-            //                 }).catch(err => {
-            //                     console.log(2)
-            //                     console.log(err);
-            //                     return rej(err);
-            //                 })
-            //             }).catch(err => {
-            //                 console.log(3)
-            //                 console.log(err)
-            //                 return rej(err)
-            //             })
-            //         }).catch(err => {
-            //             console.log(4)
-            //             console.log(err)
-            //             return rej(err)
-            //         })
-            //     }
-            // });
         });
     }
     static allocateAsset(assetTag, username) {

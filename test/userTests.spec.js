@@ -9,8 +9,7 @@ import { assert } from "chai";
 describe.skip("Update User Tests", () => {
     let existingUser = {
         username: "johndoe",
-        fname: "John",
-        lname: "Doe",
+        name: 'John Doe',
         email: "johndoe@gmail.com",
         password: "password",
         company: "Test Company",

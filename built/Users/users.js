@@ -33,7 +33,7 @@ class User {
     static checkIfUserNameExists(username) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((res, rej) => {
-                pool.query(userTable.getNameEmail, [username]).then((data) => {
+                pool.query(userTable.checkIfNameExists, [username]).then((data) => {
                     if (data.rowCount > 0) {
                         res(true);
                     }

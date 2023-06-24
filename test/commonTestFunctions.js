@@ -39,6 +39,6 @@ export async function createTestAntennae(props) {
 }
 
 export async function createTestUser(props) {
-    await pool.query("INSERT INTO User2 (username, email, password, fname, lname, userType, companyname) VALUES ($1, $2, $3, $4, $5, $6, $7)", [props.username, 
-    props.email, props.password, props.fname, props.lname, props.usertype, props.company])
+    await pool.query("INSERT INTO User2 (username, email, password, name, userType, companyname) VALUES ($1, $2, $3, $4, $5, $6)", [props.username, 
+    props.email, props.password, props.name, props.usertype, props.company])
 }

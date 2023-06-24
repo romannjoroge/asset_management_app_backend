@@ -42,7 +42,7 @@ class User {
 
     static async checkIfUserNameExists(username: string): Promise<boolean> {
         return new Promise((res, rej) => {
-            pool.query(userTable.getNameEmail, [username]).then((data: UserFetchResult) => {
+            pool.query(userTable.checkIfNameExists, [username]).then((data: UserFetchResult) => {
                 if (data.rowCount > 0) {
                     res(true);
                 } else {

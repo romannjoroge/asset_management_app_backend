@@ -3,11 +3,11 @@ import utility from '../utility/utility.js';
 import { Errors, Succes } from '../utility/constants.js';
 const router = express.Router();
 import pool from '../../db2.js';
+import { assignGatePass } from '../GatePass/assignGatepass.js';
 import MyError from '../utility/myError.js';
 import locationTable from '../Tracking/db_location.js';
 import { updateAntennae } from '../Tracking/antennae.js';
 import { updateReader } from '../Tracking/readers.js';
-import { createGatePass } from '../GatePass/createGatepass.js';
 router.get('/movements', (req, res) => {
     let { from, to } = req.query;
     // Check if they are valid dates
@@ -120,7 +120,7 @@ router.post('/create', (req, res) => {
     let toLocation = req.body.toLocation;
     let date = req.body.date;
     let reason = req.body.reason;
-    let assets = req.body.assets;
+    let barcode = req.body.barcode;
     try {
         date = utility.checkIfValidDate(date, "Invalid Date");
     }
@@ -129,7 +129,7 @@ router.post('/create', (req, res) => {
         return res.status(400).json({ message: err.message });
     }
     // Create Gatepass
-    createGatePass({ name, fromLocation, toLocation, date, reason, assets }).then(_ => {
+    assignGatePass({ username: name, date: date, fromLocation: fromLocation, toLocation: toLocation, barcode: barcode, reason: reason }).then(_ => {
         return res.json({ message: Succes[13] });
     }).catch(err => {
         console.log(err);

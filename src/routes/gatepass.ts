@@ -9,7 +9,6 @@ import MyError from '../utility/myError.js';
 import locationTable from '../Tracking/db_location.js';
 import { AntennaeUpdateJSON, updateAntennae } from '../Tracking/antennae.js';
 import { updateReader, updateReaderJSON } from '../Tracking/readers.js';
-import { createGatePass } from '../GatePass/createGatepass.js';
 
 router.get('/movements', (req, res) => {
     let {
@@ -136,7 +135,7 @@ router.post('/create', (req, res) => {
     let toLocation = req.body.toLocation;
     let date = req.body.date;
     let reason = req.body.reason;
-    let assets = req.body.assets;
+    let barcode = req.body.barcode;
 
     try {
         date = utility.checkIfValidDate(date, "Invalid Date");
@@ -146,7 +145,7 @@ router.post('/create', (req, res) => {
     }
 
     // Create Gatepass
-    createGatePass({name, fromLocation, toLocation, date, reason, assets}).then(_ => {
+    assignGatePass({username: name, date: date, fromLocation: fromLocation, toLocation: toLocation, barcode: barcode, reason: reason}).then(_ => {
         return res.json({message: Succes[13]});
     }).catch(err => {
         console.log(err);
