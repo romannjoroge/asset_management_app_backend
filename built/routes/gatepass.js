@@ -8,6 +8,7 @@ import MyError from '../utility/myError.js';
 import locationTable from '../Tracking/db_location.js';
 import { updateAntennae } from '../Tracking/antennae.js';
 import { updateReader } from '../Tracking/readers.js';
+import { getApprovers } from '../GatePass/getApprovers.js';
 router.get('/movements', (req, res) => {
     let { from, to } = req.query;
     // Check if they are valid dates
@@ -25,6 +26,17 @@ router.get('/movements', (req, res) => {
             return res.status(400).json({ message: Errors[38] });
         }
         return res.json(data.rows);
+    }).catch(err => {
+        console.log(err);
+        return res.status(400).json({ message: Errors[9] });
+    });
+});
+router.get('/approvers', (req, res) => {
+    // Get location ID from query
+    let locationID = Number.parseInt(req.query.locationID);
+    // Get all approvers for a location
+    getApprovers(locationID).then(data => {
+        return res.json(data);
     }).catch(err => {
         console.log(err);
         return res.status(400).json({ message: Errors[9] });

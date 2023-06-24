@@ -179,9 +179,13 @@ function returnFetchedResultsFromDatabase(query, arguements, valueWanted) {
         return fetchResult;
     });
 }
+function arrayEquals(a, b) {
+    return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((val) => b.includes(val));
+}
 // function fileUpload(req, res){
 // }
 const utility = {
+    arrayEquals,
     isAnyEmpty,
     checkIfBoolean,
     checkIfNumberisPositive,

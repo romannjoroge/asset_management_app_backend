@@ -176,6 +176,18 @@ CREATE TABLE Asset_File (
       REFERENCES Asset(assetTag)
 );
 
+CREATE TABLE GatePassAuthorizers (
+  username varchar(50),
+  locationID int,
+  PRIMARY KEY(username, locationID),
+  CONSTRAINT "FK_GatePassAuthorizers.username"
+    FOREIGN KEY (username)
+      REFERENCES User2(username),
+  CONSTRAINT "FK_GatePassAuthorizers.locationID"
+    FOREIGN KEY (locationID)
+      REFERENCES Location(ID)
+);
+
 CREATE TABLE StockTake (
   ID serial,
   locationID int,

@@ -42,3 +42,7 @@ export async function createTestUser(props) {
     await pool.query("INSERT INTO User2 (username, email, password, name, userType, companyname) VALUES ($1, $2, $3, $4, $5, $6)", [props.username, 
     props.email, props.password, props.name, props.usertype, props.company])
 }
+
+export async function createGatePassAuthorization(props) {
+    await pool.query("INSERT INTO GatePassAuthorizers (username, locationID) VALUES ($1, $2)", [props.username, props.locationID]);
+}

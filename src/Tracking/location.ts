@@ -5,6 +5,7 @@ import pool from '../../db2.js';
 import MyError from '../utility/myError.js';
 import locationTable from './db_location.js';
 import { Errors } from '../utility/constants.js';
+import reportsTable from '../Reports/db_reports.js';
 
 interface selectLocation {
     id: number;
@@ -40,6 +41,56 @@ class Location {
                 return res(result.rowCount > 0);
             }).catch(err => {
                 return rej(new MyError(Errors[9]));
+            });
+        });
+    }
+
+    // Find all child locations
+    static findChildLocations(id: number, locationIDs: number[]): Promise<number[] | never> {
+        return new Promise((res, rej) => {
+            // Get the child locations of the location with id ID
+            pool.query(reportsTable.getChildLocations, [id]).then(data => {
+                if (data.rowCount > 0) {
+                    // Add each location to locationIDs and call findChildLocations on each location
+                    for (let i in data.rows) {
+                        locationIDs.push(data.rows[i]['id']);
+
+                        // Resolve so that recursive call can end
+                        res(Location.findChildLocations(data.rows[i]['id'], locationIDs));
+                    }
+                }
+                // Base Case, function should do nothing if location has no children 
+                else {
+                    res(locationIDs);
+                }
+            }).catch(err => {
+                console.log(err);
+                rej(Errors[9]);
+            })
+        });
+    }
+
+    // Find parent locations
+    static findParentLocations(id: number, locationIDs: number[]): Promise<number[] | never> {
+        return new Promise((res, rej) => {
+            // Get the parent locations of the locations with id ID
+            pool.query(locationTable.getParentLocations, [id]).then(data => {
+                if (data.rowCount > 0) {
+                    // Add each location to locationIDs and call findChildLocations on each location
+                    for (let i in data.rows) {
+                        locationIDs.push(data.rows[i]['parentlocationid']);
+
+                        // Resolve so that recursive call can end
+                        res(Location.findParentLocations(data.rows[i]['parentlocationid'], locationIDs));
+                    }
+                }
+                // Base Case, function should do nothing if location has no children 
+                else {
+                    res(locationIDs);
+                }
+            }).catch(err => {
+                console.log(err);
+                rej(Errors[9]);
             });
         });
     }
