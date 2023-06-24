@@ -2,6 +2,7 @@ import Location from "../Tracking/location.js";
 import MyError from "../utility/myError.js";
 import { Errors } from "../utility/constants.js";
 import pool from "../../db2.js";
+import gatepasstable from "./db_gatepass.js";
 export function getApprovers(locationID) {
     return new Promise((res, rej) => {
         // Check if location exists
@@ -18,10 +19,10 @@ export function getApprovers(locationID) {
                 console.log(locationIDs);
                 function getName(names, locationID) {
                     return new Promise((res2, rej2) => {
-                        pool.query(`SELECT u.name FROM User2 u JOIN GatePassAuthorizers g ON g.username = u.username WHERE g.locationid = $1`, [locationID]).then(data => {
+                        pool.query(gatepasstable.getApprovers, [locationID]).then(data => {
                             if (data.rowCount > 0) {
                                 console.log(data.rows[0]['name']);
-                                names.push(data.rows[0]['name']);
+                                names.push({ name: data.rows[0]['name'], username: data.rows[0]['username'] });
                             }
                             return res2();
                         }).catch(err => {

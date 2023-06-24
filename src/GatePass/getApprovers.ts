@@ -2,8 +2,9 @@ import Location from "../Tracking/location.js";
 import MyError from "../utility/myError.js";
 import { Errors } from "../utility/constants.js";
 import pool from "../../db2.js";
+import gatepasstable from "./db_gatepass.js";
 
-export function getApprovers(locationID: number): Promise<string[] | never> {
+export function getApprovers(locationID: number): Promise<{name: string, username: string}[] | never> {
     return new Promise((res, rej) => {
         // Check if location exists
         Location.verifyLocationID(locationID).then(exists => {
@@ -18,12 +19,12 @@ export function getApprovers(locationID: number): Promise<string[] | never> {
                 const offset = 1;
                 locationIDs.push(locationID);
                 console.log(locationIDs);
-                function getName(names: string[], locationID: number): Promise<void | never> {
+                function getName(names: {name: string, username: string}[], locationID: number): Promise<void | never> {
                     return new Promise((res2, rej2) => {
-                        pool.query(`SELECT u.name FROM User2 u JOIN GatePassAuthorizers g ON g.username = u.username WHERE g.locationid = $1`, [locationID]).then(data => {
+                        pool.query(gatepasstable.getApprovers, [locationID]).then(data => {
                             if (data.rowCount > 0) {
                                 console.log(data.rows[0]['name']);
-                                names.push(data.rows[0]['name']);
+                                names.push({name: data.rows[0]['name'], username: data.rows[0]['username']});
                             }
                             return res2();
                         }).catch(err => {
@@ -34,7 +35,7 @@ export function getApprovers(locationID: number): Promise<string[] | never> {
                 }
 
                 let promises: Promise<void | never>[] = [];
-                let names: string[] = [];
+                let names: {name: string, username: string}[] = [];
                 locationIDs.forEach(locationID => promises.push(getName(names, locationID)));
                 Promise.all(promises).then(() => {
                     return res(names);
