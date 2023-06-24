@@ -27,7 +27,7 @@ interface GatePass {
 export function assignGatePass(gatePass: GatePass): Promise<void | never> {
     return new Promise((res, rej) => {
         // Check if user exists
-        User.checkIfUserNameExists(gatePass.username).then(userExist => {
+        User.checkIfUserExists(gatePass.username).then(userExist => {
             if(userExist === false){
                 return rej(new MyError(Errors[30]));
             }

@@ -57,7 +57,7 @@ describe("Assign Asset Gatepass test", function () {
 
     it("should return an error if asset does not exist", async function () {
         let gatepass = {
-            username: user.name,
+            username: user.username,
             fromLocation: '',
             toLocation: '',
             date: '',
@@ -91,7 +91,7 @@ describe("Assign Asset Gatepass test", function () {
 
     it("should return an error if location does not exist", async function () {
         let gatepass = {
-            username: user.name,
+            username: user.username,
             fromLocation: '',
             toLocation: '',
             date: '',
@@ -109,7 +109,7 @@ describe("Assign Asset Gatepass test", function () {
     it("should crete a gatepass entry", async function () {
         // For some reason the database is saying that assetID column in GatePassAsset does not exist when creating a gatepass entry
         let gatepass = {
-            username: user.name,
+            username: user.username,
             fromLocation: location.id,
             toLocation: location.id,
             date: new Date(2021, 6, 13),
