@@ -15,8 +15,10 @@ const deleteUserRoles = "DELETE FROM UserRole WHERE username=$1";
 const getNameEmail = "SELECT name, email FROM User2 WHERE username = $1 AND deleted = false";
 const checkIfNameExists = "SELECT * FROM User2 WHERE name = $1 AND deleted = false";
 const getNames = "SELECT name, username FROM User2 WHERE deleted = false"
+const getName = "SELECT name FROM User2 WHERE username = $1 AND deleted = false";
 
 let userTable = {
+    getName,
     getNames,
     checkIfNameExists,
     getNameEmail,

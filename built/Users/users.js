@@ -11,8 +11,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import pool from '../../db2.js';
 // Importing custom classes
 import userTable from './db_users.js';
+import MyError from '../utility/myError.js';
+import { Errors } from '../utility/constants.js';
 class User {
     constructor() { }
+    static getName(username) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((res, rej) => {
+                pool.query(userTable.getName, [username]).then((data) => {
+                    if (data.rowCount > 0) {
+                        return res(data.rows[0]['name']);
+                    }
+                }).catch(err => {
+                    console.log(err);
+                    return rej(new MyError(Errors[9]));
+                });
+            });
+        });
+    }
     static checkIfUserExists(username) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((res, rej) => {
