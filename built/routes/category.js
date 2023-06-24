@@ -65,7 +65,7 @@ router.post('/add', (req, res) => {
         });
     });
 });
-router.put('/update', (req, res) => {
+router.post('/update', (req, res) => {
     let updateBody = {};
     let updateBodyFromJSON = req.body.updateBody;
     let id = Number.parseInt(req.body.id);
