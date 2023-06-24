@@ -20,6 +20,22 @@ router.get('/getUsers', (req, res) => {
         });
     });
 });
+router.get('/getNames', (req, res) => {
+    // Send data from DB
+    pool.query(userTable.getNames, []).then(data => {
+        if (data.rowCount <= 0) {
+            return res.status(404).json({
+                message: Errors[14],
+            });
+        }
+        return res.status(200).json(data.rows);
+    }).catch(e => {
+        console.log(e);
+        return res.status(501).json({
+            message: Errors[9],
+        });
+    });
+});
 router.get('/userTable', (req, res) => {
     // Get usernames and emails from database
     pool.query(userTable.nameEmail, []).then(data => {
