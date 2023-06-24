@@ -127,8 +127,6 @@ router.put('/updateReader', (req, res) => {
     });
 });
 router.get('/getPastGatePasses', (req, res) => {
-    console.log('\n\n');
-    console.log(req);
     // Send past requests
     getPastRequests(req.username).then(data => {
         return res.json(data);

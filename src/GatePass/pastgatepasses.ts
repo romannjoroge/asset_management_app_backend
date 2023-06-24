@@ -25,20 +25,17 @@ interface GetGatePassFromDB {
 export function getPastRequests(username: string): Promise<GatePassRequests[] | void> {
     return new Promise((res, rej) => {
         // Check if user exists
+        console.log(username);
         User.checkIfUserExists(username).then(exists => {
             if (exists === false) {
+                console.log(1);
                 return rej(new MyError(Errors[30]));
             }
 
-            // Get username
-            User.getName(username).then(name => {
-                // Get past requests
-                pool.query(gatePassTable.getPreviousGatePasses, [name]).then((data: GetGatePassFromDB) => {
-                    return res(data.rows);
-                }).catch(err => {
-                    console.log(err);
-                    return rej(new MyError(Errors[9]));
-                });
+            // Get past requests
+            pool.query(gatePassTable.getPreviousGatePasses, [username]).then((data: GetGatePassFromDB) => {
+                console.log(3);
+                return res(data.rows);
             }).catch(err => {
                 console.log(err);
                 return rej(new MyError(Errors[9]));
