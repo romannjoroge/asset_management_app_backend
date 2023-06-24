@@ -34,7 +34,7 @@ interface RoleFetchResult {
     rows: RoleFromDB[]
 }
 
-interface UserFetchResult {
+export interface UserFetchResult {
     rowCount: number;
     rows: UserFromDB[]
 }

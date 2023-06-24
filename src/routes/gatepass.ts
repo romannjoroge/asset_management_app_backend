@@ -9,6 +9,7 @@ import MyError from '../utility/myError.js';
 import locationTable from '../Tracking/db_location.js';
 import { AntennaeUpdateJSON, updateAntennae } from '../Tracking/antennae.js';
 import { updateReader, updateReaderJSON } from '../Tracking/readers.js';
+import { createGatePass } from '../GatePass/createGatepass.js';
 
 router.get('/movements', (req, res) => {
     let {
@@ -130,49 +131,25 @@ router.put('/updateReader', (req, res) => {
 
 // Route for creating a gatepass
 router.post('/create', (req, res) => {
-    let barcodes: string[] = req.body.barcodes;
-    let username: string = req.body.username;
-    let reason: string = req.body.reason;
-    let leavingTime: string = req.body.leavingTime;
-    let returnTime: string = req.body.returnTime;
-    let entry: boolean = req.body.entry;
-
-    let assetIDsToAdd: number[];
-    let leavingTimeToAdd: Date;
-    let returnTimeToAdd: Date;
+    let name = req.body.name;
+    let fromLocation = req.body.fromLocation;
+    let toLocation = req.body.toLocation;
+    let date = req.body.date;
+    let reason = req.body.reason;
+    let assets = req.body.assets;
 
     try {
-        leavingTimeToAdd = utility.checkIfValidDate(leavingTime, "Invalid Leaving Time");
-        returnTimeToAdd = utility.checkIfValidDate(returnTime, "Invalid Return Time");
+        date = utility.checkIfValidDate(date, "Invalid Date");
     } catch(err) {
         console.log(err);
-        if (err instanceof MyError) {
-            return res.status(400).json({message: err.message});
-        } else {
-            return res.status(400).json({message: Errors[9]});
-        }
+        return res.status(400).json({message: err.message});
     }
 
-    // Convert barcodes to assetIDs
-    let promises: Promise<number>[] = [];
-    barcodes.forEach(barcode => {
-        promises.push(Asset._getAssetID(barcode));
-    });
-
-    Promise.all(promises).then(data => {
-        assetIDsToAdd = data;
-        // Add GatePass
-        assignGatePass(assetIDsToAdd, username, reason, leavingTimeToAdd, returnTimeToAdd, entry).then(_ => {
-            return res.json({message: Succes[13]});
-        }).catch(err => {
-            console.log(err);
-            if (err instanceof MyError) {
-                return res.status(400).json({message: err.message});
-            } else {
-                return res.status(400).json({message: Errors[9]});
-            }
-        });
+    // Create Gatepass
+    createGatePass({name, fromLocation, toLocation, date, reason, assets}).then(_ => {
+        return res.json({message: Succes[13]});
     }).catch(err => {
+        console.log(err);
         if (err instanceof MyError) {
             return res.status(400).json({message: err.message});
         } else {

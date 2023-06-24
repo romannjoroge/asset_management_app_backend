@@ -62,7 +62,7 @@ export function assignGatePass(assetIDs, username, reason, leavingTime, returnTi
         });
     });
 }
-function insertGatePassEntry(assetID, gatePassID) {
+export function insertGatePassEntry(assetID, gatePassID) {
     return new Promise((res, rej) => {
         // Insert into database
         console.log(gatePassID, assetID);

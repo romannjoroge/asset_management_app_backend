@@ -90,7 +90,7 @@ interface DepreciationFROMJSON {
     value?: string;
 }
 
-router.put('/update', (req, res) => {
+router.post('/update', (req, res) => {
     let updateBody: UpdateCategoryJSON = {};
     let updateBodyFromJSON: UpdateCategoryFromJSON = req.body.updateBody;
     let id: number = Number.parseInt(req.body.id);

@@ -3,12 +3,11 @@ import utility from '../utility/utility.js';
 import { Errors, Succes } from '../utility/constants.js';
 const router = express.Router();
 import pool from '../../db2.js';
-import { assignGatePass } from '../GatePass/assignGatepass.js';
-import Asset from '../Allocation/Asset/asset2.js';
 import MyError from '../utility/myError.js';
 import locationTable from '../Tracking/db_location.js';
 import { updateAntennae } from '../Tracking/antennae.js';
 import { updateReader } from '../Tracking/readers.js';
+import { createGatePass } from '../GatePass/createGatepass.js';
 router.get('/movements', (req, res) => {
     let { from, to } = req.query;
     // Check if they are valid dates
@@ -116,48 +115,24 @@ router.put('/updateReader', (req, res) => {
 });
 // Route for creating a gatepass
 router.post('/create', (req, res) => {
-    let barcodes = req.body.barcodes;
-    let username = req.body.username;
+    let name = req.body.name;
+    let fromLocation = req.body.fromLocation;
+    let toLocation = req.body.toLocation;
+    let date = req.body.date;
     let reason = req.body.reason;
-    let leavingTime = req.body.leavingTime;
-    let returnTime = req.body.returnTime;
-    let entry = req.body.entry;
-    let assetIDsToAdd;
-    let leavingTimeToAdd;
-    let returnTimeToAdd;
+    let assets = req.body.assets;
     try {
-        leavingTimeToAdd = utility.checkIfValidDate(leavingTime, "Invalid Leaving Time");
-        returnTimeToAdd = utility.checkIfValidDate(returnTime, "Invalid Return Time");
+        date = utility.checkIfValidDate(date, "Invalid Date");
     }
     catch (err) {
         console.log(err);
-        if (err instanceof MyError) {
-            return res.status(400).json({ message: err.message });
-        }
-        else {
-            return res.status(400).json({ message: Errors[9] });
-        }
+        return res.status(400).json({ message: err.message });
     }
-    // Convert barcodes to assetIDs
-    let promises = [];
-    barcodes.forEach(barcode => {
-        promises.push(Asset._getAssetID(barcode));
-    });
-    Promise.all(promises).then(data => {
-        assetIDsToAdd = data;
-        // Add GatePass
-        assignGatePass(assetIDsToAdd, username, reason, leavingTimeToAdd, returnTimeToAdd, entry).then(_ => {
-            return res.json({ message: Succes[13] });
-        }).catch(err => {
-            console.log(err);
-            if (err instanceof MyError) {
-                return res.status(400).json({ message: err.message });
-            }
-            else {
-                return res.status(400).json({ message: Errors[9] });
-            }
-        });
+    // Create Gatepass
+    createGatePass({ name, fromLocation, toLocation, date, reason, assets }).then(_ => {
+        return res.json({ message: Succes[13] });
     }).catch(err => {
+        console.log(err);
         if (err instanceof MyError) {
             return res.status(400).json({ message: err.message });
         }

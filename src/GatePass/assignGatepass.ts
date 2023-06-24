@@ -78,7 +78,7 @@ export function assignGatePass(assetIDs: number[], username: string, reason: str
     });
 }
 
-function insertGatePassEntry(assetID: number, gatePassID: number): Promise<void | never> {
+export function insertGatePassEntry(assetID: number, gatePassID: number): Promise<void | never> {
     return new Promise((res, rej) => {
         // Insert into database
         console.log(gatePassID, assetID);
