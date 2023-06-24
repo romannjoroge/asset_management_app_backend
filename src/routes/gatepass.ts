@@ -3,7 +3,7 @@ import utility from '../utility/utility.js';
 import { Errors, Succes } from '../utility/constants.js';
 const router = express.Router();
 import pool from '../../db2.js';
-import { assignGatePass } from '../GatePass/assignGatepass.js';
+import { requestForGatepass } from '../GatePass/assignGatepass.js';
 import Asset from '../Allocation/Asset/asset2.js';
 import MyError from '../utility/myError.js';
 import locationTable from '../Tracking/db_location.js';
@@ -150,6 +150,7 @@ router.post('/create', (req, res) => {
     let date = req.body.date;
     let reason = req.body.reason;
     let barcode = req.body.barcode;
+    let approvers = req.body.approvers;
 
     try {
         date = utility.checkIfValidDate(date, "Invalid Date");
@@ -158,8 +159,9 @@ router.post('/create', (req, res) => {
         return res.status(400).json({message: err.message});
     }
 
+    let gatePass = {username: name, date: date, fromLocation: fromLocation, toLocation: toLocation, barcode: barcode, reason: reason};
     // Create Gatepass
-    assignGatePass({username: name, date: date, fromLocation: fromLocation, toLocation: toLocation, barcode: barcode, reason: reason}).then(_ => {
+    requestForGatepass(gatePass, approvers).then(_ => {
         return res.json({message: Succes[13]});
     }).catch(err => {
         console.log(err);

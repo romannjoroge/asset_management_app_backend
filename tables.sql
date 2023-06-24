@@ -188,6 +188,19 @@ CREATE TABLE GatePassAuthorizers (
       REFERENCES Location(ID)
 );
 
+CREATE TABLE AuthorizeGatepass (
+  username varchar(50),
+  gatePassID int,
+  deleted boolean DEFAULT false,
+  PRIMARY KEY (username, gatePassID),
+  CONSTRAINT "FK_AuthorizeGatepass.username"
+    FOREIGN KEY (username)
+      REFERENCES User2(username),
+  CONSTRAINT "FK_AuthorizeGatepass.gatePassID"
+    FOREIGN KEY (gatePassID)
+      REFERENCES GatePass(ID)
+);
+
 CREATE TABLE StockTake (
   ID serial,
   locationID int,

@@ -5,6 +5,54 @@ import User from "../Users/users.js";
 import pool from "../../db2.js";
 import gatePassTable from './db_gatepass.js';
 import Location from "../Tracking/location.js";
+export function requestForGatepass(gatePass, users) {
+    return new Promise((res, rej) => {
+        // Confirm users exist
+        let promises = [];
+        users.forEach(user => promises.push(User.checkIfUserExists(user)));
+        Promise.all(promises).then(results => {
+            // Assert all users exist
+            if (results.includes(false)) {
+                return rej(new MyError(Errors[30]));
+            }
+            // Create GatePass
+            let gatePassID;
+            assignGatePass(gatePass).then(id => {
+                gatePassID = id;
+                // Add Authorizers
+                let promises = [];
+                users.forEach(user => promises.push(addAuthorizer(user, gatePassID)));
+                Promise.all(promises).then(_ => {
+                    return res();
+                }).catch(err => {
+                    console.log(err);
+                    return rej(new MyError(Errors[9]));
+                });
+            }).catch(err => {
+                if (err instanceof MyError) {
+                    return rej(err);
+                }
+                else {
+                    return rej(new MyError(Errors[9]));
+                }
+            });
+        }).catch(err => {
+            console.log(err);
+            return rej(new MyError(Errors[9]));
+        });
+    });
+}
+function addAuthorizer(username, gatePassID) {
+    return new Promise((res, rej) => {
+        // Add Authorizer
+        pool.query(gatePassTable.addGateAuthorizer, [username, gatePassID]).then(_ => {
+            return res();
+        }).catch(err => {
+            console.log(err);
+            return rej(new MyError(Errors[9]));
+        });
+    });
+}
 export function assignGatePass(gatePass) {
     return new Promise((res, rej) => {
         // Check if user exists
@@ -34,7 +82,7 @@ export function assignGatePass(gatePass) {
                                 let gatePassID = data.rows[0].id;
                                 // Create GatePassAsset
                                 insertGatePassEntry(assetid, gatePassID).then(_ => {
-                                    return res();
+                                    return res(gatePassID);
                                 }).catch(err => {
                                     console.log(err);
                                     return rej(new MyError(Errors[9]));
