@@ -12,6 +12,7 @@ import { updateReader, updateReaderJSON } from '../Tracking/readers.js';
 import { getApprovers } from '../GatePass/getApprovers.js';
 import { getPastRequests } from '../GatePass/pastgatepasses.js';
 import { getRequestedGatePasses } from '../GatePass/requestedgatepasses.js';
+import { handleRequest } from '../GatePass/handleGatepass.js';
 
 router.get('/movements', (req, res) => {
     let {
@@ -161,6 +162,24 @@ router.get('/requestedGatePasses', (req, res) => {
     // Send requested requests
     getRequestedGatePasses(req.username).then(data => {
         return res.json(data);
+    }).catch(err => {
+        if (err instanceof MyError) {
+            return res.status(400).json({message: err.message});
+        } else {
+            return res.status(400).json({message: Errors[9]});
+        }
+    });
+});
+
+router.post('/handle', (req, res) => {
+    // Get details from request
+    let id: number = Number.parseInt(req.body.id);
+    let approved: boolean = req.body.approved;
+    let comment: string = req.body.comment;
+
+    // Handle GatePass
+    handleRequest(approved, comment, id).then(_ => {
+        return res.json({message: Succes[18]});
     }).catch(err => {
         if (err instanceof MyError) {
             return res.status(400).json({message: err.message});

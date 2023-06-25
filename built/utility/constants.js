@@ -84,5 +84,6 @@ export const Succes = {
     '15': 'Antennae Updated',
     '16': 'RFID Reader Updated',
     '17': "User Updated",
+    '18': "GatePass Handled",
 };
 //# sourceMappingURL=constants.js.map

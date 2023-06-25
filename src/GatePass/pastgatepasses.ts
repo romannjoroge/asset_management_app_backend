@@ -15,6 +15,7 @@ interface GatePassRequests {
     approved: boolean;
 }
 
+
 interface GetGatePassFromDB {
     rowCount: number;
     rows: GatePassRequests[]
