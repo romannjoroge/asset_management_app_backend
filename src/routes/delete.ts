@@ -12,7 +12,6 @@ router.delete('/delete/:item', (req, res) => {
     let table;
     let query;
     let arguements;
-    console.log("Asset Is Being Deleted");
 
     if (item == "DepreciationPercent") {
         table = "DepreciationPercent";
@@ -28,6 +27,10 @@ router.delete('/delete/:item', (req, res) => {
         query = `UPDATE ${table} SET deleted = true WHERE assetID = $1 AND stockTakeID = $2`;
         let {assetID, attachment} = req.query;
         arguements = [assetID, attachment];
+    } else if (item == "inventory") {
+        table = "Inventory";
+        query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
+        arguements = [id];
     } else if (item == "category") {
         table = "Category";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;

@@ -70,6 +70,7 @@ export const Errors = {
     '68': "Batch Does Not Exist",
     '69': "Could Not Allocate Batch",
     '70': "Could Not Add Asset To Batch",
+    '71': "Could Not Update Inventory",
 };
 export const Succes = {
     '1': 'Asset Created Successfuly',
@@ -94,5 +95,6 @@ export const Succes = {
     "20": "Batch Created",
     '21': "Batch Allocated",
     '22': "Asset Added To Batch",
+    '23': "Inventory Updated",
 };
 //# sourceMappingURL=constants.js.map

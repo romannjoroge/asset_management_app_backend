@@ -36,9 +36,10 @@ const getAssetInInventoryDetails = `SELECT a.barcode, a.noInBuilding, a.code, a.
                                     l.name as locationname, c.name as categoryname FROM Asset as a JOIN Location as l ON a.locationid = l.id 
                                     JOIN Category as c ON a.categoryid = c.id WHERE a.deleted = false AND a.assetID IN (SELECT assetID FROM BatchAsset 
                                     WHERE batchID IN (SELECT batchID FROM InventoryBatch WHERE inventoryID = $1));`
-
+const updateInventory = 'UPDATE Inventory SET name = $1 WHERE id = $2';
 
 export default {
+    updateInventory,
     getAssetInInventoryDetails,
     getAssetsInBatch,
     getBatchesInInventory,
