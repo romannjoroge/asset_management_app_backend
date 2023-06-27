@@ -4,7 +4,6 @@ import { Errors, Succes } from '../utility/constants.js';
 const router = express.Router();
 import pool from '../../db2.js';
 import { requestForGatepass } from '../GatePass/assignGatepass.js';
-import Asset from '../Allocation/Asset/asset2.js';
 import MyError from '../utility/myError.js';
 import locationTable from '../Tracking/db_location.js';
 import { updateAntennae } from '../Tracking/antennae.js';
@@ -238,23 +237,13 @@ router.get('/assetsInBatch/:id', (req, res) => {
 });
 router.post('/addToBatch', (req, res) => {
     // Get barcode and batch id
-    let barcode = req.body.barcode;
+    let assetID = Number.parseInt(req.body.assetID);
     let batchID = Number.parseInt(req.body.batchID);
-    // Get asset id
-    Asset._getAssetID(barcode).then(id => {
-        // Insert into db
-        pool.query(gatepasstable.insertBatchAsset, [id, batchID]).then(_ => {
-            return res.json({ message: Succes[22] });
-        }).catch(err => {
-            return res.status(400).json({ message: Errors[70] });
-        });
+    // Insert into db
+    pool.query(gatepasstable.insertBatchAsset, [assetID, batchID]).then(_ => {
+        return res.json({ message: Succes[22] });
     }).catch(err => {
-        if (err instanceof MyError) {
-            return res.status(501).json({ message: err.message });
-        }
-        else {
-            return res.status(501).json({ message: Errors[9] });
-        }
+        return res.status(400).json({ message: Errors[70] });
     });
 });
 router.get('/batchesInInventory/:id', (req, res) => {
