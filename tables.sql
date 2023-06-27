@@ -201,6 +201,47 @@ CREATE TABLE AuthorizeGatepass (
       REFERENCES GatePass(ID)
 );
 
+CREATE TABLE Inventory (
+  ID serial,
+  name text NOT NULL,
+  PRIMARY KEY (ID)
+);
+
+CREATE TABLE Batch (
+  id serial,
+  date timestamptz NOT NULL,
+  comments text,
+  locationID int,
+  PRIMARY KEY (id),
+  CONSTRAINT "FK_Batch.locationID"
+    FOREIGN KEY (locationID)
+      REFERENCES Location(ID)
+);
+
+CREATE TABLE InventoryBatch (
+  inventoryID int NOT NULL,
+  batchID int NOT NULL,
+  PRIMARY KEY (inventoryID, batchID),
+  CONSTRAINT "FK_InventoryBatch.inventoryID"
+    FOREIGN KEY (inventoryID)
+      REFERENCES Inventory(ID),
+  CONSTRAINT "FK_InventoryBatch.batchID"
+    FOREIGN KEY (batchID)
+      REFERENCES Batch(ID)
+);
+
+CREATE TABLE BatchAsset (
+  batchID int NOT NULL,
+  assetID int NOT NULL,
+  PRIMARY KEY (batchID, assetID),
+  CONSTRAINT "FK_BatchAsset.batchID"
+    FOREIGN KEY (batchID)
+      REFERENCES Batch(ID),
+  CONSTRAINT "FK_BatchAsset.assetID"
+    FOREIGN KEY (assetID)
+      REFERENCES Asset(assetID)
+);
+
 CREATE TABLE StockTake (
   ID serial,
   locationID int,
