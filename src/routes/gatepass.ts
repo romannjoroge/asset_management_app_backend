@@ -16,6 +16,7 @@ import { handleRequest } from '../GatePass/handleGatepass.js';
 import { createInventory } from '../GatePass/createInventory.js';
 import { createBatch } from '../GatePass/createBatch.js';
 import { allocateBatch } from '../GatePass/allocateBatch.js';
+import gatepasstable from '../GatePass/db_gatepass.js';
 
 router.get('/movements', (req, res) => {
     let {
@@ -233,6 +234,15 @@ router.post('/allocateBatch', (req, res) => {
         } else {
             return res.status(501).json({message: Errors[9]});
         }
+    });
+});
+
+router.get('/unallocatedBatch', (req, res) => {
+    // Get all unallocated batches
+    pool.query(gatepasstable.getUnallocatedAssets).then(data => {
+        return res.json(data.rows);
+    }).catch(err => {
+        return res.status(501).json({message: Errors[9]});
     });
 });
 
