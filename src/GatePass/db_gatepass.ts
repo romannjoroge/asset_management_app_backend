@@ -25,12 +25,12 @@ const checkIfBatchExists = "SELECT * FROM Batch WHERE id = $1";
 const allocateBatch = "INSERT INTO InventoryBatch (inventoryid, batchid) VALUES ($1, $2)";
 const getUnallocatedAssets = `SELECT b.id, b.comments as name, l.name as location, (SELECT COUNT(*) AS no_items FROM BatchAsset 
                             WHERE batchid = b.id), b.date FROM Batch b JOIN Location l ON l.id = b.locationid WHERE b.id NOT IN 
-                            (SELECT batchid FROM InventoryBatch)`;
+                            (SELECT batchid FROM InventoryBatch) AND b.deleted = false`;
 const getBatchesInInventory = `SELECT b.id, b.comments as name, l.name as location, (SELECT COUNT(*) AS no_items FROM BatchAsset 
                             WHERE batchid = b.id), b.date FROM Batch b JOIN Location l ON l.id = b.locationid WHERE b.id IN 
-                            (SELECT batchid FROM InventoryBatch WHERE inventoryid = $1);`;
+                            (SELECT batchid FROM InventoryBatch WHERE inventoryid = $1) AND b.deleted = false;`;
 const getAssetsInBatch = `SELECT b.id, b.date, a.barcode, l.name as location FROM Batch b JOIN Location l ON l.id = b.locationid 
-                        JOIN BatchAsset ba ON ba.batchid = b.id JOIN Asset a ON a.assetid = ba.assetid WHERE ba.batchid = $1`;
+                        JOIN BatchAsset ba ON ba.batchid = b.id JOIN Asset a ON a.assetid = ba.assetid WHERE ba.batchid = $1 AND b.deleted = false`;
 const getAssetInInventoryDetails = `SELECT a.barcode, a.noInBuilding, a.code, a.description, a.serialnumber, a.acquisitiondate, a.condition, 
                                     a.responsibleUsername, a.acquisitioncost, a.residualvalue, a.usefulLife, a.depreciationtype, a.depreciationpercent,
                                     l.name as locationname, c.name as categoryname FROM Asset as a JOIN Location as l ON a.locationid = l.id 
