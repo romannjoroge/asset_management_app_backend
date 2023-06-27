@@ -26,8 +26,12 @@ const allocateBatch = "INSERT INTO InventoryBatch (inventoryid, batchid) VALUES 
 const getUnallocatedAssets = `SELECT b.id, b.comments as name, l.name as location, (SELECT COUNT(*) AS no_items FROM BatchAsset 
                             WHERE batchid = b.id), b.date FROM Batch b JOIN Location l ON l.id = b.locationid WHERE b.id NOT IN 
                             (SELECT batchid FROM InventoryBatch)`;
+const getBatchesInInventory = `SELECT b.id, b.comments as name, l.name as location, (SELECT COUNT(*) AS no_items FROM BatchAsset 
+                            WHERE batchid = b.id), b.date FROM Batch b JOIN Location l ON l.id = b.locationid WHERE b.id IN 
+                            (SELECT batchid FROM InventoryBatch WHERE inventoryid = $1);`;
 
 export default {
+    getBatchesInInventory,
     getUnallocatedAssets,
     allocateBatch,
     checkIfBatchExists,
