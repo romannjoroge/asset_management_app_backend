@@ -18,8 +18,12 @@ const doesGatePassExist = `SELECT * FROM Gatepass WHERE id = $1`;
 const handleGatePass = `UPDATE Gatepass SET approved = $1, comment = $2 WHERE id = $3;`;
 const createInventory = "INSERT INTO Inventory (name) VALUES ($1)";
 const createBatch = "INSERT INTO Batch (date, comments, locationid) VALUES ($1, $2, $3)";
+const getBatchID = `SELECT MAX(id) FROM Batch WHERE locationid = $1 AND date = $2 AND comments = $3`;
+const insertBatchAsset = "INSERT INTO BatchAsset(assetID, batchID) VALUES ($1, $2)";
 
 export default {
+    insertBatchAsset,
+    getBatchID,
     createBatch,
     createInventory,
     handleGatePass,

@@ -196,6 +196,7 @@ router.post('/createBatch', (req, res) => {
     let date = req.body.date;
     let comments = req.body.comments;
     let locationID = Number.parseInt(req.body.locationID);
+    let assets = req.body.assets;
 
     // Get date from date
     let dateToAdd: Date;
@@ -203,7 +204,7 @@ router.post('/createBatch', (req, res) => {
         dateToAdd = utility.checkIfValidDate(date, "Invalid Date");
 
         // Create Batch
-        createBatch(dateToAdd, comments, locationID).then(_ => {
+        createBatch(dateToAdd, comments, locationID, assets).then(_ => {
             return res.json({message: Succes[20]})
         }).catch(err => {
             if (err instanceof MyError) {
