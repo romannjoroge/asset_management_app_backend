@@ -268,6 +268,18 @@ router.post('/editInventory/:id', (req, res) => {
         return res.status(400).json({ message: Errors[71] });
     });
 });
+router.post('/editBatch/:id', (req, res) => {
+    // Get new comment
+    let comment = req.body.comment;
+    let id = Number.parseInt(req.params.id);
+    // Update db
+    pool.query(gatepasstable.updateBatch, [comment, id]).then(_ => {
+        return res.json({ message: Succes[24] });
+    }).catch(err => {
+        console.log(err);
+        return res.status(400).json({ message: Errors[72] });
+    });
+});
 router.get('/assetsInInventory/:id', (req, res) => {
     let id = Number.parseInt(req.params.id);
     // Return db results
