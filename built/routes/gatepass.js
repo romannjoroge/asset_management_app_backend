@@ -14,6 +14,7 @@ import { getRequestedGatePasses } from '../GatePass/requestedgatepasses.js';
 import { handleRequest } from '../GatePass/handleGatepass.js';
 import { createInventory } from '../GatePass/createInventory.js';
 import { createBatch } from '../GatePass/createBatch.js';
+import { allocateBatch } from '../GatePass/allocateBatch.js';
 router.get('/movements', (req, res) => {
     let { from, to } = req.query;
     // Check if they are valid dates
@@ -198,6 +199,22 @@ router.post('/createBatch', (req, res) => {
     catch (err) {
         return res.status(501).json({ message: Errors[9] });
     }
+});
+router.post('/allocateBatch', (req, res) => {
+    // Get details
+    let inventoryID = Number.parseInt(req.body.inventoryID);
+    let batchID = Number.parseInt(req.body.batchID);
+    // Allocate Batch
+    allocateBatch(inventoryID, batchID).then(_ => {
+        return res.json({ message: Succes[21] });
+    }).catch(err => {
+        if (err instanceof MyError) {
+            return res.status(501).json({ message: err.message });
+        }
+        else {
+            return res.status(501).json({ message: Errors[9] });
+        }
+    });
 });
 router.post('/createInventory', (req, res) => {
     // Get details from request

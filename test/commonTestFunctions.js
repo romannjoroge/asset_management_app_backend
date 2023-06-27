@@ -46,3 +46,11 @@ export async function createTestUser(props) {
 export async function createGatePassAuthorization(props) {
     await pool.query("INSERT INTO GatePassAuthorizers (username, locationID) VALUES ($1, $2)", [props.username, props.locationID]);
 }
+
+export async function createTestInventory(props) {
+    await pool.query("INSERT INTO Inventory (id, name) VALUES ($1, $2)", [props.id, props.name]);
+}
+
+export async function createTestBatch(props) {
+    await pool.query("INSERT INTO Batch (id, date, comments, locationid) VALUES($1, $2, $3, $4)", [props.id, props.date, props.comments, props.locationid]);
+}

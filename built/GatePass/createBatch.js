@@ -31,7 +31,6 @@ export function createBatch(date, comments, locationID, assets) {
                         });
                     });
                 }).catch(err => {
-                    console.log(err);
                     return rej(new MyError(Errors[9]));
                 });
             }).catch(err => {

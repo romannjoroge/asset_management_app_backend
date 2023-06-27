@@ -65,7 +65,10 @@ export const Errors = {
     '63': "Could Not Update Reader",
     '64': "Invalid Details",
     '65': "Could Not Update User",
-    '66': "Could Not Create Batch"
+    '66': "Could Not Create Batch",
+    '67': "Inventory Does Not Exist",
+    '68': "Batch Does Not Exist",
+    '69': "Could Not Allocate Batch",
 }
 
 export const Succes = {
@@ -89,4 +92,5 @@ export const Succes = {
     '18': "GatePass Handled",
     '19': 'Inventory Created',
     "20": "Batch Created",
+    '21': "Batch Allocated",
 }

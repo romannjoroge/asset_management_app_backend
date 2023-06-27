@@ -1,6 +1,6 @@
 import pool from "../db2.js";
 import utility from "../built/utility/utility.js";
-import { createTemporaryTable, dropTemporaryTable, createTestUser, createAsset, createLocation, createGatePassAuthorization } from "./commonTestFunctions.js";
+import { createTemporaryTable, dropTemporaryTable, createTestUser, createAsset, createLocation, createGatePassAuthorization, createTestInventory, createTestBatch } from "./commonTestFunctions.js";
 import { assert } from "chai";
 import { assignGatePass } from '../built/GatePass/assignGatepass.js';
 import MyError from "../built/utility/myError.js";
@@ -8,6 +8,7 @@ import { Errors } from "../built/utility/constants.js";
 import { getApprovers } from "../built/GatePass/getApprovers.js";
 import { createInventory } from '../built/GatePass/createInventory.js'
 import { createBatch } from '../built/GatePass/createBatch.js';
+import { allocateBatch } from '../built/GatePass/allocateBatch.js';
 
 describe("Create Inventory Test", function() {
     beforeEach(async function() {
@@ -143,4 +144,84 @@ describe("Create Batch Test", function() {
             assert(false, "Could Not Delete Test Data")
         }
     })
+});
+
+describe("Allocate Batches To Inventory Test", function(){
+    let location = {
+        id: 1010,
+        name: "TestestLocation",
+        parentlocationid: 1
+    };
+
+    let inventory = {
+        id: 1000,
+        name: "TestInventory"
+    };
+
+    let batch = {
+        id: 1000,
+        date: new Date(2023, 10, 11),
+        comments: "This is a batch",
+        locationid: location.id
+    }
+
+    beforeEach(async function() {
+        try {
+            await createTemporaryTable("Inventory");
+            await createTemporaryTable("Batch");
+            await createTemporaryTable("InventoryBatch");
+            await createTemporaryTable("Location");
+            await createTestInventory(inventory);
+            await createTestBatch(batch);
+            await createLocation(location);
+        } catch(err) {
+            console.log(err);
+            assert(false, "Could Not Create Test Data");
+        }
+    });
+
+    async function assertFunctionFails(inventoryID, batchID, errorMessage) {
+        try {
+            await allocateBatch(inventoryID, batchID);
+            assert(false, "Error Should Be Thrown");
+        } catch(err) {
+            assert(err instanceof MyError && err.message == errorMessage, err.message);
+        }
+    }
+
+    it("should fail when inventory doesn't exist", async function() {
+        await assertFunctionFails(10000, batch.id, Errors[67]);
+    });
+
+    it("should fail when batch doesn't exist", async function() {
+        await assertFunctionFails(inventory.id, 10000, Errors[68]);
+    });
+
+    it("should allocate batch to inventory", async function() {
+        try {
+            await allocateBatch(inventory.id, batch.id);
+            let result = await pool.query("SELECT * FROM InventoryBatch WHERE inventoryid = $1 AND batchid = $2", [inventory.id, batch.id]);
+            utility.verifyDatabaseFetchResults(result, "Could Not Get InventoryBatch");
+            let createdInventoryBatch = {
+                inventoryID: result.rows[0]['inventoryid'],
+                batchID: result.rows[0]['batchid']
+            };
+            assert.deepEqual(createdInventoryBatch, {inventoryID: inventory.id, batchID: batch.id}, "InventoryBatch Not Created Nicely");
+        } catch(err) {
+            console.log(err);
+            assert(false, "Error Not Meant To Be Thrown");
+        }
+    });
+
+    afterEach(async function() {
+        try {
+            await dropTemporaryTable("Inventory");
+            await dropTemporaryTable("Batch");
+            await dropTemporaryTable("InventoryBatch");
+            await dropTemporaryTable("Location");
+        } catch(err) {
+            console.log(err);
+            assert(false, "Could Not Delete Test Data");
+        }
+    });
 });
