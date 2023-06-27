@@ -29,7 +29,10 @@ const getUnallocatedAssets = `SELECT b.id, b.comments as name, l.name as locatio
 const getBatchesInInventory = `SELECT b.id, b.comments as name, l.name as location, (SELECT COUNT(*) AS no_items FROM BatchAsset 
                             WHERE batchid = b.id), b.date FROM Batch b JOIN Location l ON l.id = b.locationid WHERE b.id IN 
                             (SELECT batchid FROM InventoryBatch WHERE inventoryid = $1);`;
+const getAssetsInBatch = `SELECT b.id, b.date, a.barcode, l.name as location FROM Batch b JOIN Location l ON l.id = b.locationid 
+                        JOIN BatchAsset ba ON ba.batchid = b.id JOIN Asset a ON a.assetid = ba.assetid WHERE ba.batchid = $1`;
 export default {
+    getAssetsInBatch,
     getBatchesInInventory,
     getUnallocatedAssets,
     allocateBatch,

@@ -246,6 +246,18 @@ router.get('/getInventories', (req, res) => {
     });
 });
 
+router.get('/assetsInBatch/:id', (req, res) => {
+    // Get batch id
+    let id = Number.parseInt(req.params.id);
+
+    // Return db results
+    pool.query(gatepasstable.getAssetsInBatch, [id]).then(data => {
+        return res.json(data.rows);
+    }).catch(err => {
+        return res.status(501).json({message: Errors[9]});
+    });
+});
+
 router.get('/batchesInInventory/:id', (req, res) => {
     let id = Number.parseInt(req.params.id);
     // Return db results
