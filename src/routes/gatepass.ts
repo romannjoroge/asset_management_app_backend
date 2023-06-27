@@ -258,6 +258,28 @@ router.get('/assetsInBatch/:id', (req, res) => {
     });
 });
 
+router.post('/addToBatch', (req, res) => {
+    // Get barcode and batch id
+    let barcode = req.body.barcode;
+    let batchID = Number.parseInt(req.body.batchID);
+
+    // Get asset id
+    Asset._getAssetID(barcode).then(id => {
+        // Insert into db
+        pool.query(gatepasstable.insertBatchAsset, [id, batchID]).then(_ => {
+            return res.json({message: Succes[22]});
+        }).catch(err => {
+            return res.status(400).json({message: Errors[70]});
+        });
+    }).catch(err => {
+        if (err instanceof MyError) {
+            return res.status(501).json({message: err.message})
+        } else {
+            return res.status(501).json({message: Errors[9]});
+        }
+    });
+});
+
 router.get('/batchesInInventory/:id', (req, res) => {
     let id = Number.parseInt(req.params.id);
     // Return db results
