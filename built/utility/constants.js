@@ -64,7 +64,8 @@ export const Errors = {
     '62': "Could Not Update Antennae",
     '63': "Could Not Update Reader",
     '64': "Invalid Details",
-    '65': "Could Not Update User"
+    '65': "Could Not Update User",
+    '66': "Could Not Create Batch"
 };
 export const Succes = {
     '1': 'Asset Created Successfuly',
@@ -85,6 +86,7 @@ export const Succes = {
     '16': 'RFID Reader Updated',
     '17': "User Updated",
     '18': "GatePass Handled",
-    '19': 'Inventory Created'
+    '19': 'Inventory Created',
+    "20": "Batch Created",
 };
 //# sourceMappingURL=constants.js.map

@@ -13,6 +13,7 @@ import { getPastRequests } from '../GatePass/pastgatepasses.js';
 import { getRequestedGatePasses } from '../GatePass/requestedgatepasses.js';
 import { handleRequest } from '../GatePass/handleGatepass.js';
 import { createInventory } from '../GatePass/createInventory.js';
+import { createBatch } from '../GatePass/createBatch.js';
 router.get('/movements', (req, res) => {
     let { from, to } = req.query;
     // Check if they are valid dates
@@ -171,6 +172,31 @@ router.post('/handle', (req, res) => {
             return res.status(400).json({ message: Errors[9] });
         }
     });
+});
+router.post('/createBatch', (req, res) => {
+    // Get details from request
+    let date = req.body.date;
+    let comments = req.body.comments;
+    let locationID = Number.parseInt(req.body.locationID);
+    // Get date from date
+    let dateToAdd;
+    try {
+        dateToAdd = utility.checkIfValidDate(date, "Invalid Date");
+        // Create Batch
+        createBatch(dateToAdd, comments, locationID).then(_ => {
+            return res.json({ message: Succes[20] });
+        }).catch(err => {
+            if (err instanceof MyError) {
+                return res.status(501).json({ message: err.message });
+            }
+            else {
+                return res.status(501).json({ message: Errors[9] });
+            }
+        });
+    }
+    catch (err) {
+        return res.status(501).json({ message: Errors[9] });
+    }
 });
 router.post('/createInventory', (req, res) => {
     // Get details from request

@@ -16,9 +16,11 @@ const getRequestedGatePasses = `SELECT g.id, g.name, (SELECT name AS fromlocatio
                                 username = $1) AND g.approved = false`;
 const doesGatePassExist = `SELECT * FROM Gatepass WHERE id = $1`;
 const handleGatePass = `UPDATE Gatepass SET approved = $1, comment = $2 WHERE id = $3;`;
-const createInventory = "INSERT INTO Inventory (name) VALUES ($1)"
+const createInventory = "INSERT INTO Inventory (name) VALUES ($1)";
+const createBatch = "INSERT INTO Batch (date, comments, locationid) VALUES ($1, $2, $3)";
 
 export default {
+    createBatch,
     createInventory,
     handleGatePass,
     doesGatePassExist,
