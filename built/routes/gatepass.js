@@ -217,6 +217,14 @@ router.post('/allocateBatch', (req, res) => {
         }
     });
 });
+router.get('/getInventories', (req, res) => {
+    // Return db results
+    pool.query("SELECT * FROM Inventory").then(data => {
+        return res.json(data.rows);
+    }).catch(err => {
+        return res.status(501).json({ message: Errors[9] });
+    });
+});
 router.get('/unallocatedBatch', (req, res) => {
     // Get all unallocated batches
     pool.query(gatepasstable.getUnallocatedAssets).then(data => {
