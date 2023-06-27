@@ -11,7 +11,7 @@ import { createInventory } from '../built/GatePass/createInventory.js'
 describe("Create Inventory Test", function() {
     beforeEach(async function() {
         try {
-            createTemporaryTable("Inventory");
+            await createTemporaryTable("Inventory");
         } catch(err) {
             console.log(err);
             assert(false, "Could Not Create Test Data");

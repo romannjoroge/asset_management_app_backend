@@ -13,6 +13,7 @@ import { getApprovers } from '../GatePass/getApprovers.js';
 import { getPastRequests } from '../GatePass/pastgatepasses.js';
 import { getRequestedGatePasses } from '../GatePass/requestedgatepasses.js';
 import { handleRequest } from '../GatePass/handleGatepass.js';
+import { createInventory } from '../GatePass/createInventory.js';
 
 router.get('/movements', (req, res) => {
     let {
@@ -187,6 +188,16 @@ router.post('/handle', (req, res) => {
             return res.status(400).json({message: Errors[9]});
         }
     });
+});
+
+router.post('/createInventory', (req, res) => {
+    // Get details from request
+    const name = req.body.name;
+
+    // Create inventory
+    createInventory(name).then(_ => {
+        return res.json({message: Succes[19]})
+    })
 });
 
 // Route for creating a gatepass

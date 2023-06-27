@@ -86,4 +86,5 @@ export const Succes = {
     '16': 'RFID Reader Updated',
     '17': "User Updated",
     '18': "GatePass Handled",
+    '19': 'Inventory Created'
 }
