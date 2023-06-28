@@ -27,7 +27,7 @@ interface InventoryResultFetchRequest {
     rows: inventoryResults[];
 }
 
-export function allocateBatch(inventoryID: number, batchID: number): Promise<void | never> {
+export function allocateBatch(inventoryID: number, batchIDs: number[]): Promise<void | never> {
     return new Promise((res, rej) => {
         // Check if inventory exists
         pool.query(gatepasstable.checkIfInventoryExists, [inventoryID]).then((result: InventoryResultFetchRequest) => {
@@ -35,23 +35,51 @@ export function allocateBatch(inventoryID: number, batchID: number): Promise<voi
                 return rej(new MyError(Errors[67]));
             }
 
-            // Check if batch exists
-            pool.query(gatepasstable.checkIfBatchExists, [batchID]).then((result: BatchResultsFetchRequest) => {
-                if (result.rowCount <= 0) {
-                    return rej(new MyError(Errors[68]));
-                }
+            let promises: Promise<void | never>[] = [];
+            // Confirm if all batches exist
+            batchIDs.forEach(batchID => promises.push(checkIfBatchExists(batchID)));
 
-                // Allocate batch
-                pool.query(gatepasstable.allocateBatch, [inventoryID, batchID]).then(_ => {
+            Promise.all(promises).then(_ => {
+                // Allocate batches
+                promises = [];
+                batchIDs.forEach(batchID => promises.push(allocateBatchInDB(inventoryID, batchID)));
+
+                Promise.all(promises).then(_ => {
                     return res();
                 }).catch(err => {
-                    console.log(err);
-                    return rej(new MyError(Errors[69]));
+                    return rej(err);
                 });
-            }).catch(err => {});
+            }).catch(err => {
+                return rej(err);
+            });
         }).catch(err => {
             console.log(err);
             return rej(new MyError(Errors[67]));
+        });
+    });
+}
+
+function checkIfBatchExists(batchID: number): Promise<void | never> {
+    return new Promise((res, rej) => {
+        pool.query(gatepasstable.checkIfBatchExists, [batchID]).then((result: BatchResultsFetchRequest) => {
+            if (result.rowCount <= 0) {
+                return rej(new MyError(Errors[68]));
+            }
+            return res();
+        }).catch(err => {
+            return rej(new MyError(Errors[68]));
+        });
+    });
+}
+
+function allocateBatchInDB(inventoryID: number, batchID: number): Promise<void | never> {
+    return new Promise((res, rej) => {
+        // Allocate batch
+        pool.query(gatepasstable.allocateBatch, [inventoryID, batchID]).then(_ => {
+            return res();
+        }).catch(err => {
+            console.log(err);
+            return rej(new MyError(Errors[69]));
         });
     });
 }

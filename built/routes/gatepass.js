@@ -205,9 +205,9 @@ router.post('/createBatch', (req, res) => {
 router.post('/allocateBatch', (req, res) => {
     // Get details
     let inventoryID = Number.parseInt(req.body.inventoryID);
-    let batchID = Number.parseInt(req.body.batchID);
+    let batchIDs = req.body.batchIDs;
     // Allocate Batch
-    allocateBatch(inventoryID, batchID).then(_ => {
+    allocateBatch(inventoryID, batchIDs).then(_ => {
         return res.json({ message: Succes[21] });
     }).catch(err => {
         if (err instanceof MyError) {

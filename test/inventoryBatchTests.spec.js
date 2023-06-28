@@ -194,12 +194,12 @@ describe("Allocate Batches To Inventory Test", function(){
     });
 
     it("should fail when batch doesn't exist", async function() {
-        await assertFunctionFails(inventory.id, 10000, Errors[68]);
+        await assertFunctionFails(inventory.id, [10000], Errors[68]);
     });
 
     it("should allocate batch to inventory", async function() {
         try {
-            await allocateBatch(inventory.id, batch.id);
+            await allocateBatch(inventory.id, [batch.id]);
             let result = await pool.query("SELECT * FROM InventoryBatch WHERE inventoryid = $1 AND batchid = $2", [inventory.id, batch.id]);
             utility.verifyDatabaseFetchResults(result, "Could Not Get InventoryBatch");
             let createdInventoryBatch = {
