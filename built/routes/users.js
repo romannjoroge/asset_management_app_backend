@@ -5,6 +5,8 @@ import { Errors, Succes } from '../utility/constants.js';
 import pool from '../../db2.js';
 import { updateUser } from '../Users/update.js';
 import MyError from '../utility/myError.js';
+import gatepasstable from '../GatePass/db_gatepass.js';
+import bcrypt from 'bcrypt';
 router.get('/getUsers', (req, res) => {
     pool.query(userTable.getUsers, []).then(data => {
         if (data.rowCount <= 0) {
@@ -86,33 +88,55 @@ router.get('/user/:id', (req, res) => {
 // Route To Add A User To A Company
 router.post('/addUser', (req, res) => {
     // Get User Details And Roles From Frontend
-    let { name, email, password, username, companyName, roles } = req.body;
-    // Check if user with email already exists
-    pool.query(userTable.doesUserExist, [email, username]).then(fetchResult => {
-        // If the rows returned are not empty return an error
-        if (fetchResult.rowCount > 0) {
-            return res.status(400).json({ message: Errors[24] });
-        }
-        // Add user if doesn't exist
-        pool.query(userTable.addUser, [name, email, password, username, companyName]).then(_ => {
-            // Add user roles
-            for (var i = 0; i < roles.length; i++) {
-                if (i == roles.length - 1) {
-                    pool.query(userTable.addUserRole, [username, roles[i]]).then(_ => {
-                        return res.json({ message: "User Created" });
-                    }).catch(err => {
-                        console.log(err);
-                        return res.status(501).json({ message: Errors[9] });
-                    });
-                }
-                else {
-                    pool.query(userTable.addUserRole, [username, roles[i]]).catch(err => {
-                        console.log(err);
-                        return res.status(501).json({ message: Errors[9] });
-                    });
-                }
+    let { name, email, password, username, companyName, gatepasslocation } = req.body;
+    let roles = req.body.roles;
+    function addUserRole(username, role) {
+        return new Promise((res, rej) => {
+            pool.query(userTable.addUserRole, [username, role]).then(_ => {
+                return res();
+            }).catch(err => {
+                console.log(err);
+                return rej(new MyError(Errors[9]));
+            });
+        });
+    }
+    bcrypt.hash(password, 10).then(hash => {
+        // Check if user with email already exists
+        pool.query(userTable.doesUserExist, [email, username]).then(fetchResult => {
+            // If the rows returned are not empty return an error
+            if (fetchResult.rowCount > 0) {
+                return res.status(400).json({ message: Errors[24] });
             }
+            // Add user if doesn't exist
+            pool.query(userTable.addUser, [name, email, hash, username, companyName]).then(_ => {
+                // Add user roles
+                let promises = [];
+                roles.forEach(role => promises.push(addUserRole(username, role)));
+                Promise.all(promises).then(_ => {
+                    if (gatepasslocation) {
+                        // Add user as gatepass authorizer for location
+                        pool.query(gatepasstable.addApprover, [username, gatepasslocation]).then(_ => {
+                            return res.json({ message: Succes[4] });
+                        }).catch(err => {
+                            console.log(err);
+                            return res.status(501).json({ message: Errors[9] });
+                        });
+                    }
+                    else {
+                        return res.json({ message: Succes[4] });
+                    }
+                }).catch(err => {
+                    console.log(3);
+                    console.log(err);
+                    return res.status(501).json({ message: Errors[9] });
+                });
+            }).catch(err => {
+                console.log(2);
+                console.log(err);
+                return res.status(501).json({ message: Errors[9] });
+            });
         }).catch(err => {
+            console.log(1);
             console.log(err);
             return res.status(501).json({ message: Errors[9] });
         });

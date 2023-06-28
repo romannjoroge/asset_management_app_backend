@@ -4,6 +4,7 @@ const getGatePass = "SELECT id FROM Gatepass WHERE reason = $1 AND name = $2 AND
 const checkIfUserExists = "SELECT * FROM User2 WHERE CONCAT(fname, ' ', lname) = $1 AND deleted = false";
 const getLocationID = "SELECT id FROM Location WHERE name = $1";
 const getApprovers = `SELECT u.username, u.name FROM User2 u JOIN GatePassAuthorizers g ON g.username = u.username WHERE g.locationid = $1`;
+const addApprover = `INSERT INTO GatePassAuthorizers (username, locationid) VALUES ($1, $2)`;
 const addGateAuthorizer = 'INSERT INTO AuthorizeGatepass (username, gatepassid) VALUES ($1, $2)';
 const getPreviousGatePasses = `SELECT g.id, (SELECT name FROM User2 WHERE username = g.name), (SELECT name AS fromlocation FROM Location WHERE id = g.fromlocation), 
                             (SELECT name AS tolocation FROM Location WHERE id = g.tolocation), g.date, a.barcode, g.reason, 
@@ -39,6 +40,7 @@ const getAssetInInventoryDetails = `SELECT a.barcode, a.noInBuilding, a.code, a.
 const updateInventory = 'UPDATE Inventory SET name = $1 WHERE id = $2';
 const updateBatch = 'UPDATE Batch SET comments = $1 WHERE id = $2';
 export default {
+    addApprover,
     updateBatch,
     updateInventory,
     getAssetInInventoryDetails,
