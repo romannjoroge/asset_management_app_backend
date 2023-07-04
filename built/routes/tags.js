@@ -2,47 +2,36 @@ import express from 'express';
 const router = express.Router();
 import assetTable from '../Allocation/Asset/db_assets.js';
 import pool from '../../db2.js';
+import MyError from '../utility/myError.js';
 import { Errors } from '../utility/constants.js';
 router.post('/tags', (req, res) => {
     console.log(req.body);
     // Get values from req.body
-    let { commandCode, hardwareKey, tagRecNums, tagRecords } = req.body;
-    console.log(hardwareKey, tagRecords);
+    let commandCode = req.body.commandCode;
+    let hardwareKey = req.body.hardwareKey;
+    let tagRecNums = req.body.tagRecNums;
+    let tagRecords = req.body.tagRecords;
     // Add tag to database
-    function addTag() {
+    function addTag(commandCode, hardwareKey, tagRecNums, antNo, pc, epcID, crc) {
         return new Promise((res, rej) => {
-            for (var i in tagRecords) {
-                let tag = tagRecords[i];
-                console.log(tag);
-                pool.query(assetTable.insertAssetTag, [commandCode, hardwareKey, tagRecNums, tag.antNo, tag.pc, tag.epcID, tag.crc]).then(_ => {
-                    // Add an entry to log.csv file
-                    // let csvData = [{
-                    //     commandCode,
-                    //     hardwareKey,
-                    //     tagRecNums,
-                    //     antNo: tag.antNo,
-                    //     pc: tag.pc,
-                    //     epcID: tag.epcID,
-                    //     crc: tag.crc
-                    // }];
-                    // let csvFromData = convertArrayToCSV(csvData);
-                    // fs.appendFile(path.join(__dirname, 'tags.log'), `${new Date().toISOString()},${commandCode},${hardwareKey},${tagRecNums},${tag.antNo},${tag.pc},${tag.epcID},${tag.crc}\n`).then(_ => {
-                    // }).catch(e => {
-                    //     console.log(e);
-                    //     return res.status(500).json({
-                    //         message: Errors[9],
-                    //     })
-                    // });
-                    res.send("Done");
-                }).catch(e => {
-                    console.log(e);
-                    return res.status(500).json({ message: Errors[9] });
-                });
-            }
+            pool.query(assetTable.insertAssetTag, [commandCode, hardwareKey, tagRecNums, antNo, pc, epcID, crc]).then(_ => {
+                return res();
+            }).catch(err => {
+                return rej(new MyError(Errors[73]));
+            });
         });
     }
     let promises = [];
-    res.send("Done");
+    for (var i in tagRecords) {
+        let antNo = Number.parseInt(tagRecords[i].antNo);
+        promises.push(addTag(commandCode, hardwareKey, tagRecNums, antNo, tagRecords[i].pc, tagRecords[i].epcID, tagRecords[i].crc));
+    }
+    Promise.all(promises).then(_ => {
+        res.send("Done");
+    }).catch(err => {
+        console.log(err);
+        return res.status(500).json({ message: Errors[73] });
+    });
 });
 router.post('/heartBeats', (req, res) => {
     console.log("Heart Beat...");
