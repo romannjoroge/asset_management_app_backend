@@ -171,6 +171,7 @@ router.post('/tags', (req, res) => {
     console.log(req.body);
     // Get values from req.body
     let { commandCode, hardwareKey, tagRecNums, tagRecords } = req.body;
+    console.log(hardwareKey, tagRecords);
     // Add tag to database
     for (var i in tagRecords) {
         let tag = tagRecords[i];
