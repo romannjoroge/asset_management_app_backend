@@ -386,6 +386,25 @@ CREATE TABLE GatePass (
       REFERENCES User2(username)
 );
 
+CREATE TABLE ReaderDevice (
+  id serial,
+  locationID int NOT NULL,
+  deleted boolean NOT NULL DEFAULT false,
+  PRIMARY KEY (id),
+  CONSTRAINT "FK_ReaderDevice.locationID"
+    FOREIGN KEY (locationID)
+      REFERENCES Location(ID)
+);
+
+CREATE TABLE ProcessedTags (
+  id serial,
+  scannedTime timestamp with time zone NOT NULL DEFAULT NOW(),
+  assetID int NOT NULL,
+  readerDeviceID int NOT NULL,
+  pc varchar(50) NOT NULL,
+  deleted boolean NOT NULL DEFAULT false
+);
+
 
 -- Creates the home folder when the database is created. This is the topmost folder in the system
 INSERT INTO Folder(name) VALUES('home');
