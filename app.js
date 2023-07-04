@@ -21,6 +21,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 // Importing routes
+import tags from './built/routes/tags.js';
 import allocate from './built/routes/allocation.js';
 import deleteRoute from './built/routes/delete.js';
 import items from './built/routes/items.js';
@@ -41,6 +42,7 @@ app.use('/gatepass', checkifAuthenticated, gatepass)
 app.use('/reports',  reports)
 app.use('/users', checkifAuthenticated, checkifAuthorized('User Manager'), users)
 app.use('/delete', deleteRoute);
+app.use('/tags', tags);
 
 
 app.get('/', (req, res) => {
