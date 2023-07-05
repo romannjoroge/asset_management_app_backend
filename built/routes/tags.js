@@ -39,17 +39,16 @@ router.post('/tags', (req, res) => {
     let promises = [];
     for (var i in tagRecords) {
         let antNo = Number.parseInt(tagRecords[i].antNo);
-        let tag = { commandCode, hardwareKey, tagRecNums, tagRecords, [i]: .antNo, tagRecords, [i]: .pc, tagRecords, [i]: .epcID, tagRecords, [i]: .crc };
-        tags.add(new Tag(commandCode, hardwareKey, tagRecNums, tagRecords[i].antNo, tagRecords[i].pc, tagRecords[i].epcID, tagRecords[i].crc));
-        // promises.push(addTag(commandCode, hardwareKey, tagRecNums, antNo, tagRecords[i].pc, tagRecords[i].epcID, tagRecords[i].crc));
+        let tag = { commandCode, hardwareKey, tagRecNums, antNo: tagRecords[i].antNo, pc: tagRecords[i].pc, epcID: tagRecords[i].epcID, crc: tagRecords[i].crc };
+        tags.add(JSON.stringify(tag));
+        promises.push(addTag(commandCode, hardwareKey, tagRecNums, antNo, tagRecords[i].pc, tagRecords[i].epcID, tagRecords[i].crc));
     }
-    // Promise.all(promises).then(_ => {
-    //     res.send("Done");
-    // }).catch(err => {
-    //     console.log(err);
-    //     return res.status(500).json({message: Errors[73]});
-    // });
-    res.send("Done");
+    Promise.all(promises).then(_ => {
+        res.send("Done");
+    }).catch(err => {
+        console.log(err);
+        return res.status(500).json({ message: Errors[73] });
+    });
 });
 router.post('/heartBeats', (req, res) => {
     console.log("Heart Beat...");

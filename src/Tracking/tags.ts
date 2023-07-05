@@ -46,14 +46,15 @@ function addProcessedTagToDB(processedTag: processedTag): Promise<void> {
     });
 }
 
-export function addProcessedTag(tags: Set<rawTag>): Promise<void> {
+export function addProcessedTag(tags: Set<string>): Promise<void> {
     return new Promise((res, rej) => {
         if (tags.size == 0) {
             return res();
         } else {
             let promises: Promise<void>[] = [];
             tags.forEach(tag => {
-                promises.push(convertRawTagToProcessedTag(tag).then(processedTag => {
+                let newTag:rawTag = JSON.parse(tag);
+                promises.push(convertRawTagToProcessedTag(newTag).then(processedTag => {
                     return addProcessedTagToDB(processedTag);
                 }));
             });

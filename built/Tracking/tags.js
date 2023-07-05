@@ -33,7 +33,8 @@ export function addProcessedTag(tags) {
         else {
             let promises = [];
             tags.forEach(tag => {
-                promises.push(convertRawTagToProcessedTag(tag).then(processedTag => {
+                let newTag = JSON.parse(tag);
+                promises.push(convertRawTagToProcessedTag(newTag).then(processedTag => {
                     return addProcessedTagToDB(processedTag);
                 }));
             });
