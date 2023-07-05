@@ -47,4 +47,11 @@ export function addProcessedTag(tags) {
         }
     });
 }
+export function convertHexToASCII(hexStr) {
+    let asciiStr = '';
+    for (let i = 0; i < hexStr.length; i += 2) {
+        asciiStr += String.fromCharCode(parseInt(hexStr.substring(i, i + 2), 16));
+    }
+    return asciiStr;
+}
 //# sourceMappingURL=tags.js.map

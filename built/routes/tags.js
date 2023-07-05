@@ -6,6 +6,7 @@ import MyError from '../utility/myError.js';
 import { Errors } from '../utility/constants.js';
 import { addProcessedTag } from '../Tracking/tags.js';
 import schedule from 'node-schedule';
+import { convertHexToASCII } from '../Tracking/tags.js';
 // Create set for tags
 let tags = new Set();
 // Create job for adding tags to database
@@ -29,7 +30,8 @@ router.post('/tags', (req, res) => {
     // Add tag to database
     function addTag(commandCode, hardwareKey, tagRecNums, antNo, pc, epcID, crc) {
         return new Promise((res, rej) => {
-            pool.query(assetTable.insertAssetTag, [commandCode, hardwareKey, tagRecNums, antNo, pc, epcID, crc]).then(_ => {
+            let epcIDToAdd = convertHexToASCII(epcID);
+            pool.query(assetTable.insertAssetTag, [commandCode, hardwareKey, tagRecNums, antNo, pc, epcIDToAdd, crc]).then(_ => {
                 return res();
             }).catch(err => {
                 return rej(new MyError(Errors[73]));
@@ -39,7 +41,8 @@ router.post('/tags', (req, res) => {
     let promises = [];
     for (var i in tagRecords) {
         let antNo = Number.parseInt(tagRecords[i].antNo);
-        let tag = { commandCode, hardwareKey, tagRecNums, antNo: tagRecords[i].antNo, pc: tagRecords[i].pc, epcID: tagRecords[i].epcID, crc: tagRecords[i].crc };
+        let epcIDToAdd = convertHexToASCII(tagRecords[i].epcID);
+        let tag = { commandCode, hardwareKey, tagRecNums, antNo: tagRecords[i].antNo, pc: tagRecords[i].pc, epcID: epcIDToAdd, crc: tagRecords[i].crc };
         tags.add(JSON.stringify(tag));
         promises.push(addTag(commandCode, hardwareKey, tagRecNums, antNo, tagRecords[i].pc, tagRecords[i].epcID, tagRecords[i].crc));
     }

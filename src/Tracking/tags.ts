@@ -67,3 +67,11 @@ export function addProcessedTag(tags: Set<string>): Promise<void> {
         }
     });
 }
+
+export function convertHexToASCII(hexStr: string): string {
+    let asciiStr = '';
+    for (let i = 0; i < hexStr.length; i += 2) {
+        asciiStr += String.fromCharCode(parseInt(hexStr.substring(i, i+2), 16));
+    }
+    return asciiStr;
+}
