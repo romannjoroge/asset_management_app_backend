@@ -28,7 +28,9 @@ const getNumberofAntennaes = "SELECT id, noAntennae FROM RFIDReader WHERE id IN 
 const checkIfAntennaeNumberTaken = "SELECT * FROM Antennae WHERE readerid = $1 AND antennaeno = $2";
 const getNumberofAntennaes2 = "SELECT noantennae, id FROM RFIDReader WHERE id = $1";
 const getParentLocations = "SELECT parentLocationID FROM Location WHERE id = $1 AND deleted = false";
+const addProcessedTag = "INSERT INTO ProcessedTags(scannedTime, assetID, readerDeviceID) VALUES ($1, $2, $3)";
 let locationTable = {
+    addProcessedTag,
     getParentLocations,
     getNumberofAntennaes2,
     checkIfAntennaeNumberTaken,

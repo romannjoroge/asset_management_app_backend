@@ -4,6 +4,9 @@ import assetTable from '../Allocation/Asset/db_assets.js';
 import pool from '../../db2.js';
 import MyError from '../utility/myError.js';
 import { Errors } from '../utility/constants.js';
+import { addProcessedTag } from '../Tracking/tags.js';
+import { rawTag } from '../Tracking/tags.js';
+import schedule from 'node-schedule';
 
 interface tagEntry  {
     commandCode: string;
@@ -18,6 +21,23 @@ interface tagRecords {
     epcID: string;
     crc: string;
 }
+
+// Create set for tags
+let tags: Set<string> = new Set();
+
+// Create job for adding tags to database
+schedule.scheduleJob('*/1 * * * * *', () => {
+    addProcessedTag(tags).then(_ => {
+        console.log("Added tags to database");
+        console.log(tags);
+        tags.clear();
+    }).catch(err => {
+        console.log(err);
+        tags.clear();
+    });
+});
+
+
 
 router.post('/tags', (req, res) => {
     console.log(req.body);
@@ -45,15 +65,18 @@ router.post('/tags', (req, res) => {
 
     for (var i in tagRecords) {
         let antNo = Number.parseInt(tagRecords[i].antNo);
-        promises.push(addTag(commandCode, hardwareKey, tagRecNums, antNo, tagRecords[i].pc, tagRecords[i].epcID, tagRecords[i].crc));
+        let tag: rawTag = {commandCode, hardwareKey, tagRecNums, tagRecords[i].antNo, tagRecords[i].pc, tagRecords[i].epcID, tagRecords[i].crc}
+        tags.add(new Tag(commandCode, hardwareKey, tagRecNums, tagRecords[i].antNo, tagRecords[i].pc, tagRecords[i].epcID, tagRecords[i].crc));
+        // promises.push(addTag(commandCode, hardwareKey, tagRecNums, antNo, tagRecords[i].pc, tagRecords[i].epcID, tagRecords[i].crc));
     }
 
-    Promise.all(promises).then(_ => {
-        res.send("Done");
-    }).catch(err => {
-        console.log(err);
-        return res.status(500).json({message: Errors[73]});
-    });
+    // Promise.all(promises).then(_ => {
+    //     res.send("Done");
+    // }).catch(err => {
+    //     console.log(err);
+    //     return res.status(500).json({message: Errors[73]});
+    // });
+    res.send("Done");
 });
 
 router.post('/heartBeats', (req, res) => {
