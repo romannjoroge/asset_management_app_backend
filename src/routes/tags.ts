@@ -8,6 +8,9 @@ import { addProcessedTag } from '../Tracking/tags.js';
 import { rawTag } from '../Tracking/tags.js';
 import schedule from 'node-schedule';
 import { convertHexToASCII } from '../Tracking/tags.js';
+import expressws from 'express-ws';
+var ExpressWs = expressws(express());
+import { getAssetsLeavingLocationAndIfAuthorized } from '../Tracking/movements.js';
 
 interface tagEntry  {
     commandCode: string;
@@ -35,6 +38,23 @@ schedule.scheduleJob('*/1 * * * * *', () => {
     }).catch(err => {
         console.log(err);
         tags.clear();
+    });
+});
+
+router.ws('/locationDashboard', (ws, req) => {
+    ws.on('message', (data) => {
+        let json = JSON.parse(data);
+        let {messageType} = json;
+        
+        // if message type is initialize send all data for the location
+        if (messageType == 'init') {
+            console.log("Initializing...");
+            getAssetsLeavingLocationAndIfAuthorized(json.locationID).then(movements => {
+                ws.send(JSON.stringify(movements));
+            }).catch(err => {
+                ws.send(err.message);
+            })
+        }
     });
 });
 

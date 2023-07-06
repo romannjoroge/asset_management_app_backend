@@ -20,6 +20,7 @@
   "type": "module",
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/express-ws": "^3.0.1",
     "@types/mocha": "^10.0.1",
     "@types/pg": "^8.10.2",
     "@types/sinon": "^10.0.15",
@@ -44,6 +45,7 @@
     "express-openid-connect": "^2.8.0",
     "express-promise-router": "^4.1.1",
     "express-validator": "^6.15.0",
+    "express-ws": "^5.0.2",
     "graphql": "^16.6.0",
     "jose": "^4.8.3",
     "jsonwebtoken": "^9.0.0",

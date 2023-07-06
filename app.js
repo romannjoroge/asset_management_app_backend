@@ -11,8 +11,8 @@ import {Errors}  from './built/utility/constants.js';
 import bcrypt from 'bcrypt';
 import userTable from './built/Users/db_users.js';
 import JWT from 'jsonwebtoken';
-import { WebSocketServer } from 'ws';
-const wss = new WebSocketServer({server: app.listen(5000)});
+import expressWs from 'express-ws'
+var ExpressWs = expressWs(app);
 
 // Reading JSON data from forms and JS respectively
 app.use(cors({
@@ -177,23 +177,6 @@ app.post('/login', (req, res) => {
         res.status(500).json({message:Errors[9]});
     });
 });
-
-wss.on('connection', (ws) => {
-    ws.on('message', (data) => {
-        let json = JSON.parse(data);
-        let {messageType} = json;
-        
-        // if message type is initialize send all data for the location
-        if (messageType == 'init') {
-            getAssetsLeavingLocationAndIfAuthorized(json.locationID).then(movements => {
-                console.log(movements);
-                ws.send(JSON.stringify(movements));
-            }).catch(err => {
-                ws.send(err.message);
-            })
-        }
-    });
-})
 
 
 app.on('upgrade', (request, socket, head) => {
