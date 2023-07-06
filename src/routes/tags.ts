@@ -38,8 +38,6 @@ schedule.scheduleJob('*/1 * * * * *', () => {
     });
 });
 
-
-
 router.post('/tags', (req, res) => {
     console.log(req.body);
     // Get values from req.body
@@ -54,8 +52,7 @@ router.post('/tags', (req, res) => {
         commandCode: string, hardwareKey: string, tagRecNums: string, antNo: number, pc:string, epcID: string, crc: string
         ): Promise<void | never> {
         return new Promise((res, rej) => {
-            let epcIDToAdd = convertHexToASCII(epcID);
-            pool.query(assetTable.insertAssetTag, [commandCode, hardwareKey, tagRecNums, antNo, pc, epcIDToAdd, crc]).then(_ => {
+            pool.query(assetTable.insertAssetTag, [commandCode, hardwareKey, tagRecNums, antNo, pc, epcID, crc]).then(_ => {
                 return res();
             }).catch(err => {
                 return rej(new MyError(Errors[73]));
@@ -70,7 +67,7 @@ router.post('/tags', (req, res) => {
         let epcIDToAdd = convertHexToASCII(tagRecords[i].epcID);
         let tag: rawTag = {commandCode, hardwareKey, tagRecNums, antNo: tagRecords[i].antNo, pc: tagRecords[i].pc, epcID: epcIDToAdd, crc: tagRecords[i].crc}
         tags.add(JSON.stringify(tag));
-        promises.push(addTag(commandCode, hardwareKey, tagRecNums, antNo, tagRecords[i].pc, tagRecords[i].epcID, tagRecords[i].crc));
+        promises.push(addTag(commandCode, hardwareKey, tagRecNums, antNo, tagRecords[i].pc, epcIDToAdd, tagRecords[i].crc));
     }
 
     Promise.all(promises).then(_ => {

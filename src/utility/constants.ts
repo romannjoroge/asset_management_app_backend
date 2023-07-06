@@ -73,6 +73,7 @@ export const Errors = {
     '71': "Could Not Update Inventory",
     '72': "Could Not Update Batch",
     '73': "Could Not Read Tag",
+    '74': "Could Not Get Asset Movements",
 }
 
 export const Succes = {

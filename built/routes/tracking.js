@@ -7,6 +7,8 @@ import reportsTable from '../Reports/db_reports.js';
 import { createAntennae } from '../Tracking/antennae.js';
 import { createReader } from '../Tracking/readers.js';
 import { updateLocation } from '../Tracking/update.js';
+import { getAssetsLeavingLocationAndIfAuthorized } from '../Tracking/movements.js';
+import MyError from '../utility/myError.js';
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
     pool.query(locationTable.getLocations, []).then((data) => {
@@ -124,6 +126,20 @@ router.post('/createAntennae', (req, res) => {
     }).catch(err => {
         console.log(err);
         return res.status(400).json({ message: err.message });
+    });
+});
+router.get('/movements', (req, res) => {
+    let locationID = Number.parseInt(req.query.locationID);
+    getAssetsLeavingLocationAndIfAuthorized(locationID).then(movements => {
+        res.send(movements);
+    }).catch(err => {
+        console.log(err);
+        if (err instanceof MyError) {
+            return res.status(500).json({ message: err.message });
+        }
+        else {
+            return res.status(500).json({ message: Errors[74] });
+        }
     });
 });
 router.post('/updateLocation', (req, res) => {

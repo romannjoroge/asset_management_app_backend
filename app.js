@@ -11,6 +11,8 @@ import {Errors}  from './built/utility/constants.js';
 import bcrypt from 'bcrypt';
 import userTable from './built/Users/db_users.js';
 import JWT from 'jsonwebtoken';
+import { WebSocketServer } from 'ws';
+const wss = new WebSocketServer({server: app.listen(5000)});
 
 // Reading JSON data from forms and JS respectively
 app.use(cors({
@@ -32,6 +34,7 @@ import reports from './built/routes/reports.js';
 import users from './built/routes/users.js';
 import checkifAuthenticated from './middleware/checkifAuthenticated.js';
 import checkifAuthorized from './middleware/checkifAuthorized.js';
+import { getAssetsLeavingLocationAndIfAuthorized } from './built/Tracking/movements.js';
 
 // Routers to use for different modules
 app.use('/allocation', checkifAuthenticated, checkifAuthorized('Asset Administrator'), allocate)
@@ -43,7 +46,6 @@ app.use('/reports',  reports)
 app.use('/users', checkifAuthenticated, checkifAuthorized('User Manager'), users)
 app.use('/delete', deleteRoute);
 app.use('/tags', tags);
-
 
 app.get('/', (req, res) => {
     res.status(200).json({ success: true, msg: 'Secured resource' })
@@ -174,6 +176,28 @@ app.post('/login', (req, res) => {
         console.log(err);
         res.status(500).json({message:Errors[9]});
     });
+});
+
+wss.on('connection', (ws) => {
+    ws.on('message', (data) => {
+        let json = JSON.parse(data);
+        let {messageType} = json;
+        
+        // if message type is initialize send all data for the location
+        if (messageType == 'init') {
+            getAssetsLeavingLocationAndIfAuthorized(json.locationID).then(movements => {
+                console.log(movements);
+                ws.send(JSON.stringify(movements));
+            }).catch(err => {
+                ws.send(err.message);
+            })
+        }
+    });
+})
+
+
+app.on('upgrade', (request, socket, head) => {
+    console.log("Connection Upgraded");
 });
 
 const port = 4500;
