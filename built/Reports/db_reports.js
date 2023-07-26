@@ -34,7 +34,11 @@ SELECT a.assetid, a.barcode, a.description, a.condition, c.name AS category, a.s
 a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.assetid IS NOT NULL AND a.deleted = false AND a.assetid NOT IN (SELECT assetID FROM BatchAsset 
 WHERE batchID IN (SELECT batchID FROM InventoryBatch WHERE inventoryID = $1));
 `;
+const getAdditionalAssetsInInventory = `
+SELECT assetID FROM BatchAsset WHERE batchID IN (SELECT batchID FROM InventoryBatch WHERE inventoryID = $1) AND assetID NOT IN (SELECT assetID From Asset);
+`;
 export default {
+    getAdditionalAssetsInInventory,
     getAssetsNotInInventory,
     getAssetsInInventory,
     getAssetRegister,

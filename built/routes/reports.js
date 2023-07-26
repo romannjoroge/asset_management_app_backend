@@ -30,6 +30,14 @@ router.get('/inventory/:type', (req, res) => {
             return res.status(500).json({ message: Errors[9] });
         });
     }
+    else if (type == 'additional') {
+        pool.query(reportsTable.getAdditionalAssetsInInventory, [inventoryID]).then(data => {
+            res.json(data.rows);
+        }).catch(err => {
+            console.log(err);
+            return res.status(500).json({ message: Errors[9] });
+        });
+    }
 });
 router.get('/report/:type', (req, res) => {
     // Get report type from request params

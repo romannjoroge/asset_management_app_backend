@@ -13,6 +13,7 @@ import checkifAuthenticated from '../../middleware/checkifAuthenticated.js';
 import checkifAuthorized from '../../middleware/checkifAuthorized.js';
 import utility from '../utility/utility.js';
 import locationTable from '../Tracking/db_location.js';
+import _ from 'lodash';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,6 +35,14 @@ router.get('/inventory/:type', (req, res) => {
         }).catch(err => {
             return res.status(500).json({message: Errors[9]});
         })
+    }
+    else if (type == 'additional') {
+        pool.query(reportsTable.getAdditionalAssetsInInventory, [inventoryID]).then(data => {
+            res.json(data.rows);
+        }).catch(err => {
+            console.log(err);
+            return res.status(500).json({message: Errors[9]});
+        });
     }
 });
 
