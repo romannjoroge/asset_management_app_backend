@@ -1,6 +1,6 @@
 import express from 'express';
 import utility from '../utility/utility.js';
-import { Errors, Succes } from '../utility/constants.js';
+import { Errors, MyErrors2, Succes } from '../utility/constants.js';
 const router = express.Router();
 import pool from '../../db2.js';
 import { requestForGatepass } from '../GatePass/assignGatepass.js';
@@ -13,7 +13,7 @@ import { getApprovers } from '../GatePass/getApprovers.js';
 import { getPastRequests } from '../GatePass/pastgatepasses.js';
 import { getRequestedGatePasses } from '../GatePass/requestedgatepasses.js';
 import { handleRequest } from '../GatePass/handleGatepass.js';
-import { createInventory } from '../GatePass/createInventory.js';
+import { createInventory, returnInventories } from '../GatePass/createInventory.js';
 import { createBatch } from '../GatePass/createBatch.js';
 import { allocateBatch } from '../GatePass/allocateBatch.js';
 import gatepasstable from '../GatePass/db_gatepass.js';
@@ -37,6 +37,14 @@ router.get('/movements', (req, res) => {
     }).catch(err => {
         console.log(err);
         return res.status(400).json({ message: Errors[9] });
+    });
+});
+// Route to get inventories
+router.get('/inventories', (req, res) => {
+    returnInventories().then(data => {
+        return res.json(data);
+    }).catch(err => {
+        res.status(500).send(MyErrors2.NOT_GET_INVENTORIES);
     });
 });
 router.get('/approvers', (req, res) => {

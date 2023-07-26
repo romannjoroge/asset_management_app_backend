@@ -256,8 +256,9 @@ CREATE TABLE StockTake (
 );
 
 CREATE TABLE Role (
-  ID serial,
+  id serial,
   name varchar(50),
+  deleted BOOL DEFAULT FALSE NOT NULL,
   PRIMARY KEY (ID)
 );
 

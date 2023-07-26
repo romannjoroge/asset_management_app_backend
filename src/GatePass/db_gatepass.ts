@@ -39,8 +39,10 @@ const getAssetInInventoryDetails = `SELECT a.barcode, a.noInBuilding, a.code, a.
                                     WHERE batchID IN (SELECT batchID FROM InventoryBatch WHERE inventoryID = $1));`
 const updateInventory = 'UPDATE Inventory SET name = $1 WHERE id = $2';
 const updateBatch = 'UPDATE Batch SET comments = $1 WHERE id = $2';
+const returnInventories = "SELECT id, name FROM Inventory WHERE deleted = false";
 
 export default {
+    returnInventories,
     addApprover,
     updateBatch,
     updateInventory,

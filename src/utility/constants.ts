@@ -74,6 +74,11 @@ export const Errors = {
     '72': "Could Not Update Batch",
     '73': "Could Not Read Tag",
     '74': "Could Not Get Asset Movements",
+    '75': "Could Not Get Inventories",
+}
+
+export enum MyErrors2 {
+    'NOT_GET_INVENTORIES' = "Could Not Get Inventories",
 }
 
 export const Succes = {
