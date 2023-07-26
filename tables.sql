@@ -1,19 +1,27 @@
 CREATE TABLE Company (
   name varchar(50) NOT NULL,
+  deleted BOOL DEFAULT FALSE NOT NULL,
   PRIMARY KEY (name)
 );
 
+CREATE TABLE usertype (
+  id serial,
+  name VARCHAR(50) NOT NULL,
+  deleted BOOL NOT NULL DEFAULT FALSE,
+  PRIMARY KEY (id)
+ );
+
 CREATE TABLE User2 (
-  fname varchar(50) NOT NULL,
-  lname varchar(50) NOT NULL,
+  name varchar(50) NOT NULL,
   email varchar(50) NOT NULL,
   password text NOT NULL,
-  username varchar(50),
-  companyName varchar(50) NOT NULL,
+  username varchar(50) NOT NULL,
+  companyname varchar(50) NOT NULL,
+  usertype INTEGER,
+  deleted BOOL DEFAULT FALSE NOT NULL,
   PRIMARY KEY (username),
-  CONSTRAINT "FK_User.companyName"
-    FOREIGN KEY (companyName)
-      REFERENCES Company(name)
+  CONSTRAINT "FK_User.companyName" FOREIGN KEY (companyname) REFERENCES company(name),
+  CONSTRAINT "FK_User2.userType" FOREIGN KEY (usertype) REFERENCES usertype(id)
 );
 
 CREATE TABLE BuildingOffice(
@@ -62,27 +70,26 @@ CREATE TABLE Office(
 );
 
 CREATE TABLE Location (
-  ID serial,
+  id serial,
   name varchar(50) NOT NULL,
-  companyName varchar(50) NOT NULL,
+  companyname varchar(50) NOT NULL,
   parentLocationID int,
+  deleted BOOL DEFAULT FALSE NOT NULL,
   PRIMARY KEY (ID),
-  CONSTRAINT "FK_Location.companyName"
-    FOREIGN KEY (companyName)
-      REFERENCES Company(name),
-  CONSTRAINT "FK_Location.parentLocationID"
-    FOREIGN KEY (parentLocationID)
-      REFERENCES Location(ID)
+  CONSTRAINT "FK_Location.companyName" FOREIGN KEY (companyname) REFERENCES company(name),
+  CONSTRAINT "FK_Location.parentLocationID" FOREIGN KEY (parentlocationid) REFERENCES location(id)
 );
 
 CREATE TABLE Category (
-  ID serial,
+  id serial,
   name varchar(50) NOT NULL UNIQUE,
-  depreciationType varchar(50) NOT NULL,
+  depreciationtype varchar(50) NOT NULL,
+  parentcategoryid INTEGER,
+  deleted BOOL DEFAULT FALSE NOT NULL,
   PRIMARY KEY (ID),
-  CONSTRAINT "FK_Category.parentFolderID"
-    FOREIGN KEY (parentFolderID)
-      REFERENCES Folder(ID)
+  CONSTRAINT "FK_Category.parentCategoryID"
+    FOREIGN KEY (parentcategoryid)
+      REFERENCES category(id)
 );
 
 CREATE TABLE parentChildCategory(
@@ -95,13 +102,12 @@ CREATE TABLE parentChildCategory(
     FOREIGN KEY (childID) REFERENCES Category(ID)
 );
 
-CREATE TABLE DepreciationPercent (
-  categoryID int,
-  percentage float NOT NULL,
-  PRIMARY KEY (categoryID),
-  CONSTRAINT "FK_DepreciationPercent.categoryID"
-    FOREIGN KEY (categoryID)
-      REFERENCES Category(ID)
+CREATE TABLE depreciationpercent (
+  categoryid INTEGER NOT NULL,
+  percentage double precision NOT NULL,
+  deleted BOOL DEFAULT FALSE NOT NULL,
+  PRIMARY KEY (categoryid),
+  CONSTRAINT "FK_DepreciationPercent.categoryID" FOREIGN KEY (categoryid) REFERENCES category(id)
 );
 
 CREATE TABLE AssetValuationHistory(
@@ -129,29 +135,32 @@ CREATE TABLE GatePass (
 );
 
 CREATE TABLE Asset (
-  assetTag varchar(50),
-  makeAndModelNo varchar(50),
-  isFixed boolean,
-  serialNumber varchar(50),
-  acquisitionDate date,
-  locationID int,
-  status varchar(10),
-  custodianName varchar(50),
-  acquisitionCost float,
-  insuranceValue float,
-  residualValue float,
-  categoryID int,
-  assetLifeSpan smallint,
-  PRIMARY KEY (assetTag),
-  CONSTRAINT "FK_Asset.locationID"
-    FOREIGN KEY (locationID)
-      REFERENCES Location(ID),
-  CONSTRAINT "FK_Asset.categoryID"
-    FOREIGN KEY (categoryID)
-      REFERENCES Category(ID),
-  CONSTRAINT "FK_Asset.custodianID"
-    FOREIGN KEY (custodianName)
-      REFERENCES User2(username)
+  barcode VARCHAR(20),
+  code VARCHAR(255),
+  assetid serial,
+  noinbuilding INTEGER,
+  condition VARCHAR(255),
+  responsibleusername VARCHAR(255),
+  description TEXT,
+  deleted BOOL DEFAULT FALSE NOT NULL,
+  disposalvalue double precision DEFAULT 0.0,
+  disposaldate DATE DEFAULT NOW(),
+  currentvaluationvalue double precision DEFAULT 0.0,
+  latestvaluationdate DATE DEFAULT NOW(),
+  depreciationtype varchar(50),
+  depreciationpercent double precision,
+  istagged BOOL DEFAULT FALSE NOT NULL,
+  serialnumber varchar(50),
+  acquisitiondate date DEFAULT NOW(),
+  locationid int,
+  acquisitioncost double precision,
+  residualvalue double precision,
+  categoryid int,
+  usefullife smallint,
+  PRIMARY KEY (assetid),
+  CONSTRAINT "FK_Asset.categoryID" FOREIGN KEY (categoryid) REFERENCES category(id),
+  CONSTRAINT "FK_Asset.custodianID" FOREIGN KEY (responsibleusername) REFERENCES user2(username),
+  CONSTRAINT "FK_Asset.locationID" FOREIGN KEY (locationid) REFERENCES location(id)
 );
 
 CREATE TABLE GatePassAsset (
@@ -204,42 +213,36 @@ CREATE TABLE AuthorizeGatepass (
 CREATE TABLE Inventory (
   ID serial,
   name text NOT NULL,
+  deleted BOOL DEFAULT FALSE NOT NULL,
   PRIMARY KEY (ID)
 );
 
 CREATE TABLE Batch (
   id serial,
-  date timestamptz NOT NULL,
+  date timestamp with time zone NOT NULL,
   comments text,
-  locationID int,
+  locationid int,
+  deleted BOOL DEFAULT FALSE NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT "FK_Batch.locationID"
-    FOREIGN KEY (locationID)
-      REFERENCES Location(ID)
+  CONSTRAINT "FK_Batch.locationID" FOREIGN KEY (locationid) REFERENCES location(id)
 );
 
 CREATE TABLE InventoryBatch (
-  inventoryID int NOT NULL,
-  batchID int NOT NULL,
-  PRIMARY KEY (inventoryID, batchID),
-  CONSTRAINT "FK_InventoryBatch.inventoryID"
-    FOREIGN KEY (inventoryID)
-      REFERENCES Inventory(ID),
-  CONSTRAINT "FK_InventoryBatch.batchID"
-    FOREIGN KEY (batchID)
-      REFERENCES Batch(ID)
+  inventoryid int NOT NULL,
+  batchid int NOT NULL,
+  deleted BOOL DEFAULT FALSE NOT NULL,
+  PRIMARY KEY (inventoryid, batchid),
+  CONSTRAINT "FK_InventoryBatch.batchID" FOREIGN KEY (batchid) REFERENCES batch(id),
+  CONSTRAINT "FK_InventoryBatch.inventoryID" FOREIGN KEY (inventoryid) REFERENCES inventory(id)
 );
 
 CREATE TABLE BatchAsset (
-  batchID int NOT NULL,
-  assetID int NOT NULL,
-  PRIMARY KEY (batchID, assetID),
-  CONSTRAINT "FK_BatchAsset.batchID"
-    FOREIGN KEY (batchID)
-      REFERENCES Batch(ID),
-  CONSTRAINT "FK_BatchAsset.assetID"
-    FOREIGN KEY (assetID)
-      REFERENCES Asset(assetID)
+  batchid int NOT NULL,
+  assetid int NOT NULL,
+  deleted BOOL DEFAULT FALSE NOT NULL,
+  PRIMARY KEY (batchid, assetid),
+  CONSTRAINT "FK_BatchAsset.assetID" FOREIGN KEY (assetid) REFERENCES asset(assetid),
+  CONSTRAINT "FK_BatchAsset.batchID" FOREIGN KEY (batchid) REFERENCES batch(id)
 );
 
 CREATE TABLE StockTake (
