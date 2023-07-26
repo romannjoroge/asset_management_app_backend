@@ -1,5 +1,5 @@
 let getLocation = "SELECT name FROM Location WHERE id = $1";
-let getLocations = "SELECT name, id FROM Location";
+let getLocations = "SELECT name, id FROM Location WHERE deleted = false";
 const doesLocationExist = "SELECT * FROM Location WHERE name = $1 AND parentLocationID IN (SELECT id FROM Location WHERE name = $2 AND companyName = $3) AND deleted = false";
 const createLocation = "INSERT INTO Location (name, companyname, parentLocationID) VALUES ($1, $2, (SELECT id FROM Location WHERE name = $3 AND companyName=$4))";
 const doesSiteExist = "SELECT * FROM Site WHERE name = $1 AND companyName = $2";
@@ -35,7 +35,9 @@ g.approved AS authorized FROM ProcessedTags p JOIN ReaderDevice r ON r.id = p.re
 ON a.assetid = p.assetid JOIN Category c ON c.id = a.categoryid JOIN User2 u ON u.username = a.responsibleusername WHERE readerdeviceid IN (SELECT id FROM 
 ReaderDevice WHERE locationid = $1 AND entry = false)
 `;
+let getTrackedLocations = "SELECT id, name FROM Location WHERE id IN (SELECT locationid FROM readerdevice)";
 let locationTable = {
+    getTrackedLocations,
     getAllAssetsLeavingLocationAndIfAuthorized,
     addProcessedTag,
     getParentLocations,

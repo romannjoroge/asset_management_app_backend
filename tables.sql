@@ -390,14 +390,13 @@ CREATE TABLE GatePass (
       REFERENCES User2(username)
 );
 
-CREATE TABLE ReaderDevice (
+CREATE TABLE readerdevice (
   id serial,
-  locationID int NOT NULL,
+  locationid int NOT NULL,
   deleted boolean NOT NULL DEFAULT false,
+  entry BOOL NOT NULL DEFAULT true,
   PRIMARY KEY (id),
-  CONSTRAINT "FK_ReaderDevice.locationID"
-    FOREIGN KEY (locationID)
-      REFERENCES Location(ID)
+  CONSTRAINT "FK_ReaderDevice.locationID" FOREIGN KEY (locationid) REFERENCES location(id)
 );
 
 CREATE TABLE ProcessedTags (

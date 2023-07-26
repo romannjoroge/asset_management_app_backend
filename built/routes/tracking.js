@@ -25,6 +25,16 @@ router.get('/getLocations', (req, res) => {
         });
     });
 });
+router.get('/getTrackedLocations', (req, res) => {
+    pool.query(locationTable.getTrackedLocations, []).then((data) => {
+        return res.send(data.rows);
+    }).catch((e) => {
+        console.log(e);
+        return res.status(501).json({
+            message: Errors[9]
+        });
+    });
+});
 router.get('/children/:id', (req, res) => {
     let locationID = req.params.id;
     // Get all children of a location
