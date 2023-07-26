@@ -50,6 +50,7 @@ const filterAssetsByLocationAndCategory = `SELECT a.assetid, a.barcode, a.descri
                                         AND a.categoryid = $1 AND a.locationid = $2`;
 
 
+
 const assetTable = {
     filterAssetsByLocationAndCategory,
     filterAssetsByLocation,

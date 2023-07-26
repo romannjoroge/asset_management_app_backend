@@ -41,6 +41,7 @@ const updateInventory = 'UPDATE Inventory SET name = $1 WHERE id = $2';
 const updateBatch = 'UPDATE Batch SET comments = $1 WHERE id = $2';
 const returnInventories = "SELECT id, name FROM Inventory WHERE deleted = false";
 
+
 export default {
     returnInventories,
     addApprover,

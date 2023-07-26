@@ -17,6 +17,19 @@ import locationTable from '../Tracking/db_location.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+router.get('/inventory/:type', (req, res) => {
+    let type = req.params.type
+    let inventoryID = Number.parseInt(req.query.inventoryID);
+
+    if (type === "present") {
+        pool.query(reportsTable.getAssetsInInventory, [inventoryID]).then(data => {
+            res.json(data.rows);
+        }).catch(err => {
+            return res.status(500).json({message: Errors[9]});
+        })
+    }
+});
+
 router.get('/report/:type', (req, res) => {
     // Get report type from request params
     let reportType = req.params.type;

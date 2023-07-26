@@ -24,8 +24,14 @@ const depSchedule = "SELECT year, openingBookValue FROM DepreciationSchedule WHE
 const getAssetRegister = `SELECT a.serialnumber, a.acquisitiondate, a.condition, a.responsibleusername, a.acquisitioncost, a.residualvalue, 
                         c.name AS category, a.usefullife, a.barcode, a.code, a.noinbuilding, a.description, l.name AS location FROM Asset a FULL JOIN 
                         Category c ON c.id = a.categoryid FULL JOIN Location l ON l.id = a.locationid`
+const getAssetsInInventory = `
+SELECT a.assetid, a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a FULL JOIN Location l ON l.id = 
+a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.assetid IS NOT NULL AND a.deleted = false AND a.assetid IN (SELECT assetID FROM BatchAsset 
+WHERE batchID IN (SELECT batchID FROM InventoryBatch WHERE inventoryID = $1));
+`
 
 export default {
+    getAssetsInInventory,
     getAssetRegister,
     physical_valuation,
     depSchedule,
