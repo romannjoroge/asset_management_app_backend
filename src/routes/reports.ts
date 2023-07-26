@@ -28,6 +28,13 @@ router.get('/inventory/:type', (req, res) => {
             return res.status(500).json({message: Errors[9]});
         })
     }
+    else if (type == 'missing') {
+        pool.query(reportsTable.getAssetsNotInInventory, [inventoryID]).then(data => {
+            res.json(data.rows);
+        }).catch(err => {
+            return res.status(500).json({message: Errors[9]});
+        })
+    }
 });
 
 router.get('/report/:type', (req, res) => {
