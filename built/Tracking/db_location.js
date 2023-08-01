@@ -36,7 +36,9 @@ ON a.assetid = p.assetid JOIN Category c ON c.id = a.categoryid JOIN User2 u ON 
 ReaderDevice WHERE locationid = $1 AND entry = false)
 `;
 let getTrackedLocations = "SELECT id, name FROM Location WHERE id IN (SELECT locationid FROM readerdevice)";
+let getLocationDetails = "SELECT id, name, parentLocationID FROM Location WHERE deleted = false";
 let locationTable = {
+    getLocationDetails,
     getTrackedLocations,
     getAllAssetsLeavingLocationAndIfAuthorized,
     addProcessedTag,

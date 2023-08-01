@@ -27,6 +27,33 @@ router.get('/getLocations', (req, res) => {
     })
 });
 
+interface LocationDetails {
+    id: number,
+    parentlocationid: number,
+    name: string
+}
+
+interface LocationDetailsFetchRequest {
+    rows: LocationDetails[]
+    rowCount: number
+}
+
+router.get('/locationDetails', (req, res) => {
+    pool.query(locationTable.getLocationDetails, []).then((data) => {
+        if (data.rowCount <= 0){
+            return res.status(404).json({
+                message: Errors[13]
+            });
+        }
+        return res.json(data.rows);
+    }).catch((e) => {
+        console.log(e);
+        return res.status(501).json({
+            message: Errors[9]
+        })
+    });
+});
+
 router.get('/getTrackedLocations', (req, res) => {
     pool.query(locationTable.getTrackedLocations, []).then((data) => {
         return res.send(data.rows);
