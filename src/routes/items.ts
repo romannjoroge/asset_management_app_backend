@@ -131,8 +131,8 @@ router.get('/view/:id', checkifAuthenticated, checkifAuthorized('Asset User'), (
 router.get('/get/:item', (req, res) => {
     let item = req.params.item;
     let query;
-    let arguements;
-    let errorMessage;
+    let arguements: any[];
+    let errorMessage: string;
 
     if (item === "assetCategory") {
         query = assetTable.assetCategories;
@@ -140,6 +140,10 @@ router.get('/get/:item', (req, res) => {
         errorMessage = Errors[22];
     } else if (item === "assets") {
         query = assetTable.getAllAssets;
+        arguements = [];
+        errorMessage = Errors[8];
+    } else if(item === "assetLocations") {
+        query = assetTable.getAllAssetsWithLocationID;
         arguements = [];
         errorMessage = Errors[8];
     } else {

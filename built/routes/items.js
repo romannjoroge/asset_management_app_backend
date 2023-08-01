@@ -104,6 +104,11 @@ router.get('/get/:item', (req, res) => {
         arguements = [];
         errorMessage = Errors[8];
     }
+    else if (item === "assetLocations") {
+        query = assetTable.getAllAssetsWithLocationID;
+        arguements = [];
+        errorMessage = Errors[8];
+    }
     else {
         return res.status(400).json({ message: Errors[0] });
     }
