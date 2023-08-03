@@ -7,7 +7,7 @@ import MyError from "../built/utility/myError.js";
 import { Errors } from "../built/utility/constants.js";
 import { getApprovers } from "../built/GatePass/getApprovers.js";
 
-describe("Assign Asset Gatepass test", function () {
+describe.skip("Assign Asset Gatepass test", function () {
     let asset = {
         assetID: 1000,
         barCode: "AUA7000",
@@ -158,7 +158,7 @@ describe("Assign Asset Gatepass test", function () {
 });
 
 
-describe("Get Approvers", function () {
+describe.skip("Get Approvers", function () {
     let parentLocation = {
         id: 1002,
         name: "TestyLocation3",

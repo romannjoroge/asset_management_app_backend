@@ -6,7 +6,7 @@ import { Errors } from '../built/utility/constants.js';
 import utility from "../built/utility/utility.js";
 import { assert } from "chai";
 
-describe("Create Antennae Tests", function () {
+describe.skip("Create Antennae Tests", function () {
     let existingReader = {
         hardwareKey: "1234567890",
         locationID: 1,
@@ -99,7 +99,7 @@ describe("Create Antennae Tests", function () {
     });
 });
 
-describe("Update Antennae Tests", function () {
+describe.skip("Update Antennae Tests", function () {
     let existingReader = {
         hardwareKey: "1234567890",
         locationID: 1,

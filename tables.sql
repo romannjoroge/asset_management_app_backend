@@ -157,6 +157,8 @@ CREATE TABLE Asset (
   residualvalue double precision,
   categoryid int,
   usefullife smallint,
+  lastConverted timestamp,
+  isConverted BOOL DEFAULT FALSE,
   PRIMARY KEY (assetid),
   CONSTRAINT "FK_Asset.categoryID" FOREIGN KEY (categoryid) REFERENCES category(id),
   CONSTRAINT "FK_Asset.custodianID" FOREIGN KEY (responsibleusername) REFERENCES user2(username),

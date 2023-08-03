@@ -38,6 +38,8 @@ router.ws('/locationDashboard', (ws, req) => {
         }
     });
 });
+router.post('/sync', (req, res) => {
+});
 router.post('/tags', (req, res) => {
     console.log(req.body);
     // Get values from req.body

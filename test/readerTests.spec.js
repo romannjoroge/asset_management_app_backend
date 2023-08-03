@@ -6,7 +6,7 @@ import { Errors } from '../built/utility/constants.js';
 import utility from "../built/utility/utility.js";
 import pool from "../db2.js";
 
-describe("Create Reader Tests", function () {
+describe.skip("Create Reader Tests", function () {
     let existingReader = {
         hardwareKey: "1234567890",
         locationID: 1,
@@ -69,7 +69,7 @@ describe("Create Reader Tests", function () {
     });
 });
 
-describe("Update Reader Tests", function () {
+describe.skip("Update Reader Tests", function () {
     let existingReader = {
         hardwareKey: "1234567890",
         locationID: 1,

@@ -1,8 +1,29 @@
 import pool from "../../db2.js";
 import Asset from "../Allocation/Asset/asset2.js";
-import { Errors } from "../utility/constants.js";
+import { Errors, MyErrors2 } from "../utility/constants.js";
 import MyError from "../utility/myError.js";
 import locationTable from "./db_location.js";
+export function syncTags(tags) {
+    let promises = [];
+    for (var tag in tags) {
+    }
+}
+export function syncTag(tag) {
+    return new Promise((res, rej) => {
+        // Convert date to ISO string
+        Asset._getAssetID(tag.barcode).then(assetID => {
+            pool.query(locationTable.syncItem, [tag.timestamp, true, assetID]).then(() => {
+                return res();
+            }).catch(err => {
+                console.log(err);
+                return rej(new MyError(MyErrors2.NOT_STORE_CONVERTED));
+            });
+        }).catch(err => {
+            console.log(err);
+            return rej(new MyError(MyErrors2.NOT_STORE_CONVERTED));
+        });
+    });
+}
 function convertRawTagToProcessedTag(rawTag) {
     return new Promise((res, rej) => {
         let readerDeviceID = rawTag.hardwareKey + rawTag.antNo;

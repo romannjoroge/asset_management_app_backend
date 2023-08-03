@@ -79,6 +79,7 @@ export const Errors = {
 export var MyErrors2;
 (function (MyErrors2) {
     MyErrors2["NOT_GET_INVENTORIES"] = "Could Not Get Inventories";
+    MyErrors2["NOT_STORE_CONVERTED"] = "Could Not Store Converted Assets";
 })(MyErrors2 || (MyErrors2 = {}));
 export const Succes = {
     '1': 'Asset Created Successfuly',

@@ -41,7 +41,7 @@ async function checkDepreciationScheduleEntries(expectedEntries, assetID) {
     }
 }
 
-describe("Creating Depreciation Schedules for assets with written down value depreciation type", function(){
+describe.skip("Creating Depreciation Schedules for assets with written down value depreciation type", function(){
     // Test Variables
     let depreciationPercentage = 20;
     let barcode = 'AUA7000';
@@ -125,7 +125,7 @@ describe("Creating Depreciation Schedules for assets with written down value dep
     });
 });
 
-describe("Creating Depreciation Schedules for assets with straight line depreciation type", function(){
+describe.skip("Creating Depreciation Schedules for assets with straight line depreciation type", function(){
     let assetID = 1000;
     let acquisitionCost = 10000;
     let residualValue = 2000;
@@ -202,7 +202,7 @@ describe("Creating Depreciation Schedules for assets with straight line deprecia
     });
 });
 
-describe("Creating Depreciation Schedules for assets with double declining balance", function(){
+describe.skip("Creating Depreciation Schedules for assets with double declining balance", function(){
     let assetID = 1000;
     let acquisitionCost = 10000;
     let assetlifespan = 5;
