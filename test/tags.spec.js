@@ -68,7 +68,7 @@ describe("Sync Asset Tests", () => {
 
         let tag = {
             barcode: nonExistingbarcode,
-            timestamp: Date.now()
+            timestamp: new Date
         }
 
         try {
@@ -86,7 +86,7 @@ describe("Sync Asset Tests", () => {
     it("should pass when existing asset is given", async() => {
         let tag = {
             barcode: testAsset.barCode,
-            timestamp: Date.now()
+            timestamp: new Date
         }
 
         try {

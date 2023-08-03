@@ -11,8 +11,9 @@ export function syncTags(tags) {
 export function syncTag(tag) {
     return new Promise((res, rej) => {
         // Convert date to ISO string
+        let dateToAdd = tag.timestamp.toISOString();
         Asset._getAssetID(tag.barcode).then(assetID => {
-            pool.query(locationTable.syncItem, [tag.timestamp, true, assetID]).then(() => {
+            pool.query(locationTable.syncItem, [dateToAdd, true, assetID]).then(() => {
                 return res();
             }).catch(err => {
                 console.log(err);
