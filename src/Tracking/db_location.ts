@@ -37,8 +37,10 @@ ReaderDevice WHERE locationid = $1 AND entry = false)
 let getTrackedLocations = "SELECT id, name FROM Location WHERE id IN (SELECT locationid FROM readerdevice)";
 let getLocationDetails = "SELECT id, name, parentLocationID FROM Location WHERE deleted = false";
 let syncItem = "UPDATE Asset SET lastConverted = $1, isConverted = $2 WHERE assetID = $3";
+let createRFIDReader = "INSERT INTO RFIDReader (readerID, locationid, entry) VALUES ($1, $2, $3)";
 
 let locationTable = {
+    createRFIDReader,
     syncItem,
     getLocationDetails,
     getTrackedLocations,

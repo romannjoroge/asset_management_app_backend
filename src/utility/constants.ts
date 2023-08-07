@@ -79,7 +79,8 @@ export const Errors = {
 
 export enum MyErrors2 {
     'NOT_GET_INVENTORIES' = "Could Not Get Inventories",
-    'NOT_STORE_CONVERTED' = "Could Not Store Converted Assets"
+    'NOT_STORE_CONVERTED' = "Could Not Store Converted Assets",
+    'NOT_CREATE_READER' = "Could Not Create Reader",
 }
 
 export const Succes = {
