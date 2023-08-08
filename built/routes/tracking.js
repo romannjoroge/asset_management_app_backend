@@ -2,13 +2,14 @@ import express from 'express';
 const router = express.Router();
 import pool from '../../db2.js';
 import locationTable from '../Tracking/db_location.js';
-import { Errors, Succes } from '../utility/constants.js';
+import { Errors, MyErrors2, Succes, Success2 } from '../utility/constants.js';
 import reportsTable from '../Reports/db_reports.js';
 import { createAntennae } from '../Tracking/antennae.js';
 import { createReader } from '../Tracking/readers.js';
 import { updateLocation } from '../Tracking/update.js';
 import { getAssetsLeavingLocationAndIfAuthorized } from '../Tracking/movements.js';
 import MyError from '../utility/myError.js';
+import { createReaderDevice } from '../Tracking/rfidReader.js';
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
     pool.query(locationTable.getLocations, []).then((data) => {
@@ -89,6 +90,24 @@ router.get('/view/:item', (req, res) => {
             return res.status(400).json({ message: errorMessage });
         }
         return res.json(fetchResult.rows);
+    });
+});
+router.post('/reader', (req, res) => {
+    // Get data from request
+    let readerdeviceid = req.body.readerID;
+    let locationid = Number.parseInt(req.body.locationID);
+    let entry = req.body.entry;
+    // Create reader
+    createReaderDevice(readerdeviceid, locationid, entry).then(_ => {
+        return res.json({ message: Success2.CREATED_READER_DEVICE });
+    }).catch(err => {
+        console.log(err);
+        if (err instanceof MyError) {
+            return res.status(400).json({ message: err.message });
+        }
+        else {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        }
     });
 });
 // Route for creating locations or sites

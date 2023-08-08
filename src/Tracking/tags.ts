@@ -26,7 +26,7 @@ interface SyncItem {
     timestamp: Date;
 }
 
-export function syncTags(tags: <SyncItem>[]): Promise<void> {
+export function syncTags(tags: SyncItem[]): Promise<void> {
     let promises: Promise<void>[] = [];
 
     for (var tag in tags) {

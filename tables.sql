@@ -354,6 +354,15 @@ CREATE TABLE Tags(
   PRIMARY KEY (id)
 );
 
+CREATE TABLE IF NOT EXISTS readerdevice (
+  id varchar(50),
+  PRIMARY KEY (id),
+  locationid int,
+  CONSTRAINT "FK_ReaderDevice.locationID" FOREIGN KEY (locationid) REFERENCES location(id),
+  deleted BOOL DEFAULT FALSE NOT NULL,
+  entry BOOL DEFAULT TRUE NOT NULL
+);
+
 CREATE TABLE RFIDReader(
   id serial,
   address int NOT NULL,

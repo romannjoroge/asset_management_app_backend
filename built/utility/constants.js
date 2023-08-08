@@ -80,7 +80,16 @@ export var MyErrors2;
 (function (MyErrors2) {
     MyErrors2["NOT_GET_INVENTORIES"] = "Could Not Get Inventories";
     MyErrors2["NOT_STORE_CONVERTED"] = "Could Not Store Converted Assets";
+    MyErrors2["NOT_CREATE_READER"] = "Could Not Create Reader";
+    MyErrors2["NOT_CONFIRM_READER"] = "Could Not Confirm Reader Details";
+    MyErrors2["READER_EXISTS"] = "Reader Already Exists";
+    MyErrors2["INTERNAL_SERVER_ERROR"] = "Internal Server Error";
+    MyErrors2["INVALID_READER_DETAILS"] = "Invalid Reader Details";
 })(MyErrors2 || (MyErrors2 = {}));
+export var Success2;
+(function (Success2) {
+    Success2["CREATED_READER_DEVICE"] = "Reader Device Created Successfully";
+})(Success2 || (Success2 = {}));
 export const Succes = {
     '1': 'Asset Created Successfuly',
     '2': "Reports Sent Successfully",

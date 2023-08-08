@@ -54,3 +54,8 @@ export async function createTestInventory(props) {
 export async function createTestBatch(props) {
     await pool.query("INSERT INTO Batch (id, date, comments, locationid) VALUES($1, $2, $3, $4)", [props.id, props.date, props.comments, props.locationid]);
 }
+
+export async function createTestReaderDevice(props) {
+    await pool.query("INSERT INTO ReaderDevice (readerdeviceid, locationid, deleted, entry, id) VALUES ($1, $2, $3, $4, $5)", 
+                    [props.readerdeviceid, props.locationid, props.deleted, props.entry, props.id]);
+}

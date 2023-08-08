@@ -81,6 +81,14 @@ export enum MyErrors2 {
     'NOT_GET_INVENTORIES' = "Could Not Get Inventories",
     'NOT_STORE_CONVERTED' = "Could Not Store Converted Assets",
     'NOT_CREATE_READER' = "Could Not Create Reader",
+    'NOT_CONFIRM_READER' = "Could Not Confirm Reader Details",
+    'READER_EXISTS' = "Reader Already Exists",
+    'INTERNAL_SERVER_ERROR' = "Internal Server Error",
+    'INVALID_READER_DETAILS' = "Invalid Reader Details"
+}
+
+export enum Success2 {
+    'CREATED_READER_DEVICE' = "Reader Device Created Successfully",
 }
 
 export const Succes = {
