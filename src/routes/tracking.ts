@@ -9,7 +9,7 @@ import { createReader } from '../Tracking/readers.js';
 import { updateLocationJSON, updateLocation } from '../Tracking/update.js';
 import { getAssetsLeavingLocationAndIfAuthorized } from '../Tracking/movements.js';
 import MyError from '../utility/myError.js';
-import { createReaderDevice } from '../Tracking/rfidReader.js';
+import { createReaderDevice, getReaderDevices } from '../Tracking/rfidReader.js';
 
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
@@ -110,7 +110,22 @@ router.get('/view/:item', (req, res) => {
         return res.json(fetchResult.rows)
     })
 });
+// Gets reader devices in system
+router.get("/reader", (req, res) => {
+    // Run command
+    getReaderDevices().then(data => {
+        return res.json(data);
+    }).catch(err => {
+        console.log(err);
+        if (err instanceof MyError) {
+            return res.status(400).json({message: err.message});
+        } else {
+            return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+        }
+    })
+});
 
+// Creates a reader device
 router.post('/reader', (req, res) => {
     // Get data from request
     let readerdeviceid: string = req.body.readerID;

@@ -5,6 +5,30 @@ import MyError from "../utility/myError.js";
 import locationTable from "./db_location.js";
 import Location from "./location.js";
 
+interface getReaderDevice {
+    id: number,
+    entry: boolean,
+    readerdeviceid: string,
+    location: string,
+}
+
+interface getReaderDeviceFetchResult {
+    rows: getReaderDevice[];
+    rowCount: number
+}
+
+export function getReaderDevices(): Promise<getReaderDevice[]> {
+    return new Promise((res, rej) => {
+        // Run database query
+        pool.query(locationTable.getReaderDevices).then((fetchResult: getReaderDeviceFetchResult) => {
+            return res(fetchResult.rows);
+        }).catch(err => {
+            console.log(err);
+            return rej(new MyError(MyErrors2.NOT_GET_READERS));
+        })
+    });
+}
+
 export function createReaderDevice(readerdeviceid: string, locationid: number, entry: boolean): Promise<void> {
     return new Promise((res, rej) => {
         // Check if reader exists

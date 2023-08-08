@@ -4,6 +4,17 @@ import { MyErrors2 } from "../utility/constants.js";
 import MyError from "../utility/myError.js";
 import locationTable from "./db_location.js";
 import Location from "./location.js";
+export function getReaderDevices() {
+    return new Promise((res, rej) => {
+        // Run database query
+        pool.query(locationTable.getReaderDevices).then((fetchResult) => {
+            return res(fetchResult.rows);
+        }).catch(err => {
+            console.log(err);
+            return rej(new MyError(MyErrors2.NOT_GET_READERS));
+        });
+    });
+}
 export function createReaderDevice(readerdeviceid, locationid, entry) {
     return new Promise((res, rej) => {
         // Check if reader exists

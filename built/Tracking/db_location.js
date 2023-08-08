@@ -40,7 +40,11 @@ let getLocationDetails = "SELECT id, name, parentLocationID FROM Location WHERE 
 let syncItem = "UPDATE Asset SET lastConverted = $1, isConverted = $2 WHERE assetID = $3";
 let createReaderDevice = "INSERT INTO readerdevice (readerdeviceid, locationid, entry) VALUES ($1, $2, $3)";
 let doesReaderDeviceExist = "SELECT * FROM readerdevice WHERE readerdeviceid = $1 AND deleted = false";
+let getReaderDevices = `
+SELECT r.id, entry, readerdeviceid, l.name AS location FROM ReaderDevice r INNER JOIN Location l ON l.id = r.locationid WHERE r.deleted = false;
+`;
 let locationTable = {
+    getReaderDevices,
     doesReaderDeviceExist,
     createReaderDevice,
     syncItem,
