@@ -39,7 +39,7 @@ let getTrackedLocations = "SELECT id, name FROM Location WHERE id IN (SELECT loc
 let getLocationDetails = "SELECT id, name, parentLocationID FROM Location WHERE deleted = false";
 let syncItem = "UPDATE Asset SET lastConverted = $1, isConverted = $2 WHERE assetID = $3";
 let createReaderDevice = "INSERT INTO readerdevice (readerdeviceid, locationid, entry) VALUES ($1, $2, $3)";
-let doesReaderDeviceExist = "SELECT * FROM readerdevice WHERE readerdeviceid = $1";
+let doesReaderDeviceExist = "SELECT * FROM readerdevice WHERE readerdeviceid = $1 AND deleted = false";
 let locationTable = {
     doesReaderDeviceExist,
     createReaderDevice,
