@@ -107,6 +107,10 @@ router.get("/reader", (req, res) => {
         }
     });
 });
+router.post('/editReaderDevice', (req, res) => {
+    let body = req.body;
+    let props = {};
+});
 // Creates a reader device
 router.post('/reader', (req, res) => {
     // Get data from request

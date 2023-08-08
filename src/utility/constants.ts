@@ -85,7 +85,9 @@ export enum MyErrors2 {
     'READER_EXISTS' = "Reader Already Exists",
     'INTERNAL_SERVER_ERROR' = "Internal Server Error",
     'INVALID_READER_DETAILS' = "Invalid Reader Details",
-    'NOT_GET_READERS' = "Could Not Get Readers"
+    'NOT_GET_READERS' = "Could Not Get Readers",
+    'READER_DOESNT_EXIST' = "Reader Does Not Exist",
+    'NOT_EDIT_READER' = "Could Not Update Reader",
 }
 
 export enum Success2 {

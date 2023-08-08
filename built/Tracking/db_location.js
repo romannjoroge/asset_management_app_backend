@@ -43,7 +43,9 @@ let doesReaderDeviceExist = "SELECT * FROM readerdevice WHERE readerdeviceid = $
 let getReaderDevices = `
 SELECT r.id, entry, readerdeviceid, l.name AS location FROM ReaderDevice r INNER JOIN Location l ON l.id = r.locationid WHERE r.deleted = false;
 `;
+let doesReaderIDExist = "SELECT * FROM ReaderDevice WHERE id = $1";
 let locationTable = {
+    doesReaderIDExist,
     getReaderDevices,
     doesReaderDeviceExist,
     createReaderDevice,

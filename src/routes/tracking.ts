@@ -9,7 +9,7 @@ import { createReader } from '../Tracking/readers.js';
 import { updateLocationJSON, updateLocation } from '../Tracking/update.js';
 import { getAssetsLeavingLocationAndIfAuthorized } from '../Tracking/movements.js';
 import MyError from '../utility/myError.js';
-import { createReaderDevice, getReaderDevices } from '../Tracking/rfidReader.js';
+import { createReaderDevice, editReaderDevice, getReaderDevices } from '../Tracking/rfidReader.js';
 
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
@@ -124,6 +124,11 @@ router.get("/reader", (req, res) => {
         }
     })
 });
+
+router.post('/editReaderDevice', (req, res) => {
+    let body: editReaderDevice = req.body;
+    let props: editReaderDevice = {};
+})
 
 // Creates a reader device
 router.post('/reader', (req, res) => {

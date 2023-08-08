@@ -17,6 +17,130 @@ interface getReaderDeviceFetchResult {
     rowCount: number
 }
 
+export interface editReaderDevice {
+    readerdeviceid?: string;
+    entry?: boolean;
+    locationid?: number;
+}
+
+export function editReaderDevice(deviceID: number, props: editReaderDevice): Promise<void> {
+    return new Promise((res, rej) => {
+        // Check if provided device exists
+        doesReaderDeviceIDExist(deviceID).then(doesExist => {
+            if (doesExist == false) {
+                return rej(new MyError(MyErrors2.READER_DOESNT_EXIST));
+            }
+
+            // Verify provided reader details
+            verifyReaderDeviceDetails(props).then(isValid => {
+                if (isValid == false) {
+                    return rej(new MyError(MyErrors2.INVALID_READER_DETAILS));
+                }
+
+                // Update Details
+                let promises: Promise<void>[] = [];
+                Object.entries(props).forEach(([key2, value]) => promises.push(updateReader(deviceID, {[key2]: value})));
+
+                Promise.all(promises).then(() => {
+                    return res();
+                }).catch(err => {
+                    console.log(err);
+                    if (err instanceof MyError) {
+                        return rej(err);
+                    } else {
+                        return rej(new MyError(MyErrors2.NOT_EDIT_READER));
+                    }
+                });
+            }).catch(err => {
+                console.log(err);
+                if (err instanceof MyError) {
+                    return rej(err);
+                } else {
+                    return rej(new MyError(MyErrors2.NOT_EDIT_READER));
+                }
+            })
+        }).catch(err => {
+            console.log(err);
+            if (err instanceof MyError) {
+                return rej(err);
+            } else {
+                return rej(new MyError(MyErrors2.NOT_EDIT_READER));
+            }
+        })
+    })
+}
+
+function updateReader(deviceID: number, props: editReaderDevice): Promise<void> {
+    return new Promise((res, rej) => {
+        if (props.entry != null) {
+            updateReaderEntry(props.entry, deviceID).then(_ => {
+                return res();
+            }).catch(err => {
+                console.log(err);
+                return rej(new MyError(MyErrors2.NOT_EDIT_READER));
+            })
+        } 
+        
+        else if (props.locationid) {
+            updateReaderLocation(props.locationid, deviceID).then(_ => {
+                return res();
+            }).catch(err => {
+                console.log(err);
+                return rej(new MyError(MyErrors2.NOT_EDIT_READER));
+            })
+        }
+        
+        else if (props.readerdeviceid) {
+            updateReaderReaderDeviceID(props.readerdeviceid, deviceID).then(_ => {
+                return res();
+            }).catch(err => {
+                console.log(err);
+                return rej(new MyError(MyErrors2.NOT_EDIT_READER));
+            })
+        } 
+
+        else {
+            return rej(new MyError(MyErrors2.INVALID_READER_DETAILS));
+        }
+    });
+}
+
+function updateReaderLocation(locationID: number, deviceID: number): Promise<void> {
+    return new Promise((res, rej) => {
+        // Run Query
+        pool.query("UPDATE ReaderDevice SET locationid = $1 WHERE id = $2", [locationID, deviceID]).then(_ => {
+            return res();
+        }).catch(err => {
+            console.log(err);
+            return rej(new MyError(MyErrors2.NOT_EDIT_READER));
+        })
+    });
+}
+
+function updateReaderEntry(enty: boolean, deviceID: number): Promise<void> {
+    return new Promise((res, rej) => {
+        // Run Query
+        pool.query("UPDATE ReaderDevice SET entry = $1 WHERE id = $2", [enty, deviceID]).then(_ => {
+            return res();
+        }).catch(err => {
+            console.log(err);
+            return rej(new MyError(MyErrors2.NOT_EDIT_READER));
+        })
+    });
+}
+
+function updateReaderReaderDeviceID(readerdeviceid: string, deviceID: number): Promise<void> {
+    return new Promise((res, rej) => {
+        // Run Query
+        pool.query("UPDATE ReaderDevice SET readerdeviceid = $1 WHERE id = $2", [readerdeviceid, deviceID]).then(_ => {
+            return res();
+        }).catch(err => {
+            console.log(err);
+            return rej(new MyError(MyErrors2.NOT_EDIT_READER));
+        })
+    });
+}
+
 export function getReaderDevices(): Promise<getReaderDevice[]> {
     return new Promise((res, rej) => {
         // Run database query
@@ -38,7 +162,7 @@ export function createReaderDevice(readerdeviceid: string, locationid: number, e
             }
 
             // Verify reader details
-            verifyReaderDeviceDetails(locationid).then(isValid => {
+            verifyReaderDeviceDetails({locationid}).then(isValid => {
                 if (isValid == false) {
                     return rej(new MyError(MyErrors2.INVALID_READER_DETAILS));
                 }
@@ -86,18 +210,24 @@ interface SelecteReaderDeviceFetchResult {
     rowCount: number;
 }
 
-export function verifyReaderDeviceDetails(locationid: number): Promise<boolean> {
+export function verifyReaderDeviceDetails(props: editReaderDevice): Promise<boolean> {
     return new Promise((res, rej) => {
-        Location.verifyLocationID(locationid).then(doesExist => {
-            if (doesExist == false) {
-                return res(false);
-            }
+        if (props.locationid) {
+            Location.verifyLocationID(props.locationid).then(doesExist => {
+                if (doesExist == false) {
+                    return res(false);
+                }
+    
+                return res(true);
+            }).catch(err => {
+                console.log(err);
+                return rej(new MyError(MyErrors2.NOT_CONFIRM_READER));
+            })
+        }
 
-            return res(true);
-        }).catch(err => {
-            console.log(err);
-            return rej(new MyError(MyErrors2.NOT_CONFIRM_READER));
-        })
+        else {
+            return rej(new MyError(MyErrors2.INVALID_READER_DETAILS));
+        }
     });
 }
 
@@ -109,6 +239,20 @@ export function createReaderDeviceDB(readerdeviceid: string, locationid: number,
         }).catch(err => {
             console.log(err);
             return rej(new MyError(MyErrors2.NOT_CREATE_READER));
+        })
+    });
+}
+
+export function doesReaderDeviceIDExist(deviceID: number): Promise<boolean> {
+    return new Promise((res, rej) => {
+        pool.query(locationTable.doesReaderIDExist, [deviceID]).then((data: SelecteReaderDeviceFetchResult) => {
+            if (data.rowCount <= 0) {
+                return res(false);
+            } else {
+                return res(true);
+            }
+        }).catch(err => {
+            return rej(new MyError(MyErrors2.NOT_CONFIRM_READER));
         })
     });
 }
