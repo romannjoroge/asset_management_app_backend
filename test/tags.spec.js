@@ -101,7 +101,7 @@ describe("Sync Asset Tests", () => {
         }
     });
 
-    it.skip("should pass when existing asset is given", async() => {
+    it("should pass when existing asset is given", async() => {
         let tag = {
             barcode: testAsset.barCode,
             timestamp: new Date()
@@ -126,7 +126,7 @@ describe("Sync Asset Tests", () => {
         }
     });
 
-    it.skip("should be able to sync multiple tags", async() => {
+    it("should be able to sync multiple tags", async() => {
         let tags = [
             {
                 barcode: testAsset.barCode,

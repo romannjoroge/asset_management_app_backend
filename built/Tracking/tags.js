@@ -28,8 +28,9 @@ export function syncTag(tag) {
             if (doesExist == false) {
                 return rej(new MyError(MyErrors2.ASSET_NOT_EXIST));
             }
+            let timestamp = new Date(tag.timestamp);
             // Convert date to ISO string
-            let dateToAdd = tag.timestamp.toISOString();
+            let dateToAdd = timestamp.toISOString();
             Asset._getAssetID(tag.barcode).then(assetID => {
                 pool.query(locationTable.syncItem, [dateToAdd, true, assetID]).then(() => {
                     return res();

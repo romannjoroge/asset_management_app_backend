@@ -2,6 +2,7 @@ import pool from "../../db2.js";
 import Asset from "../Allocation/Asset/asset2.js";
 import { Errors, MyErrors2 } from "../utility/constants.js";
 import MyError from "../utility/myError.js";
+import utility from "../utility/utility.js";
 import locationTable from "./db_location.js";
 import _ from 'lodash';
 
@@ -23,7 +24,7 @@ export interface rawTag {
 
 export interface SyncItem {
     barcode: string;
-    timestamp: Date;
+    timestamp: string;
 }
 
 export function syncTags(tags: SyncItem[]): Promise<void> {
@@ -54,8 +55,9 @@ export function syncTag(tag: SyncItem): Promise<void> {
                 return rej(new MyError(MyErrors2.ASSET_NOT_EXIST));
             } 
 
+            let timestamp = new Date(tag.timestamp);
             // Convert date to ISO string
-            let dateToAdd = tag.timestamp.toISOString();
+            let dateToAdd = timestamp.toISOString();
             Asset._getAssetID(tag.barcode).then(assetID => {
                 pool.query(locationTable.syncItem, [dateToAdd, true, assetID]).then(() => {
                     return res();
