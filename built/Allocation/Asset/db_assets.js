@@ -48,7 +48,7 @@ const filterAssetsByCategory = `SELECT a.assetid, a.barcode, a.description, a.co
 const filterAssetsByLocationAndCategory = `SELECT a.assetid, a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a 
                                         FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.assetid IS NOT NULL AND a.deleted = false
                                         AND a.categoryid = $1 AND a.locationid = $2`;
-const getAllAssetsWithLocationID = "SELECT a.assetid, a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, a.locationid FROM Asset a FULL JOIN Category c ON a.categoryid = c.id WHERE a.assetid IS NOT NULL AND a.deleted = false";
+const getAllAssetsWithLocationID = "SELECT a.assetid, a.barcode, a.description, a.condition, a.isconverted, c.name AS category, a.serialNumber, a.locationid, l.name as location FROM Asset a FULL JOIN Category c ON a.categoryid = c.id INNER JOIN Location l ON l.id = a.locationid WHERE a.assetid IS NOT NULL AND a.deleted = false";
 const assetTable = {
     getAllAssetsWithLocationID,
     filterAssetsByLocationAndCategory,
