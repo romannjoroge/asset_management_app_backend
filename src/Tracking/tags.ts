@@ -21,34 +21,60 @@ export interface rawTag {
     crc: string;
 }
 
-interface SyncItem {
+export interface SyncItem {
     barcode: string;
     timestamp: Date;
 }
 
 export function syncTags(tags: SyncItem[]): Promise<void> {
-    let promises: Promise<void>[] = [];
+    return new Promise((res, rej) => {
+        let promises: Promise<void>[] = [];
 
-    for (var tag in tags) {
+        // Sync every tag
+        tags.forEach((tag) => promises.push(syncTag(tag)));
 
-    }
+        Promise.all(promises).then(_ => {
+            return res();
+        }).catch(err => {
+            console.log(err);
+            if (err instanceof MyError) {
+                return rej(err);
+            } else {
+                return rej(new MyError(MyErrors2.NOT_STORE_CONVERTED));
+            }
+        })
+    });
 }
 
 export function syncTag(tag: SyncItem): Promise<void> {
     return new Promise((res, rej) => {
-        // Convert date to ISO string
-        let dateToAdd = tag.timestamp.toISOString();
-        Asset._getAssetID(tag.barcode).then(assetID => {
-            pool.query(locationTable.syncItem, [dateToAdd, true, assetID]).then(() => {
-                return res();
+        // Check if asset exist
+        Asset._doesBarCodeExist(tag.barcode).then(doesExist => {
+            if (doesExist == false) {
+                return rej(new MyError(MyErrors2.ASSET_NOT_EXIST));
+            } 
+
+            // Convert date to ISO string
+            let dateToAdd = tag.timestamp.toISOString();
+            Asset._getAssetID(tag.barcode).then(assetID => {
+                pool.query(locationTable.syncItem, [dateToAdd, true, assetID]).then(() => {
+                    return res();
+                }).catch(err => {
+                    console.log(err);
+                    return rej(new MyError(MyErrors2.NOT_STORE_CONVERTED));
+                })
             }).catch(err => {
                 console.log(err);
                 return rej(new MyError(MyErrors2.NOT_STORE_CONVERTED));
-            })
+            });
         }).catch(err => {
             console.log(err);
-            return rej(new MyError(MyErrors2.NOT_STORE_CONVERTED));
-        });
+            if (err instanceof MyError) {
+                return rej(err);
+            } else {
+                return rej(new MyError(MyErrors2.NOT_STORE_CONVERTED));
+            }
+        })
     });
 }
 

@@ -88,11 +88,13 @@ export enum MyErrors2 {
     'NOT_GET_READERS' = "Could Not Get Readers",
     'READER_DOESNT_EXIST' = "Reader Does Not Exist",
     'NOT_EDIT_READER' = "Could Not Update Reader",
+    'ASSET_NOT_EXIST' = "Asset Does Not Exist",
 }
 
 export enum Success2 {
     'CREATED_READER_DEVICE' = "Reader Device Created Successfully",
     'UPDATE_READER_DEVICE' = "Reader Device Updated Successfully",
+    'SYNC_CONVERTED' = "Synced Converted Assets Succesfully",
 }
 
 export const Succes = {

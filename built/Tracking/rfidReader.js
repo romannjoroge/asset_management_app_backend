@@ -185,7 +185,7 @@ export function verifyReaderDeviceDetails(props) {
                 return rej(new MyError(MyErrors2.NOT_CONFIRM_READER));
             });
         }
-        else if (props.readerdeviceid) {
+        if (props.readerdeviceid) {
             checkIfReaderDeviceExists(props.readerdeviceid).then(doesExist => {
                 if (doesExist == false) {
                     return res(true);
@@ -196,11 +196,8 @@ export function verifyReaderDeviceDetails(props) {
                 return rej(new MyError(MyErrors2.NOT_CONFIRM_READER));
             });
         }
-        else if (props.entry !== null && props.entry !== undefined) {
+        if (props.entry !== null && props.entry !== undefined) {
             return res(true);
-        }
-        else {
-            return rej(new MyError(MyErrors2.INVALID_READER_DETAILS));
         }
     });
 }

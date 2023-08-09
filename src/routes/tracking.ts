@@ -11,6 +11,7 @@ import { getAssetsLeavingLocationAndIfAuthorized } from '../Tracking/movements.j
 import MyError from '../utility/myError.js';
 import { createReaderDevice, editReaderDevice, getReaderDevices } from '../Tracking/rfidReader.js';
 import { update } from 'lodash';
+import { syncTags, SyncItem } from '../Tracking/tags.js';
 
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
@@ -125,6 +126,23 @@ router.get("/reader", (req, res) => {
         }
     })
 });
+
+router.post('/sync', (req, res) => {
+    // Get data
+    let tags: SyncItem[] = req.body.tags;
+
+    // Sync tags
+    syncTags(tags).then(_ => {
+        return res.json({message: Success2.SYNC_CONVERTED});
+    }).catch(err => {
+        console.log(err);
+        if (err instanceof MyError) {
+            return res.status(400).json({message: err.message});
+        } else {
+            return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+        }
+    });
+})
 
 router.post('/editReaderDevice', (req, res) => {
     let body: editReaderDevice = req.body;

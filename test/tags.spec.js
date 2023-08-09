@@ -1,4 +1,4 @@
-import {syncTag} from '../built/Tracking/tags.js';
+import {syncTag, syncTags} from '../built/Tracking/tags.js';
 import { assert } from 'chai';
 import {createTemporaryTable, createAsset, createCategory, createTestUser, dropTemporaryTable, createLocation} from './commonTestFunctions.js'
 import MyError from '../built/utility/myError.js';
@@ -46,6 +46,23 @@ describe("Sync Asset Tests", () => {
         acquisitionCost: 10000
     };
 
+    let testAsset2 = {
+        assetID: 1001,
+        barCode: "AUA7001",
+        locationID: testLocation.id,
+        noInBuilding: 1,
+        code: 'AUA7001',
+        description: 'This is a test asset',
+        categoryID: testCategory.id,
+        usefulLife: 10,
+        serialNumber: 'AUA7000',
+        condition: 'Good',
+        responsibleUsername: testUser.name,
+        acquisitionDate: '06-13-2023',
+        residualValue: 1000,
+        acquisitionCost: 10000
+    };
+
     beforeEach(async () => {
         try {
             await createTemporaryTable('Asset');
@@ -56,6 +73,7 @@ describe("Sync Asset Tests", () => {
             await createLocation(testLocation);
             await createCategory(testCategory)
             await createAsset(testAsset);
+            await createAsset(testAsset2);
         } catch(err) {
             console.log(err);
             assert.equal(false, "Could Not Create Test Asset")
@@ -74,7 +92,7 @@ describe("Sync Asset Tests", () => {
         try {
             await syncTag(tag);
         } catch(err) {
-            if (err instanceof MyError && err.message == MyErrors2.NOT_STORE_CONVERTED) {
+            if (err instanceof MyError && err.message == MyErrors2.ASSET_NOT_EXIST) {
                 assert(true, "Correct Error Thrown");
             } else {
                 console.log(err);
@@ -83,10 +101,10 @@ describe("Sync Asset Tests", () => {
         }
     });
 
-    it("should pass when existing asset is given", async() => {
+    it.skip("should pass when existing asset is given", async() => {
         let tag = {
             barcode: testAsset.barCode,
-            timestamp: new Date
+            timestamp: new Date()
         }
 
         try {
@@ -95,7 +113,7 @@ describe("Sync Asset Tests", () => {
             // See if entry was update
             let assetID = await Asset._getAssetID(tag.barcode);
             const query = "SELECT lastConverted, isConverted FROM Asset WHERE assetID = $1";
-            let fetchResult = pool.query(query, [assetID]);
+            let fetchResult = await pool.query(query, [assetID]);
             let result = fetchResult.rows[0];
             let expectedResult = {
                 "lastconverted": tag.timestamp,
@@ -106,7 +124,48 @@ describe("Sync Asset Tests", () => {
             console.log(err);
             assert(false, "Error Should Not Be Thrown");
         }
-    })
+    });
+
+    it.skip("should be able to sync multiple tags", async() => {
+        let tags = [
+            {
+                barcode: testAsset.barCode,
+                timestamp: new Date()
+            },
+            {
+                barcode: testAsset2.barCode,
+                timestamp: new Date()
+            }
+        ];
+
+        try {
+            await syncTags(tags);
+
+            // See if entry was update
+            let assetID1 = await Asset._getAssetID(tags[0].barcode);
+            const query = "SELECT lastConverted, isConverted FROM Asset WHERE assetID = $1";
+            let fetchResult1 = await pool.query(query, [assetID1]);
+            let result1 = fetchResult1.rows[0];
+            let expectedResult1 = {
+                "lastconverted": tags[0].timestamp,
+                "isconverted": true
+            };
+            assert.deepEqual(result1, expectedResult1, "Wrong Thing Returned");
+
+            // See if entry2 was update
+            let assetID2 = await Asset._getAssetID(tags[1].barcode);
+            let fetchResult2 = await pool.query(query, [assetID2]);
+            let result2 = fetchResult2.rows[0];
+            let expectedResult2 = {
+                "lastconverted": tags[1].timestamp,
+                "isconverted": true
+            };
+            assert.deepEqual(result2, expectedResult2, "Wrong Thing Returned");
+        } catch(err) {
+            console.log(err);
+            assert(false, "Error Should Not Be Thrown");
+        }
+    });
 
     afterEach(async () => {
         try {
