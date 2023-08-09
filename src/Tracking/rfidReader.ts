@@ -32,16 +32,18 @@ export function editReaderDevice(deviceID: number, props: editReaderDevice): Pro
             }
 
             // Verify provided reader details
-            verifyReaderDeviceDetails(props).then(isValid => {
-                if (isValid == false) {
+            let promises: Promise<boolean>[] = [];
+            Object.entries(props).forEach(([key2, value]) => promises.push(verifyReaderDeviceDetails({[key2]: value})));
+            Promise.all(promises).then(isValid => {
+                if (isValid.includes(false)) {
                     return rej(new MyError(MyErrors2.INVALID_READER_DETAILS));
                 }
 
                 // Update Details
-                let promises: Promise<void>[] = [];
-                Object.entries(props).forEach(([key2, value]) => promises.push(updateReader(deviceID, {[key2]: value})));
+                let promises2: Promise<void>[] = [];
+                Object.entries(props).forEach(([key2, value]) => promises2.push(updateReader(deviceID, {[key2]: value})));
 
-                Promise.all(promises).then(() => {
+                Promise.all(promises2).then(() => {
                     return res();
                 }).catch(err => {
                     console.log(err);
@@ -56,9 +58,9 @@ export function editReaderDevice(deviceID: number, props: editReaderDevice): Pro
                 if (err instanceof MyError) {
                     return rej(err);
                 } else {
-                    return rej(new MyError(MyErrors2.NOT_EDIT_READER));
+                    return rej(new MyError(MyErrors2.NOT_CONFIRM_READER));
                 }
-            })
+            });
         }).catch(err => {
             console.log(err);
             if (err instanceof MyError) {
@@ -72,7 +74,7 @@ export function editReaderDevice(deviceID: number, props: editReaderDevice): Pro
 
 function updateReader(deviceID: number, props: editReaderDevice): Promise<void> {
     return new Promise((res, rej) => {
-        if (props.entry != null) {
+        if (props.entry !== null && props.entry !== undefined) {
             updateReaderEntry(props.entry, deviceID).then(_ => {
                 return res();
             }).catch(err => {
@@ -212,6 +214,7 @@ interface SelecteReaderDeviceFetchResult {
 
 export function verifyReaderDeviceDetails(props: editReaderDevice): Promise<boolean> {
     return new Promise((res, rej) => {
+        console.log(props);
         if (props.locationid) {
             Location.verifyLocationID(props.locationid).then(doesExist => {
                 if (doesExist == false) {
@@ -225,8 +228,21 @@ export function verifyReaderDeviceDetails(props: editReaderDevice): Promise<bool
             })
         }
 
-        else {
-            return rej(new MyError(MyErrors2.INVALID_READER_DETAILS));
+        if (props.readerdeviceid) {
+            checkIfReaderDeviceExists(props.readerdeviceid).then(doesExist => {
+                if (doesExist == false) {
+                    return res(true);
+                }
+    
+                return res(false);
+            }).catch(err => {
+                console.log(err);
+                return rej(new MyError(MyErrors2.NOT_CONFIRM_READER));
+            });
+        }
+
+        if (props.entry !== null && props.entry !== undefined) {
+            return res(true);
         }
     });
 }

@@ -5,11 +5,12 @@ import locationTable from '../Tracking/db_location.js';
 import { Errors, MyErrors2, Succes, Success2 } from '../utility/constants.js';
 import reportsTable from '../Reports/db_reports.js';
 import { createAntennae } from '../Tracking/antennae.js';
-import { createReader } from '../Tracking/readers.js';
+import { createReader, updateReader } from '../Tracking/readers.js';
 import { updateLocationJSON, updateLocation } from '../Tracking/update.js';
 import { getAssetsLeavingLocationAndIfAuthorized } from '../Tracking/movements.js';
 import MyError from '../utility/myError.js';
 import { createReaderDevice, editReaderDevice, getReaderDevices } from '../Tracking/rfidReader.js';
+import { update } from 'lodash';
 
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
@@ -128,6 +129,31 @@ router.get("/reader", (req, res) => {
 router.post('/editReaderDevice', (req, res) => {
     let body: editReaderDevice = req.body;
     let props: editReaderDevice = {};
+    let deviceID: number = Number.parseInt(req.body.deviceID);
+
+    if (body.locationid) {
+        props.locationid = body.locationid;
+    }
+    
+    if (body.readerdeviceid) {
+        props.readerdeviceid = body.readerdeviceid;
+    }
+
+    if (body.entry !== null && body.entry !== undefined) {
+        props.entry = body.entry;
+    }
+
+    // Update reader device
+    editReaderDevice(deviceID, props).then(_ => {
+        return res.json({message: Success2.UPDATE_READER_DEVICE});
+    }).catch(err => {
+        console.log(err);
+        if (err instanceof MyError) {
+            return res.status(400).json({message: err.message});
+        } else {
+            return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+        }
+    });
 })
 
 // Creates a reader device

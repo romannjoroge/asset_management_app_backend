@@ -92,6 +92,7 @@ export enum MyErrors2 {
 
 export enum Success2 {
     'CREATED_READER_DEVICE' = "Reader Device Created Successfully",
+    'UPDATE_READER_DEVICE' = "Reader Device Updated Successfully",
 }
 
 export const Succes = {

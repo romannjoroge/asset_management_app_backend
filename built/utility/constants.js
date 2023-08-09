@@ -92,6 +92,7 @@ export var MyErrors2;
 export var Success2;
 (function (Success2) {
     Success2["CREATED_READER_DEVICE"] = "Reader Device Created Successfully";
+    Success2["UPDATE_READER_DEVICE"] = "Reader Device Updated Successfully";
 })(Success2 || (Success2 = {}));
 export const Succes = {
     '1': 'Asset Created Successfuly',
