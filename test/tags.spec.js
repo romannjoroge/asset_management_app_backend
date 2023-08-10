@@ -112,12 +112,13 @@ describe("Sync Asset Tests", () => {
 
             // See if entry was update
             let assetID = await Asset._getAssetID(tag.barcode);
-            const query = "SELECT lastConverted, isConverted FROM Asset WHERE assetID = $1";
+            const query = "SELECT lastConverted, isConverted, isTagged FROM Asset WHERE assetID = $1";
             let fetchResult = await pool.query(query, [assetID]);
             let result = fetchResult.rows[0];
             let expectedResult = {
                 "lastconverted": tag.timestamp,
-                "isconverted": true
+                "isconverted": true,
+                "istagged": true
             };
             assert.deepEqual(result, expectedResult, "Wrong Thing Returned");
         } catch(err) {
@@ -143,12 +144,13 @@ describe("Sync Asset Tests", () => {
 
             // See if entry was update
             let assetID1 = await Asset._getAssetID(tags[0].barcode);
-            const query = "SELECT lastConverted, isConverted FROM Asset WHERE assetID = $1";
+            const query = "SELECT lastConverted, isConverted, istagged FROM Asset WHERE assetID = $1";
             let fetchResult1 = await pool.query(query, [assetID1]);
             let result1 = fetchResult1.rows[0];
             let expectedResult1 = {
                 "lastconverted": tags[0].timestamp,
-                "isconverted": true
+                "isconverted": true,
+                "istagged": true
             };
             assert.deepEqual(result1, expectedResult1, "Wrong Thing Returned");
 
@@ -158,7 +160,8 @@ describe("Sync Asset Tests", () => {
             let result2 = fetchResult2.rows[0];
             let expectedResult2 = {
                 "lastconverted": tags[1].timestamp,
-                "isconverted": true
+                "isconverted": true,
+                "istagged": true
             };
             assert.deepEqual(result2, expectedResult2, "Wrong Thing Returned");
         } catch(err) {

@@ -1,0 +1,2 @@
+SELECT barcode, assetID, l.name as location, isconverted, istagged FROM Asset a INNER JOIN Location l ON l.id = a.locationid WHERE assetID BETWEEN 904 and 915;
+UPDATE Asset SET isconverted = true, istagged = true WHERE assetID BETWEEN 893 and 900;

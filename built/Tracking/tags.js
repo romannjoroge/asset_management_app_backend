@@ -32,7 +32,7 @@ export function syncTag(tag) {
             // Convert date to ISO string
             let dateToAdd = timestamp.toISOString();
             Asset._getAssetID(tag.barcode).then(assetID => {
-                pool.query(locationTable.syncItem, [dateToAdd, true, assetID]).then(() => {
+                pool.query(locationTable.syncItem, [dateToAdd, true, true, assetID]).then(() => {
                     return res();
                 }).catch(err => {
                     console.log(err);
