@@ -32,6 +32,7 @@ import tracking from './built/routes/tracking.js';
 import gatepass from './built/routes/gatepass.js';
 import reports from './built/routes/reports.js';
 import users from './built/routes/users.js';
+import importModule from './built/routes/import.js';
 import checkifAuthenticated from './middleware/checkifAuthenticated.js';
 import checkifAuthorized from './middleware/checkifAuthorized.js';
 import { getAssetsLeavingLocationAndIfAuthorized } from './built/Tracking/movements.js';
@@ -45,6 +46,7 @@ app.use('/gatepass', checkifAuthenticated, gatepass)
 app.use('/reports',  reports)
 app.use('/users', checkifAuthenticated, checkifAuthorized('User Manager'), users)
 app.use('/delete', deleteRoute);
+app.use('/import', importModule);
 app.use('/tags', tags);
 
 app.get('/', (req, res) => {

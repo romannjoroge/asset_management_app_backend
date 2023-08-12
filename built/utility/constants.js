@@ -89,6 +89,7 @@ export var MyErrors2;
     MyErrors2["READER_DOESNT_EXIST"] = "Reader Does Not Exist";
     MyErrors2["NOT_EDIT_READER"] = "Could Not Update Reader";
     MyErrors2["ASSET_NOT_EXIST"] = "Asset Does Not Exist";
+    MyErrors2["NOT_STORE_FILE"] = "Could Not Store File";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

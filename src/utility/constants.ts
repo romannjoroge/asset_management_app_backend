@@ -89,6 +89,7 @@ export enum MyErrors2 {
     'READER_DOESNT_EXIST' = "Reader Does Not Exist",
     'NOT_EDIT_READER' = "Could Not Update Reader",
     'ASSET_NOT_EXIST' = "Asset Does Not Exist",
+    'NOT_STORE_FILE' = "Could Not Store File"
 }
 
 export enum Success2 {
