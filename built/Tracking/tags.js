@@ -5,13 +5,16 @@ import MyError from "../utility/myError.js";
 import locationTable from "./db_location.js";
 export function syncTags(tags) {
     return new Promise((res, rej) => {
+        console.log(1);
         let promises = [];
         let missingAssets = [];
         // Sync every tag
         tags.forEach((tag) => promises.push(syncTag(tag, missingAssets)));
         Promise.all(promises).then(_ => {
+            console.log(2);
             return res(missingAssets);
         }).catch(err => {
+            console.log(3);
             console.log(err);
             if (err instanceof MyError) {
                 return rej(err);
@@ -37,6 +40,7 @@ export function syncTag(tag, missingAssets) {
                 // return rej(new MyError(MyErrors2.ASSET_NOT_EXIST));
                 // No longer throwing an error since someone could have written a wrong barcode by mistake and we don't want to stop the whole process
                 missingAssets.push(tag.barcode);
+                return res();
             }
             let timestamp = new Date(tag.timestamp);
             // Convert date to ISO string

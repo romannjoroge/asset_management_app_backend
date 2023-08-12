@@ -14,12 +14,19 @@ import categoryTable from './db_category2.js';
 // Importing custom MyError class
 import MyError from '../../utility/myError.js';
 import utility from '../../utility/utility.js';
-import { Errors } from '../../utility/constants.js';
+import { Errors, MyErrors2 } from '../../utility/constants.js';
 import { DepreciationTypes } from '../Asset/asset2.js';
 class Category {
     // Constructor
+    /**
+     *
+     * @param categoryName The name of the category to be created
+     * @param parentCategoryID The id of the parent category, this is optional as categories don't need to always have parents
+     * @param depreciationType
+     * @param depreciationPercentage Optional as not every category needs to have it
+     */
     constructor(categoryName, parentCategoryID, depreciationType, depreciationPercentage) {
-        if (utility.isAnyEmpty([categoryName, parentCategoryID, depreciationType])) {
+        if (utility.isAnyEmpty([categoryName, depreciationType])) {
             throw new MyError("Missing Information");
         }
         if (typeof categoryName === "string") {
@@ -28,48 +35,90 @@ class Category {
         else {
             throw new MyError("Invalid Category Name");
         }
-        if (!Number.isInteger(parentCategoryID)) {
-            throw new MyError("Invalid parent category");
-        }
-        else {
-            this.parentCategoryID = parentCategoryID;
+        // If there is a parentcategory id check if it is valid
+        if (parentCategoryID) {
+            if (!Number.isInteger(parentCategoryID)) {
+                throw new MyError(MyErrors2.INVALID_PARENT_CATEGORY);
+            }
+            else {
+                this.parentCategoryID = parentCategoryID;
+            }
         }
         Category.verifyDepreciationDetails({ type: depreciationType, value: depreciationPercentage });
         this.depreciaitionType = depreciationType;
         this.depreciationPercentage = depreciationPercentage;
     }
     // Function that saves category in the database
+    /**
+     *
+     * @param categoryName Name of the category to add to database
+     * @param parentCategoryID The optional parent category of category
+     * @param depreciationType
+     * @param depreciationPercentage Optional
+     * @description Given the following details the function adds the details to the database. The name must be unique otherwise an error is thrown. Parent category is optional
+     */
     static _saveCategoryInDb(categoryName, parentCategoryID, depreciationType, depreciationPercentage) {
         return __awaiter(this, void 0, void 0, function* () {
             // Create category
-            pool.query(categoryTable.add, [categoryName, depreciationType, parentCategoryID]).then(_ => {
-                if (depreciationPercentage) {
-                    // Add depreciaition percentage to database
-                    // Get ID of created category
-                    Category._getCategoryID(categoryName).then(ID => {
-                        // Add depreciation percentage to database
-                        pool.query(categoryTable.addWritten, [ID, depreciationPercentage]).then(_ => {
+            // Check if parent category is given
+            if (parentCategoryID) {
+                pool.query(categoryTable.add, [categoryName, depreciationType, parentCategoryID]).then(_ => {
+                    if (depreciationPercentage) {
+                        // Add depreciaition percentage to database
+                        // Get ID of created category
+                        Category._getCategoryID(categoryName).then(ID => {
+                            // Add depreciation percentage to database
+                            pool.query(categoryTable.addWritten, [ID, depreciationPercentage]).then(_ => {
+                            }).catch(err => {
+                                throw new MyError("Could Not Add Entry to DepreciationPercentage table");
+                            });
                         }).catch(err => {
-                            throw new MyError("Could Not Add Entry to DepreciationPercentage table");
+                            console.log(err);
+                            throw new MyError(Errors[12]);
                         });
-                    }).catch(err => {
-                        console.log(err);
-                        throw new MyError(Errors[12]);
-                    });
-                }
-            }).catch(err => {
-                console.log(err);
-                throw new MyError(Errors[9]);
-            });
+                    }
+                }).catch(err => {
+                    console.log(err);
+                    throw new MyError(Errors[9]);
+                });
+            }
+            else {
+                // Add a category with no parent
+                pool.query(categoryTable.addCategoryWithNoParent, [categoryName, depreciationType]).then(_ => {
+                    if (depreciationPercentage) {
+                        // Add depreciaition percentage to database
+                        // Get ID of created category
+                        Category._getCategoryID(categoryName).then(ID => {
+                            // Add depreciation percentage to database
+                            pool.query(categoryTable.addWritten, [ID, depreciationPercentage]).then(_ => {
+                            }).catch(err => {
+                                throw new MyError("Could Not Add Entry to DepreciationPercentage table");
+                            });
+                        }).catch(err => {
+                            console.log(err);
+                            throw new MyError(Errors[12]);
+                        });
+                    }
+                }).catch(err => {
+                    console.log(err);
+                    throw new MyError(Errors[9]);
+                });
+            }
         });
     }
+    /**
+     * @description This function combines both the constructor and save in db functions
+     */
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
             if (yield Category._doesCategoryExist(this.categoryName)) {
                 throw new MyError("Category Already Exists");
             }
-            if (!(yield Category._doesCategoryIDExist(this.parentCategoryID))) {
-                throw new MyError("Parent Category Does Not Exist");
+            // If there is a parent category check if it is valida
+            if (this.parentCategoryID) {
+                if (!(yield Category._doesCategoryIDExist(this.parentCategoryID))) {
+                    throw new MyError("Parent Category Does Not Exist");
+                }
             }
             utility.addErrorHandlingToAsyncFunction(Category._saveCategoryInDb, "Could not add category to system", this.categoryName, this.parentCategoryID, this.depreciaitionType, this.depreciationPercentage);
         });

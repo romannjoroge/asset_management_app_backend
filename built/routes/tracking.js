@@ -181,14 +181,31 @@ router.post('/create/:item', (req, res) => {
     let createItemQuery;
     let createItemParams;
     let successMessage;
+    /**
+     * @description This handles creating a location.
+     * @param name is the name of the location to create. It must be unique in its site / parent location (to be decided if useful)
+     * @param companyName the name of the organization
+     * @param site name of the parent location. This is optional
+     */
     if (item == 'location') {
         let { name, site, companyName } = req.body;
-        itemExistParams = [name, site, companyName];
-        itemExistQuery = locationTable.doesLocationExist;
-        ExistErrorMessage = Errors[32];
-        createItemQuery = locationTable.createLocation;
-        createItemParams = [name, companyName, site, companyName];
-        successMessage = Succes[5];
+        // Check if site is there
+        if (!site) {
+            itemExistParams = [name, companyName];
+            itemExistQuery = locationTable.doesSiteExist;
+            ExistErrorMessage = MyErrors2.EXISTS_LOCATION;
+            createItemQuery = locationTable.createLocationWithNoParent,
+                createItemParams = [name, companyName];
+            successMessage = Success2.CREATED_LOCATION;
+        }
+        else {
+            itemExistParams = [name, site, companyName];
+            itemExistQuery = locationTable.doesLocationExist;
+            ExistErrorMessage = MyErrors2.EXISTS_LOCATION;
+            createItemQuery = locationTable.createLocation;
+            createItemParams = [name, companyName, site, companyName];
+            successMessage = Success2.CREATED_LOCATION;
+        }
     }
     else if (item == 'site') {
         let { name, county, city, address, companyName } = req.body;
@@ -213,7 +230,7 @@ router.post('/create/:item', (req, res) => {
             return res.json({ message: successMessage });
         }).catch(err => {
             console.log(err);
-            return res.status(500).json({ message: Errors[9] });
+            return res.status(400).json({ message: MyErrors2.NOT_CREATE_LOCATION });
         });
     }).catch(err => {
         console.log(err);

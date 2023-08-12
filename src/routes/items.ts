@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import Asset from '../Allocation/Asset/asset2.js';
-import { Errors, Succes } from '../utility/constants.js';
+import { Errors, MyErrors2, Succes, Success2 } from '../utility/constants.js';
 import pool from '../../db2.js';
 import assetTable from '../Allocation/Asset/db_assets.js';
 import checkifAuthorized from '../../middleware/checkifAuthorized.js';
@@ -57,10 +57,14 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
     let asset = new Asset(barcode, usefulLife, acquisitionDate, locationID, condition, responsibleUsername, acquisitionCost, categoryName, 
         attachments, noInBuilding, serialNumber, code, description, residualValue, depreciationType, depreciationPercent);
     asset.initialize().then(_ => {
-        return res.send(Succes[1]);
+        return res.json({message: Success2.CREATED_ASSET});
     }).catch(e => {
         console.log(e);
-        return res.status(500).json({message: Errors[9]})
+        if (e instanceof MyError) {
+            return res.status(400).json({message: e.message});
+        } else {
+            return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+        }
     });
 });
 

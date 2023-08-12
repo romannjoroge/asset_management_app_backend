@@ -310,13 +310,29 @@ CREATE TABLE Log (
       REFERENCES User2(username)
 );
 
-CREATE TABLE UserRole (
-  username varchar(50),
-  roleID int,
-  PRIMARY KEY (username, roleID),
-  CONSTRAINT "FK_User Role.username"
-    FOREIGN KEY (username)
-      REFERENCES User2(username)
+CREATE TABLE depreciationschedule (
+  year INTEGER NOT NULL,
+  openingbookvalue DOUBLE precision NOT NULL,
+  depreciationexpense DOUBLE precision NOT NULL,
+  accumulateddepreciation DOUBLE precision NOT NULL,
+  closingbookvalue DOUBLE precision NOT NULL,
+  assetid INTEGER,
+  deleted BOOLEAN DEFAULT FALSE,
+  CONSTRAINT "FK_DepreciationSchedule.assetid" FOREIGN KEY (assetid) REFERENCES asset(assetid)
+);
+
+CREATE TABLE Role (
+  id serial,
+  name varchar(50),
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE userrole (
+  username VARCHAR(50) NOT NULL,
+  roleid int NOT NULL,
+  deleted BOOLEAN DEFAULT FALSE,
+  CONSTRAINT "FK_User Role.username" FOREIGN KEY (username) REFERENCES user2(username),
+  PRIMARY KEY (username, roleid)
 );
 
 CREATE TABLE "RFID Reader" (

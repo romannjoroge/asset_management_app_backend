@@ -1,4 +1,5 @@
 const addCategory = 'INSERT into Category (name, depreciationType, parentCategoryID) VALUES($1, $2, $3)'
+const addCategoryWithNoParent = 'INSERT into Category (name, depreciationType, parentCategoryID) VALUES($1, $2, null)'
 const getCategoryID = 'SELECT ID FROM Category WHERE name = $1'
 const addWrittenValueDepreciationEntry = 'INSERT INTO DepreciationPercent (categoryID, percentage) VALUES ($1, $2)'
 const updateCategoryName = "UPDATE Category SET name = $1 WHERE id = $2";
@@ -20,6 +21,7 @@ const getAllCategories2 = `
 `
 
 let categoryTable = {
+    addCategoryWithNoParent: addCategoryWithNoParent,
     add: addCategory,
     getID: getCategoryID,
     addWritten: addWrittenValueDepreciationEntry,

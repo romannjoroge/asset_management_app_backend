@@ -89,13 +89,18 @@ export enum MyErrors2 {
     'READER_DOESNT_EXIST' = "Reader Does Not Exist",
     'NOT_EDIT_READER' = "Could Not Update Reader",
     'ASSET_NOT_EXIST' = "Asset Does Not Exist",
-    'NOT_STORE_FILE' = "Could Not Store File"
+    'NOT_STORE_FILE' = "Could Not Store File",
+    'INVALID_PARENT_CATEGORY' = "Invalid parent category",
+    'EXISTS_LOCATION' = "Location Already Exists",
+    'NOT_CREATE_LOCATION' = "Could Not Create Location",
 }
 
 export enum Success2 {
     'CREATED_READER_DEVICE' = "Reader Device Created Successfully",
     'UPDATE_READER_DEVICE' = "Reader Device Updated Successfully",
     'SYNC_CONVERTED' = "Synced Converted Assets Succesfully",
+    'CREATED_ASSET' = 'Asset Created Successfuly',
+    'CREATED_LOCATION' = "Location Created",
 }
 
 export const Succes = {

@@ -90,12 +90,17 @@ export var MyErrors2;
     MyErrors2["NOT_EDIT_READER"] = "Could Not Update Reader";
     MyErrors2["ASSET_NOT_EXIST"] = "Asset Does Not Exist";
     MyErrors2["NOT_STORE_FILE"] = "Could Not Store File";
+    MyErrors2["INVALID_PARENT_CATEGORY"] = "Invalid parent category";
+    MyErrors2["EXISTS_LOCATION"] = "Location Already Exists";
+    MyErrors2["NOT_CREATE_LOCATION"] = "Could Not Create Location";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {
     Success2["CREATED_READER_DEVICE"] = "Reader Device Created Successfully";
     Success2["UPDATE_READER_DEVICE"] = "Reader Device Updated Successfully";
     Success2["SYNC_CONVERTED"] = "Synced Converted Assets Succesfully";
+    Success2["CREATED_ASSET"] = "Asset Created Successfuly";
+    Success2["CREATED_LOCATION"] = "Location Created";
 })(Success2 || (Success2 = {}));
 export const Succes = {
     '1': 'Asset Created Successfuly',

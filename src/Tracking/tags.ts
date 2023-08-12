@@ -29,6 +29,7 @@ export interface SyncItem {
 
 export function syncTags(tags: SyncItem[]): Promise<string[]> {
     return new Promise((res, rej) => {
+        console.log(1);
         let promises: Promise<void>[] = [];
         let missingAssets: string[] = [];
 
@@ -36,8 +37,10 @@ export function syncTags(tags: SyncItem[]): Promise<string[]> {
         tags.forEach((tag) => promises.push(syncTag(tag, missingAssets),));
 
         Promise.all(promises).then(_ => {
+            console.log(2);
             return res(missingAssets);
         }).catch(err => {
+            console.log(3);
             console.log(err);
             if (err instanceof MyError) {
                 return rej(err);
@@ -62,6 +65,7 @@ export function syncTag(tag: SyncItem, missingAssets: string[]): Promise<void> {
                 // return rej(new MyError(MyErrors2.ASSET_NOT_EXIST));
                 // No longer throwing an error since someone could have written a wrong barcode by mistake and we don't want to stop the whole process
                 missingAssets.push(tag.barcode);
+                return res();
             } 
 
             let timestamp = new Date(tag.timestamp);
