@@ -6,10 +6,11 @@ import locationTable from "./db_location.js";
 export function syncTags(tags) {
     return new Promise((res, rej) => {
         let promises = [];
+        let missingAssets = [];
         // Sync every tag
-        tags.forEach((tag) => promises.push(syncTag(tag)));
+        tags.forEach((tag) => promises.push(syncTag(tag, missingAssets)));
         Promise.all(promises).then(_ => {
-            return res();
+            return res(missingAssets);
         }).catch(err => {
             console.log(err);
             if (err instanceof MyError) {
@@ -21,12 +22,21 @@ export function syncTags(tags) {
         });
     });
 }
-export function syncTag(tag) {
+/**
+ *
+ * @param tag The details of the asset that is being marked as converted or tagged
+ * @param missingAssets A list that I will return that indicates which assets were not found in the database but were written by the reader
+ * @returns list of missing assets
+ * @description This function takes the details of an asset that includes the barcode and the timestamp and marks the asset as converted or tagged. If the barcode is cuurently not in the database, it will be added to the missingAssets list and sent back to the reader
+ */
+export function syncTag(tag, missingAssets) {
     return new Promise((res, rej) => {
         // Check if asset exist
         Asset._doesBarCodeExist(tag.barcode).then(doesExist => {
             if (doesExist == false) {
-                return rej(new MyError(MyErrors2.ASSET_NOT_EXIST));
+                // return rej(new MyError(MyErrors2.ASSET_NOT_EXIST));
+                // No longer throwing an error since someone could have written a wrong barcode by mistake and we don't want to stop the whole process
+                missingAssets.push(tag.barcode);
             }
             let timestamp = new Date(tag.timestamp);
             // Convert date to ISO string

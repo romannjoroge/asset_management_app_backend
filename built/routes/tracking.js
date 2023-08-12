@@ -108,12 +108,15 @@ router.get("/reader", (req, res) => {
         }
     });
 });
+/**
+ * @description This routes receives details of the written assets from the reader. It then sends to the reader a list of the barcodes of assets that were not found in the database
+ */
 router.post('/sync', (req, res) => {
     // Get data
     let tags = req.body.tags;
     // Sync tags
-    syncTags(tags).then(_ => {
-        return res.json({ message: Success2.SYNC_CONVERTED });
+    syncTags(tags).then(missingAssets => {
+        return res.json({ message: Success2.SYNC_CONVERTED, data: missingAssets });
     }).catch(err => {
         console.log(err);
         if (err instanceof MyError) {
