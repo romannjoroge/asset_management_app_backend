@@ -12,6 +12,12 @@ interface processedTag {
     readerDeviceID: string;
 }
 
+interface movement {
+    locationid: number;
+    assetid: number;
+    entry: boolean;
+}
+
 export interface rawTag {
     commandCode: string;
     hardwareKey: string;
@@ -119,6 +125,7 @@ function addProcessedTagToDB(processedTag: processedTag): Promise<void> {
 
 export function addProcessedTag(tags: Set<string>): Promise<void> {
     return new Promise((res, rej) => {
+        let processedTags = [];
         if (tags.size == 0) {
             return res();
         } else {
@@ -126,11 +133,12 @@ export function addProcessedTag(tags: Set<string>): Promise<void> {
             tags.forEach(tag => {
                 let newTag:rawTag = JSON.parse(tag);
                 promises.push(convertRawTagToProcessedTag(newTag).then(processedTag => {
+                    processedTags.push(processedTag);
                     return addProcessedTagToDB(processedTag);
                 }));
             });
             Promise.all(promises).then(_ => {
-                return res();
+                // Update event if entry of exit is detected
             }).catch(err => {
                 console.log(err);
                 return rej(new MyError(Errors[73]));

@@ -6,8 +6,6 @@ import pool from '../../db2.js';
 import assetTable from '../Allocation/Asset/db_assets.js';
 import checkifAuthorized from '../../middleware/checkifAuthorized.js';
 import checkifAuthenticated from '../../middleware/checkifAuthenticated.js';
-import { convertArrayToCSV } from 'convert-array-to-csv';
-import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Category from '../Allocation/Category/category2.js';

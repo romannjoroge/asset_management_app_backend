@@ -359,15 +359,25 @@ CREATE TABLE DepreciationSchedule (
 
 CREATE TABLE Tags(
   id serial,
-  scannedTime timestamp with time zone DEFAULT NOW(),
-  commandCode varchar(50) NOT NULL,
-  hardwareKey varchar(50) NOT NULL,
-  tagRecNums varchar(50) NOT NULL,
-  antNo varchar(50) NOT NULL,
+  scannedtime timestamp with time zone DEFAULT NOW(),
+  commandcode varchar(50) NOT NULL,
+  hardwarekey varchar(50) NOT NULL,
+  tagrecnums varchar(50) NOT NULL,
+  antno INTEGER NOT NULL,
   pc varchar(50) NOT NULL,
-  epcID varchar(50) NOT NULL,
+  epcid varchar(50) NOT NULL,
   crc varchar(50) NOT NULL,
+  deleted BOOLEAN DEFAULT false NOT NULL,
   PRIMARY KEY (id)
+);
+
+CREATE TABLE processedtags (
+  id serial,
+  scannedtime timestamp with time zone DEFAULT NOW() NOT NULL,
+  assetid int NOT NULL,
+  readerdeviceid VARCHAR(50) NOT NULL,
+  deleted BOOLEAN DEFAULT false NOT NULL,
+  PRIMARY KEY (id),
 );
 
 CREATE TABLE IF NOT EXISTS readerdevice (

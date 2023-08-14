@@ -91,6 +91,7 @@ function addProcessedTagToDB(processedTag) {
 }
 export function addProcessedTag(tags) {
     return new Promise((res, rej) => {
+        let processedTags = [];
         if (tags.size == 0) {
             return res();
         }
@@ -99,11 +100,12 @@ export function addProcessedTag(tags) {
             tags.forEach(tag => {
                 let newTag = JSON.parse(tag);
                 promises.push(convertRawTagToProcessedTag(newTag).then(processedTag => {
+                    processedTags.push(processedTag);
                     return addProcessedTagToDB(processedTag);
                 }));
             });
             Promise.all(promises).then(_ => {
-                return res();
+                // Update event if entry of exit is detected
             }).catch(err => {
                 console.log(err);
                 return rej(new MyError(Errors[73]));

@@ -93,6 +93,7 @@ export enum MyErrors2 {
     'INVALID_PARENT_CATEGORY' = "Invalid parent category",
     'EXISTS_LOCATION' = "Location Already Exists",
     'NOT_CREATE_LOCATION' = "Could Not Create Location",
+    'NOT_READ_TAG' = "Could Not Read Tag"
 }
 
 export enum Success2 {
