@@ -44,8 +44,14 @@ let getReaderDevices = `
 SELECT r.id, entry, readerdeviceid, l.name AS location FROM ReaderDevice r INNER JOIN Location l ON l.id = r.locationid WHERE r.deleted = false;
 `
 let doesReaderIDExist = "SELECT * FROM ReaderDevice WHERE id = $1";
+let getPreviousEntry = "SELECT * FROM ProcessedTags WHERE assetID = $1 AND scannedTime < $2 ORDER BY scannedTime DESC LIMIT 1";
+let getPreviousReaderDevices = "SELECT p.readerdeviceid, r.entry FROM ProcessedTags p INNER JOIN ReaderDevice r ON r.readerdeviceid = p.readerdeviceid WHERE assetID = $1 ORDER BY scannedTime DESC LIMIT 2"
+let getLocationOfReaderDevice = "SELECT locationid FROM ReaderDevice WHERE readerdeviceid = $1";
 
 let locationTable = {
+    getLocationOfReaderDevice,
+    getPreviousReaderDevices,
+    getPreviousEntry,
     createLocationWithNoParent,
     doesReaderIDExist,
     getReaderDevices,

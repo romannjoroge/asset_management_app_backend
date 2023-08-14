@@ -77,7 +77,28 @@ router.post('/test2', (req, res) => {
     }
 });
 router.ws('/locationDashboard', (ws, req) => {
-    // ws.on()
+    let locationID = Number.parseInt(req.query.locationID);
+    // React to an event
+    eventEmitter.on('location', (data) => {
+        if (data.location == locationID) {
+            ws.send(JSON.stringify(data.data));
+        }
+        else {
+            ws.send("Not this location");
+        }
+    });
+    // React to an error
+    eventEmitter.on('error', (data) => {
+        ws.send(JSON.stringify(data));
+    });
+    ws.on('message', (data) => {
+        // Converts data to an object
+        let json = JSON.parse(data.toString());
+        // Logs the data
+        console.log(json.data);
+        // Sends data back to client
+        ws.send(JSON.stringify({ data: "Hello from server" }));
+    });
 });
 router.post('/tags', (req, res) => {
     console.log(req.body);
@@ -86,7 +107,6 @@ router.post('/tags', (req, res) => {
     let hardwareKey = req.body.hardwareKey;
     let tagRecNums = req.body.tagRecNums;
     let tagRecords = req.body.tagRecords;
-    console.log(1);
     // Add tag to database
     function addTag(commandCode, hardwareKey, tagRecNums, antNo, pc, epcID, crc) {
         return new Promise((res, rej) => {

@@ -3,6 +3,9 @@ import Asset from "../Allocation/Asset/asset2.js";
 import { Errors, MyErrors2 } from "../utility/constants.js";
 import MyError from "../utility/myError.js";
 import locationTable from "./db_location.js";
+import _ from 'lodash';
+import events from 'events';
+const eventEmitter = new events.EventEmitter();
 export function syncTags(tags) {
     return new Promise((res, rej) => {
         console.log(1);
@@ -72,7 +75,7 @@ function convertRawTagToProcessedTag(rawTag) {
         let readerDeviceID = rawTag.hardwareKey + rawTag.antNo;
         let scannedTime = new Date();
         Asset._getAssetID(rawTag.epcID).then(assetID => {
-            return res({ scannedTime, assetID, readerDeviceID });
+            return res({ scannedTime, assetID, readerDeviceID, barcode: rawTag.epcID });
         }).catch(err => {
             console.log(err);
             return rej(new MyError(Errors[73]));
@@ -81,11 +84,181 @@ function convertRawTagToProcessedTag(rawTag) {
 }
 function addProcessedTagToDB(processedTag) {
     return new Promise((res, rej) => {
+        console.log("Something Is Added To DB!");
         pool.query(locationTable.addProcessedTag, [processedTag.scannedTime, processedTag.assetID, processedTag.readerDeviceID]).then(_ => {
             return res();
         }).catch(err => {
             console.log(err);
             return rej(new MyError(Errors[73]));
+        });
+    });
+}
+function convertAndAddTag(rawTag, processedTags) {
+    return new Promise((res, rej) => {
+        convertRawTagToProcessedTag(rawTag).then(processedTag => {
+            processedTags.push(processedTag);
+            addProcessedTagToDB(processedTag).then(_ => {
+                return res();
+            }).catch(err => {
+                return rej(err);
+            });
+        }).catch(err => {
+            return rej(err);
+        });
+    });
+}
+/**
+ *
+ * @param processedTag A tag that has been read by a reader and processed by system
+ * @returns true if the previous entry is different so the asset has entered or left the building. false if there is no difference
+ */
+function isPreviousEntryInDBDifferent(processedTag) {
+    return new Promise((res, rej) => {
+        // Get the previous entries of the asset in the processed tags table
+        pool.query(locationTable.getPreviousEntry, [processedTag.assetID, processedTag.scannedTime]).then((fetchResult) => {
+            // If nothing is returned then its not different
+            if (fetchResult.rowCount <= 0) {
+                return res(false);
+            }
+            let previousEntry = fetchResult.rows[0];
+            // Check if previous entry has a different reader id
+            if (previousEntry.readerdeviceid !== processedTag.readerDeviceID) {
+                // If the previous entry has a different reader device id return true
+                return res(true);
+            }
+            else {
+                // Else return false
+                return res(false);
+            }
+        }).catch(err => {
+            return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+        });
+    });
+}
+function orderReaders(readers) {
+    return _.orderBy(readers, ['scannedTime'], ['desc']);
+}
+function emitSignal(isEntering, processedTag) {
+    return new Promise((res, rej) => {
+        // If the asset is entering get the location of the processed tag
+        if (isEntering == true) {
+            // Get the location of readerid in processed tag
+            pool.query(locationTable.getLocationOfReaderDevice, [processedTag.readerDeviceID]).then((fetchResult) => {
+                if (fetchResult.rowCount <= 0) {
+                    return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                }
+                let location = fetchResult.rows[0].locationid;
+                // Combine with isEntering and emit
+                return res({ isEntering, location, barcode: processedTag.barcode });
+            }).catch(err => {
+                return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+            });
+        }
+        // Otherwise get the location of the previous occurence 
+        else {
+            // Get previous occurence
+            pool.query(locationTable.getPreviousEntry, [processedTag.assetID, processedTag.scannedTime]).then((fetchResult) => {
+                if (fetchResult.rowCount <= 0) {
+                    return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                }
+                let previousEntry = fetchResult.rows[0];
+                // Get location of readerid in previous occurence
+                pool.query(locationTable.getLocationOfReaderDevice, [previousEntry.readerdeviceid]).then((fetchResult) => {
+                    if (fetchResult.rowCount <= 0) {
+                        return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                    }
+                    let location = fetchResult.rows[0].locationid;
+                    // Combine with isEntering and emit
+                    return res({ isEntering, location, barcode: processedTag.barcode });
+                }).catch(err => {
+                    return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                });
+            }).catch(err => {
+                return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+            });
+        }
+    });
+}
+/**
+ *
+ * @param processedTag A tag that has been read by a reader and processed by system and is different from previous entry
+ * @returns true if the asset is entering the building. false if the asset is leaving the building
+ */
+function isAssetLeavingOrEntering(processedTag) {
+    return new Promise((res, rej) => {
+        // Assume that the 2 previous entries for the asset have different readers
+        // To determine whether the asset entered or not we see the order of reader
+        // Get previous readers and if entering or leaving
+        pool.query(locationTable.getPreviousReaderDevices, [processedTag.assetID]).then((fetchResult) => {
+            if (fetchResult.rowCount <= 0) {
+                return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+            }
+            let orderedReaders = orderReaders(fetchResult.rows);
+            // If first reader is an entry then exit then item is entering
+            if (orderedReaders[1].entry == true && orderedReaders[0].entry == false) {
+                return res(true);
+            }
+            else {
+                // Else it is leaving
+                return res(false);
+            }
+        }).catch(err => {
+            return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+        });
+    });
+}
+/**
+ *
+ * @param processedTag A tag that has been read by a reader and processed by system
+ * @returns Nothing. It just emits if the item has entered or left the building
+ * @description This function takes a processed tag and checks if the item has entered or left the building. If it has, it emits an event to the location dashboard
+ */
+function processPreviousEntries(processedTag) {
+    return new Promise((res, rej) => {
+        // See if previous tag is different
+        isPreviousEntryInDBDifferent(processedTag).then(isDifferent => {
+            console.log("Is it different: ");
+            console.log(isDifferent);
+            // If they are different determine whether asset is entering or leaving
+            if (isDifferent == true) {
+                isAssetLeavingOrEntering(processedTag).then(isEntering => {
+                    console.log("Is it entering: ");
+                    console.log(isEntering);
+                    // Emit a signal
+                    emitSignal(isEntering, processedTag).then(signal => {
+                        eventEmitter.emit('location', signal);
+                        return res();
+                    }).catch(err => {
+                        console.log(err);
+                        if (err instanceof MyError) {
+                            return rej(err);
+                        }
+                        else {
+                            return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                        }
+                    });
+                }).catch(err => {
+                    console.log(err);
+                    if (err instanceof MyError) {
+                        return rej(err);
+                    }
+                    else {
+                        return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                    }
+                });
+            }
+            else {
+                // Else stop
+                return res();
+            }
+        }).catch(err => {
+            console.log(err);
+            if (err instanceof MyError) {
+                return rej(err);
+            }
+            else {
+                return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+            }
         });
     });
 }
@@ -98,14 +271,27 @@ export function addProcessedTag(tags) {
         else {
             let promises = [];
             tags.forEach(tag => {
+                console.log(tag);
                 let newTag = JSON.parse(tag);
-                promises.push(convertRawTagToProcessedTag(newTag).then(processedTag => {
-                    processedTags.push(processedTag);
-                    return addProcessedTagToDB(processedTag);
-                }));
+                promises.push(convertAndAddTag(newTag, processedTags));
             });
             Promise.all(promises).then(_ => {
                 // Update event if entry of exit is detected
+                let promises2 = [];
+                processedTags.forEach(processedTag => {
+                    promises2.push(processPreviousEntries(processedTag));
+                });
+                Promise.all(promises2).then(_ => {
+                    return res();
+                }).catch(err => {
+                    console.log(err);
+                    if (err instanceof MyError) {
+                        return rej(err);
+                    }
+                    else {
+                        return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                    }
+                });
             }).catch(err => {
                 console.log(err);
                 return rej(new MyError(Errors[73]));
