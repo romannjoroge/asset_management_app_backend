@@ -84,6 +84,13 @@ router.post('/test2', (req, res) => {
     })
 });
 
+router.ws('/test3', (ws, req) => {
+    var data = Math.random();
+    setInterval(async () => {
+        ws.send(JSON.stringify({data: data}));
+    }, 1000);
+});
+
 router.ws('/locationDashboard', (ws, req) => {
     // React to an event
     eventEmitter.on('location', (data) => {
