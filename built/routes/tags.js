@@ -69,9 +69,8 @@ router.post('/test2', (req, res) => {
     });
 });
 router.ws('/test3', (ws, req) => {
-    var data = Math.random();
     setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
-        ws.send(JSON.stringify({ data: data }));
+        ws.send(JSON.stringify({ data: Math.random() }));
     }), 1000);
 });
 router.ws('/locationDashboard', (ws, req) => {

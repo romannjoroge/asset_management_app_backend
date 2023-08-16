@@ -85,9 +85,8 @@ router.post('/test2', (req, res) => {
 });
 
 router.ws('/test3', (ws, req) => {
-    var data = Math.random();
     setInterval(async () => {
-        ws.send(JSON.stringify({data: data}));
+        ws.send(JSON.stringify({data: Math.random()}));
     }, 1000);
 });
 
