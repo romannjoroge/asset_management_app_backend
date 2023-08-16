@@ -4,7 +4,7 @@ import assetTable from '../Allocation/Asset/db_assets.js';
 import pool from '../../db2.js';
 import MyError from '../utility/myError.js';
 import { Errors, MyErrors2 } from '../utility/constants.js';
-import { addProcessedTag } from '../Tracking/tags.js';
+import { addProcessedTag, testEmitFromDifferentFile } from '../Tracking/tags.js';
 import { rawTag } from '../Tracking/tags.js';
 import schedule from 'node-schedule';
 import { convertHexToASCII } from '../Tracking/tags.js';
@@ -33,7 +33,7 @@ let tags: Set<string> = new Set();
 
 // Create job for adding tags to database
 schedule.scheduleJob('*/1 * * * * *', () => {
-    addProcessedTag(tags).then(_ => {
+    addProcessedTag(tags, eventEmitter).then(_ => {
         console.log("Added tags to database");
         console.log(tags);
         tags.clear();
@@ -77,39 +77,17 @@ router.ws('/test', (ws, req) => {
 
 router.post('/test2', (req, res) => {
     // This route emits an event when it is reached
-    try {
-        function myFunc(): Promise<void | never> {
-            return new Promise((res, rej) => {
-                setTimeout(() => {
-                    eventEmitter.emit('location', {location: 1, data: "Hello"});
-                    return res();
-                }, 1000);
-            });
-        }
-        var promises: Promise<void | never>[] = [];
-        for (let i = 0; i < 20; i ++) {
-            promises.push(myFunc());
-        }
-        Promise.all(promises).then(_ => {
-            res.send("Done");
-        }).catch(err => {
-            throw "Didn't work"
-        }) 
-    } catch(err) {
-        eventEmitter.emit('error', "Something went wrong");
-    }
+    testEmitFromDifferentFile(eventEmitter).then(_ => {
+        res.send("Done");
+    }).catch(err => {
+        res.send(err.message);
+    })
 });
 
 router.ws('/locationDashboard', (ws, req) => {
-    let locationID = Number.parseInt(req.query.locationID);
-
     // React to an event
     eventEmitter.on('location', (data) => {
-        if (data.location == locationID) {
-            ws.send(JSON.stringify(data.data));
-        } else {
-            ws.send("Not this location");
-        }
+        ws.send(JSON.stringify(data));
     });
 
     // React to an error

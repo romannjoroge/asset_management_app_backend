@@ -295,7 +295,7 @@ function isAssetLeavingOrEntering(processedTag: processedTag): Promise<boolean> 
  * @returns Nothing. It just emits if the item has entered or left the building
  * @description This function takes a processed tag and checks if the item has entered or left the building. If it has, it emits an event to the location dashboard
  */
-function processPreviousEntries(processedTag: processedTag): Promise<void> {
+function processPreviousEntries(processedTag: processedTag, eventEmitter: events.EventEmitter): Promise<void> {
     return new Promise((res, rej) => {
         // See if previous tag is different
         isPreviousEntryInDBDifferent(processedTag).then(isDifferent => {
@@ -343,7 +343,50 @@ function processPreviousEntries(processedTag: processedTag): Promise<void> {
     });
 }
 
-export function addProcessedTag(tags: Set<string>): Promise<void> {
+export function testEmitFromDifferentFile(eventEmitter: events.EventEmitter): Promise<void> {
+    return new Promise((res, rej) => {
+        try {
+            function myFunc(): Promise<void | never> {
+                return new Promise((res, rej) => {
+                    setTimeout(() => {
+                        eventEmitter.emit('location', {location: 4, data: "Hello"});
+                        return res();
+                    }, 1000);
+                });
+            }
+
+            function throwError(i: number, max: number): Promise<void> {
+                return new Promise((res, rej) => {
+                    if (i == max) {
+                        return rej(new MyError("Some Error"));
+                    } else {
+                        eventEmitter.emit('location', {location: i, data: "Hello"});
+                        res();
+                    }
+                });
+            }
+            var promises: Promise<void | never>[] = [];
+            for (let i = 0; i <= 5; i ++) {
+                promises.push(throwError(i, 4));
+            }
+            Promise.all(promises).then(_ => {
+                res();
+            }).catch(err => {
+                eventEmitter.emit('error', {error: err.message});
+                return rej(err);
+            }) 
+        } catch(err) {
+            if (err instanceof MyError) {
+                eventEmitter.emit('error', {error: err.message});
+            } else {
+                eventEmitter.emit('error', {error: "Some Error"});
+            }
+            return rej(err);
+        }
+    });
+}
+
+export function addProcessedTag(tags: Set<string>, eventEmitter: events.EventEmitter): Promise<void> {
     return new Promise((res, rej) => {
         let processedTags: processedTag[] = [];
         if (tags.size == 0) {
@@ -359,7 +402,7 @@ export function addProcessedTag(tags: Set<string>): Promise<void> {
                 // Update event if entry of exit is detected
                 let promises2: Promise<void>[] = [];
                 processedTags.forEach(processedTag => {
-                    promises2.push(processPreviousEntries(processedTag));
+                    promises2.push(processPreviousEntries(processedTag, eventEmitter));
                 });
 
                 Promise.all(promises2).then(_ => {
@@ -367,13 +410,16 @@ export function addProcessedTag(tags: Set<string>): Promise<void> {
                 }).catch(err => {
                     console.log(err);
                     if (err instanceof MyError) {
+                        eventEmitter.emit('error', {error: err.message});
                         return rej(err);
                     } else {
+                        eventEmitter.emit('error', {error: MyErrors2.NOT_PROCESS_TAG});
                         return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
                     }
                 });    
             }).catch(err => {
                 console.log(err);
+                eventEmitter.emit('error', {error: Errors[73]});
                 return rej(new MyError(Errors[73]));
             });
         }
