@@ -94,7 +94,8 @@ export enum MyErrors2 {
     'EXISTS_LOCATION' = "Location Already Exists",
     'NOT_CREATE_LOCATION' = "Could Not Create Location",
     'NOT_READ_TAG' = "Could Not Read Tag",
-    'NOT_PROCESS_TAG' = "Could Not Process Tag"
+    'NOT_PROCESS_TAG' = "Could Not Process Tag",
+    'NOT_CONFIRM_GATEPASS' = "Could Not Verify If Gatepass Exists"
 }
 
 export enum Success2 {

@@ -15,6 +15,19 @@ interface processedTag {
     barcode: string;
 }
 
+interface assetFromTag {
+    scannedTime: Date;
+    assetid: number;
+    readerDeviceID: string;
+    barcode: string;
+    serialnumber: string;
+    description: string;
+    condition: string;
+    category: string;
+    user: string;
+    hasgatepass: boolean;
+}
+
 interface movement {
     locationid: number;
     assetid: number;
@@ -128,6 +141,12 @@ function convertRawTagToProcessedTag(rawTag: rawTag): Promise<processedTag> {
     });
 }
 
+function convertProcessedTagToAsset(processedTag: processedTag): Promise<assetFromTag> {
+    return new Promise((res, rej) => {
+        // Add 
+    })
+}
+
 function addProcessedTagToDB(processedTag: processedTag): Promise<void> {
     return new Promise((res, rej) => {
         console.log("Something Is Added To DB!");
@@ -202,6 +221,13 @@ interface dashboardSignal {
     isEntering: boolean;
     location: number;
     barcode: string;
+    serialnumber: string;
+    assetid: number;
+    description: string;
+    condition: string;
+    category: string;
+    user: string;
+    hasgatepass: boolean;
 }
 
 interface GetLocationOfReaderDeviceQuery {
@@ -214,7 +240,7 @@ interface GetLocationOfReaderDeviceFetchResult {
 }
 function emitSignal(isEntering: boolean, processedTag: processedTag): Promise<dashboardSignal> {
     return new Promise((res, rej) => {
-        // If the asset is entering get the location of the processed tag
+        // If the asset is entering get the details of the processed tag
         if (isEntering == true) {
             // Get the location of readerid in processed tag
             pool.query(locationTable.getLocationOfReaderDevice, [processedTag.readerDeviceID]).then((fetchResult: GetLocationOfReaderDeviceFetchResult) => {

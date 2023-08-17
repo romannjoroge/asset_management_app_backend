@@ -40,7 +40,12 @@ const getAssetInInventoryDetails = `SELECT a.barcode, a.noInBuilding, a.code, a.
 const updateInventory = 'UPDATE Inventory SET name = $1 WHERE id = $2';
 const updateBatch = 'UPDATE Batch SET comments = $1 WHERE id = $2';
 const returnInventories = "SELECT id, name FROM Inventory WHERE deleted = false";
+const getGatepassWithLocationAndScannedTime = `
+SELECT * FROM Gatepass WHERE id IN (SELECT gatepassid FROM GatepassAsset WHERE assetid = $1) 
+AND date < $2 AND date > $3 AND fromlocation = $4;
+`;
 export default {
+    getGatepassWithLocationAndScannedTime,
     returnInventories,
     addApprover,
     updateBatch,

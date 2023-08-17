@@ -59,3 +59,14 @@ export async function createTestReaderDevice(props) {
     await pool.query("INSERT INTO ReaderDevice (readerdeviceid, locationid, deleted, entry, id) VALUES ($1, $2, $3, $4, $5)", 
                     [props.readerdeviceid, props.locationid, props.deleted, props.entry, props.id]);
 }
+
+export async function createGatePassAssetEntry(props) {
+    await pool.query("INSERT INTO gatepassasset (gatepassid, assetid) VALUES ($1, $2)", [props.gatepassid, props.assetid]);
+}
+
+export async function createGatePassEntry(props) {
+    await pool.query(
+        "INSERT INTO gatepass (id, reason, name, fromlocation, tolocation, date, approved, comment) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+        [props.id, props.reason, props.name, props.fromlocation, props.tolocation, props.date, props.approved, props.comment]
+    )
+}

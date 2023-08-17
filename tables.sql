@@ -36,16 +36,6 @@ CREATE TABLE BuildingOffice(
   PRIMARY KEY(officeID, buildingID)
 );
 
-CREATE TABLE Folder (
-  ID serial,
-  name varchar(50) NOT NULL,
-  companyName varchar(50) NOT NULL,
-  CONSTRAINT "FK_Folder.companyName"
-    FOREIGN KEY (companyName)
-      REFERENCES Company(name),
-  PRIMARY KEY (ID)
-);
-
 CREATE TABLE Site(
   ID serial,
   name varchar(50) NOT NULL,
@@ -121,19 +111,6 @@ CREATE TABLE AssetValuationHistory(
       REFERENCES Asset(assetID)
 );
 
-CREATE TABLE GatePass (
-  ID serial,
-  expectedTime timestamptz,
-  entry boolean,
-  username varchar(50),
-  reason text,
-  deleted boolean DEFAULT false,
-  PRIMARY KEY (ID),
-  CONSTRAINT "FK_GatePass.username"
-    FOREIGN KEY (username)
-      REFERENCES User2(username)
-);
-
 CREATE TABLE Asset (
   barcode VARCHAR(20),
   code VARCHAR(255),
@@ -163,19 +140,6 @@ CREATE TABLE Asset (
   CONSTRAINT "FK_Asset.categoryID" FOREIGN KEY (categoryid) REFERENCES category(id),
   CONSTRAINT "FK_Asset.custodianID" FOREIGN KEY (responsibleusername) REFERENCES user2(username),
   CONSTRAINT "FK_Asset.locationID" FOREIGN KEY (locationid) REFERENCES location(id)
-);
-
-CREATE TABLE GatePassAsset (
-  gatePassID int,
-  assetID int,
-  deleted boolean DEFAULT false,
-  PRIMARY KEY (gatePassID, assetID),
-  CONSTRAINT "FK_GatePassAsset.gatePassID"
-    FOREIGN KEY (gatePassID)
-      REFERENCES GatePass(ID),
-  CONSTRAINT "FK_GatePassAsset.assetTag"
-    FOREIGN KEY (assetID)
-      REFERENCES Asset(assetID)
 );
 
 CREATE TABLE Asset_File (
@@ -413,18 +377,39 @@ CREATE TABLE Antennae(
   PRIMARY KEY (id)
 );
 
-CREATE TABLE GatePass (
+CREATE TABLE gatepass (
   id serial,
-  leavingtime timestamptz,
-  arrivingtime timestamptz,
-  entry boolean,
-  username varchar(50),
   reason text,
-  deleted boolean DEFAULT false,
-  PRIMARY KEY (ID),
-  CONSTRAINT "FK_GatePass.username"
-    FOREIGN KEY (username)
-      REFERENCES User2(username)
+  deleted boolean NOT NULL DEFAULT false,
+  name text,
+  fromlocation int,
+  tolocation int,
+  date timestamp with time zone,
+  approved boolean DEFAULT false,
+  comment text,
+  PRIMARY KEY (id),
+  CONSTRAINT "FK_GatePass.fromLocation" FOREIGN KEY (fromlocation) REFERENCES location(id),
+  CONSTRAINT "FK_GatePass.toLocation" FOREIGN KEY (tolocation) REFERENCES location(id)
+);
+
+
+CREATE TABLE gatepassauthorizers (
+  username varchar(50) NOT NULL,
+  locationid int NOT NULL,
+  deleted boolean NOT NULL DEFAULT false,
+  PRIMARY KEY (username, locationid),
+  CONSTRAINT "FK_GatePassAuthorizers.locationID" FOREIGN KEY (locationid) REFERENCES location(id),
+  CONSTRAINT "FK_GatePassAuthorizers.username" FOREIGN KEY (username) REFERENCES user2(username)
+);
+
+
+CREATE TABLE gatepassasset(
+  gatepassid int NOT NULL,
+  assetid int NOT NULL,
+  deleted boolean NOT NULL DEFAULT false,
+  PRIMARY KEY (gatepassid, assetid),
+  CONSTRAINT "FK_GatePassAsset.assetTag" FOREIGN KEY (assetid) REFERENCES asset(assetid),
+  CONSTRAINT "FK_GatePassAsset.gatePassID" FOREIGN KEY (gatepassid) REFERENCES gatepass(id)
 );
 
 CREATE TABLE readerdevice (

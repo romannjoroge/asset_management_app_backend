@@ -95,6 +95,7 @@ export var MyErrors2;
     MyErrors2["NOT_CREATE_LOCATION"] = "Could Not Create Location";
     MyErrors2["NOT_READ_TAG"] = "Could Not Read Tag";
     MyErrors2["NOT_PROCESS_TAG"] = "Could Not Process Tag";
+    MyErrors2["NOT_CONFIRM_GATEPASS"] = "Could Not Verify If Gatepass Exists";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

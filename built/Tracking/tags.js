@@ -82,6 +82,11 @@ function convertRawTagToProcessedTag(rawTag) {
         });
     });
 }
+function convertProcessedTagToAsset(processedTag) {
+    return new Promise((res, rej) => {
+        // Add 
+    });
+}
 function addProcessedTagToDB(processedTag) {
     return new Promise((res, rej) => {
         console.log("Something Is Added To DB!");
@@ -140,7 +145,7 @@ function orderReaders(readers) {
 }
 function emitSignal(isEntering, processedTag) {
     return new Promise((res, rej) => {
-        // If the asset is entering get the location of the processed tag
+        // If the asset is entering get the details of the processed tag
         if (isEntering == true) {
             // Get the location of readerid in processed tag
             pool.query(locationTable.getLocationOfReaderDevice, [processedTag.readerDeviceID]).then((fetchResult) => {

@@ -1,11 +1,12 @@
 import pool from "../db2.js";
 import utility from "../built/utility/utility.js";
-import { createTemporaryTable, dropTemporaryTable, createTestUser, createAsset, createLocation, createGatePassAuthorization } from "./commonTestFunctions.js";
+import { createTemporaryTable, dropTemporaryTable, createTestUser, createAsset, createLocation, createGatePassAuthorization, createGatePassAssetEntry, createGatePassEntry, createCategory } from "./commonTestFunctions.js";
 import { assert } from "chai";
 import { assignGatePass } from '../built/GatePass/assignGatepass.js';
 import MyError from "../built/utility/myError.js";
 import { Errors } from "../built/utility/constants.js";
 import { getApprovers } from "../built/GatePass/getApprovers.js";
+import { doesAssetHaveGatepass } from '../built/GatePass/hasGatepass.js';
 
 describe.skip("Assign Asset Gatepass test", function () {
     let asset = {
@@ -267,6 +268,181 @@ describe.skip("Get Approvers", function () {
         } catch(err) {
             console.log(err);
             assert(false, "Could Not Drop Temporary Table");
+        }
+    });
+});
+
+describe("Does Asset Have Gatepass", function () {
+    let category = {
+        id: 1000,
+        name: "OldCategory",
+        parentcategoryid: 1,
+        depreciationtype: "Straight Line",
+        deleted: false
+    };
+
+    let user = {
+        username: "CoolUser",
+        name: "Cool User",
+        email: "cooluser@gmail.com",
+        company: "TestCompany",
+        password: "EWFS3424",
+        usertype: 1,
+    }
+
+    let asset = {
+        assetID: 1000,
+        barCode: "AUA7000",
+        locationID: 1,
+        noInBuilding: 1,
+        code: 'AUA7000',
+        description: 'This is a test asset',
+        categoryID: category.id,
+        usefulLife: 10,
+        serialNumber: 'AUA7000',
+        condition: 'Good',
+        responsibleUsername: user.username,
+        acquisitionDate: '06-13-2023',
+        residualValue: 1000,
+        acquisitionCost: 10000
+    };
+
+    let location = {
+        id: 1000,
+        name: "TestyLocation",
+        parentlocationid: 1
+    };
+
+    let location2 = {
+        id: 1001,
+        name: "TestyLocation2",
+        parentlocationid: 1
+    };
+
+    let gatepass = {
+        id: 1000,
+        reason: "Go to the club",
+        name: "Something",
+        fromlocation: location.id,
+        tolocation: location2.id,
+        date: new Date(),
+        approved: true,
+        comment: "This is some comment"
+    };
+
+    let gatepassEntry = {
+        gatepassid: gatepass.id,
+        assetid: asset.assetID
+    }
+
+    beforeEach(async function () {
+        try{
+            await createTemporaryTable("Category");
+            await createCategory({
+                id: category.id,
+                name: category.name,
+                depreciationType: category.depreciationtype,
+                parentCategoryID: category.parentcategoryid,
+            });
+            await createTemporaryTable("Asset");
+            await createTemporaryTable("GatePass");
+            await createGatePassEntry(gatepass);
+            await createTemporaryTable("User2");
+            await createTemporaryTable("Location");
+            await createLocation(location);
+            await createTemporaryTable("gatepassasset");
+            await createTestUser(user);
+            await createAsset(asset);
+            await createGatePassAssetEntry(gatepassEntry)
+        } catch(err) {
+            console.log(err);
+            assert(false, "Could Not Create Test Data");
+        }
+    });
+
+    it("should return false when asset does not exist", async function () {
+        let nonExistentAsset = -1000;
+        try {
+            let doesExist = await doesAssetHaveGatepass(nonExistentAsset, Date.now(), location.id, location2.id);
+            assert(doesExist == false, "Wrong Result Returned");
+        } catch(err) {
+            console.log(err);
+            assert(false, "Error Should Not Be Thrown");
+        }
+    });
+
+    it ("should return false if from location is invalid", async function() {
+        let assetID = gatepassEntry.assetid;
+        let scannedTime = gatepass.date;
+        let fromlocation = 100000;
+        let toLocation = gatepass.tolocation;
+
+        try {
+            let doesExist = await doesAssetHaveGatepass(assetID, scannedTime, fromlocation, toLocation);
+            assert(doesExist == false, "Wrong Result Returned");
+        } catch(err) {
+            console.log(err);
+            assert(false, "No Error Should Have Been Thrown");
+        }
+    });
+
+
+    it ("should return false if to location is invalid", async function() {
+        let assetID = gatepassEntry.assetid;
+        let scannedTime = gatepass.date;
+        let fromlocation = gatepass.fromlocation;
+        let toLocation = 10000;
+
+        try {
+            let doesExist = await doesAssetHaveGatepass(assetID, scannedTime, fromlocation, toLocation);
+            assert(doesExist == false, "Wrong Result Returned");
+        } catch(err) {
+            console.log(err);
+            assert(false, "No Error Should Have Been Thrown");
+        }
+    });
+
+    it ("should return false if there is no gatepass entry for the scanned time", async function() {
+        let assetID = gatepassEntry.assetid;
+        let scannedTime = new Date(2021, 6, 13);
+        let fromlocation = gatepass.fromlocation;
+        let toLocation = gatepass.tolocation;
+
+        try {
+            let doesExist = await doesAssetHaveGatepass(assetID, scannedTime, fromlocation, toLocation);
+            assert(doesExist == false, "Wrong Result Returned");
+        } catch(err) {
+            console.log(err);
+            assert(false, "No Error Should Have Been Thrown");
+        }
+    });
+
+    it ("should return true if the gatepass exists", async function() {
+        let assetID = gatepassEntry.assetid;
+        let scannedTime = gatepass.date;
+        let fromlocation = gatepass.fromlocation;
+        let toLocation = gatepass.tolocation;
+
+        try {
+            let doesExist = await doesAssetHaveGatepass(assetID, scannedTime, fromlocation, toLocation);
+            assert(doesExist == false, "Wrong Result Returned");
+        } catch(err) {
+            console.log(err);
+            assert(false, "No Error Should Have Been Thrown");
+        }
+    });
+
+    afterEach(async function() {
+        try {
+            await dropTemporaryTable("Category");
+            await dropTemporaryTable("Asset");
+            await dropTemporaryTable("Gatepass");
+            await dropTemporaryTable("User2");
+            await dropTemporaryTable("Location");
+            await dropTemporaryTable("gatepassasset");
+        } catch(err) {
+            console.log(err);
+            assert(false, "Could Not Delete Test Data")
         }
     });
 });
