@@ -30,6 +30,8 @@ schedule.scheduleJob('*/1 * * * * *', () => {
         tags.clear();
     }).catch(err => {
         console.log(err);
+        console.log("I am being handled");
+        eventEmitter.emit('myError', { error: MyErrors2.NOT_PROCESS_TAG });
         tags.clear();
     });
 });
@@ -48,7 +50,7 @@ router.ws('/test', (ws, req) => {
         }
     });
     // React to an error
-    eventEmitter.on('error', (data) => {
+    eventEmitter.on('myError', (data) => {
         ws.send(JSON.stringify(data));
     });
     ws.on('message', (data) => {
@@ -79,7 +81,7 @@ router.ws('/locationDashboard', (ws, req) => {
         ws.send(JSON.stringify(data));
     });
     // React to an error
-    eventEmitter.on('error', (data) => {
+    eventEmitter.on('myError', (data) => {
         ws.send(JSON.stringify(data));
     });
     ws.on('message', (data) => {

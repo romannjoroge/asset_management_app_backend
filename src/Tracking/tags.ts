@@ -6,6 +6,7 @@ import utility from "../utility/utility.js";
 import locationTable from "./db_location.js";
 import _ from 'lodash';
 import events from 'events';
+import { doesAssetHaveGatepass } from "../GatePass/hasGatepass.js";
 const eventEmitter = new events.EventEmitter();
 
 interface processedTag {
@@ -16,9 +17,10 @@ interface processedTag {
 }
 
 interface assetFromTag {
+    isEntering: boolean;
     scannedTime: Date;
     assetid: number;
-    readerDeviceID: string;
+    location: number;
     barcode: string;
     serialnumber: string;
     description: string;
@@ -141,9 +143,80 @@ function convertRawTagToProcessedTag(rawTag: rawTag): Promise<processedTag> {
     });
 }
 
-function convertProcessedTagToAsset(processedTag: processedTag): Promise<assetFromTag> {
+interface BuildAssetFromTagDetails {
+    serialnumber: string;
+    description: string;
+    condition: string;
+    category: string;
+    user: string;
+}
+
+interface BuildAssetFromTagDetailsFetchResult {
+    rows: BuildAssetFromTagDetails[];
+    rowCount: number;
+}
+
+function convertProcessedTagToAsset(processedTag: processedTag, isEntering: boolean, location: number): Promise<assetFromTag> {
     return new Promise((res, rej) => {
-        // Add 
+        let createdAssetTag: assetFromTag;
+        // Get serial number, description, condition, category, user to processed tag
+        pool.query(locationTable.buildAssetFromTagDetails, [processedTag.assetID]).then((result: BuildAssetFromTagDetailsFetchResult) => {
+            if(result.rowCount <= 0) {
+                return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+            }
+
+            let assetDetails = result.rows[0];
+            // Get has gatepass to processed tag
+            if (isEntering == true) {
+                // The location from processed tag is the from location
+                doesAssetHaveGatepass(processedTag.assetID, processedTag.scannedTime, location).then(hasGatepass => {
+                    // Fill createdAssetTag with correct details
+                    createdAssetTag = {
+                        scannedTime: processedTag.scannedTime,
+                        assetid: processedTag.assetID,
+                        location: location,
+                        barcode: processedTag.barcode,
+                        serialnumber: assetDetails.serialnumber,
+                        description: assetDetails.description,
+                        condition: assetDetails.condition,
+                        category: assetDetails.category,
+                        user: assetDetails.user,
+                        hasgatepass: hasGatepass,
+                        isEntering: isEntering
+                    };
+
+                    return res(createdAssetTag);
+                }).catch(err => {
+                    console.log(err);
+                    return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                });
+            } else {
+                doesAssetHaveGatepass(processedTag.assetID, processedTag.scannedTime, undefined, location).then(hasGatepass => {
+                    // Fill createdAssetTag with correct details
+                    createdAssetTag = {
+                        scannedTime: processedTag.scannedTime,
+                        assetid: processedTag.assetID,
+                        location: location,
+                        barcode: processedTag.barcode,
+                        serialnumber: assetDetails.serialnumber,
+                        description: assetDetails.description,
+                        condition: assetDetails.condition,
+                        category: assetDetails.category,
+                        user: assetDetails.user,
+                        hasgatepass: hasGatepass,
+                        isEntering: isEntering
+                    };
+
+                    return res(createdAssetTag);
+                }).catch(err => {
+                    console.log(err);
+                    return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                });
+            }
+        }).catch(err => {
+            console.log(err);
+            return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+        });
     })
 }
 
@@ -154,7 +227,7 @@ function addProcessedTagToDB(processedTag: processedTag): Promise<void> {
             return res();
         }).catch(err => {
             console.log(err);
-            return rej(new MyError(Errors[73]));
+            return rej(new MyError(MyErrors2.NOT_READ_TAG));
         });
     });
 }
@@ -166,9 +239,11 @@ function convertAndAddTag(rawTag: rawTag, processedTags: processedTag[]): Promis
             addProcessedTagToDB(processedTag).then(_ => {
                 return res();
             }).catch(err => {
+                console.log(err);
                 return rej(err);
             });
         }).catch(err => {
+            console.log(err);
             return rej(err);
         });
     });
@@ -197,6 +272,7 @@ function isPreviousEntryInDBDifferent(processedTag: processedTag): Promise<boole
                 return res(false);
             }
         }).catch(err => {
+            console.log(err);
             return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
         });
     });
@@ -217,19 +293,6 @@ function orderReaders(readers: PreviousReaderQuery[]): PreviousReaderQuery[] {
     return _.orderBy(readers, ['scannedTime'], ['desc']);
 }
 
-interface dashboardSignal {
-    isEntering: boolean;
-    location: number;
-    barcode: string;
-    serialnumber: string;
-    assetid: number;
-    description: string;
-    condition: string;
-    category: string;
-    user: string;
-    hasgatepass: boolean;
-}
-
 interface GetLocationOfReaderDeviceQuery {
     locationid: number;
 }
@@ -238,7 +301,7 @@ interface GetLocationOfReaderDeviceFetchResult {
     rows: GetLocationOfReaderDeviceQuery[];
     rowCount: number;
 }
-function emitSignal(isEntering: boolean, processedTag: processedTag): Promise<dashboardSignal> {
+function emitSignal(isEntering: boolean, processedTag: processedTag): Promise<assetFromTag> {
     return new Promise((res, rej) => {
         // If the asset is entering get the details of the processed tag
         if (isEntering == true) {
@@ -248,9 +311,16 @@ function emitSignal(isEntering: boolean, processedTag: processedTag): Promise<da
                     return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
                 }
                 let location = fetchResult.rows[0].locationid;
-                // Combine with isEntering and emit
-                return res({isEntering, location, barcode: processedTag.barcode});
+                
+                // Get assetFromTag and send it
+                convertProcessedTagToAsset(processedTag, isEntering, location).then(assetFromTag => {
+                    return res(assetFromTag);
+                }).catch(err => {
+                    console.log(err);
+                    return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                });
             }).catch(err => {
+                console.log(err);
                 return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
             });
             
@@ -271,12 +341,19 @@ function emitSignal(isEntering: boolean, processedTag: processedTag): Promise<da
                         return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
                     }
                     let location = fetchResult.rows[0].locationid;
-                    // Combine with isEntering and emit
-                    return res({isEntering, location, barcode: processedTag.barcode});
+                    // Get assetFromTag and send it
+                    convertProcessedTagToAsset(processedTag, isEntering, location).then(assetFromTag => {
+                        return res(assetFromTag);
+                    }).catch(err => {
+                        console.log(err);
+                        return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                    });
                 }).catch(err => {
+                    console.log(err);
                     return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
                 });
             }).catch(err => {
+                console.log(err);
                 return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
             });
 
@@ -309,6 +386,7 @@ function isAssetLeavingOrEntering(processedTag: processedTag): Promise<boolean> 
                 return res(false);
             }
         }).catch(err => {
+            console.log(err);
             return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
         });
     });
@@ -398,15 +476,9 @@ export function testEmitFromDifferentFile(eventEmitter: events.EventEmitter): Pr
             Promise.all(promises).then(_ => {
                 res();
             }).catch(err => {
-                eventEmitter.emit('error', {error: err.message});
                 return rej(err);
             }) 
         } catch(err) {
-            if (err instanceof MyError) {
-                eventEmitter.emit('error', {error: err.message});
-            } else {
-                eventEmitter.emit('error', {error: "Some Error"});
-            }
             return rej(err);
         }
     });
@@ -436,16 +508,13 @@ export function addProcessedTag(tags: Set<string>, eventEmitter: events.EventEmi
                 }).catch(err => {
                     console.log(err);
                     if (err instanceof MyError) {
-                        eventEmitter.emit('error', {error: err.message});
                         return rej(err);
                     } else {
-                        eventEmitter.emit('error', {error: MyErrors2.NOT_PROCESS_TAG});
                         return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
                     }
                 });    
             }).catch(err => {
                 console.log(err);
-                eventEmitter.emit('error', {error: Errors[73]});
                 return rej(new MyError(Errors[73]));
             });
         }

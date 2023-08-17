@@ -48,7 +48,13 @@ let doesReaderIDExist = "SELECT * FROM ReaderDevice WHERE id = $1";
 let getPreviousEntry = "SELECT * FROM ProcessedTags WHERE assetID = $1 AND scannedTime < $2 ORDER BY scannedTime DESC LIMIT 1";
 let getPreviousReaderDevices = "SELECT p.readerdeviceid, r.entry FROM ProcessedTags p INNER JOIN ReaderDevice r ON r.readerdeviceid = p.readerdeviceid WHERE assetID = $1 ORDER BY scannedTime DESC LIMIT 2";
 let getLocationOfReaderDevice = "SELECT locationid FROM ReaderDevice WHERE readerdeviceid = $1";
+let buildAssetFromTagDetails = `
+SELECT serialnumber, description, condition, c.name AS category, u.name AS user 
+FROM Asset a INNER JOIN Category c ON c.id = a.categoryid INNER JOIN 
+User2 u ON u.username = a.responsibleusername WHERE assetID = $1
+`;
 let locationTable = {
+    buildAssetFromTagDetails,
     getLocationOfReaderDevice,
     getPreviousReaderDevices,
     getPreviousEntry,

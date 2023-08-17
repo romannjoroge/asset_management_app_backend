@@ -39,6 +39,11 @@ schedule.scheduleJob('*/1 * * * * *', () => {
         tags.clear();
     }).catch(err => {
         console.log(err);
+        if (err instanceof MyError) {
+            eventEmitter.emit('error', {message: err.message});
+        } else {
+            eventEmitter.emit('error', {message: MyErrors2.NOT_PROCESS_TAG});
+        }
         tags.clear();
     });
 });

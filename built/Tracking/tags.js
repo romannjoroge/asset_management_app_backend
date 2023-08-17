@@ -5,6 +5,7 @@ import MyError from "../utility/myError.js";
 import locationTable from "./db_location.js";
 import _ from 'lodash';
 import events from 'events';
+import { doesAssetHaveGatepass } from "../GatePass/hasGatepass.js";
 const eventEmitter = new events.EventEmitter();
 export function syncTags(tags) {
     return new Promise((res, rej) => {
@@ -82,9 +83,65 @@ function convertRawTagToProcessedTag(rawTag) {
         });
     });
 }
-function convertProcessedTagToAsset(processedTag) {
+function convertProcessedTagToAsset(processedTag, isEntering, location) {
     return new Promise((res, rej) => {
-        // Add 
+        let createdAssetTag;
+        // Get serial number, description, condition, category, user to processed tag
+        pool.query(locationTable.buildAssetFromTagDetails, [processedTag.assetID]).then((result) => {
+            if (result.rowCount <= 0) {
+                return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+            }
+            let assetDetails = result.rows[0];
+            // Get has gatepass to processed tag
+            if (isEntering == true) {
+                // The location from processed tag is the from location
+                doesAssetHaveGatepass(processedTag.assetID, processedTag.scannedTime, location).then(hasGatepass => {
+                    // Fill createdAssetTag with correct details
+                    createdAssetTag = {
+                        scannedTime: processedTag.scannedTime,
+                        assetid: processedTag.assetID,
+                        location: location,
+                        barcode: processedTag.barcode,
+                        serialnumber: assetDetails.serialnumber,
+                        description: assetDetails.description,
+                        condition: assetDetails.condition,
+                        category: assetDetails.category,
+                        user: assetDetails.user,
+                        hasgatepass: hasGatepass,
+                        isEntering: isEntering
+                    };
+                    return res(createdAssetTag);
+                }).catch(err => {
+                    console.log(err);
+                    return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                });
+            }
+            else {
+                doesAssetHaveGatepass(processedTag.assetID, processedTag.scannedTime, undefined, location).then(hasGatepass => {
+                    // Fill createdAssetTag with correct details
+                    createdAssetTag = {
+                        scannedTime: processedTag.scannedTime,
+                        assetid: processedTag.assetID,
+                        location: location,
+                        barcode: processedTag.barcode,
+                        serialnumber: assetDetails.serialnumber,
+                        description: assetDetails.description,
+                        condition: assetDetails.condition,
+                        category: assetDetails.category,
+                        user: assetDetails.user,
+                        hasgatepass: hasGatepass,
+                        isEntering: isEntering
+                    };
+                    return res(createdAssetTag);
+                }).catch(err => {
+                    console.log(err);
+                    return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                });
+            }
+        }).catch(err => {
+            console.log(err);
+            return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+        });
     });
 }
 function addProcessedTagToDB(processedTag) {
@@ -94,7 +151,7 @@ function addProcessedTagToDB(processedTag) {
             return res();
         }).catch(err => {
             console.log(err);
-            return rej(new MyError(Errors[73]));
+            return rej(new MyError(MyErrors2.NOT_READ_TAG));
         });
     });
 }
@@ -105,9 +162,11 @@ function convertAndAddTag(rawTag, processedTags) {
             addProcessedTagToDB(processedTag).then(_ => {
                 return res();
             }).catch(err => {
+                console.log(err);
                 return rej(err);
             });
         }).catch(err => {
+            console.log(err);
             return rej(err);
         });
     });
@@ -136,6 +195,7 @@ function isPreviousEntryInDBDifferent(processedTag) {
                 return res(false);
             }
         }).catch(err => {
+            console.log(err);
             return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
         });
     });
@@ -153,9 +213,15 @@ function emitSignal(isEntering, processedTag) {
                     return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
                 }
                 let location = fetchResult.rows[0].locationid;
-                // Combine with isEntering and emit
-                return res({ isEntering, location, barcode: processedTag.barcode });
+                // Get assetFromTag and send it
+                convertProcessedTagToAsset(processedTag, isEntering, location).then(assetFromTag => {
+                    return res(assetFromTag);
+                }).catch(err => {
+                    console.log(err);
+                    return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                });
             }).catch(err => {
+                console.log(err);
                 return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
             });
         }
@@ -173,12 +239,19 @@ function emitSignal(isEntering, processedTag) {
                         return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
                     }
                     let location = fetchResult.rows[0].locationid;
-                    // Combine with isEntering and emit
-                    return res({ isEntering, location, barcode: processedTag.barcode });
+                    // Get assetFromTag and send it
+                    convertProcessedTagToAsset(processedTag, isEntering, location).then(assetFromTag => {
+                        return res(assetFromTag);
+                    }).catch(err => {
+                        console.log(err);
+                        return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                    });
                 }).catch(err => {
+                    console.log(err);
                     return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
                 });
             }).catch(err => {
+                console.log(err);
                 return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
             });
         }
@@ -208,6 +281,7 @@ function isAssetLeavingOrEntering(processedTag) {
                 return res(false);
             }
         }).catch(err => {
+            console.log(err);
             return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
         });
     });
@@ -296,17 +370,10 @@ export function testEmitFromDifferentFile(eventEmitter) {
             Promise.all(promises).then(_ => {
                 res();
             }).catch(err => {
-                eventEmitter.emit('error', { error: err.message });
                 return rej(err);
             });
         }
         catch (err) {
-            if (err instanceof MyError) {
-                eventEmitter.emit('error', { error: err.message });
-            }
-            else {
-                eventEmitter.emit('error', { error: "Some Error" });
-            }
             return rej(err);
         }
     });
@@ -335,17 +402,14 @@ export function addProcessedTag(tags, eventEmitter) {
                 }).catch(err => {
                     console.log(err);
                     if (err instanceof MyError) {
-                        eventEmitter.emit('error', { error: err.message });
                         return rej(err);
                     }
                     else {
-                        eventEmitter.emit('error', { error: MyErrors2.NOT_PROCESS_TAG });
                         return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
                     }
                 });
             }).catch(err => {
                 console.log(err);
-                eventEmitter.emit('error', { error: Errors[73] });
                 return rej(new MyError(Errors[73]));
             });
         }
