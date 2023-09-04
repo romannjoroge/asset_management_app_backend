@@ -54,7 +54,7 @@ router.ws('/test', (ws, req) => {
         }
     });
     // React to an error
-    eventEmitter.on('myError', (data) => {
+    eventEmitter.on('error', (data) => {
         ws.send(JSON.stringify(data));
     });
     ws.on('message', (data) => {
@@ -85,7 +85,7 @@ router.ws('/locationDashboard', (ws, req) => {
         ws.send(JSON.stringify(data));
     });
     // React to an error
-    eventEmitter.on('myError', (data) => {
+    eventEmitter.on('error', (data) => {
         ws.send(JSON.stringify(data));
     });
     ws.on('message', (data) => {
