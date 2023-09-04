@@ -11,7 +11,7 @@ import MyError from '../utility/myError.js';
 import { filterAssetByDetails } from '../Allocation/Asset/filter.js';
 // import storage from '../Importing/multerSetup.js';
 import multer from 'multer';
-const upload = multer({dest: '../../attachments'});
+const upload = multer({dest: './attachments'});
 
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     let {
