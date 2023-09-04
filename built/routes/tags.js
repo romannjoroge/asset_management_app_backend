@@ -30,8 +30,12 @@ schedule.scheduleJob('*/1 * * * * *', () => {
         tags.clear();
     }).catch(err => {
         console.log(err);
-        console.log("I am being handled");
-        eventEmitter.emit('myError', { error: MyErrors2.NOT_PROCESS_TAG });
+        if (err instanceof MyError) {
+            eventEmitter.emit('error', { message: err.message });
+        }
+        else {
+            eventEmitter.emit('error', { message: MyErrors2.NOT_PROCESS_TAG });
+        }
         tags.clear();
     });
 });
