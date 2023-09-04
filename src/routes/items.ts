@@ -6,18 +6,12 @@ import pool from '../../db2.js';
 import assetTable from '../Allocation/Asset/db_assets.js';
 import checkifAuthorized from '../../middleware/checkifAuthorized.js';
 import checkifAuthenticated from '../../middleware/checkifAuthenticated.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import Category from '../Allocation/Category/category2.js';
 import userTable from '../Users/db_users.js';
-import Location from '../Tracking/location.js';
 import MyError from '../utility/myError.js';
-import User from '../Users/users.js';
-import utility from '../utility/utility.js';
 import { filterAssetByDetails } from '../Allocation/Asset/filter.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// import storage from '../Importing/multerSetup.js';
+import multer from 'multer';
+const upload = multer({dest: '../../attachments'});
 
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     let {
@@ -216,55 +210,6 @@ router.delete('/delete/:barcode', (req, res) => {
     })
 })
 
-// router.post('/tags', (req, res) => {
-//     console.log(req.body);
-//     // Get values from req.body
-//     let {
-//         commandCode, 
-//         hardwareKey,
-//         tagRecNums,
-//         tagRecords
-//     } = req.body;
-//     console.log(hardwareKey, tagRecords);
-//     // Add tag to database
-//     for (var i in tagRecords) {
-//         let tag = tagRecords[i];
-//         console.log(tag);
-//         pool.query(assetTable.insertAssetTag, [commandCode, hardwareKey, tagRecNums, tag.antNo, tag.pc, tag.epcID, tag.crc]).then(_ => {
-//             // Add an entry to log.csv file
-//             let csvData = [{
-//                 commandCode,
-//                 hardwareKey,
-//                 tagRecNums,
-//                 antNo: tag.antNo,
-//                 pc: tag.pc,
-//                 epcID: tag.epcID,
-//                 crc: tag.crc
-//             }];
-//             let csvFromData = convertArrayToCSV(csvData);
-//             fs.appendFile(path.join(__dirname, 'tags.log'), `${new Date().toISOString()},${commandCode},${hardwareKey},${tagRecNums},${tag.antNo},${tag.pc},${tag.epcID},${tag.crc}\n`).then(_ => {
-                
-//             }).catch(e => {
-//                 console.log(e);
-//                 return res.status(500).json({
-//                     message: Errors[9],
-//                 })
-//             });
-//         }).catch(e => {
-//             console.log(e);
-//             return res.status(500).json({message: Errors[9]})
-//         })
-//     }
-//     res.send("Done");
-// })
-
-// 192.168.0.180:80
-
-// router.post('/heartBeats', (req, res) => {
-//     console.log("Heart Beat...");
-//     console.log(req);
-//     res.send("Done");
-// });
 
 router.get('/search', (req, res) => {
     const query = req.query.query;
@@ -301,8 +246,18 @@ router.get('/filter', (req, res) => {
     });
 });
 
-router.route('*', (req, res) => {
-    res.status(404).json({ data: 'Resource not found' })
-})
+router.post('/testUpload', upload.single('file'), (req, res) => {
+    try {
+        console.log(req.file);
+        res.send("Hello");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Could Not Send File");
+    }
+});
+
+router.route("*", (req, res) => {
+    res.status(404).json({message: "Route not found"});
+});
 
 export default router;
