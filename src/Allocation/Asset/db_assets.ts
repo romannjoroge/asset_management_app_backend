@@ -50,8 +50,10 @@ const filterAssetsByLocationAndCategory = `SELECT a.assetid, a.barcode, a.descri
                                         AND a.categoryid = $1 AND a.locationid = $2`;
 
 const getAllAssetsWithLocationID = "SELECT a.assetid, a.barcode, a.description, a.condition, a.isconverted, c.name AS category, a.serialNumber, a.locationid, l.name as location FROM Asset a FULL JOIN Category c ON a.categoryid = c.id INNER JOIN Location l ON l.id = a.locationid WHERE a.assetid IS NOT NULL AND a.deleted = false"
+const getMaxAssetID = "SELECT MAX(assetID) AS max FROM Asset";
 
 const assetTable = {
+    getMaxAssetID,
     getAllAssetsWithLocationID,
     filterAssetsByLocationAndCategory,
     filterAssetsByLocation,

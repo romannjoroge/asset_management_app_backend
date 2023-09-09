@@ -19,8 +19,10 @@ const getAllCategories2 = `
                         SELECT c.name AS category, c.id, c.depreciationtype, d.percentage, (SELECT name AS parent FROM Category WHERE id = c.parentCategoryID) 
                         FROM Category c FULL JOIN DepreciationPercent d ON d.categoryID = c.id WHERE c.deleted = false
 `
+const getAllCategories3 = "SELECT id, name, depreciationtype, parentcategoryid, code FROM Category WHERE deleted = false";
 
 let categoryTable = {
+    getAllCategories3,
     addCategoryWithNoParent: addCategoryWithNoParent,
     add: addCategory,
     getID: getCategoryID,
