@@ -34,5 +34,6 @@ export enum AuditTrailEvents {
     "DELETE_BATCH" = "Batch Deleted",
     "UPDATE_BATCH" = "Batch Updated",
     "ASSIGN_BATCH_INVENTORY" = "Batch assigned to inventory",
-    "UNASSIGN_BATCH_INVENTORY" = "Batch unassigned to inventory"
+    "UNASSIGN_BATCH_INVENTORY" = "Batch unassigned to inventory",
+    "UNKOWN" = "Unknown Event"
 }

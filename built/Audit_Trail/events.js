@@ -36,5 +36,6 @@ export var AuditTrailEvents;
     AuditTrailEvents["UPDATE_BATCH"] = "Batch Updated";
     AuditTrailEvents["ASSIGN_BATCH_INVENTORY"] = "Batch assigned to inventory";
     AuditTrailEvents["UNASSIGN_BATCH_INVENTORY"] = "Batch unassigned to inventory";
+    AuditTrailEvents["UNKOWN"] = "Unknown Event";
 })(AuditTrailEvents || (AuditTrailEvents = {}));
 //# sourceMappingURL=events.js.map
