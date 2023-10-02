@@ -1,0 +1,40 @@
+// This file contains the enum defining the events that are tracked
+export var AuditTrailEvents;
+(function (AuditTrailEvents) {
+    AuditTrailEvents["CREATE_ASSET"] = "Asset Created";
+    AuditTrailEvents["DELETE_ASSET"] = "Asset Deleted";
+    AuditTrailEvents["UPDATE_ASSET"] = "Asset Updated";
+    AuditTrailEvents["CREATE_CATEGORY"] = "Category Created";
+    AuditTrailEvents["DELETE_CATEGORY"] = "Category Deleted";
+    AuditTrailEvents["UPDATE_CATEGORY"] = "Category Updated";
+    AuditTrailEvents["CREATE_LOCATION"] = "Location Created";
+    AuditTrailEvents["DELETE_LOCATION"] = "Location Deleted";
+    AuditTrailEvents["UPDATE_LOCATION"] = "Location Updated";
+    AuditTrailEvents["CREATE_READER"] = "Reader Created";
+    AuditTrailEvents["DELETE_READER"] = "Reader Deleted";
+    AuditTrailEvents["UPDATE_READER"] = "Reader Updated";
+    AuditTrailEvents["CREATE_USER"] = "User Created";
+    AuditTrailEvents["DELETE_USER"] = "User Deleted";
+    AuditTrailEvents["UPDATE_USER"] = "User Updated";
+    AuditTrailEvents["ASSET_REGISTER_REPORT"] = "Asset Register Report Generated";
+    AuditTrailEvents["ASSET_DEPRECIATION_SCHEDULE_REPORT"] = "Asset Depreciation Schedule Report Generated";
+    AuditTrailEvents["ASSET_ACQUISITION_REPORT"] = "Asset Acquisition Report Generated";
+    AuditTrailEvents["STOCK_TAKE_RECONCILIATION_REPORT"] = "Stock Take Reconciliation Report Generated";
+    AuditTrailEvents["CATEGORY_DERECIATION_CONFIGURATION_REPORT"] = "Category Depreciation Configuration Report Generated";
+    AuditTrailEvents["ASSET_CATEGORY_REPORT"] = "Asset Category Report Generated";
+    AuditTrailEvents["AUDIT_TRAIL_REPORT"] = "Audit Trail Report Generated";
+    AuditTrailEvents["CHAIN_OF_CUSTODY_REPORT"] = "Chain Of Custody Report Generated";
+    AuditTrailEvents["MOVEMENT_REPORT"] = "Movement Report Generated";
+    AuditTrailEvents["REQUEST_GATEPASS"] = "Gatepass Requested";
+    AuditTrailEvents["APPROVE_GATEPASS"] = "Gatepass Approved";
+    AuditTrailEvents["REJECT_GATEPASS"] = "Gatepass Rejected";
+    AuditTrailEvents["CREATE_INVENTORY"] = "Inventory Created";
+    AuditTrailEvents["DELETE_INVENTORY"] = "Inventory Deleted";
+    AuditTrailEvents["UPDATE_INVENTORY"] = "Inventory Updated";
+    AuditTrailEvents["CREATE_BATCH"] = "Batch Created";
+    AuditTrailEvents["DELETE_BATCH"] = "Batch Deleted";
+    AuditTrailEvents["UPDATE_BATCH"] = "Batch Updated";
+    AuditTrailEvents["ASSIGN_BATCH_INVENTORY"] = "Batch assigned to inventory";
+    AuditTrailEvents["UNASSIGN_BATCH_INVENTORY"] = "Batch unassigned to inventory";
+})(AuditTrailEvents || (AuditTrailEvents = {}));
+//# sourceMappingURL=events.js.map
