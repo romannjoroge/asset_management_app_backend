@@ -7,3 +7,5 @@ oldCode
 .vscode
 routes/tags.log
 attachments
+.env
+
