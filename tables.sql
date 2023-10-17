@@ -300,11 +300,11 @@ CREATE TABLE Role (
 );
 
 CREATE TABLE userrole (
-  username VARCHAR(50) NOT NULL,
+  userid INTEGER NOT NULL,
   roleid int NOT NULL,
   deleted BOOLEAN DEFAULT FALSE,
-  CONSTRAINT "FK_User Role.username" FOREIGN KEY (username) REFERENCES user2(username),
-  PRIMARY KEY (username, roleid)
+  CONSTRAINT "FK_UserRole_userid" FOREIGN KEY (userid) REFERENCES user2(id),
+  PRIMARY KEY (userid, roleid)
 );
 
 CREATE TABLE "RFID Reader" (

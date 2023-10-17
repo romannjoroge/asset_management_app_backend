@@ -117,9 +117,12 @@ app.post('/signup',
                                 }
 
                                 let id = data.rows[0].id
-                                // Send JWT Token
-                                const token = JWT.sign({username}, process.env.TOKEN_SECRET, {expiresIn:3600});
-                                return res.status(200).json({token, username});
+                                // Give the creator of the company all roles
+                                pool.query(userTable.giveUserAllRoles, [id]).then(_ => {
+                                    // Send JWT Token
+                                    const token = JWT.sign({username, id}, process.env.TOKEN_SECRET, {expiresIn:3600});
+                                    return res.status(200).json({token, username, id});
+                                })
                             })
                         }).catch(err => {
                             console.log(err);
