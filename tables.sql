@@ -11,7 +11,8 @@ CREATE TABLE usertype (
   PRIMARY KEY (id)
  );
 
-CREATE TABLE User2 (
+CREATE TABLE IF NOT EXISTS User2 (
+  id serial,
   name varchar(50) NOT NULL,
   email varchar(50) NOT NULL,
   password text NOT NULL,
@@ -19,7 +20,7 @@ CREATE TABLE User2 (
   companyname varchar(50) NOT NULL,
   usertype INTEGER,
   deleted BOOL DEFAULT FALSE NOT NULL,
-  PRIMARY KEY (username),
+  PRIMARY KEY (id),
   CONSTRAINT "FK_User.companyName" FOREIGN KEY (companyname) REFERENCES company(name),
   CONSTRAINT "FK_User2.userType" FOREIGN KEY (usertype) REFERENCES usertype(id)
 );
@@ -59,38 +60,38 @@ CREATE TABLE Office(
   PRIMARY KEY(ID)
 );
 
-CREATE TABLE Location (
+CREATE TABLE IF NOT EXISTS Location (
   id serial,
   name varchar(50) NOT NULL,
   companyname varchar(50) NOT NULL,
-  parentLocationID int,
+  parentLocationID int, -- locations are hierarichal
   deleted BOOL DEFAULT FALSE NOT NULL,
   PRIMARY KEY (ID),
   CONSTRAINT "FK_Location.companyName" FOREIGN KEY (companyname) REFERENCES company(name),
   CONSTRAINT "FK_Location.parentLocationID" FOREIGN KEY (parentlocationid) REFERENCES location(id)
 );
 
-CREATE TABLE Category (
+CREATE TABLE IF NOT EXISTS Category (
   id serial,
-  name varchar(50) NOT NULL UNIQUE,
+  name varchar(50) NOT NULL UNIQUE, 
   depreciationtype varchar(50) NOT NULL,
-  parentcategoryid INTEGER,
-  deleted BOOL DEFAULT FALSE NOT NULL,
+  parentcategoryid INTEGER, -- parent of the category, categories have a hierarichal relationship
+  deleted BOOL DEFAULT FALSE,
   PRIMARY KEY (ID),
   CONSTRAINT "FK_Category.parentCategoryID"
     FOREIGN KEY (parentcategoryid)
       REFERENCES category(id)
 );
 
-CREATE TABLE parentChildCategory(
-  parentID int,
-  childID int,
-  PRIMARY KEY(parentID, childID),
-  CONSTRAINT "FK_Category.parentID"
-    FOREIGN KEY (parentID) REFERENCES Category(ID),
-  CONSTRAINT "FK_Category.childID"
-    FOREIGN KEY (childID) REFERENCES Category(ID)
-);
+-- CREATE TABLE parentChildCategory(
+--   parentID int,
+--   childID int,
+--   PRIMARY KEY(parentID, childID),
+--   CONSTRAINT "FK_Category.parentID"
+--     FOREIGN KEY (parentID) REFERENCES Category(ID),
+--   CONSTRAINT "FK_Category.childID"
+--     FOREIGN KEY (childID) REFERENCES Category(ID)
+-- );
 
 CREATE TABLE depreciationpercent (
   categoryid INTEGER NOT NULL,
@@ -261,17 +262,24 @@ CREATE TABLE "GatePass_Asset" (
       REFERENCES "Asset"("assetTag")
 );
 
-CREATE TABLE Log (
+CREATE TABLE IF NOT EXISTS Events (
+  id serial,
+  type text NOT NULL UNIQUE,
+  description text NOT NULL,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS Log (
   ID serial,
-  timestamp timestamptz,
-  ipAddress inet,
-  username varchar(50),
-  eventType varchar(50),
-  logDescription text,
-  PRIMARY KEY (ID),
-  CONSTRAINT "FK_Log.username"
-    FOREIGN KEY (username)
-      REFERENCES User2(username)
+  timestamp timestamptz, -- timestamp
+  ipAddress inet, -- ip address of the user who created the event
+  deleted BOOLEAN DEFAULT false, -- whethere event is deleted
+  userid INTEGER NOT NULL, -- reference to the user that created the event
+  itemid INTEGER, -- stores a referenece to the item that the event occured to
+  eventid INTEGER NOT NULL, -- stores the type of event
+  CONSTRAINT "FK_Log_userid" FOREIGN KEY (userid) REFERENCES user2(id),
+  CONSTRAINT "FK_Log_eventid" FOREIGN KEY (eventid) REFERENCES events(id),
+  PRIMARY KEY (ID)
 );
 
 CREATE TABLE depreciationschedule (

@@ -95,7 +95,9 @@ export enum MyErrors2 {
     'NOT_CREATE_LOCATION' = "Could Not Create Location",
     'NOT_READ_TAG' = "Could Not Read Tag",
     'NOT_PROCESS_TAG' = "Could Not Process Tag",
-    'NOT_CONFIRM_GATEPASS' = "Could Not Verify If Gatepass Exists"
+    'NOT_CONFIRM_GATEPASS' = "Could Not Verify If Gatepass Exists",
+    'COMPANY_EXISTS' = "Company Already Exists",
+    'NOT_CREATE_COMPANY' = "Could Not Create Company"
 }
 
 export enum Success2 {

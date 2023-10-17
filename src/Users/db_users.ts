@@ -16,8 +16,12 @@ const getNameEmail = "SELECT name, email FROM User2 WHERE username = $1 AND dele
 const checkIfNameExists = "SELECT * FROM User2 WHERE name = $1 AND deleted = false";
 const getNames = "SELECT name, username FROM User2 WHERE deleted = false"
 const getName = "SELECT name FROM User2 WHERE username = $1 AND deleted = false";
+const addCompany = "INSERT INTO Company (name) VALUES ($1)";
+const getLatestUserID = "SELECT id FROM User2 WHERE username = $1 ORDER BY id DESC LIMIT 1";
 
 let userTable = {
+    getLatestUserID,
+    addCompany,
     getName,
     getNames,
     checkIfNameExists,
