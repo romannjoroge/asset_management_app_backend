@@ -9,8 +9,8 @@ export default (role) => {
             return res.status(400).json({message:Errors[28]});
         }
 
-        // Extract username from request
-        const username = req.username
+        // Extract id from request
+        const id = req.id
 
         // Check if user has required role
         pool.query(userTable.isUserAuthorized, [role, username]).then(data => {
