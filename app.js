@@ -120,7 +120,7 @@ app.post('/signup',
                                 // Give the creator of the company all roles
                                 pool.query(userTable.giveUserAllRoles, [id]).then(_ => {
                                     // Send JWT Token
-                                    const token = JWT.sign({username, id}, process.env.TOKEN_SECRET, {expiresIn:3600});
+                                    const token = JWT.sign({id}, process.env.TOKEN_SECRET, {expiresIn:3600});
                                     return res.status(200).json({token, username, id});
                                 })
                             })
@@ -174,7 +174,7 @@ app.post('/login', (req, res) => {
 
             let id = data.rows[0].id;
             // Send JWT token
-            const token = JWT.sign({username, id}, process.env.TOKEN_SECRET, {expiresIn:3600});
+            const token = JWT.sign({id}, process.env.TOKEN_SECRET, {expiresIn:3600});
             return res.json({token, username});
         }).catch(err => {
             console.log(err);
