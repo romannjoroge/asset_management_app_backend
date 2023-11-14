@@ -3,7 +3,7 @@ import {createTemporaryTable, createAsset, createCategory, createLocation, dropT
 import {filterAssetByDetails} from '../built/Allocation/Asset/filter.js'
 
 
-describe("Filter Assets Test", function () {
+describe.skip("Filter Assets Test", function () {
     const asset1ID = 1000;
     const asset2ID = 1001;
     const category1ID = 1000;

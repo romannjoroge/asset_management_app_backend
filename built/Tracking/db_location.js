@@ -53,7 +53,9 @@ SELECT serialnumber, description, condition, c.name AS category, u.name AS user
 FROM Asset a INNER JOIN Category c ON c.id = a.categoryid INNER JOIN 
 User2 u ON u.username = a.responsibleusername WHERE assetID = $1
 `;
+let getAllLocations = "SELECT id, name, companyname, parentLocationID FROM Location WHERE deleted = false";
 let locationTable = {
+    getAllLocations,
     buildAssetFromTagDetails,
     getLocationOfReaderDevice,
     getPreviousReaderDevices,

@@ -96,6 +96,8 @@ export var MyErrors2;
     MyErrors2["NOT_READ_TAG"] = "Could Not Read Tag";
     MyErrors2["NOT_PROCESS_TAG"] = "Could Not Process Tag";
     MyErrors2["NOT_CONFIRM_GATEPASS"] = "Could Not Verify If Gatepass Exists";
+    MyErrors2["NOT_PROCESS_EXCEL_FILE"] = "Could Not Process The Excel File";
+    MyErrors2["NOT_CREATE_LOG"] = "Could Not Create Log";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

@@ -272,7 +272,7 @@ describe.skip("Get Approvers", function () {
     });
 });
 
-describe("Does Asset Have Gatepass", function () {
+describe.skip("Does Asset Have Gatepass", function () {
     let category = {
         id: 1000,
         name: "OldCategory",

@@ -39,7 +39,7 @@ export async function createTestAntennae(props) {
 }
 
 export async function createTestUser(props) {
-    await pool.query("INSERT INTO User2 (username, email, password, name, userType, companyname) VALUES ($1, $2, $3, $4, $5, $6)", [props.username, 
+    await pool.query("INSERT INTO User2 (id, username, email, password, name, userType, companyname) VALUES ($1, $2, $3, $4, $5, $6, $7)", [props.id, props.username, 
     props.email, props.password, props.name, props.usertype, props.company])
 }
 
@@ -69,4 +69,18 @@ export async function createGatePassEntry(props) {
         "INSERT INTO gatepass (id, reason, name, fromlocation, tolocation, date, approved, comment) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
         [props.id, props.reason, props.name, props.fromlocation, props.tolocation, props.date, props.approved, props.comment]
     )
+}
+
+export async function createTestLog(props) {
+    await pool.query(
+        "INSERT INTO Log (id, timestamp, ipaddress, userid, itemid, deleted, eventid) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+        [props.id, props.timestamp, props.ipaddress, props.userid, props.itemid, props.deleted, props.eventid]
+    );
+}
+
+export async function createTestEvent(props) {
+    await pool.query(
+        "INSERT INTO Events (id, type, description) VALUES ($1, $2, $3)",
+        [props.id, props.type, props.description]
+    );
 }
