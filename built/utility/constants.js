@@ -99,6 +99,7 @@ export var MyErrors2;
     MyErrors2["NOT_PROCESS_EXCEL_FILE"] = "Could Not Process The Excel File";
     MyErrors2["COMPANY_EXISTS"] = "Company Already Exists";
     MyErrors2["NOT_CREATE_COMPANY"] = "Could Not Create Company";
+    MyErrors2["USER_NOT_EXIST"] = "User Does Not Exist";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

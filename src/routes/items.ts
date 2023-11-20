@@ -24,7 +24,7 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
         usefulLife,
         serialNumber,
         condition,
-        responsibleUsername,
+        responsibleuserid,
         acquisitionDate,
         acquisitionCost,
         residualValue,
@@ -37,6 +37,7 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
     attachments = [];
 
     // Convert values to right type
+    responsibleuserid = Number.parseInt(responsibleuserid);
     noInBuilding = Number.parseInt(noInBuilding);
     usefulLife = Number.parseInt(usefulLife);
     acquisitionCost = Number.parseFloat(acquisitionCost);
@@ -46,7 +47,7 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
         depreciationPercent = Number.parseFloat(depreciationPercent);
     }
 
-    let asset = new Asset(barcode, usefulLife, acquisitionDate, locationID, condition, responsibleUsername, acquisitionCost, categoryName, 
+    let asset = new Asset(barcode, usefulLife, acquisitionDate, locationID, condition, responsibleuserid, acquisitionCost, categoryName, 
         attachments, noInBuilding, serialNumber, code, description, residualValue, depreciationType, depreciationPercent);
     asset.initialize().then(_ => {
         return res.json({message: Success2.CREATED_ASSET});

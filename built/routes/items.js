@@ -13,10 +13,11 @@ import { filterAssetByDetails } from '../Allocation/Asset/filter.js';
 import multer from 'multer';
 const upload = multer({ dest: './attachments' });
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
-    let { barcode, locationID, noInBuilding, code, description, categoryName, usefulLife, serialNumber, condition, responsibleUsername, acquisitionDate, acquisitionCost, residualValue, depreciationType, depreciationPercent, attachments } = req.body;
+    let { barcode, locationID, noInBuilding, code, description, categoryName, usefulLife, serialNumber, condition, responsibleuserid, acquisitionDate, acquisitionCost, residualValue, depreciationType, depreciationPercent, attachments } = req.body;
     // Temporary attachements fix
     attachments = [];
     // Convert values to right type
+    responsibleuserid = Number.parseInt(responsibleuserid);
     noInBuilding = Number.parseInt(noInBuilding);
     usefulLife = Number.parseInt(usefulLife);
     acquisitionCost = Number.parseFloat(acquisitionCost);
@@ -24,7 +25,7 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
     if (depreciationPercent) {
         depreciationPercent = Number.parseFloat(depreciationPercent);
     }
-    let asset = new Asset(barcode, usefulLife, acquisitionDate, locationID, condition, responsibleUsername, acquisitionCost, categoryName, attachments, noInBuilding, serialNumber, code, description, residualValue, depreciationType, depreciationPercent);
+    let asset = new Asset(barcode, usefulLife, acquisitionDate, locationID, condition, responsibleuserid, acquisitionCost, categoryName, attachments, noInBuilding, serialNumber, code, description, residualValue, depreciationType, depreciationPercent);
     asset.initialize().then(_ => {
         return res.json({ message: Success2.CREATED_ASSET });
     }).catch(e => {
