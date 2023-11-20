@@ -107,17 +107,21 @@ router.get('/view', checkifAuthenticated,  checkifAuthorized('Asset Administrato
 router.get('/view/:id', checkifAuthenticated, checkifAuthorized('Asset User'), (req, res) => {
     // Get asset tag from request params
     let asset_id = req.params.id;
+    console.log(asset_id);
 
     // Query database for details of asset with given assettag
     pool.query(assetTable.getAssetDetails, [asset_id]).then(fetchResult => {
+        console.log("DB Request Done!")
         if (fetchResult.rowCount <= 0) {
             res.status(404).json({
                 message: Errors[8],
             })
         }else{
+            console.log(fetchResult.rows[0])
             res.status(200).json(fetchResult.rows[0]);
         }
     }).catch(e => {
+        console.log(e);
         res.status(500).json({
             message: Errors[9]
         })
