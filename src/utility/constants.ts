@@ -99,7 +99,8 @@ export enum MyErrors2 {
     'NOT_PROCESS_EXCEL_FILE' = "Could Not Process The Excel File",
     'COMPANY_EXISTS' = "Company Already Exists",
     'NOT_CREATE_COMPANY' = "Could Not Create Company",
-    'USER_NOT_EXIST' = "User Does Not Exist"
+    'USER_NOT_EXIST' = "User Does Not Exist",
+    "NO_USERS" = "There Are No Users In The System"
 }
 
 export enum Success2 {
