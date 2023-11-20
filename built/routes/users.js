@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import userTable from '../Users/db_users.js';
-import { Errors, Succes } from '../utility/constants.js';
+import { Errors, MyErrors2, Succes } from '../utility/constants.js';
 import pool from '../../db2.js';
 import { updateUser } from '../Users/update.js';
 import MyError from '../utility/myError.js';
@@ -143,6 +143,18 @@ router.post('/addUser', (req, res) => {
     }).catch(err => {
         console.log(err);
         return res.status(501).json({ message: Errors[9] });
+    });
+});
+router.get('/details', (req, res) => {
+    // Return id and username of all users
+    pool.query(userTable.getUserDetails, []).then((fetchResult) => {
+        // If result is empy return an error
+        if (fetchResult.rowCount <= 0) {
+            return res.status(400).json({ message: MyErrors2['NO_USERS'] });
+        }
+        else {
+            return res.json(fetchResult.rows);
+        }
     });
 });
 router.get('/getCompany/:username', (req, res) => {
