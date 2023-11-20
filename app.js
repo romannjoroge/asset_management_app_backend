@@ -175,7 +175,11 @@ app.post('/login', (req, res) => {
             let id = data.rows[0].id;
             // Send JWT token
             const token = JWT.sign({id}, process.env.TOKEN_SECRET, {expiresIn:3600});
-            return res.json({token, username});
+            return res.json({
+                token, 
+                username,
+                user_id: id
+            });
         }).catch(err => {
             console.log(err);
             res.status(500).json({message:Errors[9]});
