@@ -4,7 +4,7 @@ import pool from '../../db2.js';
 // Importing custom classes
 import userTable from './db_users.js'
 import MyError from '../utility/myError.js';
-import { Errors } from '../utility/constants.js';
+import { Errors, MyErrors2 } from '../utility/constants.js';
 
 interface UserFromDB {
     fname: string;
@@ -52,6 +52,20 @@ class User {
                 console.log(err);
                 res(false);
             });
+        });
+    }
+
+    static async checkIfUserIDExists(userID: number): Promise<boolean> {
+        return new Promise((res, rej) => {
+            pool.query(userTable.checkIfUserIDExists, [userID]).then((data: UserFetchResult) => {
+                if (data.rowCount > 0) {
+                    res(true);
+                } else {
+                    res(false)
+                }
+            }).catch(_ => {
+                throw(new MyError(MyErrors2.USER_NOT_EXIST))
+            })
         });
     }
 

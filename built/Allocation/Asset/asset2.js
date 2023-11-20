@@ -32,7 +32,7 @@ export var assetStatusOptions;
     assetStatusOptions["Fair"] = "Fair";
 })(assetStatusOptions || (assetStatusOptions = {}));
 class Asset {
-    constructor(barCode, assetLifeSpan, acquisitionDate, locationID, condition, custodianName, acquisitionCost, categoryName, attachments, noInBuilding, serialNumber, code, description, residualValue, depreciaitionType, depreciationPercent) {
+    constructor(barCode, assetLifeSpan, acquisitionDate, locationID, condition, custodian_id, acquisitionCost, categoryName, attachments, noInBuilding, serialNumber, code, description, residualValue, depreciaitionType, depreciationPercent) {
         // utility.checkIfBoolean(fixed, "Invalid Fixed Status");
         // this.fixed = fixed;
         utility.checkIfNumberisPositive(assetLifeSpan, "Invalid asset life span");
@@ -46,7 +46,7 @@ class Asset {
         else {
             throw new MyError(Errors[49]);
         }
-        this.custodianName = custodianName;
+        this.custodian_id = custodian_id;
         utility.checkIfNumberisPositive(acquisitionCost, "Invalid acquisition cost");
         this.acquisitionCost = acquisitionCost;
         utility.checkIfString(description, "Invalid Description");
@@ -97,37 +97,29 @@ class Asset {
             // Get category ID
             Category._getCategoryID(this.categoryName).then(categoryID => {
                 this.categoryID = categoryID;
-                console.log(1);
                 // Check that location exists
                 Location.verifyLocationID(this.locationID).then(doesExist => {
                     if (!doesExist) {
                         rej(new MyError(Errors[3]));
                     }
-                    console.log(2);
                     // Check if user exists
-                    User.checkIfUserExists(this.custodianName).then(doesUserExist => {
+                    User.checkIfUserIDExists(this.custodian_id).then(doesUserExist => {
                         if (!doesUserExist) {
-                            console.log(4);
                             rej(new MyError(Errors[30]));
                         }
-                        console.log(3);
                         this._storeAssetInAssetRegister().then(_ => {
                             console.log("Asset Stored In Asset Register");
                             res();
                         }).catch(err => {
-                            console.log(err);
                             rej(new MyError(Errors[6]));
                         });
                     }).catch(err => {
-                        console.log(err);
                         rej(new MyError(Errors[6]));
                     });
                 }).catch(err => {
-                    console.log(err);
                     rej(new MyError(Errors[6]));
                 });
             }).catch(err => {
-                console.log(err);
                 rej(new MyError(Errors[6]));
             });
         });
