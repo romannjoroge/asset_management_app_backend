@@ -13,7 +13,7 @@ export default (role) => {
         const id = req.id
 
         // Check if user has required role
-        pool.query(userTable.isUserAuthorized, [role, username]).then(data => {
+        pool.query(userTable.isUserAuthorized, [role, id]).then(data => {
             // Return error if user does not have role
             if(data.rowCount <= 0) {
                 return res.status(400).json({message:Errors[28]});
