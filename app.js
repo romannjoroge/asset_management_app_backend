@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 dotenv.config()  // Brings varaibles from .env file
 import { body, validationResult } from 'express-validator'
 import pool from './db2.js';
-import {Errors}  from './built/utility/constants.js';
+import {Errors, MyErrors2}  from './built/utility/constants.js';
 import bcrypt from 'bcrypt';
 import userTable from './built/Users/db_users.js';
 import JWT from 'jsonwebtoken';
@@ -66,18 +66,19 @@ app.post('/signup',
         body('email', "Enter a Valid Email").isEmail(),
         (req, res) => {
     // Get details from user
-    let { fname,
-        lname,
+    let { name,
         email,
         password,
         username,
-        companyName, } = req.body;
+        company, } = req.body;
+
+    
 
     // Validate details
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
         // Return errors
-        return res.status(404).json({
+        return res.status(400).json({
             errors: errors.array()
         })
     }
@@ -86,45 +87,49 @@ app.post('/signup',
     pool.query("SELECT username, email FROM User2 WHERE username=$1", [username]).then(data => {
         // If user exists throw error
         if(data.rowCount > 0) {
-            return res.status(404).json({
-                errors: [
-                    {
-                        msg: Errors[24],
-                    }
-                ]
-            })
+            return res.status(400).json({msg: Errors[24],})
         }
 
         // Check if email exists
         pool.query("SELECT username FROM User2 WHERE email=$1", [email]).then(data => {
             // If email exists throw error
             if(data.rowCount > 0) {
-                return res.status(404).json({
-                    errors: [
-                        {
-                            msg: Errors[25],
-                        }
-                    ]
-                })
+                return res.status(400).json({msg: Errors[25],})
             }
 
-            // Hash the password
-            bcrypt.hash(password, 10).then(hashedPasswd => {
-                // Store user
-                pool.query(userTable.addUser, [fname, lname, email, hashedPasswd, username, companyName]).then(_ => {
-                    // Send JWT Token
-                    const token = JWT.sign({username}, process.env.TOKEN_SECRET, {expiresIn:3600});
-                    return res.status(200).json({token, username});
-                }).catch(err => {
-                    console.log(err);
-                    return res.status(500).json({
-                        errors: [
-                            {
-                                msg: Errors[9]
-                            }
-                        ]
-                    });
-                });
+            // Check if the company already exists
+            pool.query("SELECT * FROM Company WHERE name = $1", [company]).then(data => {
+                // If something is returned company exists and error should be thrown
+                if(data.rowCount > 0) {
+                    return res.status(400).json({msg: MyErrors2['COMPANY_EXISTS']})
+                }
+
+                // Add the company
+                pool.query(userTable.addCompany, [company]).then(_ => {
+                    // Hash the password
+                    bcrypt.hash(password, 10).then(hashedPasswd => {
+                        // Store user
+                        pool.query(userTable.addUser, [name, email, hashedPasswd, username, company]).then(_ => {
+                            // Get user ID
+                            pool.query(userTable.getLatestUserID, [username]).then(data => {
+                                if (data.rowCount <= 0) {
+                                    return res.status(404).json({msg: MyErrors2['NOT_CREATE_COMPANY']})
+                                }
+
+                                let id = data.rows[0].id
+                                // Give the creator of the company all roles
+                                pool.query(userTable.giveUserAllRoles, [id]).then(_ => {
+                                    // Send JWT Token
+                                    const token = JWT.sign({id}, process.env.TOKEN_SECRET, {expiresIn:3600});
+                                    return res.status(200).json({token, username, id});
+                                })
+                            })
+                        }).catch(err => {
+                            console.log(err);
+                            return res.status(500).json({msg: Errors[9]});
+                        });
+                    })
+                })
             })
         }).catch(err => {
             console.log(err);
@@ -153,7 +158,7 @@ app.post('/login', (req, res) => {
     let {username, password} = req.body;
 
     // Get User From Username
-    pool.query("SELECT password FROM User2 WHERE username=$1", [username]).then(data => {
+    pool.query("SELECT password, id FROM User2 WHERE username=$1", [username]).then(data => {
         // Return an error if user does not exist
         if(data.rowCount <= 0) {
             return res.status(400).json({message:Errors[26]});
@@ -167,8 +172,9 @@ app.post('/login', (req, res) => {
                 return res.status(400).json({message:Errors[26]});
             }
 
+            let id = data.rows[0].id;
             // Send JWT token
-            const token = JWT.sign({username}, process.env.TOKEN_SECRET, {expiresIn:3600});
+            const token = JWT.sign({id}, process.env.TOKEN_SECRET, {expiresIn:3600});
             return res.json({token, username});
         }).catch(err => {
             console.log(err);

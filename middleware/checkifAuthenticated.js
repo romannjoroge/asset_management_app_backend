@@ -16,8 +16,8 @@ export default (req, res, next) => {
     try {
         const payload = JWT.verify(token, process.env.TOKEN_SECRET);
 
-        // Add username to req
-        req.username = payload.username;
+        // Add id to req
+        req.id = payload.id;
         req.authenticated = true;
         next();
     } catch(err) {

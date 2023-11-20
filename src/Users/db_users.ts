@@ -1,7 +1,7 @@
 const checkIfUserInDB = "SELECT * FROM User2 WHERE username = $1 AND deleted = false";
 const addUser = "INSERT INTO User2 (name, email, password, username, companyName) VALUES ($1, $2, $3, $4, $5)";
 const getUsers = "SELECT username FROM User2 WHERE deleted = false";
-const isUserAuthorized = "SELECT username FROM UserRole WHERE roleID=(SELECT id FROM Role WHERE name=$1 LIMIT 1) AND username=$2";
+const isUserAuthorized = "SELECT username FROM UserRole WHERE roleID=(SELECT id FROM Role WHERE name=$1 LIMIT 1) AND userid=$2";
 const nameEmail = "SELECT username, email, name FROM User2 WHERE deleted = false";
 const userRoles = "SELECT name FROM Role WHERE id IN (SELECT roleid FROM UserRole WHERE username=$1)"
 const doesUserExist = "SELECT * FROM User2 WHERE email = $1 OR username = $2 AND deleted = false"
@@ -16,8 +16,14 @@ const getNameEmail = "SELECT name, email FROM User2 WHERE username = $1 AND dele
 const checkIfNameExists = "SELECT * FROM User2 WHERE name = $1 AND deleted = false";
 const getNames = "SELECT name, username FROM User2 WHERE deleted = false"
 const getName = "SELECT name FROM User2 WHERE username = $1 AND deleted = false";
+const addCompany = "INSERT INTO Company (name) VALUES ($1)";
+const getLatestUserID = "SELECT id FROM User2 WHERE username = $1 ORDER BY id DESC LIMIT 1";
+const giveUserAllRoles = "INSERT INTO UserRole (userid, roleid) VALUES ($1, (SELECT id FROM Role WHERE name = 'Company Administrator')), ($1, (SELECT id FROM Role WHERE name = 'User Manager')), ($1, (SELECT id FROM Role WHERE name = 'Asset Administrator')), ($1, (SELECT id FROM Role WHERE name = 'Asset Reconciler')) ,($1, (SELECT id FROM Role WHERE name = 'RFID Reader')), ($1, (SELECT id FROM Role WHERE name = 'Asset User')), ($1, (SELECT id FROM Role WHERE name = 'GatePass Authorizer'))"
 
 let userTable = {
+    giveUserAllRoles,
+    getLatestUserID,
+    addCompany,
     getName,
     getNames,
     checkIfNameExists,

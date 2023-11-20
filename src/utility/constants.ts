@@ -96,7 +96,9 @@ export enum MyErrors2 {
     'NOT_READ_TAG' = "Could Not Read Tag",
     'NOT_PROCESS_TAG' = "Could Not Process Tag",
     'NOT_CONFIRM_GATEPASS' = "Could Not Verify If Gatepass Exists",
-    'NOT_PROCESS_EXCEL_FILE' = "Could Not Process The Excel File"
+    'NOT_PROCESS_EXCEL_FILE' = "Could Not Process The Excel File",
+    'COMPANY_EXISTS' = "Company Already Exists",
+    'NOT_CREATE_COMPANY' = "Could Not Create Company"
 }
 
 export enum Success2 {
