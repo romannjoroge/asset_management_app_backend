@@ -157,7 +157,7 @@ class Asset {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((res, rej) => {
                 pool.query(assetTable.addAssetToAssetRegister, [this.barcode, this.noInBuilding, this.code, this.description,
-                    this.serialNumber, this.acquisitionDate, this.locationID, this.residualValue, this.condition, this.custodianName, this.acquisitionCost, this.categoryID,
+                    this.serialNumber, this.acquisitionDate, this.locationID, this.residualValue, this.condition, this.custodian_id, this.acquisitionCost, this.categoryID,
                     this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent]).catch(err => {
                     console.log(err);
                     return rej(new MyError(Errors[6]));
