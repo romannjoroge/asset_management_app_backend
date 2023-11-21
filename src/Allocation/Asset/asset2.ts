@@ -189,7 +189,7 @@ class Asset {
     async _storeAssetInAssetRegister(): Promise<void> {
         return new Promise((res, rej) => {
             pool.query(assetTable.addAssetToAssetRegister, [this.barcode, this.noInBuilding, this.code, this.description,
-                this.serialNumber, this.acquisitionDate, this.locationID, this.residualValue, this.condition, this.custodianName, this.acquisitionCost, this.categoryID,
+                this.serialNumber, this.acquisitionDate, this.locationID, this.residualValue, this.condition, this.custodian_id, this.acquisitionCost, this.categoryID,
                 this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent]).catch(err => {
                     console.log(err);
                     return rej(new MyError(Errors[6]));
