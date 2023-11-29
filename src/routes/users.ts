@@ -42,9 +42,21 @@ router.get('/getNames', (req, res) => {
     });
 });
 
+interface GetUserDetails {
+    name: string;
+    email: string;
+    id: number;
+    username: string;
+}
+
+interface GetUserDetailsFetchResults {
+    rows: GetUserDetails[];
+    rowCount: number
+}
+
 router.get('/userTable', (req, res) => {
-    // Get usernames and emails from database
-    pool.query(userTable.nameEmail, []).then(data => {
+    // Get username, email, name and id
+    pool.query(userTable.nameEmail, []).then((data: GetUserDetailsFetchResults) => {
         // If data is empty return an error
         if (data.rowCount <= 0) {
             return res.status(400).json({ message: Errors[22] });

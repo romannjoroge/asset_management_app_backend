@@ -39,8 +39,8 @@ router.get('/getNames', (req, res) => {
     });
 });
 router.get('/userTable', (req, res) => {
-    // Get usernames and emails from database
-    pool.query(userTable.nameEmail, []).then(data => {
+    // Get username, email, name and id
+    pool.query(userTable.nameEmail, []).then((data) => {
         // If data is empty return an error
         if (data.rowCount <= 0) {
             return res.status(400).json({ message: Errors[22] });
