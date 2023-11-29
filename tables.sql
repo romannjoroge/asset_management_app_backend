@@ -402,12 +402,12 @@ CREATE TABLE gatepass (
 
 
 CREATE TABLE gatepassauthorizers (
-  username varchar(50) NOT NULL,
+  userid int NOT NULL,
   locationid int NOT NULL,
   deleted boolean NOT NULL DEFAULT false,
   PRIMARY KEY (username, locationid),
   CONSTRAINT "FK_GatePassAuthorizers.locationID" FOREIGN KEY (locationid) REFERENCES location(id),
-  CONSTRAINT "FK_GatePassAuthorizers.username" FOREIGN KEY (username) REFERENCES user2(username)
+  CONSTRAINT "FK_GatePassAuthorizers" FOREIGN KEY (userid) REFERENCES user2(id)
 );
 
 
