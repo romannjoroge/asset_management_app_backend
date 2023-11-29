@@ -58,28 +58,45 @@ router.get('/userTable', (req, res) => {
     })
 });
 
+interface UserEmail {
+    email: string
+}
+
+interface UserRole {
+    name: string
+}
+
+interface UserRoleFetchResult {
+    rows: UserRole[];
+    rowCount: number;
+}
+
+interface UserEmailFetchResult {
+    rowCount: number;
+    rows: UserEmail[]
+}
+
 router.get('/user/:id', (req, res) => {
-    // Get username
-    const username = req.params.id;
+    // Get id of user
+    const id = req.params.id;
 
     // Get email of user
-    pool.query("SELECT email FROM User2 WHERE username=$1 AND deleted = false", [username]).then(data => {
+    pool.query("SELECT email FROM User2 WHERE id=$1 AND deleted = false", [id]).then((data: UserEmailFetchResult) => {
         // Return an error if data is empty
         if (data.rowCount == 0) {
             return res.status(400).json({ message: Errors[22] });
         }
 
         let email = data.rows[0]['email']
-        // console.log(email);
-        // return res.send("OK");
+
         // Get roles
-        pool.query(userTable.userRoles, [username]).then(data => {
+        pool.query(userTable.userRoles, [id]).then((data: UserRoleFetchResult) => {
             // Return an error if data is empty
             if (data.rowCount == 0) {
                 return res.status(400).json({ message: Errors[22] });
             }
             // Extract roles
-            let roles = data.rows.map(row => {
+            let roles: string[] = data.rows.map(row => {
                 return row['name'];
             })
             // Send roles and email
@@ -174,7 +191,7 @@ interface UserDetailsFetch {
     rowCount: number
 }
 
-router.get('/details', (req, res) => {
+router.get('/', (req, res) => {
     // Return id and username of all users
     pool.query(userTable.getUserDetails, []).then((fetchResult: UserDetailsFetch) => {
         // If result is empy return an error
