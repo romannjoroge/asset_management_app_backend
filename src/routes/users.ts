@@ -111,23 +111,30 @@ router.get('/user/:id', (req, res) => {
     })
 });
 
+interface GetUserID {
+    id: number
+}
+
+interface GetUserIDFetchResults {
+    rowCount: number;
+    rows: GetUserID[]
+}
+
 // Route To Add A User To A Company
 router.post('/addUser', (req, res) => {
     // Get User Details And Roles From Frontend
-    let {
-        name,
-        email,
-        password,
-        username,
-        companyName,
-        gatepasslocation
-    } = req.body;
+    let name: string = req.body.name;
+    let email: string = req.body.email;
+    let password: string = req.body.password;
+    let username: string = req.body.username;
+    let companyName: string = req.body.companyName;
+    let gatepasslocation: number = Number.parseInt(req.body.gatepasslocation);
 
     let roles: string[] = req.body.roles;
 
-    function addUserRole(username: string, role: string): Promise<void | never> {
+    function addUserRole(id: number, role: string): Promise<void | never> {
         return new Promise((res, rej) => {
-            pool.query(userTable.addUserRole, [username, role]).then(_ => {
+            pool.query(userTable.addUserRole, [id, role]).then(_ => {
                 return res();
             }).catch(err => {
                 console.log(err);
@@ -145,26 +152,36 @@ router.post('/addUser', (req, res) => {
             }
             // Add user if doesn't exist
             pool.query(userTable.addUser, [name, email, hash, username, companyName]).then(_ => {
-                // Add user roles
-                let promises: Promise<void | never>[] = [];
-                roles.forEach(role => promises.push(addUserRole(username, role)));
-                Promise.all(promises).then(_ => {
-                    if (gatepasslocation) {
-                        // Add user as gatepass authorizer for location
-                        pool.query(gatepasstable.addApprover, [username, gatepasslocation]).then(_ => {
-                            return res.json({message: Succes[4]});
-                        }).catch(err => {
-                            console.log(err);
-                            return res.status(501).json({message: Errors[9]});
-                        });
-                    } else {
-                        return res.json({message: Succes[4]});
+                // Get id of created user
+                pool.query(userTable.getLatestUserID, [username]).then((data: GetUserIDFetchResults) => {
+                    if(data.rowCount <= 0) {
+                        // return an error if no data was returned
+                        return res.status(400).json({message: Errors[24]});
                     }
+                    const id = data.rows[0]['id'];
+                    // Add user roles
+                    let promises: Promise<void | never>[] = [];
+                    roles.forEach(role => promises.push(addUserRole(id, role)));
+                    Promise.all(promises).then(_ => {
+                        if (gatepasslocation) {
+                            // Add user as gatepass authorizer for location
+                            pool.query(gatepasstable.addApprover, [id, gatepasslocation]).then(_ => {
+                                return res.json({message: Succes[4]});
+                            }).catch(err => {
+                                console.log(err);
+                                return res.status(501).json({message: Errors[9]});
+                            });
+                        } else {
+                            return res.json({message: Succes[4]});
+                        }
+                    }).catch(err => {
+                        console.log(3);
+                        console.log(err);
+                        return res.status(501).json({message: Errors[9]});
+                    });
                 }).catch(err => {
-                    console.log(3);
-                    console.log(err);
-                    return res.status(501).json({message: Errors[9]});
-                });
+                    return res.status(501).json({message: Errors[9]})
+                })
             }).catch(err => {
                 console.log(2);
                 console.log(err);
