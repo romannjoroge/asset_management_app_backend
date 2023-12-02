@@ -100,7 +100,10 @@ export enum MyErrors2 {
     'COMPANY_EXISTS' = "Company Already Exists",
     'NOT_CREATE_COMPANY' = "Could Not Create Company",
     'USER_NOT_EXIST' = "User Does Not Exist",
-    "NO_USERS" = "There Are No Users In The System"
+    "NO_USERS" = "There Are No Users In The System",
+    "EMAIL_ALREADY_EXISTS" = "The provided email already exists",
+    "INVAILID_NAME" = "The provided name is invalid",
+    "INVALID_ROLE" = "The provided role is invalid"
 }
 
 export enum Success2 {

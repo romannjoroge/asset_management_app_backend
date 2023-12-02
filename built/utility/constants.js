@@ -101,6 +101,9 @@ export var MyErrors2;
     MyErrors2["NOT_CREATE_COMPANY"] = "Could Not Create Company";
     MyErrors2["USER_NOT_EXIST"] = "User Does Not Exist";
     MyErrors2["NO_USERS"] = "There Are No Users In The System";
+    MyErrors2["EMAIL_ALREADY_EXISTS"] = "The provided email already exists";
+    MyErrors2["INVAILID_NAME"] = "The provided name is invalid";
+    MyErrors2["INVALID_ROLE"] = "The provided role is invalid";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {
