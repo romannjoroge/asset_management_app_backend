@@ -13,7 +13,7 @@ const getNumberOfUsers = "SELECT COUNT(*) AS noUsers FROM User2 WHERE deleted = 
 const checkIfEmailIsTaken = "SELECT * FROM User2 WHERE email = $1 AND deleted = false";
 const getRole = "SELECT * FROM Role WHERE name=$1 AND deleted = false";
 const deleteUserRoles = "DELETE FROM UserRole WHERE username=$1";
-const getNameEmail = "SELECT name, email FROM User2 WHERE username = $1 AND deleted = false";
+const getNameEmail = "SELECT name, email FROM User2 WHERE id = $1 AND deleted = false";
 const checkIfNameExists = "SELECT * FROM User2 WHERE name = $1 AND deleted = false";
 const getNames = "SELECT name, username FROM User2 WHERE deleted = false";
 const getName = "SELECT name FROM User2 WHERE username = $1 AND deleted = false";

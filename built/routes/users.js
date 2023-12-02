@@ -194,14 +194,14 @@ router.get('/getCompany/:username', (req, res) => {
         return res.status(501).json({ message: Errors[9] });
     });
 });
-router.get('/getNameEmails/:username', (req, res) => {
-    let username = req.params.username;
-    pool.query(userTable.getNameEmail, [username]).then(data => {
+router.get('/getNameEmails/:id', (req, res) => {
+    const userid = Number.parseInt(req.params.id);
+    pool.query(userTable.getNameEmail, [userid]).then((data) => {
         if (data.rowCount <= 0) {
             return res.status(404).json({ message: Errors[14] });
         }
         return res.status(200).json(data.rows);
-    }).catch(err => {
+    }).catch((err) => {
         console.log(err);
         return res.status(501).json({ message: Errors[9] });
     });
