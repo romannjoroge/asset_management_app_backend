@@ -271,7 +271,7 @@ router.get('/getNameEmails/:id', (req, res) => {
         if (data.rowCount <= 0) {
             return res.status(404).json({ message: Errors[14] });
         }
-        return res.status(200).json(data.rows);
+        return res.status(200).json(data.rows[0]);
     }).catch((err: any) => {   
         console.log(err);
         return res.status(501).json({ message: Errors[9] });
