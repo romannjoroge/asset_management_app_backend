@@ -259,15 +259,6 @@ router.get('/getCompany/:username', (req, res) => {
     }) 
 });
 
-interface UpdateUserJSON {
-    username: string;
-    fname?: string;
-    lname?: string;
-    email?: string;
-    password?: string;
-    roles?: string[];
-}
-
 router.get('/getNameEmails/:username', (req, res) => {
     let username = req.params.username;
     pool.query(userTable.getNameEmail, [username]).then(data => {
@@ -282,29 +273,27 @@ router.get('/getNameEmails/:username', (req, res) => {
 });
 
 router.post('/update', (req, res) => {
-    let body: UpdateUserJSON = req.body;
-
-    let username = body.username;
+    let userid = Number.parseInt(req.body.id)
     let updateBody: UpdateUser = {};
 
-    if (body.fname) {
-        updateBody.fname = body.fname;
+    if (req.body.name) {
+        updateBody.name = req.body.name;
     }
-    if (body.lname) {
-        updateBody.lname = body.lname;
+
+    if (req.body.email) {
+        updateBody.email = req.body.email;
     }
-    if (body.email) {
-        updateBody.email = body.email;
+
+    if (req.body.password) {
+        updateBody.password = req.body.password;
     }
-    if (body.password) {
-        updateBody.password = body.password;
-    }
-    if (body.roles) {
-        updateBody.roles = body.roles;
+
+    if (req.body.roles) {
+        updateBody.roles = req.body.roles;
     }
 
     // Update user
-    updateUser(username, updateBody).then(_ => {
+    updateUser(userid, updateBody).then(_ => {
         return res.json({message: Succes[17]});
     }).catch(err => {
         console.log(err);
