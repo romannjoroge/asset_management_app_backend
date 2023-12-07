@@ -15,8 +15,11 @@ import { getTaggedAssets } from '../Reports/tagged_assets.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // A route to get the tagged assets
-router.get('/tagged', (req, res) => {
-    getTaggedAssets().then(data => {
+router.get('/tagged/:istagged', (req, res) => {
+    // Get is tagged from request parameter
+    const istagged = Number.parseInt(req.params.istagged);
+    let tagged = istagged === 1;
+    getTaggedAssets(tagged).then(data => {
         return res.send(data);
     }).catch((err) => {
         return res.status(400).json({ message: err.message });

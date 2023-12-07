@@ -15,10 +15,10 @@ interface TaggedAsset {
     office: string
 }
 // A function that will get information of assets that are tagged
-export function getTaggedAssets(): Promise<TaggedAsset[]> {
+export function getTaggedAssets(is_tagged: boolean): Promise<TaggedAsset[]> {
     return new Promise((res, rej) => {
         // Function to get details from database
-        getDetailsFromDatabase().then((rawAssetData: RawTaggedAsset[]) => {
+        getDetailsFromDatabase(is_tagged).then((rawAssetData: RawTaggedAsset[]) => {
             // Function to get location, building and office of asset
             let promises: Promise<TaggedAsset>[] = [];
 
@@ -53,10 +53,10 @@ interface RawTaggedAssetFetchResult {
 }
 
 // Returns details of assets from the database
-function getDetailsFromDatabase(): Promise<RawTaggedAsset[]> {
+function getDetailsFromDatabase(is_tagged: boolean): Promise<RawTaggedAsset[]> {
     return new Promise((res, rej) => {
         // Get details from database
-        pool.query(reportTable.getRawAssetData, []).then((data: RawTaggedAssetFetchResult) => {
+        pool.query(reportTable.getRawAssetData, [is_tagged]).then((data: RawTaggedAssetFetchResult) => {
             return res(data.rows);
         }).catch((err: any) => {
             return rej(new MyError(MyErrors2.NOT_GET_ASSET_DATA))

@@ -4,10 +4,10 @@ import MyError from '../utility/myError.js';
 import pool from '../../db2.js';
 import Location from '../Tracking/location.js';
 // A function that will get information of assets that are tagged
-export function getTaggedAssets() {
+export function getTaggedAssets(is_tagged) {
     return new Promise((res, rej) => {
         // Function to get details from database
-        getDetailsFromDatabase().then((rawAssetData) => {
+        getDetailsFromDatabase(is_tagged).then((rawAssetData) => {
             // Function to get location, building and office of asset
             let promises = [];
             rawAssetData.map((r) => {
@@ -25,10 +25,10 @@ export function getTaggedAssets() {
     });
 }
 // Returns details of assets from the database
-function getDetailsFromDatabase() {
+function getDetailsFromDatabase(is_tagged) {
     return new Promise((res, rej) => {
         // Get details from database
-        pool.query(reportTable.getRawAssetData, []).then((data) => {
+        pool.query(reportTable.getRawAssetData, [is_tagged]).then((data) => {
             return res(data.rows);
         }).catch((err) => {
             return rej(new MyError(MyErrors2.NOT_GET_ASSET_DATA));

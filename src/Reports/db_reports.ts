@@ -40,7 +40,7 @@ SELECT assetID FROM BatchAsset WHERE batchID IN (SELECT batchID FROM InventoryBa
 
 const getRawAssetData = `
 SELECT assetID AS id, barcode, description, serialNumber AS serial_number, locationid AS location_id, c.name 
-AS category_name FROM Asset a JOIN Category c ON c.id = a.categoryid WHERE a.istagged = true
+AS category_name FROM Asset a JOIN Category c ON c.id = a.categoryid WHERE a.istagged = $1 AND a.deleted = false;
 `;
 
 export default {
