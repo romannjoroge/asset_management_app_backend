@@ -80,12 +80,12 @@ class Location {
         });
     }
 
-    // A function that finds the immediate parent of a location
-    static findParentLocation(id: number): Promise<number> {
+    // A function that finds the immediate parent of a location. If the location has no parent null is returned
+    static findParentLocation(id: number): Promise<number | void> {
         return new Promise((res, rej) => {
             pool.query(locationTable.getParentLocations, [id]).then((data: GetParentLocationFetchResult) => {
                 if (data.rowCount <= 0) {
-                    return rej(new MyError(MyErrors2.NOT_GET_PARENT_LOCATION));
+                    return res();
                 } else {
                     return res(data.rows[0].parentLocationID);
                 }
