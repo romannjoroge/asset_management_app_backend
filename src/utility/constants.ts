@@ -106,6 +106,9 @@ export enum MyErrors2 {
     "NOT_GET_LOCATION_NAME" = "Could Not Get Location Name",
     "NOT_ADD_BUILDING_LOCATION" = "Could Not Add The Building And Location To Asset",
     "NOT_GET_TAGGED_ASSETS" = "Could Not Get Tagged Assets"
+    "EMAIL_ALREADY_EXISTS" = "The provided email already exists",
+    "INVAILID_NAME" = "The provided name is invalid",
+    "INVALID_ROLE" = "The provided role is invalid"
 }
 
 export enum Success2 {
