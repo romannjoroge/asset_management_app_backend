@@ -20,10 +20,20 @@ function getTaggedAssets(): Promise<TaggedAsset[]> {
         // Function to get details from database
         getDetailsFromDatabase().then((rawAssetData: RawTaggedAsset[]) => {
             // Function to get location, building and office of asset
+            let promises: Promise<TaggedAsset>[] = [];
+
+            rawAssetData.map((r) => {
+                promises.push(addOfficeBuildingLocationToAsset(r));
+            })
 
             // Return
+            Promise.all(promises).then(data => {
+                return res(data);
+            }).catch((err: MyError) => {
+                return rej(err);
+            })
         }).catch((err: MyError) => {
-            return rej(err);
+            return rej(new MyError(MyErrors2.NOT_GET_TAGGED_ASSETS));
         })
     });
 }

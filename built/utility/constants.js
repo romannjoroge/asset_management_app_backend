@@ -105,6 +105,7 @@ export var MyErrors2;
     MyErrors2["NOT_GET_PARENT_LOCATION"] = "Could Not Get Parent Location";
     MyErrors2["NOT_GET_LOCATION_NAME"] = "Could Not Get Location Name";
     MyErrors2["NOT_ADD_BUILDING_LOCATION"] = "Could Not Add The Building And Location To Asset";
+    MyErrors2["NOT_GET_TAGGED_ASSETS"] = "Could Not Get Tagged Assets";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

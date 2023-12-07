@@ -9,9 +9,18 @@ function getTaggedAssets() {
         // Function to get details from database
         getDetailsFromDatabase().then((rawAssetData) => {
             // Function to get location, building and office of asset
+            let promises = [];
+            rawAssetData.map((r) => {
+                promises.push(addOfficeBuildingLocationToAsset(r));
+            });
             // Return
+            Promise.all(promises).then(data => {
+                return res(data);
+            }).catch((err) => {
+                return rej(err);
+            });
         }).catch((err) => {
-            return rej(err);
+            return rej(new MyError(MyErrors2.NOT_GET_TAGGED_ASSETS));
         });
     });
 }
