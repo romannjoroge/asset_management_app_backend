@@ -103,7 +103,8 @@ export enum MyErrors2 {
     "NO_USERS" = "There Are No Users In The System",
     "NOT_GET_ASSET_DATA" = "Could Not Get Asset Data",
     "NOT_GET_PARENT_LOCATION" = "Could Not Get Parent Location",
-    "NOT_GET_LOCATION_NAME" = "Could Not Get Location Name"
+    "NOT_GET_LOCATION_NAME" = "Could Not Get Location Name",
+    "NOT_ADD_BUILDING_LOCATION" = "Could Not Add The Building And Location To Asset"
 }
 
 export enum Success2 {
