@@ -101,6 +101,9 @@ export var MyErrors2;
     MyErrors2["NOT_CREATE_COMPANY"] = "Could Not Create Company";
     MyErrors2["USER_NOT_EXIST"] = "User Does Not Exist";
     MyErrors2["NO_USERS"] = "There Are No Users In The System";
+    MyErrors2["NOT_GET_ASSET_DATA"] = "Could Not Get Asset Data";
+    MyErrors2["NOT_GET_PARENT_LOCATION"] = "Could Not Get Parent Location";
+    MyErrors2["NOT_GET_LOCATION_NAME"] = "Could Not Get Location Name";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

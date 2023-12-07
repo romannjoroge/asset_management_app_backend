@@ -100,7 +100,10 @@ export enum MyErrors2 {
     'COMPANY_EXISTS' = "Company Already Exists",
     'NOT_CREATE_COMPANY' = "Could Not Create Company",
     'USER_NOT_EXIST' = "User Does Not Exist",
-    "NO_USERS" = "There Are No Users In The System"
+    "NO_USERS" = "There Are No Users In The System",
+    "NOT_GET_ASSET_DATA" = "Could Not Get Asset Data",
+    "NOT_GET_PARENT_LOCATION" = "Could Not Get Parent Location",
+    "NOT_GET_LOCATION_NAME" = "Could Not Get Location Name"
 }
 
 export enum Success2 {
