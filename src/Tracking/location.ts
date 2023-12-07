@@ -20,6 +20,11 @@ interface GetParentLocationFetchResult {
     rows: {parentLocationID: number}[]
 }
 
+interface GetLocationNameFetchResult {
+    rowCount: number;
+    rows: {name: string}[]
+}
+
 export interface selectLocationResults {
     rows: selectLocation[];
     rowCount: number;
@@ -87,6 +92,22 @@ class Location {
             }).catch((err: any) => {
                 return rej(new MyError(MyErrors2.NOT_GET_PARENT_LOCATION))
             });
+        });
+    }
+
+    // A function to get the name of a location from an id
+    static getLocationName(id: number): Promise<string> {
+        return new Promise((res, rej) => {
+            // Get name from database
+            pool.query(locationTable.getLocationName, [id]).then((data: GetLocationNameFetchResult) => {
+                if (data.rowCount <= 0) {
+                    return rej(new MyError(MyErrors2.NOT_GET_LOCATION_NAME));
+                } else {
+                    return res(data.rows[0].name);
+                }
+            }).catch((err: any) => {
+                return rej(new MyError(MyErrors2.NOT_GET_LOCATION_NAME))
+            })
         });
     }
 

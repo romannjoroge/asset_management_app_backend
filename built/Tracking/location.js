@@ -78,6 +78,22 @@ class Location {
             });
         });
     }
+    // A function to get the name of a location from an id
+    static getLocationName(id) {
+        return new Promise((res, rej) => {
+            // Get name from database
+            pool.query(locationTable.getLocationName, [id]).then((data) => {
+                if (data.rowCount <= 0) {
+                    return rej(new MyError(MyErrors2.NOT_GET_LOCATION_NAME));
+                }
+                else {
+                    return res(data.rows[0].name);
+                }
+            }).catch((err) => {
+                return rej(new MyError(MyErrors2.NOT_GET_LOCATION_NAME));
+            });
+        });
+    }
     // Find parent locations
     static findParentLocations(id, locationIDs) {
         return new Promise((res, rej) => {
