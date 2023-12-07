@@ -15,7 +15,7 @@ interface TaggedAsset {
     office: string
 }
 // A function that will get information of assets that are tagged
-function getTaggedAssets(): Promise<TaggedAsset[]> {
+export function getTaggedAssets(): Promise<TaggedAsset[]> {
     return new Promise((res, rej) => {
         // Function to get details from database
         getDetailsFromDatabase().then((rawAssetData: RawTaggedAsset[]) => {

@@ -11,8 +11,17 @@ import checkifAuthenticated from '../../middleware/checkifAuthenticated.js';
 import checkifAuthorized from '../../middleware/checkifAuthorized.js';
 import utility from '../utility/utility.js';
 import locationTable from '../Tracking/db_location.js';
+import { getTaggedAssets } from '../Reports/tagged_assets.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+// A route to get the tagged assets
+router.get('/tagged', (req, res) => {
+    getTaggedAssets().then(data => {
+        return res.send(data);
+    }).catch((err) => {
+        return res.status(400).json({ message: err.message });
+    });
+});
 router.get('/inventory/:type', (req, res) => {
     let type = req.params.type;
     let inventoryID = Number.parseInt(req.query.inventoryID);

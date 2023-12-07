@@ -4,7 +4,7 @@ import MyError from '../utility/myError.js';
 import pool from '../../db2.js';
 import Location from '../Tracking/location.js';
 // A function that will get information of assets that are tagged
-function getTaggedAssets() {
+export function getTaggedAssets() {
     return new Promise((res, rej) => {
         // Function to get details from database
         getDetailsFromDatabase().then((rawAssetData) => {
