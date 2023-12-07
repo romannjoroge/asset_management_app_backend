@@ -101,6 +101,11 @@ export enum MyErrors2 {
     'NOT_CREATE_COMPANY' = "Could Not Create Company",
     'USER_NOT_EXIST' = "User Does Not Exist",
     "NO_USERS" = "There Are No Users In The System",
+    "NOT_GET_ASSET_DATA" = "Could Not Get Asset Data",
+    "NOT_GET_PARENT_LOCATION" = "Could Not Get Parent Location",
+    "NOT_GET_LOCATION_NAME" = "Could Not Get Location Name",
+    "NOT_ADD_BUILDING_LOCATION" = "Could Not Add The Building And Location To Asset",
+    "NOT_GET_TAGGED_ASSETS" = "Could Not Get Tagged Assets"
     "EMAIL_ALREADY_EXISTS" = "The provided email already exists",
     "INVAILID_NAME" = "The provided name is invalid",
     "INVALID_ROLE" = "The provided role is invalid"

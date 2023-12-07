@@ -14,9 +14,25 @@ import checkifAuthorized from '../../middleware/checkifAuthorized.js';
 import utility from '../utility/utility.js';
 import locationTable from '../Tracking/db_location.js';
 import _ from 'lodash';
+import { getTaggedAssets } from '../Reports/tagged_assets.js';
+import MyError from '../utility/myError.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// A route to get the tagged assets
+router.get('/tagged/:istagged', (req, res) => {
+    // Get is tagged from request parameter
+    const istagged = Number.parseInt(req.params.istagged);
+
+    let tagged: boolean = istagged === 1;
+
+    getTaggedAssets(tagged).then(data => {
+        return res.send(data);
+    }).catch((err: MyError) => {
+        return res.status(400).json({message: err.message})
+    })
+});
 
 router.get('/inventory/:type', (req, res) => {
     let type = req.params.type

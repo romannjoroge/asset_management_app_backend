@@ -1,5 +1,5 @@
-let getLocation = "SELECT name FROM Location WHERE id = $1";
-let getLocations = "SELECT name, id FROM Location WHERE deleted = false";
+const getLocation = "SELECT name FROM Location WHERE id = $1";
+const getLocations = "SELECT name, id FROM Location WHERE deleted = false";
 const doesLocationExist = "SELECT * FROM Location WHERE name = $1 AND parentLocationID IN (SELECT id FROM Location WHERE name = $2 AND companyName = $3) AND deleted = false";
 const createLocation = "INSERT INTO Location (name, companyname, parentLocationID) VALUES ($1, $2, (SELECT id FROM Location WHERE name = $3 AND companyName=$4))";
 const createLocationWithNoParent = "INSERT INTO Location (name, companyname, parentLocationID) VALUES ($1, $2, null)";
@@ -36,25 +36,27 @@ g.approved AS authorized FROM ProcessedTags p JOIN ReaderDevice r ON r.id = p.re
 ON a.assetid = p.assetid JOIN Category c ON c.id = a.categoryid JOIN User2 u ON u.username = a.responsibleusername WHERE readerdeviceid IN (SELECT id FROM 
 ReaderDevice WHERE locationid = $1 AND entry = false)
 `;
-let getTrackedLocations = "SELECT id, name FROM Location WHERE id IN (SELECT locationid FROM readerdevice)";
-let getLocationDetails = "SELECT id, name, parentLocationID FROM Location WHERE deleted = false";
-let syncItem = "UPDATE Asset SET lastConverted = $1, isConverted = $2, isTagged = $3 WHERE assetID = $4";
-let createReaderDevice = "INSERT INTO readerdevice (readerdeviceid, locationid, entry) VALUES ($1, $2, $3)";
-let doesReaderDeviceExist = "SELECT * FROM readerdevice WHERE readerdeviceid = $1 AND deleted = false";
-let getReaderDevices = `
+const getTrackedLocations = "SELECT id, name FROM Location WHERE id IN (SELECT locationid FROM readerdevice)";
+const getLocationDetails = "SELECT id, name, parentLocationID FROM Location WHERE deleted = false";
+const syncItem = "UPDATE Asset SET lastConverted = $1, isConverted = $2, isTagged = $3 WHERE assetID = $4";
+const createReaderDevice = "INSERT INTO readerdevice (readerdeviceid, locationid, entry) VALUES ($1, $2, $3)";
+const doesReaderDeviceExist = "SELECT * FROM readerdevice WHERE readerdeviceid = $1 AND deleted = false";
+const getReaderDevices = `
 SELECT r.id, entry, readerdeviceid, l.name AS location FROM ReaderDevice r INNER JOIN Location l ON l.id = r.locationid WHERE r.deleted = false;
 `;
-let doesReaderIDExist = "SELECT * FROM ReaderDevice WHERE id = $1";
-let getPreviousEntry = "SELECT * FROM ProcessedTags WHERE assetID = $1 AND scannedTime < $2 ORDER BY scannedTime DESC LIMIT 1";
-let getPreviousReaderDevices = "SELECT p.readerdeviceid, r.entry FROM ProcessedTags p INNER JOIN ReaderDevice r ON r.readerdeviceid = p.readerdeviceid WHERE assetID = $1 ORDER BY scannedTime DESC LIMIT 2";
-let getLocationOfReaderDevice = "SELECT locationid FROM ReaderDevice WHERE readerdeviceid = $1";
-let buildAssetFromTagDetails = `
+const doesReaderIDExist = "SELECT * FROM ReaderDevice WHERE id = $1";
+const getPreviousEntry = "SELECT * FROM ProcessedTags WHERE assetID = $1 AND scannedTime < $2 ORDER BY scannedTime DESC LIMIT 1";
+const getPreviousReaderDevices = "SELECT p.readerdeviceid, r.entry FROM ProcessedTags p INNER JOIN ReaderDevice r ON r.readerdeviceid = p.readerdeviceid WHERE assetID = $1 ORDER BY scannedTime DESC LIMIT 2";
+const getLocationOfReaderDevice = "SELECT locationid FROM ReaderDevice WHERE readerdeviceid = $1";
+const buildAssetFromTagDetails = `
 SELECT serialnumber, description, condition, c.name AS category, u.name AS user 
 FROM Asset a INNER JOIN Category c ON c.id = a.categoryid INNER JOIN 
 User2 u ON u.username = a.responsibleusername WHERE assetID = $1
 `;
-let getAllLocations = "SELECT id, name, companyname, parentLocationID FROM Location WHERE deleted = false";
+const getAllLocations = "SELECT id, name, companyname, parentLocationID FROM Location WHERE deleted = false";
+const getLocationName = "SELECT name FROM Location WHERE id = $1";
 let locationTable = {
+    getLocationName,
     getAllLocations,
     buildAssetFromTagDetails,
     getLocationOfReaderDevice,

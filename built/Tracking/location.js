@@ -12,7 +12,7 @@ import pool from '../../db2.js';
 // Importing custom classes
 import MyError from '../utility/myError.js';
 import locationTable from './db_location.js';
-import { Errors } from '../utility/constants.js';
+import { Errors, MyErrors2 } from '../utility/constants.js';
 import reportsTable from '../Reports/db_reports.js';
 class Location {
     constructor() { }
@@ -60,6 +60,37 @@ class Location {
             }).catch(err => {
                 console.log(err);
                 rej(Errors[9]);
+            });
+        });
+    }
+    // A function that finds the immediate parent of a location
+    static findParentLocation(id) {
+        return new Promise((res, rej) => {
+            pool.query(locationTable.getParentLocations, [id]).then((data) => {
+                if (data.rowCount <= 0) {
+                    return rej(new MyError(MyErrors2.NOT_GET_PARENT_LOCATION));
+                }
+                else {
+                    return res(data.rows[0].parentLocationID);
+                }
+            }).catch((err) => {
+                return rej(new MyError(MyErrors2.NOT_GET_PARENT_LOCATION));
+            });
+        });
+    }
+    // A function to get the name of a location from an id
+    static getLocationName(id) {
+        return new Promise((res, rej) => {
+            // Get name from database
+            pool.query(locationTable.getLocationName, [id]).then((data) => {
+                if (data.rowCount <= 0) {
+                    return rej(new MyError(MyErrors2.NOT_GET_LOCATION_NAME));
+                }
+                else {
+                    return res(data.rows[0].name);
+                }
+            }).catch((err) => {
+                return rej(new MyError(MyErrors2.NOT_GET_LOCATION_NAME));
             });
         });
     }

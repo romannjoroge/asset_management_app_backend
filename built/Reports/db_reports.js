@@ -37,7 +37,12 @@ WHERE batchID IN (SELECT batchID FROM InventoryBatch WHERE inventoryID = $1));
 const getAdditionalAssetsInInventory = `
 SELECT assetID FROM BatchAsset WHERE batchID IN (SELECT batchID FROM InventoryBatch WHERE inventoryID = $1) AND assetID NOT IN (SELECT assetID From Asset);
 `;
+const getRawAssetData = `
+SELECT assetID AS id, barcode, description, serialNumber AS serial_number, locationid AS location_id, c.name 
+AS category_name FROM Asset a JOIN Category c ON c.id = a.categoryid WHERE a.istagged = $1 AND a.deleted = false;
+`;
 export default {
+    getRawAssetData,
     getAdditionalAssetsInInventory,
     getAssetsNotInInventory,
     getAssetsInInventory,
