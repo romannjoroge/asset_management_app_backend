@@ -4,7 +4,7 @@ import pool from '../../db2.js';
 // Importing custom classes
 import MyError from '../utility/myError.js';
 import locationTable from './db_location.js';
-import { Errors } from '../utility/constants.js';
+import { Errors, MyErrors2 } from '../utility/constants.js';
 import reportsTable from '../Reports/db_reports.js';
 
 interface selectLocation {
@@ -13,6 +13,11 @@ interface selectLocation {
     companyname: string;
     parentlocationid: number;
     deleted: boolean;
+}
+
+interface GetParentLocationFetchResult {
+    rowCount: number;
+    rows: {parentLocationID: number}[]
 }
 
 export interface selectLocationResults {
@@ -67,6 +72,21 @@ class Location {
                 console.log(err);
                 rej(Errors[9]);
             })
+        });
+    }
+
+    // A function that finds the immediate parent of a location
+    static findParentLocation(id: number): Promise<number> {
+        return new Promise((res, rej) => {
+            pool.query(locationTable.getParentLocations, [id]).then((data: GetParentLocationFetchResult) => {
+                if (data.rowCount <= 0) {
+                    return rej(new MyError(MyErrors2.NOT_GET_PARENT_LOCATION));
+                } else {
+                    return res(data.rows[0].parentLocationID);
+                }
+            }).catch((err: any) => {
+                return rej(new MyError(MyErrors2.NOT_GET_PARENT_LOCATION))
+            });
         });
     }
 
