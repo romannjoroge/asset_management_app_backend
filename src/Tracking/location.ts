@@ -17,7 +17,7 @@ interface selectLocation {
 
 interface GetParentLocationFetchResult {
     rowCount: number;
-    rows: {parentLocationID: number}[]
+    rows: {parentLocationid: number}[]
 }
 
 interface GetLocationNameFetchResult {
@@ -87,7 +87,7 @@ class Location {
                 if (data.rowCount <= 0) {
                     return res();
                 } else {
-                    return res(data.rows[0].parentLocationID);
+                    return res(data.rows[0].parentLocationid);
                 }
             }).catch((err: any) => {
                 return rej(new MyError(MyErrors2.NOT_GET_PARENT_LOCATION))
