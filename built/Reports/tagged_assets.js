@@ -35,7 +35,7 @@ function getDetailsFromDatabase(is_tagged) {
         });
     });
 }
-function addOfficeBuildingLocationToAsset(rawAsset) {
+export function addOfficeBuildingLocationToAsset(rawAsset) {
     return new Promise((res, rej) => {
         // Get id of building of location
         Location.findParentLocation(rawAsset.location_id).then((building_id) => {
@@ -72,8 +72,8 @@ function addOfficeBuildingLocationToAsset(rawAsset) {
                                     category_name: rawAsset.category_name,
                                     serial_number: rawAsset.serial_number,
                                     location: building_name,
-                                    building: building_name,
-                                    office: location_name
+                                    building: location_name,
+                                    office: undefined
                                 });
                             });
                         }
@@ -90,8 +90,8 @@ function addOfficeBuildingLocationToAsset(rawAsset) {
                         category_name: rawAsset.category_name,
                         serial_number: rawAsset.serial_number,
                         location: location_name,
-                        building: location_name,
-                        office: location_name
+                        building: undefined,
+                        office: undefined
                     });
                 });
             }

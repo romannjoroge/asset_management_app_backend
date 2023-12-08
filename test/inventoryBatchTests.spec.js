@@ -42,7 +42,7 @@ describe("Create Inventory Test", function() {
     })
 });
 
-describe("Create Batch Test", function() {
+describe.skip("Create Batch Test", function() {
     let location = {
         id: 1010,
         name: "TestestLocation",

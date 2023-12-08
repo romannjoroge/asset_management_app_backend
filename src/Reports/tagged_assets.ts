@@ -11,8 +11,8 @@ interface TaggedAsset {
     category_name: string;
     serial_number: string;
     location: string;
-    building: string;
-    office: string
+    building?: string;
+    office?: string
 }
 // A function that will get information of assets that are tagged
 export function getTaggedAssets(is_tagged: boolean): Promise<TaggedAsset[]> {
@@ -64,7 +64,7 @@ function getDetailsFromDatabase(is_tagged: boolean): Promise<RawTaggedAsset[]> {
     });
 }
 
-function addOfficeBuildingLocationToAsset(rawAsset: RawTaggedAsset): Promise<TaggedAsset> {
+export function addOfficeBuildingLocationToAsset(rawAsset: RawTaggedAsset): Promise<TaggedAsset> {
     return new Promise((res, rej) => {
         // Get id of building of location
         Location.findParentLocation(rawAsset.location_id).then((building_id: number | void) => {
@@ -100,8 +100,8 @@ function addOfficeBuildingLocationToAsset(rawAsset: RawTaggedAsset): Promise<Tag
                                     category_name: rawAsset.category_name,
                                     serial_number: rawAsset.serial_number,
                                     location: building_name,
-                                    building: building_name,
-                                    office: location_name
+                                    building: location_name,
+                                    office: undefined
                                 });
                             })
                         }
@@ -117,8 +117,8 @@ function addOfficeBuildingLocationToAsset(rawAsset: RawTaggedAsset): Promise<Tag
                         category_name: rawAsset.category_name,
                         serial_number: rawAsset.serial_number,
                         location: location_name,
-                        building: location_name,
-                        office: location_name
+                        building: undefined,
+                        office: undefined
                     });
                 })
             }

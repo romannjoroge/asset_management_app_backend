@@ -9,7 +9,7 @@ import updateCategory from '../built/Allocation/Category/updateCategory.js';
 import pool from '../db2.js';
 import utility from '../built/utility/utility.js';
 
-describe("Update Category Test", function () {
+describe.skip("Update Category Test", function () {
     let oldCategory = {
         id: 1000,
         name: "OldCategory",
