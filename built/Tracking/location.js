@@ -71,7 +71,7 @@ class Location {
                     return res();
                 }
                 else {
-                    return res(data.rows[0].parentLocationid);
+                    return res(data.rows[0].parentlocationid);
                 }
             }).catch((err) => {
                 return rej(new MyError(MyErrors2.NOT_GET_PARENT_LOCATION));
