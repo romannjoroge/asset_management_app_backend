@@ -111,6 +111,7 @@ export var MyErrors2;
     MyErrors2["INVALID_ROLE"] = "The provided role is invalid";
     MyErrors2["NOT_ADD_OTP"] = "Could Not Store Create OTP In System";
     MyErrors2["NOT_GENERATE_OTP"] = "Could Not Generate OTP";
+    MyErrors2["NOT_GET_OTP"] = "Could Not Get OTP Details For User";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

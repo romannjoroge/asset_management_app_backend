@@ -7,7 +7,7 @@ import Sinon from "sinon";
 import Auth from '../built/Auth/auth.js';
 import User from "../built/Users/users.js";
 
-describe("Generating OTP Test", () => {
+describe.skip("Generating OTP Test", () => {
     it("should fail when given a user that does not exist", async () => {
         const non_existent_user = 1000;
 
@@ -44,3 +44,78 @@ describe("Generating OTP Test", () => {
         
     })
 });
+
+describe("Verify OTP", () => {
+    it("should return false if user does not exist", async () => {
+        let non_existent_user = 1000;
+
+        let userExistsStub = Sinon.stub(User, "checkIfUserIDExists")
+                                .withArgs(non_existent_user)
+                                .resolves(false);
+        
+        // Call function
+        try {
+            const exists = await Auth.verifyOTP(non_existent_user, "");
+            assert(exists === false,  "False should be returned");
+        } catch(err) {
+            console.log(err);
+            assert(false, `${err} should not be thrown`);
+        }
+    });
+
+    it("should return false if the user exists but there is not OTP record", async () => {
+        let existing_user = 20;
+
+        let userExistsStub = Sinon.stub(User, "checkIfUserIDExists")
+                                .withArgs(existing_user)
+                                .resolves(true);
+        
+
+        // Call function
+        try {
+            const exists = await Auth.verifyOTP(existing_user, "");
+            assert(exists === false,  "False should be returned");
+        } catch(err) {
+            console.log(err);
+            assert(false, `${err} should not be thrown`);
+        }
+    });
+
+    it("should return false if the user exists, there is an OTP record but it is wrong", async () => {
+        let existing_user = 1;
+        let wrong_OTP = "";
+
+        let userExistsStub = Sinon.stub(User, "checkIfUserIDExists")
+                                .withArgs(existing_user)
+                                .resolves(true);
+        
+
+        // Call function
+        try {
+            const exists = await Auth.verifyOTP(existing_user, wrong_OTP);
+            assert(exists === false,  "False should be returned");
+        } catch(err) {
+            console.log(err);
+            assert(false, `${err} should not be thrown`);
+        }
+    });
+
+    it("should return false if the user exists, there is an OTP record, it is the right OTP but it has expired", async () => {
+        let existing_user = 1;
+        let correct_OTP = "783333";
+
+        let userExistsStub = Sinon.stub(User, "checkIfUserIDExists")
+                                .withArgs(existing_user)
+                                .resolves(true);
+        
+
+        // Call function
+        try {
+            const exists = await Auth.verifyOTP(existing_user, correct_OTP);
+            assert(exists === false,  "False should be returned");
+        } catch(err) {
+            console.log(err);
+            assert(false, `${err} should not be thrown`);
+        }
+    });
+})

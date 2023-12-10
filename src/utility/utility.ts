@@ -1,6 +1,10 @@
 import { assert } from "chai";
 import MyError from "./myError.js";
 
+function getTimeDifferenceInSeconds(startTime: Date, endTime: Date): number {
+    return (endTime.getTime() - startTime.getTime()) / 1000;
+}
+
 function isAnyEmpty(arr){
     /*
         arr - arr is an array of variables of any type
@@ -192,7 +196,8 @@ const utility = {
     isFetchResultEmpty,
     assertThatFunctionWorks,
     returnFetchedResultsFromDatabase,
-    checkIfString
+    checkIfString,
+    getTimeDifferenceInSeconds
 }
 
 export default utility;
