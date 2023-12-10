@@ -4,7 +4,7 @@ import MyError from "../utility/myError.js";
 import { MyErrors2 } from "../utility/constants.js";
 dotenv.config()
 
-class Mail {
+export default class Mail {
     static #transport = createTransport({
         host: process.env.MAIL_HOST,
         port: process.env.MAIL_PORT,

@@ -35,4 +35,5 @@ _Mail_transport = { value: createTransport({
             pass: process.env.MAIL_PASSWORD
         }
     }) };
+export default Mail;
 //# sourceMappingURL=mail.js.map
