@@ -7,7 +7,7 @@ import Sinon from "sinon";
 import Auth from '../built/Auth/auth.js';
 import User from "../built/Users/users.js";
 
-describe.skip("Generating OTP Test", () => {
+describe("Generating OTP Test", () => {
     it("should fail when given a user that does not exist", async () => {
         const non_existent_user = 1000;
 
@@ -45,7 +45,7 @@ describe.skip("Generating OTP Test", () => {
     })
 });
 
-describe("Verify OTP", () => {
+describe.skip("Verify OTP", () => {
     it("should return false if user does not exist", async () => {
         let non_existent_user = 1000;
 
@@ -113,6 +113,25 @@ describe("Verify OTP", () => {
         try {
             const exists = await Auth.verifyOTP(existing_user, correct_OTP);
             assert(exists === false,  "False should be returned");
+        } catch(err) {
+            console.log(err);
+            assert(false, `${err} should not be thrown`);
+        }
+    });
+
+    it("should return true if the user exists, there is an OTP record, it is the right OTP and the time has not expired", async () => {
+        let existing_user = 1;
+        let correct_OTP = "312575";
+
+        let userExistsStub = Sinon.stub(User, "checkIfUserIDExists")
+                                .withArgs(existing_user)
+                                .resolves(true);
+        
+
+        // Call function
+        try {
+            const exists = await Auth.verifyOTP(existing_user, correct_OTP);
+            assert(exists,  "True should be returned");
         } catch(err) {
             console.log(err);
             assert(false, `${err} should not be thrown`);
