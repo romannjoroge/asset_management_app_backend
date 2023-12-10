@@ -111,7 +111,9 @@ export enum MyErrors2 {
     "INVALID_ROLE" = "The provided role is invalid",
     "NOT_ADD_OTP" = "Could Not Store Create OTP In System",
     "NOT_GENERATE_OTP" = "Could Not Generate OTP",
-    "NOT_GET_OTP" = "Could Not Get OTP Details For User"
+    "NOT_GET_OTP" = "Could Not Get OTP Details For User",
+    "NOT_DELETE_OTP" = "Could Not Delete OTP Record",
+    "NOT_VERIFY_OTP" = "Could Not Verify OTP"
 }
 
 export enum Success2 {

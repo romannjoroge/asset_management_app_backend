@@ -3,7 +3,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _a, _Auth_storeOtp, _Auth_generateOTPString, _Auth_getOTPDetails;
+var _a, _Auth_storeOtp, _Auth_generateOTPString, _Auth_getOTPDetails, _Auth_deleteOTPFromDB;
 import pool from "../../db2.js";
 import User from "../Users/users.js";
 import { MyErrors2 } from "../utility/constants.js";
@@ -51,8 +51,13 @@ class Auth {
                     if (timeDifference > 10) {
                         return res(false);
                     }
-                    return res(true);
+                    // Delete OTP
+                    __classPrivateFieldGet(this, _a, "m", _Auth_deleteOTPFromDB).call(this, otpDetails.id).then((_) => {
+                        return res(true);
+                    });
                 });
+            }).catch((err) => {
+                return rej(new MyError(MyErrors2.NOT_VERIFY_OTP));
             });
         });
     }
@@ -76,6 +81,14 @@ _a = Auth, _Auth_storeOtp = function _Auth_storeOtp(otp, userid, generated_time)
             return res(data.rows[0]);
         }).catch((err) => {
             return rej(new MyError(MyErrors2.NOT_GET_OTP));
+        });
+    });
+}, _Auth_deleteOTPFromDB = function _Auth_deleteOTPFromDB(otpid) {
+    return new Promise((res, rej) => {
+        pool.query(authQueries.delete_otp_record, [otpid]).then((_) => {
+            return res();
+        }).catch((err) => {
+            return rej(new MyError(MyErrors2.NOT_DELETE_OTP));
         });
     });
 };

@@ -6,6 +6,7 @@ import authQueries from './db.js';
 import utility from "../utility/utility.js";
 
 interface OTPDetails {
+    id: number
     userid: number,
     otp: string,
     created_time: Date
@@ -64,6 +65,16 @@ export default class Auth {
         })
     }
 
+    static #deleteOTPFromDB(otpid: number): Promise<void> {
+        return new Promise((res, rej) => {
+            pool.query(authQueries.delete_otp_record, [otpid]).then((_: any) => {
+                return res()
+            }).catch((err: any) => {
+                return rej(new MyError(MyErrors2.NOT_DELETE_OTP))
+            })
+        });
+    }
+
     static verifyOTP(userid: number, otp: string): Promise<boolean> {
         return new Promise((res, rej) => {
             // Check if user exists
@@ -90,8 +101,13 @@ export default class Auth {
                         return res(false);
                     }
 
-                    return res(true);
+                    // Delete OTP
+                    this.#deleteOTPFromDB(otpDetails.id).then((_: any) => {
+                        return res(true);
+                    })
                 })
+            }).catch((err: any) => {
+                return rej(new MyError(MyErrors2.NOT_VERIFY_OTP))
             })
         });
     }
