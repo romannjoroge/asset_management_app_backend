@@ -113,7 +113,8 @@ export enum MyErrors2 {
     "NOT_GENERATE_OTP" = "Could Not Generate OTP",
     "NOT_GET_OTP" = "Could Not Get OTP Details For User",
     "NOT_DELETE_OTP" = "Could Not Delete OTP Record",
-    "NOT_VERIFY_OTP" = "Could Not Verify OTP"
+    "NOT_VERIFY_OTP" = "Could Not Verify OTP",
+    "NOT_SEND_MAIL" = "Could Not Send Mail"
 }
 
 export enum Success2 {
