@@ -108,7 +108,9 @@ export enum MyErrors2 {
     "NOT_GET_TAGGED_ASSETS" = "Could Not Get Tagged Assets",
     "EMAIL_ALREADY_EXISTS" = "The provided email already exists",
     "INVAILID_NAME" = "The provided name is invalid",
-    "INVALID_ROLE" = "The provided role is invalid"
+    "INVALID_ROLE" = "The provided role is invalid",
+    "NOT_ADD_OTP" = "Could Not Store Create OTP In System",
+    "NOT_GENERATE_OTP" = "Could Not Generate OTP"
 }
 
 export enum Success2 {

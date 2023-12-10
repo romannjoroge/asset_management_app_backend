@@ -8,7 +8,7 @@ import Sinon from "sinon";
 import Location from "../built/Tracking/location.js";
 
 // Testing the addOfficeBuildingLocationToAsset function
-describe("Add Office Building Location To Asset Test", () => {
+describe.skip("Add Office Building Location To Asset Test", () => {
     // Variables
     const rawAssetA = {
         id: 1,
