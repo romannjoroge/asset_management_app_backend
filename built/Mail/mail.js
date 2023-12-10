@@ -18,8 +18,10 @@ class Mail {
                 subject,
                 html
             }).then(info => {
+                console.log("Sent!");
                 return res();
             }).catch((err) => {
+                console.log(err);
                 return rej(new MyError(MyErrors2.NOT_SEND_MAIL));
             });
         });
@@ -36,4 +38,12 @@ _Mail_transport = { value: createTransport({
         }
     }) };
 export default Mail;
+let html = `
+    <h1>Hello Wierdo</h1>
+    <p>If you get this I am coming to slap you!</p>
+`;
+let from = "Your Loving Brother <roman.njoroge@njuguna.com>";
+let to = "rico.njoroge@njuguna.com";
+let subject = "Look At Email v2!";
+Mail.sendMail(html, from, to, subject);
 //# sourceMappingURL=mail.js.map
