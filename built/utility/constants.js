@@ -111,6 +111,8 @@ export var MyErrors2;
     MyErrors2["INVAILID_NAME"] = "The provided name is invalid";
     MyErrors2["INVALID_ROLE"] = "The provided role is invalid";
     MyErrors2["NOT_GET_PARENT_CATEGORY"] = "Could Not Get Parent Category";
+    MyErrors2["NOT_ADD_CATEGORY_TO_ASSET"] = "Could Not Add Category And Sub Category To Raw Asset";
+    MyErrors2["NOT_GET_CATEGORY_NAME"] = "Could Not Get Category Name";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

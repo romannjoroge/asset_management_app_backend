@@ -110,7 +110,9 @@ export enum MyErrors2 {
     "EMAIL_ALREADY_EXISTS" = "The provided email already exists",
     "INVAILID_NAME" = "The provided name is invalid",
     "INVALID_ROLE" = "The provided role is invalid",
-    "NOT_GET_PARENT_CATEGORY" = "Could Not Get Parent Category"
+    "NOT_GET_PARENT_CATEGORY" = "Could Not Get Parent Category",
+    "NOT_ADD_CATEGORY_TO_ASSET" = "Could Not Add Category And Sub Category To Raw Asset",
+    "NOT_GET_CATEGORY_NAME" = "Could Not Get Category Name"
 }
 
 export enum Success2 {
