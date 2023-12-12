@@ -139,6 +139,32 @@ class Category {
             return categoryID;
         });
     }
+    /**
+     *
+     * @param categoryID ID of the category to find parent of
+     * @description A function that finds the ID of the parent of the specified category
+     */
+    static getParentCategoryID(categoryID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((res, rej) => {
+                // Check if category exists, if not throw error
+                this._doesCategoryIDExist(categoryID).then(doesExist => {
+                    if (doesExist === false) {
+                        return rej(new MyError(MyErrors2.CATEGORY_NOT_EXIST));
+                    }
+                    // Get parent of category
+                    pool.query(categoryTable.getParentCategoryID, [categoryID]).then((fetchResult) => {
+                        if (fetchResult.rowCount <= 0) {
+                            return res();
+                        }
+                        return res(fetchResult.rows[0].parentcategoryid);
+                    });
+                }).catch((err) => {
+                    return rej(new MyError(MyErrors2.NOT_GET_PARENT_CATEGORY));
+                });
+            });
+        });
+    }
     static _doesCategoryExist(categoryName) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

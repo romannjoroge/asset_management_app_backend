@@ -11,7 +11,10 @@ import { Errors, MyErrors2 } from '../../utility/constants.js';
 import { DepreciationTypes } from '../Asset/asset2.js';
 import { Depreciation } from './updateCategory.js';
 
-
+interface GetParentCategoryFetchResult {
+    rowCount: number;
+    rows: {parentcategoryid: number}[]
+}
 class Category {
     categoryName: string;
     parentCategoryID?: number;
@@ -153,6 +156,32 @@ class Category {
 
         categoryID = fetchResult.rows[0].id;
         return categoryID;
+    }
+    /**
+     * 
+     * @param categoryID ID of the category to find parent of
+     * @description A function that finds the ID of the parent of the specified category
+     */
+    static async getParentCategoryID(categoryID: number): Promise<number | void> {
+        return new Promise((res, rej) => {
+            // Check if category exists, if not throw error
+            this._doesCategoryIDExist(categoryID).then(doesExist => {
+                if(doesExist === false) {
+                    return rej(new MyError(MyErrors2.CATEGORY_NOT_EXIST));
+                }
+
+                // Get parent of category
+                pool.query(categoryTable.getParentCategoryID, [categoryID]).then((fetchResult: GetParentCategoryFetchResult) => {
+                    if(fetchResult.rowCount <=0) {
+                        return res();
+                    }
+                    return res(fetchResult.rows[0].parentcategoryid);
+                })
+
+            }).catch((err: any) => {
+                return rej(new MyError(MyErrors2.NOT_GET_PARENT_CATEGORY))
+            })
+        })
     }
 
     static async _doesCategoryExist(categoryName: string): Promise<boolean> {
