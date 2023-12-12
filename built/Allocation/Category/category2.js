@@ -145,23 +145,45 @@ class Category {
      * @description A function that finds the ID of the parent of the specified category
      */
     static getParentCategoryID(categoryID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((res, rej) => {
-                // Check if category exists, if not throw error
-                this._doesCategoryIDExist(categoryID).then(doesExist => {
-                    if (doesExist === false) {
-                        return rej(new MyError(MyErrors2.CATEGORY_NOT_EXIST));
+        return new Promise((res, rej) => {
+            // Check if category exists, if not throw error
+            this._doesCategoryIDExist(categoryID).then(doesExist => {
+                if (doesExist === false) {
+                    return rej(new MyError(MyErrors2.CATEGORY_NOT_EXIST));
+                }
+                // Get parent of category
+                pool.query(categoryTable.getParentCategoryID, [categoryID]).then((fetchResult) => {
+                    if (fetchResult.rowCount <= 0) {
+                        return res();
                     }
-                    // Get parent of category
-                    pool.query(categoryTable.getParentCategoryID, [categoryID]).then((fetchResult) => {
-                        if (fetchResult.rowCount <= 0) {
-                            return res();
-                        }
-                        return res(fetchResult.rows[0].parentcategoryid);
-                    });
-                }).catch((err) => {
-                    return rej(new MyError(MyErrors2.NOT_GET_PARENT_CATEGORY));
+                    return res(fetchResult.rows[0].parentcategoryid);
                 });
+            }).catch((err) => {
+                return rej(new MyError(MyErrors2.NOT_GET_PARENT_CATEGORY));
+            });
+        });
+    }
+    /**
+     *
+     * @param categoryID ID of the category to get name of
+     * @description Gets name of the given category
+     */
+    static getCategoryName(categoryID) {
+        return new Promise((res, rej) => {
+            // Check if category exists
+            Category._doesCategoryIDExist(categoryID).then(categoryExists => {
+                if (categoryExists === false) {
+                    return rej(new MyError(MyErrors2.CATEGORY_NOT_EXIST));
+                }
+                // Return name of category
+                pool.query(categoryTable.getCategoryName, [categoryID]).then((data) => {
+                    if (data.rowCount <= 0) {
+                        return res();
+                    }
+                    return res(data.rows[0].name);
+                });
+            }).catch((err) => {
+                return rej(new MyError(MyErrors2.NOT_GET_CATEGORY_NAME));
             });
         });
     }

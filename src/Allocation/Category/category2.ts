@@ -15,6 +15,11 @@ interface GetParentCategoryFetchResult {
     rowCount: number;
     rows: {parentcategoryid: number}[]
 }
+
+interface GetCategoryNameFetchResult {
+    rowCount: number;
+    rows: {name: string}[]
+}
 class Category {
     categoryName: string;
     parentCategoryID?: number;
@@ -162,7 +167,7 @@ class Category {
      * @param categoryID ID of the category to find parent of
      * @description A function that finds the ID of the parent of the specified category
      */
-    static async getParentCategoryID(categoryID: number): Promise<number | void> {
+    static getParentCategoryID(categoryID: number): Promise<number | void> {
         return new Promise((res, rej) => {
             // Check if category exists, if not throw error
             this._doesCategoryIDExist(categoryID).then(doesExist => {
@@ -180,6 +185,32 @@ class Category {
 
             }).catch((err: any) => {
                 return rej(new MyError(MyErrors2.NOT_GET_PARENT_CATEGORY))
+            })
+        })
+    }
+
+    /**
+     * 
+     * @param categoryID ID of the category to get name of
+     * @description Gets name of the given category
+     */
+    static getCategoryName(categoryID: number): Promise<string | void> {
+        return new Promise((res, rej) => {
+            // Check if category exists
+            Category._doesCategoryIDExist(categoryID).then(categoryExists => {
+                if(categoryExists === false) {
+                    return rej(new MyError(MyErrors2.CATEGORY_NOT_EXIST));
+                }
+
+                // Return name of category
+                pool.query(categoryTable.getCategoryName, [categoryID]).then((data: GetCategoryNameFetchResult) => {
+                    if(data.rowCount <= 0) {
+                        return res();
+                    }
+                    return res(data.rows[0].name);
+                })
+            }).catch((err: any) => {
+                return rej(new MyError(MyErrors2.NOT_GET_CATEGORY_NAME));
             })
         })
     }
