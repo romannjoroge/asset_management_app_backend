@@ -22,7 +22,7 @@ class Auth {
                 const otp = __classPrivateFieldGet(this, _a, "m", _Auth_generateOTPString).call(this);
                 // Store details
                 __classPrivateFieldGet(this, _a, "m", _Auth_storeOtp).call(this, otp, userid, new Date()).then(_ => {
-                    return res();
+                    return res(otp);
                 });
             }).catch(err => {
                 return rej(new MyError(MyErrors2.NOT_GENERATE_OTP));

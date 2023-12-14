@@ -14,11 +14,13 @@ export default function verifyAuthenticationDetails(username, password) {
         // Encrypt password
         bcrypt.hash(password, 10).then(hashedPass => {
             // Return if any user has the encrypted password and the username
-            pool.query(authTable.confirm_authentication_details, [username, password]).then((fetchResult) => {
+            pool.query(authTable.get_encrypted_password, [username]).then((fetchResult) => {
                 if (fetchResult.rowCount <= 0) {
                     return res(false);
                 }
-                return res(true);
+                bcrypt.compare(password, fetchResult.rows[0].password).then(isSame => {
+                    return res(isSame);
+                });
             }).catch((err) => {
                 return rej(new MyError(MyErrors2.NOT_LOGIN_USER));
             });

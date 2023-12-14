@@ -33,7 +33,7 @@ export default class Auth {
         return randomNumber.toString();
     }
 
-    static generateOTP(userid: number): Promise<void> {
+    static generateOTP(userid: number): Promise<string> {
         return new Promise((res, rej) => {
             // If user does not exist throw error
             User.checkIfUserIDExists(userid).then(userExists => {
@@ -46,7 +46,7 @@ export default class Auth {
 
                 // Store details
                 this.#storeOtp(otp, userid, new Date()).then(_ => {
-                    return res();
+                    return res(otp);
                 })
             }).catch(err => {
                 return rej(new MyError(MyErrors2.NOT_GENERATE_OTP))

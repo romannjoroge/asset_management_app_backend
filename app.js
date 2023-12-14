@@ -24,6 +24,7 @@ app.use(express.json())
 
 // Importing routes
 import tags from './built/routes/tags.js';
+import auth from './built/routes/auth.js';
 import allocate from './built/routes/allocation.js';
 import deleteRoute from './built/routes/delete.js';
 import items from './built/routes/items.js';
@@ -38,6 +39,7 @@ import checkifAuthorized from './middleware/checkifAuthorized.js';
 import { getAssetsLeavingLocationAndIfAuthorized } from './built/Tracking/movements.js';
 
 // Routers to use for different modules
+app.use('/auth', auth);
 app.use('/allocation', checkifAuthenticated, checkifAuthorized('Asset Administrator'), allocate)
 app.use('/assets/items', checkifAuthenticated, items)
 app.use('/assets/category', checkifAuthenticated, checkifAuthorized('Asset Administrator'), category)
@@ -46,6 +48,7 @@ app.use('/gatepass', checkifAuthenticated, gatepass)
 app.use('/reports',  reports)
 app.use('/users', checkifAuthenticated, checkifAuthorized('User Manager'), users)
 app.use('/delete', deleteRoute);
+
 // app.use('/import', importModule);
 app.use('/tags', tags);
 

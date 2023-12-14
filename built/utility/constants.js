@@ -115,6 +115,8 @@ export var MyErrors2;
     MyErrors2["NOT_DELETE_OTP"] = "Could Not Delete OTP Record";
     MyErrors2["NOT_VERIFY_OTP"] = "Could Not Verify OTP";
     MyErrors2["NOT_SEND_MAIL"] = "Could Not Send Mail";
+    MyErrors2["NOT_LOGIN_USER"] = "Could Not Log In User";
+    MyErrors2["NOT_GET_USER_ID"] = "Could Not Get User ID";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

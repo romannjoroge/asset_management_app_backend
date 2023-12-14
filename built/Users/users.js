@@ -72,10 +72,44 @@ class User {
                     else {
                         res(false);
                     }
-                }).catch(err => {
+                }).catch((err) => {
                     console.log(err);
                     res(false);
                 });
+            });
+        });
+    }
+    /**
+     *
+     * @param username Username of user
+     * @description Gets the id of the user from their username
+     */
+    static getUserID(username) {
+        return new Promise((res, rej) => {
+            pool.query(userTable.getUserID, [username]).then((fetchResult) => {
+                if (fetchResult.rowCount <= 0) {
+                    return rej(new MyError(MyErrors2.USER_NOT_EXIST));
+                }
+                return res(fetchResult.rows[0].id);
+            }).catch((err) => {
+                return rej(new MyError(MyErrors2.NOT_GET_USER_ID));
+            });
+        });
+    }
+    /**
+     *
+     * @param userid id of the user to get username of
+     * @returns username of the user
+     */
+    static getUsername(userid) {
+        return new Promise((res, rej) => {
+            pool.query(userTable.getUsername, [userid]).then((fetchResult) => {
+                if (fetchResult.rowCount <= 0) {
+                    return rej(new MyError(MyErrors2.USER_NOT_EXIST));
+                }
+                return res(fetchResult.rows[0].username);
+            }).catch((err) => {
+                return rej(new MyError(MyErrors2.USER_NOT_EXIST));
             });
         });
     }
