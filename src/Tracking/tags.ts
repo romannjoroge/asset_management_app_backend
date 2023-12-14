@@ -145,6 +145,8 @@ function convertRawTagToProcessedTag(rawTag: rawTag): Promise<processedTag> {
             // Get ID of reader device from DB
             pool.query(db_gatepass.getReaderID, [readerDeviceID]).then((fetchResult: ReaderDeviceIDFetchResult) => {
                 return res({scannedTime, assetID, readerDeviceID: fetchResult.rows[0].id, barcode: rawTag.epcID, pc: rawTag.pc});
+            }).catch((err: any) => {
+                return rej(new MyError(Errors[73]))
             })
         }).catch(err => {
             console.log(err);
