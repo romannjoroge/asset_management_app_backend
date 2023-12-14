@@ -3,15 +3,15 @@ import { Errors } from "../utility/constants.js";
 import User from "../Users/users.js";
 import pool from "../../db2.js";
 import gatePassTable from './db_gatepass.js';
-export function getRequestedGatePasses(username) {
+export function getRequestedGatePasses(userid) {
     return new Promise((res, rej) => {
         // Check if user exists
-        User.checkIfUserExists(username).then(exists => {
+        User.checkIfUserIDExists(userid).then(exists => {
             if (exists === false) {
                 return rej(new MyError(Errors[30]));
             }
             // Get requested requests
-            pool.query(gatePassTable.getRequestedGatePasses, [username]).then((data) => {
+            pool.query(gatePassTable.getPreviousGatePasses, [userid]).then((data) => {
                 return res(data.rows);
             }).catch(err => {
                 console.log(err);
