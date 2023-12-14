@@ -165,13 +165,13 @@ CREATE TABLE GatePassAuthorizers (
 );
 
 CREATE TABLE AuthorizeGatepass (
-  username varchar(50),
+  userid int,
   gatePassID int,
   deleted boolean DEFAULT false,
-  PRIMARY KEY (username, gatePassID),
-  CONSTRAINT "FK_AuthorizeGatepass.username"
-    FOREIGN KEY (username)
-      REFERENCES User2(username),
+  PRIMARY KEY (userid, gatePassID),
+  CONSTRAINT "FK_AuthorizeGatepass.userid"
+    FOREIGN KEY (userid)
+      REFERENCES User2(id),
   CONSTRAINT "FK_AuthorizeGatepass.gatePassID"
     FOREIGN KEY (gatePassID)
       REFERENCES GatePass(ID)
