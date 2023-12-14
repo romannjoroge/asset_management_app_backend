@@ -324,7 +324,7 @@ router.post('/createInventory', (req, res) => {
 });
 // Route for creating a gatepass
 router.post('/create', (req, res) => {
-    let name = req.body.name;
+    let id = req.body.id;
     let fromLocation = req.body.fromLocation;
     let toLocation = req.body.toLocation;
     let date = req.body.date;
@@ -338,7 +338,7 @@ router.post('/create', (req, res) => {
         console.log(err);
         return res.status(400).json({ message: err.message });
     }
-    let gatePass = { username: name, date: date, fromLocation: fromLocation, toLocation: toLocation, barcode: barcode, reason: reason };
+    let gatePass = { userid: id, date: date, fromLocation: fromLocation, toLocation: toLocation, barcode: barcode, reason: reason };
     // Create Gatepass
     requestForGatepass(gatePass, approvers).then(_ => {
         return res.json({ message: Succes[13] });
