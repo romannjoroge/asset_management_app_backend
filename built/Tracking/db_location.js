@@ -55,7 +55,9 @@ User2 u ON u.id = a.responsibleuserid WHERE assetID = $1
 `;
 const getAllLocations = "SELECT id, name, companyname, parentLocationID FROM Location WHERE deleted = false";
 const getLocationName = "SELECT name FROM Location WHERE id = $1";
+const isReaderDeviceAtEntryOrExit = "SELECT entry FROM ReaderDevice WHERE id = $1";
 let locationTable = {
+    isReaderDeviceAtEntryOrExit,
     getLocationName,
     getAllLocations,
     buildAssetFromTagDetails,

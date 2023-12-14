@@ -214,6 +214,7 @@ function emitSignal(isEntering, processedTag) {
         // If the asset is entering get the details of the processed tag
         if (isEntering == true) {
             // Get the location of readerid in processed tag
+            console.log(`Reader Device ID is ${processedTag.readerDeviceID}`);
             pool.query(locationTable.getLocationOfReaderDevice, [processedTag.readerDeviceID]).then((fetchResult) => {
                 if (fetchResult.rowCount <= 0) {
                     return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
@@ -275,16 +276,31 @@ function isAssetLeavingOrEntering(processedTag) {
         // Get previous readers and if entering or leaving
         pool.query(locationTable.getPreviousReaderDevices, [processedTag.assetID]).then((fetchResult) => {
             if (fetchResult.rowCount <= 0) {
-                return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                // Return whether the reader device is on entry or exit
+                pool.query(locationTable.isReaderDeviceAtEntryOrExit, [processedTag.readerDeviceID]).then((fetchResult) => {
+                    return res(fetchResult.rows[0].entry);
+                }).catch((err) => {
+                    return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                });
             }
             let orderedReaders = orderReaders(fetchResult.rows);
-            // If first reader is an entry then exit then item is entering
-            if (orderedReaders[1].entry == true && orderedReaders[0].entry == false) {
-                return res(true);
+            if (orderReaders.length >= 2) {
+                // If first reader is an entry then exit then item is entering
+                if (orderedReaders[1].entry == true && orderedReaders[0].entry == false) {
+                    return res(true);
+                }
+                else {
+                    // Else it is leaving
+                    return res(false);
+                }
             }
             else {
-                // Else it is leaving
-                return res(false);
+                if (orderedReaders.length > 0) {
+                    return res(orderedReaders[0].entry);
+                }
+                else {
+                    return res(false);
+                }
             }
         }).catch(err => {
             console.log(err);
