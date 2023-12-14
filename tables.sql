@@ -153,8 +153,9 @@ CREATE TABLE Asset_File (
 );
 
 CREATE TABLE GatePassAuthorizers (
-  username varchar(50),
+  userid varchar(50),
   locationID int,
+  deleted NOT NULL DEFAULT false,
   PRIMARY KEY(username, locationID),
   CONSTRAINT "FK_GatePassAuthorizers.username"
     FOREIGN KEY (username)
@@ -405,7 +406,7 @@ CREATE TABLE gatepassauthorizers (
   userid int NOT NULL,
   locationid int NOT NULL,
   deleted boolean NOT NULL DEFAULT false,
-  PRIMARY KEY (username, locationid),
+  PRIMARY KEY (userid, locationid),
   CONSTRAINT "FK_GatePassAuthorizers.locationID" FOREIGN KEY (locationid) REFERENCES location(id),
   CONSTRAINT "FK_GatePassAuthorizers" FOREIGN KEY (userid) REFERENCES user2(id)
 );
