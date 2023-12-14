@@ -3,7 +3,7 @@ const createGatePassAsset = "INSERT INTO GatePassAsset (gatePassID, assetid) VAL
 const getGatePass = "SELECT id FROM Gatepass WHERE reason = $1 AND name = $2 AND fromlocation = $3 AND tolocation = $4 AND date = $5 ORDER BY id DESC LIMIT 1";
 const checkIfUserExists = "SELECT * FROM User2 WHERE CONCAT(fname, ' ', lname) = $1 AND deleted = false";
 const getLocationID = "SELECT id FROM Location WHERE name = $1";
-const getApprovers = `SELECT u.username, u.name FROM User2 u JOIN GatePassAuthorizers g ON g.username = u.username WHERE g.locationid = $1`;
+const getApprovers = "SELECT u.username, u.name FROM User2 u JOIN GatePassAuthorizers g ON g.userid = u.id WHERE g.locationid = $1";
 const addApprover = `INSERT INTO GatepassAuthorizers (userid, locationid) VALUES ($1, $2);`;
 const addGateAuthorizer = 'INSERT INTO AuthorizeGatepass (username, gatepassid) VALUES ($1, $2)';
 const getPreviousGatePasses = `SELECT g.id, (SELECT username AS name FROM User2 WHERE userid = g.userid LIMIT 1), (SELECT name AS 
