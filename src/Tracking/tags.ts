@@ -7,13 +7,15 @@ import locationTable from "./db_location.js";
 import _ from 'lodash';
 import events from 'events';
 import { doesAssetHaveGatepass } from "../GatePass/hasGatepass.js";
+import db_gatepass from "../GatePass/db_gatepass.js";
 const eventEmitter = new events.EventEmitter();
 
 interface processedTag {
     scannedTime: Date;
     assetID: number;
-    readerDeviceID: string;
+    readerDeviceID: number;
     barcode: string;
+    pc: string;
 }
 
 interface assetFromTag {
@@ -130,12 +132,22 @@ export function syncTag(tag: SyncItem, missingAssets: string[]): Promise<void> {
     });
 }
 
+interface ReaderDeviceIDFetchResult {
+    rowCount: number;
+    rows: {id: number}[]
+}
+
 function convertRawTagToProcessedTag(rawTag: rawTag): Promise<processedTag> {
     return new Promise((res, rej) => {
         let readerDeviceID = rawTag.hardwareKey + rawTag.antNo;
         let scannedTime = new Date();
         Asset._getAssetID(rawTag.epcID).then(assetID => {
-            return res({scannedTime, assetID, readerDeviceID, barcode: rawTag.epcID});
+            // Get ID of reader device from DB
+            pool.query(db_gatepass.getReaderID, [readerDeviceID]).then((fetchResult: ReaderDeviceIDFetchResult) => {
+                return res({scannedTime, assetID, readerDeviceID: fetchResult.rows[0].id, barcode: rawTag.epcID, pc: rawTag.pc});
+            }).catch((err: any) => {
+                return rej(new MyError(Errors[73]))
+            })
         }).catch(err => {
             console.log(err);
             return rej(new MyError(Errors[73]));
@@ -222,7 +234,7 @@ function convertProcessedTagToAsset(processedTag: processedTag, isEntering: bool
 
 function addProcessedTagToDB(processedTag: processedTag): Promise<void> {
     return new Promise((res, rej) => {
-        console.log("Something Is Added To DB!");
+        console.log(`Something Is Added To DB!`);
         pool.query(locationTable.addProcessedTag, [processedTag.scannedTime, processedTag.assetID, processedTag.readerDeviceID]).then(_ => {
             return res();
         }).catch(err => {

@@ -47,8 +47,10 @@ const getGatepassWithLocationAndScannedTime = `
 SELECT * FROM Gatepass WHERE id IN (SELECT gatepassid FROM GatepassAsset WHERE assetid = $1) 
 AND date < $2 AND date > $3 AND fromlocation = $4;
 `;
+const getReaderID = "SELECT id FROM ReaderDevice WHERE readerdeviceid = $1;"
 
 export default {
+    getReaderID,
     getGatepassWithLocationAndScannedTime,
     returnInventories,
     addApprover,
