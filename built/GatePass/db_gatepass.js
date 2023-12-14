@@ -36,7 +36,7 @@ const getBatchesInInventory = `SELECT b.id, b.comments as name, l.name as locati
 const getAssetsInBatch = `SELECT b.id, b.date, a.barcode, l.name as location FROM Batch b JOIN Location l ON l.id = b.locationid 
                         JOIN BatchAsset ba ON ba.batchid = b.id JOIN Asset a ON a.assetid = ba.assetid WHERE ba.batchid = $1 AND b.deleted = false`;
 const getAssetInInventoryDetails = `SELECT a.barcode, a.noInBuilding, a.code, a.description, a.serialnumber, a.acquisitiondate, a.condition, 
-                                    a.responsibleUsername, a.acquisitioncost, a.residualvalue, a.usefulLife, a.depreciationtype, a.depreciationpercent,
+                                    (SELECT name AS responsibleusername FROM User2 WHERE id = a.responsibleuserid LIMIT 1), a.acquisitioncost, a.residualvalue, a.usefulLife, a.depreciationtype, a.depreciationpercent,
                                     l.name as locationname, c.name as categoryname FROM Asset as a JOIN Location as l ON a.locationid = l.id 
                                     JOIN Category as c ON a.categoryid = c.id WHERE a.deleted = false AND a.assetID IN (SELECT assetID FROM BatchAsset 
                                     WHERE batchID IN (SELECT batchID FROM InventoryBatch WHERE inventoryID = $1));`;
