@@ -233,7 +233,7 @@ function convertProcessedTagToAsset(processedTag: processedTag, isEntering: bool
 function addProcessedTagToDB(processedTag: processedTag): Promise<void> {
     return new Promise((res, rej) => {
         console.log(`Something Is Added To DB!`);
-        pool.query(locationTable.addProcessedTag, [processedTag.scannedTime, processedTag.assetID, processedTag.readerDeviceID, processedTag.pc]).then(_ => {
+        pool.query(locationTable.addProcessedTag, [processedTag.scannedTime, processedTag.assetID, processedTag.readerDeviceID]).then(_ => {
             return res();
         }).catch(err => {
             console.log(err);
