@@ -143,7 +143,7 @@ router.put('/updateReader', (req, res) => {
 });
 router.get('/getPastGatePasses', (req, res) => {
     // Send past requests
-    getPastRequests(req.username).then(data => {
+    getPastRequests(req.id).then(data => {
         return res.json(data);
     }).catch(err => {
         if (err instanceof MyError) {
