@@ -9,6 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { assert } from "chai";
 import MyError from "./myError.js";
+function getTimeDifferenceInSeconds(startTime, endTime) {
+    return (endTime.getTime() - startTime.getTime()) / 1000;
+}
 function isAnyEmpty(arr) {
     /*
         arr - arr is an array of variables of any type
@@ -200,7 +203,8 @@ const utility = {
     isFetchResultEmpty,
     assertThatFunctionWorks,
     returnFetchedResultsFromDatabase,
-    checkIfString
+    checkIfString,
+    getTimeDifferenceInSeconds
 };
 export default utility;
 //# sourceMappingURL=utility.js.map

@@ -411,6 +411,15 @@ CREATE TABLE gatepassauthorizers (
   CONSTRAINT "FK_GatePassAuthorizers" FOREIGN KEY (userid) REFERENCES user2(id)
 );
 
+CREATE TABLE IF NOT EXISTS UserOTP(
+  id SERIAL,
+  userid INT NOT NULL,
+  otp text,
+  created_time timestamptz NOT NULL,
+  PRIMARY KEY(id),
+  CONSTRAINT "FK_UserOTP_userid" FOREIGN KEY (userid) REFERENCES user2(id)
+);
+
 
 CREATE TABLE gatepassasset(
   gatepassid int NOT NULL,

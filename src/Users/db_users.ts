@@ -21,8 +21,12 @@ const addCompany = "INSERT INTO Company (name) VALUES ($1)";
 const getLatestUserID = "SELECT id FROM User2 WHERE username = $1 ORDER BY id DESC LIMIT 1";
 const giveUserAllRoles = "INSERT INTO UserRole (userid, roleid) VALUES ($1, (SELECT id FROM Role WHERE name = 'Company Administrator')), ($1, (SELECT id FROM Role WHERE name = 'User Manager')), ($1, (SELECT id FROM Role WHERE name = 'Asset Administrator')), ($1, (SELECT id FROM Role WHERE name = 'Asset Reconciler')) ,($1, (SELECT id FROM Role WHERE name = 'RFID Reader')), ($1, (SELECT id FROM Role WHERE name = 'Asset User')), ($1, (SELECT id FROM Role WHERE name = 'GatePass Authorizer'))";
 const getUserDetails = "SELECT name, id FROM User2 WHERE deleted = false";
+const getUserID = "SELECT id FROM User2 WHERE username = $1";
+const getUsername = "SELECT username FROM User2 WHERE id = $1";
 
 let userTable = {
+    getUsername,
+    getUserID,
     getUserDetails,
     checkIfUserIDExists,
     giveUserAllRoles,
