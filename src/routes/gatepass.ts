@@ -173,7 +173,7 @@ router.get('/getPastGatePasses', (req, res) => {
 
 router.get('/requestedGatePasses', (req, res) => {
     // Send requested requests
-    getRequestedGatePasses(req.username).then(data => {
+    getRequestedGatePasses(req.id).then(data => {
         return res.json(data);
     }).catch(err => {
         if (err instanceof MyError) {
