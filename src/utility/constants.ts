@@ -100,6 +100,7 @@ export enum MyErrors2 {
     'COMPANY_EXISTS' = "Company Already Exists",
     'NOT_CREATE_COMPANY' = "Could Not Create Company",
     'USER_NOT_EXIST' = "User Does Not Exist",
+    'CATEGORY_NOT_EXIST' = "Category Does Not Exist",
     "NO_USERS" = "There Are No Users In The System",
     "NOT_GET_ASSET_DATA" = "Could Not Get Asset Data",
     "NOT_GET_PARENT_LOCATION" = "Could Not Get Parent Location",
@@ -116,7 +117,10 @@ export enum MyErrors2 {
     "NOT_VERIFY_OTP" = "Could Not Verify OTP",
     "NOT_SEND_MAIL" = "Could Not Send Mail",
     "NOT_LOGIN_USER" = "Could Not Log In User",
-    "NOT_GET_USER_ID" = "Could Not Get User ID"
+    "NOT_GET_USER_ID" = "Could Not Get User ID",
+    "NOT_GET_PARENT_CATEGORY" = "Could Not Get Parent Category",
+    "NOT_ADD_CATEGORY_TO_ASSET" = "Could Not Add Category And Sub Category To Raw Asset",
+    "NOT_GET_CATEGORY_NAME" = "Could Not Get Category Name"
 }
 
 export enum Success2 {

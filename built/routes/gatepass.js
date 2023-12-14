@@ -143,7 +143,7 @@ router.put('/updateReader', (req, res) => {
 });
 router.get('/getPastGatePasses', (req, res) => {
     // Send past requests
-    getPastRequests(req.username).then(data => {
+    getPastRequests(req.id).then(data => {
         return res.json(data);
     }).catch(err => {
         if (err instanceof MyError) {
@@ -156,7 +156,7 @@ router.get('/getPastGatePasses', (req, res) => {
 });
 router.get('/requestedGatePasses', (req, res) => {
     // Send requested requests
-    getRequestedGatePasses(req.username).then(data => {
+    getRequestedGatePasses(req.id).then(data => {
         return res.json(data);
     }).catch(err => {
         if (err instanceof MyError) {
@@ -324,7 +324,7 @@ router.post('/createInventory', (req, res) => {
 });
 // Route for creating a gatepass
 router.post('/create', (req, res) => {
-    let name = req.body.name;
+    let id = req.body.id;
     let fromLocation = req.body.fromLocation;
     let toLocation = req.body.toLocation;
     let date = req.body.date;
@@ -338,7 +338,7 @@ router.post('/create', (req, res) => {
         console.log(err);
         return res.status(400).json({ message: err.message });
     }
-    let gatePass = { username: name, date: date, fromLocation: fromLocation, toLocation: toLocation, barcode: barcode, reason: reason };
+    let gatePass = { userid: id, date: date, fromLocation: fromLocation, toLocation: toLocation, barcode: barcode, reason: reason };
     // Create Gatepass
     requestForGatepass(gatePass, approvers).then(_ => {
         return res.json({ message: Succes[13] });

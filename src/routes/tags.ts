@@ -129,12 +129,13 @@ router.post('/tags', (req, res) => {
 
     // Add tag to database
     function addTag(
-        commandCode: string, hardwareKey: string, tagRecNums: string, antNo: number, pc:string, epcID: string, crc: string
+        commandCode: string, hardwareKey: string, tagRecNums: string, antNo: string, pc:string, epcID: string, crc: string
         ): Promise<void | never> {
         return new Promise((res, rej) => {
             pool.query(assetTable.insertAssetTag, [commandCode, hardwareKey, tagRecNums, antNo, pc, epcID, crc]).then(_ => {
                 return res();
             }).catch(err => {
+                console.log(err);
                 return rej(new MyError(MyErrors2.NOT_READ_TAG));
             })
         });
@@ -143,7 +144,7 @@ router.post('/tags', (req, res) => {
     let promises: Promise<void | never>[] = [];
 
     for (var i in tagRecords) {
-        let antNo = Number.parseInt(tagRecords[i].antNo);
+        let antNo = tagRecords[i].antNo;
         let epcIDToAdd = convertHexToASCII(tagRecords[i].epcID);
         let tag: rawTag = {commandCode, hardwareKey, tagRecNums, antNo: tagRecords[i].antNo, pc: tagRecords[i].pc, epcID: epcIDToAdd, crc: tagRecords[i].crc}
         tags.add(JSON.stringify(tag));

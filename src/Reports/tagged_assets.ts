@@ -3,13 +3,19 @@ import { MyErrors2 } from '../utility/constants.js';
 import MyError from '../utility/myError.js';
 import pool from '../../db2.js';
 import Location from '../Tracking/location.js';
+import Category from '../Allocation/Category/category2.js';
 
 interface TaggedAsset {
     id: number;
     barcode: string;
-    description: string;
-    category_name: string;
-    serial_number: string;
+    status?: string;
+    description?: string;
+    make_and_model_no?: string;
+    category_name?: string;
+    sub_category_name?: string;
+    open_market_value?: number;
+    insurance_value?: number;
+    serial_number?: string;
     location: string;
     building?: string;
     office?: string
@@ -23,7 +29,7 @@ export function getTaggedAssets(is_tagged: boolean): Promise<TaggedAsset[]> {
             let promises: Promise<TaggedAsset>[] = [];
 
             rawAssetData.map((r) => {
-                promises.push(addOfficeBuildingLocationToAsset(r));
+                promises.push(rawAssetToTaggedAsset(r));
             })
 
             // Return
@@ -41,10 +47,20 @@ export function getTaggedAssets(is_tagged: boolean): Promise<TaggedAsset[]> {
 interface RawTaggedAsset {
     id: number;
     barcode: string;
+    make_and_model_no?: string;
+    status?: string;
     description: string;
-    category_name: string;
+    category_id: number;
+    open_market_value?: number;
+    insurance_value?: number;
     serial_number: string;
     location_id: number
+}
+
+interface RawTaggedAssetWithLocation extends RawTaggedAsset{
+    location: string;
+    building?: string;
+    office?: string
 }
 
 interface RawTaggedAssetFetchResult {
@@ -64,7 +80,80 @@ function getDetailsFromDatabase(is_tagged: boolean): Promise<RawTaggedAsset[]> {
     });
 }
 
-export function addOfficeBuildingLocationToAsset(rawAsset: RawTaggedAsset): Promise<TaggedAsset> {
+function rawAssetToTaggedAsset(rawAsset: RawTaggedAsset): Promise<TaggedAsset> {
+    return new Promise((res, rej) => {
+        // Add location details to asset
+        addOfficeBuildingLocationToAsset(rawAsset).then(rawAssetWithLocation => {
+            // Add category details to asset
+            addCategoryAndSubCategory(rawAssetWithLocation).then(taggedAsset => {
+                return res(taggedAsset);
+            })
+        }).catch((err: any) => {
+            return rej(new MyError(MyErrors2.NOT_GET_TAGGED_ASSETS));
+        })
+    })
+}
+
+function addCategoryAndSubCategory(rawAsset: RawTaggedAssetWithLocation): Promise<TaggedAsset> {
+    return new Promise((res, rej) => {
+        // Check if category exists
+        Category._doesCategoryIDExist(rawAsset.category_id).then(categoryExists => {
+            if(categoryExists == false) {
+                return rej(new MyError(MyErrors2.CATEGORY_NOT_EXIST));
+            }
+
+            // Get parent category of asset
+            Category.getParentCategoryID(rawAsset.category_id).then(parentCategoryID => {
+                if(parentCategoryID) {
+                    // Get category name
+                    Category.getCategoryName(parentCategoryID).then(categName => {
+                        // Get name of sub category
+                        Category.getCategoryName(rawAsset.category_id).then(subCategName => {
+                            return res({
+                                id: rawAsset.id,
+                                barcode: rawAsset.barcode,
+                                status: rawAsset.status,
+                                description: rawAsset.description,
+                                make_and_model_no: rawAsset.make_and_model_no,
+                                category_name: categName ?? "",
+                                sub_category_name: subCategName ?? "",
+                                open_market_value: rawAsset.open_market_value,
+                                insurance_value: rawAsset.insurance_value,
+                                serial_number: rawAsset.serial_number,
+                                location: rawAsset.location,
+                                building: rawAsset.building,
+                                office: rawAsset.office
+                            })
+                        })
+                    })
+                }
+
+                // Get name of category
+                Category.getCategoryName(rawAsset.category_id).then(categName => {
+                    return res({
+                        id: rawAsset.id,
+                        barcode: rawAsset.barcode,
+                        status: rawAsset.status,
+                        description: rawAsset.description,
+                        make_and_model_no: rawAsset.make_and_model_no,
+                        category_name: categName ?? "",
+                        sub_category_name: undefined,
+                        open_market_value: rawAsset.open_market_value,
+                        insurance_value: rawAsset.insurance_value,
+                        serial_number: rawAsset.serial_number,
+                        location: rawAsset.location,
+                        building: rawAsset.building,
+                        office: rawAsset.office
+                    })
+                })
+            })
+        }).catch((err: any) => {
+            return rej(new MyError(MyErrors2.NOT_ADD_CATEGORY_TO_ASSET));
+        })
+    })
+}
+
+export function addOfficeBuildingLocationToAsset(rawAsset: RawTaggedAsset): Promise<RawTaggedAssetWithLocation> {
     return new Promise((res, rej) => {
         // Get id of building of location
         Location.findParentLocation(rawAsset.location_id).then((building_id: number | void) => {
@@ -81,9 +170,14 @@ export function addOfficeBuildingLocationToAsset(rawAsset: RawTaggedAsset): Prom
                                     return res({
                                         id: rawAsset.id,
                                         barcode: rawAsset.barcode,
+                                        make_and_model_no: rawAsset.make_and_model_no,
+                                        status: rawAsset.status,
                                         description: rawAsset.description,
-                                        category_name: rawAsset.category_name,
+                                        category_id: rawAsset.category_id,
+                                        open_market_value: rawAsset.open_market_value,
+                                        insurance_value: rawAsset.insurance_value,
                                         serial_number: rawAsset.serial_number,
+                                        location_id: rawAsset.location_id,
                                         location: site_name,
                                         building: building_name,
                                         office: location_name
@@ -96,9 +190,14 @@ export function addOfficeBuildingLocationToAsset(rawAsset: RawTaggedAsset): Prom
                                 return res({
                                     id: rawAsset.id,
                                     barcode: rawAsset.barcode,
+                                    make_and_model_no: rawAsset.make_and_model_no,
+                                    status: rawAsset.status,
                                     description: rawAsset.description,
-                                    category_name: rawAsset.category_name,
+                                    category_id: rawAsset.category_id,
+                                    open_market_value: rawAsset.open_market_value,
+                                    insurance_value: rawAsset.insurance_value,
                                     serial_number: rawAsset.serial_number,
+                                    location_id: rawAsset.location_id,
                                     location: building_name,
                                     building: location_name,
                                     office: undefined
@@ -113,9 +212,14 @@ export function addOfficeBuildingLocationToAsset(rawAsset: RawTaggedAsset): Prom
                     return res({
                         id: rawAsset.id,
                         barcode: rawAsset.barcode,
+                        make_and_model_no: rawAsset.make_and_model_no,
+                        status: rawAsset.status,
                         description: rawAsset.description,
-                        category_name: rawAsset.category_name,
+                        category_id: rawAsset.category_id,
+                        open_market_value: rawAsset.open_market_value,
+                        insurance_value: rawAsset.insurance_value,
                         serial_number: rawAsset.serial_number,
+                        location_id: rawAsset.location_id,
                         location: location_name,
                         building: undefined,
                         office: undefined

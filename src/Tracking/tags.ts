@@ -7,13 +7,15 @@ import locationTable from "./db_location.js";
 import _ from 'lodash';
 import events from 'events';
 import { doesAssetHaveGatepass } from "../GatePass/hasGatepass.js";
+import db_gatepass from "../GatePass/db_gatepass.js";
 const eventEmitter = new events.EventEmitter();
 
 interface processedTag {
     scannedTime: Date;
     assetID: number;
-    readerDeviceID: string;
+    readerDeviceID: number;
     barcode: string;
+    pc: string;
 }
 
 interface assetFromTag {
@@ -130,12 +132,22 @@ export function syncTag(tag: SyncItem, missingAssets: string[]): Promise<void> {
     });
 }
 
+interface ReaderDeviceIDFetchResult {
+    rowCount: number;
+    rows: {id: number}[]
+}
+
 function convertRawTagToProcessedTag(rawTag: rawTag): Promise<processedTag> {
     return new Promise((res, rej) => {
         let readerDeviceID = rawTag.hardwareKey + rawTag.antNo;
         let scannedTime = new Date();
         Asset._getAssetID(rawTag.epcID).then(assetID => {
-            return res({scannedTime, assetID, readerDeviceID, barcode: rawTag.epcID});
+            // Get ID of reader device from DB
+            pool.query(db_gatepass.getReaderID, [readerDeviceID]).then((fetchResult: ReaderDeviceIDFetchResult) => {
+                return res({scannedTime, assetID, readerDeviceID: fetchResult.rows[0].id, barcode: rawTag.epcID, pc: rawTag.pc});
+            }).catch((err: any) => {
+                return rej(new MyError(Errors[73]))
+            })
         }).catch(err => {
             console.log(err);
             return rej(new MyError(Errors[73]));
@@ -222,7 +234,7 @@ function convertProcessedTagToAsset(processedTag: processedTag, isEntering: bool
 
 function addProcessedTagToDB(processedTag: processedTag): Promise<void> {
     return new Promise((res, rej) => {
-        console.log("Something Is Added To DB!");
+        console.log(`Something Is Added To DB!`);
         pool.query(locationTable.addProcessedTag, [processedTag.scannedTime, processedTag.assetID, processedTag.readerDeviceID]).then(_ => {
             return res();
         }).catch(err => {
@@ -306,6 +318,7 @@ function emitSignal(isEntering: boolean, processedTag: processedTag): Promise<as
         // If the asset is entering get the details of the processed tag
         if (isEntering == true) {
             // Get the location of readerid in processed tag
+            console.log(`Reader Device ID is ${processedTag.readerDeviceID}`);
             pool.query(locationTable.getLocationOfReaderDevice, [processedTag.readerDeviceID]).then((fetchResult: GetLocationOfReaderDeviceFetchResult) => {
                 if (fetchResult.rowCount <= 0) {
                     return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
@@ -361,6 +374,11 @@ function emitSignal(isEntering: boolean, processedTag: processedTag): Promise<as
     });
 }
 
+interface IsReaderDeviceAtEntranceOrExitFetchResult {
+    rowCount: number;
+    rows: {entry: boolean}[]
+}
+
 /**
  * 
  * @param processedTag A tag that has been read by a reader and processed by system and is different from previous entry
@@ -374,16 +392,29 @@ function isAssetLeavingOrEntering(processedTag: processedTag): Promise<boolean> 
         // Get previous readers and if entering or leaving
         pool.query(locationTable.getPreviousReaderDevices, [processedTag.assetID]).then((fetchResult: PreviousReaderQueryFetchResult) => {
             if (fetchResult.rowCount <= 0) {
-                return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                // Return whether the reader device is on entry or exit
+                pool.query(locationTable.isReaderDeviceAtEntryOrExit, [processedTag.readerDeviceID]).then((fetchResult: IsReaderDeviceAtEntranceOrExitFetchResult) => {
+                    return res(fetchResult.rows[0].entry);
+                }).catch((err: any) => {
+                    return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                })
             } 
 
             let orderedReaders = orderReaders(fetchResult.rows);
-            // If first reader is an entry then exit then item is entering
-            if (orderedReaders[1].entry == true && orderedReaders[0].entry == false) {
-                return res(true);
+            if(orderReaders.length >= 2) {
+                // If first reader is an entry then exit then item is entering
+                if (orderedReaders[1].entry == true && orderedReaders[0].entry == false) {
+                    return res(true);
+                } else {
+                    // Else it is leaving
+                    return res(false);
+                }
             } else {
-                // Else it is leaving
-                return res(false);
+                if(orderedReaders.length > 0) {
+                    return res(orderedReaders[0].entry);
+                } else {
+                    return res(false);
+                }
             }
         }).catch(err => {
             console.log(err);

@@ -16,7 +16,7 @@ interface GetGatePassFromDBResult {
 }
 
 interface GatePass {
-    username: string;
+    userid: number;
     date: Date;
     fromLocation: number;
     toLocation: number;
@@ -24,11 +24,11 @@ interface GatePass {
     reason: string;
 }
 
-export function requestForGatepass(gatePass: GatePass, users: string[]): Promise<void | never> {
+export function requestForGatepass(gatePass: GatePass, users: number[]): Promise<void | never> {
     return new Promise((res, rej) => {
         // Confirm users exist
         let promises: Promise<boolean>[] = [];
-        users.forEach(user => promises.push(User.checkIfUserExists(user)));
+        users.forEach(user => promises.push(User.checkIfUserIDExists(user)));
 
         Promise.all(promises).then(results => {
             // Assert all users exist
@@ -64,10 +64,10 @@ export function requestForGatepass(gatePass: GatePass, users: string[]): Promise
     });
 }
 
-function addAuthorizer(username: string, gatePassID: number): Promise<void | never> {
+function addAuthorizer(userid: number, gatePassID: number): Promise<void | never> {
     return new Promise((res, rej) => {
         // Add Authorizer
-        pool.query(gatePassTable.addGateAuthorizer, [username, gatePassID]).then(_ => {
+        pool.query(gatePassTable.addGateAuthorizer, [userid, gatePassID]).then(_ => {
             return res();
         }).catch(err => {
             console.log(err);
@@ -79,7 +79,7 @@ function addAuthorizer(username: string, gatePassID: number): Promise<void | nev
 export function assignGatePass(gatePass: GatePass): Promise<number | never> {
     return new Promise((res, rej) => {
         // Check if user exists
-        User.checkIfUserExists(gatePass.username).then(userExist => {
+        User.checkIfUserIDExists(gatePass.userid).then(userExist => {
             if(userExist === false){
                 return rej(new MyError(Errors[30]));
             }
@@ -99,9 +99,9 @@ export function assignGatePass(gatePass: GatePass): Promise<number | never> {
                         }
 
                         // Create GatePass
-                        pool.query(gatePassTable.createGatePass, [gatePass.reason, gatePass.username, gatePass.fromLocation, gatePass.toLocation, gatePass.date]).then(_ => {
+                        pool.query(gatePassTable.createGatePass, [gatePass.reason, gatePass.userid, gatePass.fromLocation, gatePass.toLocation, gatePass.date]).then(_ => {
                             // Get Created GatePassID
-                            pool.query(gatePassTable.getGatePass, [gatePass.reason, gatePass.username, gatePass.fromLocation, gatePass.toLocation, gatePass.date]).then(data => {
+                            pool.query(gatePassTable.getGatePass, [gatePass.reason, gatePass.userid, gatePass.fromLocation, gatePass.toLocation, gatePass.date]).then(data => {
                                 if (data.rowCount === 0) {
                                     return rej(new MyError(Errors[9]));
                                 }

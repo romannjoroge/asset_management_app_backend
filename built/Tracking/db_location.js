@@ -47,15 +47,17 @@ SELECT r.id, entry, readerdeviceid, l.name AS location FROM ReaderDevice r INNER
 const doesReaderIDExist = "SELECT * FROM ReaderDevice WHERE id = $1";
 const getPreviousEntry = "SELECT * FROM ProcessedTags WHERE assetID = $1 AND scannedTime < $2 ORDER BY scannedTime DESC LIMIT 1";
 const getPreviousReaderDevices = "SELECT p.readerdeviceid, r.entry FROM ProcessedTags p INNER JOIN ReaderDevice r ON r.readerdeviceid = p.readerdeviceid WHERE assetID = $1 ORDER BY scannedTime DESC LIMIT 2";
-const getLocationOfReaderDevice = "SELECT locationid FROM ReaderDevice WHERE readerdeviceid = $1";
+const getLocationOfReaderDevice = "SELECT locationid FROM ReaderDevice WHERE id = $1";
 const buildAssetFromTagDetails = `
 SELECT serialnumber, description, condition, c.name AS category, u.name AS user 
 FROM Asset a INNER JOIN Category c ON c.id = a.categoryid INNER JOIN 
-User2 u ON u.username = a.responsibleusername WHERE assetID = $1
+User2 u ON u.id = a.responsibleuserid WHERE assetID = $1
 `;
 const getAllLocations = "SELECT id, name, companyname, parentLocationID FROM Location WHERE deleted = false";
 const getLocationName = "SELECT name FROM Location WHERE id = $1";
+const isReaderDeviceAtEntryOrExit = "SELECT entry FROM ReaderDevice WHERE id = $1";
 let locationTable = {
+    isReaderDeviceAtEntryOrExit,
     getLocationName,
     getAllLocations,
     buildAssetFromTagDetails,

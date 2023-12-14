@@ -39,8 +39,9 @@ SELECT assetID FROM BatchAsset WHERE batchID IN (SELECT batchID FROM InventoryBa
 `;
 
 const getRawAssetData = `
-SELECT assetID AS id, barcode, description, serialNumber AS serial_number, locationid AS location_id, c.name 
-AS category_name FROM Asset a JOIN Category c ON c.id = a.categoryid WHERE a.istagged = $1 AND a.deleted = false;
+SELECT assetID AS id, acquisitioncost AS open_market_value, condition AS status, barcode, categoryid AS category_id, 
+description, serialNumber AS serial_number, locationid AS location_id FROM Asset a WHERE a.istagged = $1 AND 
+a.deleted = false;
 `;
 
 export default {

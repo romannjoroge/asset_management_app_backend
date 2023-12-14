@@ -6,6 +6,7 @@ import locationTable from "./db_location.js";
 import _ from 'lodash';
 import events from 'events';
 import { doesAssetHaveGatepass } from "../GatePass/hasGatepass.js";
+import db_gatepass from "../GatePass/db_gatepass.js";
 const eventEmitter = new events.EventEmitter();
 export function syncTags(tags) {
     return new Promise((res, rej) => {
@@ -76,7 +77,12 @@ function convertRawTagToProcessedTag(rawTag) {
         let readerDeviceID = rawTag.hardwareKey + rawTag.antNo;
         let scannedTime = new Date();
         Asset._getAssetID(rawTag.epcID).then(assetID => {
-            return res({ scannedTime, assetID, readerDeviceID, barcode: rawTag.epcID });
+            // Get ID of reader device from DB
+            pool.query(db_gatepass.getReaderID, [readerDeviceID]).then((fetchResult) => {
+                return res({ scannedTime, assetID, readerDeviceID: fetchResult.rows[0].id, barcode: rawTag.epcID, pc: rawTag.pc });
+            }).catch((err) => {
+                return rej(new MyError(Errors[73]));
+            });
         }).catch(err => {
             console.log(err);
             return rej(new MyError(Errors[73]));
@@ -146,7 +152,7 @@ function convertProcessedTagToAsset(processedTag, isEntering, location) {
 }
 function addProcessedTagToDB(processedTag) {
     return new Promise((res, rej) => {
-        console.log("Something Is Added To DB!");
+        console.log(`Something Is Added To DB!`);
         pool.query(locationTable.addProcessedTag, [processedTag.scannedTime, processedTag.assetID, processedTag.readerDeviceID]).then(_ => {
             return res();
         }).catch(err => {
@@ -208,6 +214,7 @@ function emitSignal(isEntering, processedTag) {
         // If the asset is entering get the details of the processed tag
         if (isEntering == true) {
             // Get the location of readerid in processed tag
+            console.log(`Reader Device ID is ${processedTag.readerDeviceID}`);
             pool.query(locationTable.getLocationOfReaderDevice, [processedTag.readerDeviceID]).then((fetchResult) => {
                 if (fetchResult.rowCount <= 0) {
                     return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
@@ -269,16 +276,31 @@ function isAssetLeavingOrEntering(processedTag) {
         // Get previous readers and if entering or leaving
         pool.query(locationTable.getPreviousReaderDevices, [processedTag.assetID]).then((fetchResult) => {
             if (fetchResult.rowCount <= 0) {
-                return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                // Return whether the reader device is on entry or exit
+                pool.query(locationTable.isReaderDeviceAtEntryOrExit, [processedTag.readerDeviceID]).then((fetchResult) => {
+                    return res(fetchResult.rows[0].entry);
+                }).catch((err) => {
+                    return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                });
             }
             let orderedReaders = orderReaders(fetchResult.rows);
-            // If first reader is an entry then exit then item is entering
-            if (orderedReaders[1].entry == true && orderedReaders[0].entry == false) {
-                return res(true);
+            if (orderReaders.length >= 2) {
+                // If first reader is an entry then exit then item is entering
+                if (orderedReaders[1].entry == true && orderedReaders[0].entry == false) {
+                    return res(true);
+                }
+                else {
+                    // Else it is leaving
+                    return res(false);
+                }
             }
             else {
-                // Else it is leaving
-                return res(false);
+                if (orderedReaders.length > 0) {
+                    return res(orderedReaders[0].entry);
+                }
+                else {
+                    return res(false);
+                }
             }
         }).catch(err => {
             console.log(err);

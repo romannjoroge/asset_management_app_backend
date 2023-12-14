@@ -22,7 +22,7 @@ export function getApprovers(locationID) {
                         pool.query(gatepasstable.getApprovers, [locationID]).then(data => {
                             if (data.rowCount > 0) {
                                 console.log(data.rows[0]['name']);
-                                names.push({ name: data.rows[0]['name'], username: data.rows[0]['username'] });
+                                names.push({ name: data.rows[0]['name'], id: data.rows[0]['id'] });
                             }
                             return res2();
                         }).catch(err => {
