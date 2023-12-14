@@ -110,13 +110,14 @@ router.post('/tags', (req, res) => {
             pool.query(assetTable.insertAssetTag, [commandCode, hardwareKey, tagRecNums, antNo, pc, epcID, crc]).then(_ => {
                 return res();
             }).catch(err => {
+                console.log(err);
                 return rej(new MyError(MyErrors2.NOT_READ_TAG));
             });
         });
     }
     let promises = [];
     for (var i in tagRecords) {
-        let antNo = Number.parseInt(tagRecords[i].antNo);
+        let antNo = tagRecords[i].antNo;
         let epcIDToAdd = convertHexToASCII(tagRecords[i].epcID);
         let tag = { commandCode, hardwareKey, tagRecNums, antNo: tagRecords[i].antNo, pc: tagRecords[i].pc, epcID: epcIDToAdd, crc: tagRecords[i].crc };
         tags.add(JSON.stringify(tag));

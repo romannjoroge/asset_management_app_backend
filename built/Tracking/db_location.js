@@ -29,7 +29,7 @@ const getNumberofAntennaes = "SELECT id, noAntennae FROM RFIDReader WHERE id IN 
 const checkIfAntennaeNumberTaken = "SELECT * FROM Antennae WHERE readerid = $1 AND antennaeno = $2";
 const getNumberofAntennaes2 = "SELECT noantennae, id FROM RFIDReader WHERE id = $1";
 const getParentLocations = "SELECT parentLocationID FROM Location WHERE id = $1 AND deleted = false";
-const addProcessedTag = "INSERT INTO ProcessedTags(scannedTime, assetID, readerDeviceID) VALUES ($1, $2, $3)";
+const addProcessedTag = "INSERT INTO ProcessedTags(scannedTime, assetID, readerDeviceID, pc) VALUES ($1, $2, $3, $4)";
 const getAllAssetsLeavingLocationAndIfAuthorized = `
 SELECT p.scannedTime, g.date AS gatepassdate, u.name AS responsibleuser, a.serialnumber, a.barcode, a.description, a.condition, c.name AS category, 
 g.approved AS authorized FROM ProcessedTags p JOIN ReaderDevice r ON r.id = p.readerdeviceid JOIN Gatepass g ON g.fromlocation = r.locationid JOIN Asset a 

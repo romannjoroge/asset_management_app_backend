@@ -6,6 +6,7 @@ import locationTable from "./db_location.js";
 import _ from 'lodash';
 import events from 'events';
 import { doesAssetHaveGatepass } from "../GatePass/hasGatepass.js";
+import db_gatepass from "../GatePass/db_gatepass.js";
 const eventEmitter = new events.EventEmitter();
 export function syncTags(tags) {
     return new Promise((res, rej) => {
@@ -76,7 +77,10 @@ function convertRawTagToProcessedTag(rawTag) {
         let readerDeviceID = rawTag.hardwareKey + rawTag.antNo;
         let scannedTime = new Date();
         Asset._getAssetID(rawTag.epcID).then(assetID => {
-            return res({ scannedTime, assetID, readerDeviceID, barcode: rawTag.epcID });
+            // Get ID of reader device from DB
+            pool.query(db_gatepass.getReaderID, [readerDeviceID]).then((fetchResult) => {
+                return res({ scannedTime, assetID, readerDeviceID: fetchResult.rows[0].id, barcode: rawTag.epcID, pc: rawTag.pc });
+            });
         }).catch(err => {
             console.log(err);
             return rej(new MyError(Errors[73]));
@@ -146,8 +150,8 @@ function convertProcessedTagToAsset(processedTag, isEntering, location) {
 }
 function addProcessedTagToDB(processedTag) {
     return new Promise((res, rej) => {
-        console.log("Something Is Added To DB!");
-        pool.query(locationTable.addProcessedTag, [processedTag.scannedTime, processedTag.assetID, processedTag.readerDeviceID]).then(_ => {
+        console.log(`Something Is Added To DB!`);
+        pool.query(locationTable.addProcessedTag, [processedTag.scannedTime, processedTag.assetID, processedTag.readerDeviceID, processedTag.pc]).then(_ => {
             return res();
         }).catch(err => {
             console.log(err);
