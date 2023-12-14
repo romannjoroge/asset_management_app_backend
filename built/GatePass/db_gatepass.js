@@ -1,11 +1,11 @@
-const createGatePass = `INSERT INTO GatePass (reason, name, fromlocation, tolocation, date) VALUES ($1, $2, $3, $4, $5)`;
+const createGatePass = `INSERT INTO GatePass (reason, userid, fromlocation, tolocation, date) VALUES ($1, $2, $3, $4, $5)`;
 const createGatePassAsset = "INSERT INTO GatePassAsset (gatePassID, assetid) VALUES ($1, $2)";
-const getGatePass = "SELECT id FROM Gatepass WHERE reason = $1 AND name = $2 AND fromlocation = $3 AND tolocation = $4 AND date = $5 ORDER BY id DESC LIMIT 1";
+const getGatePass = "SELECT id FROM Gatepass WHERE reason = $1 AND userid = $2 AND fromlocation = $3 AND tolocation = $4 AND date = $5 ORDER BY id DESC LIMIT 1";
 const checkIfUserExists = "SELECT * FROM User2 WHERE CONCAT(fname, ' ', lname) = $1 AND deleted = false";
 const getLocationID = "SELECT id FROM Location WHERE name = $1";
 const getApprovers = "SELECT u.id, u.name FROM User2 u JOIN GatePassAuthorizers g ON g.userid = u.id WHERE g.locationid = $1";
 const addApprover = `INSERT INTO GatepassAuthorizers (userid, locationid) VALUES ($1, $2);`;
-const addGateAuthorizer = 'INSERT INTO AuthorizeGatepass (username, gatepassid) VALUES ($1, $2)';
+const addGateAuthorizer = 'INSERT INTO AuthorizeGatepass (userid, gatepassid) VALUES ($1, $2)';
 const getPreviousGatePasses = `SELECT g.id, (SELECT username AS name FROM User2 WHERE userid = g.userid LIMIT 1), (SELECT name AS 
     fromlocation FROM Location WHERE id = g.fromlocation), (SELECT name AS tolocation FROM Location WHERE id = 
         g.tolocation), g.date, a.barcode, g.reason, g.approved FROM Gatepass g LEFT JOIN location l ON l.id = 
