@@ -6,10 +6,13 @@ const getLocationID = "SELECT id FROM Location WHERE name = $1";
 const getApprovers = `SELECT u.username, u.name FROM User2 u JOIN GatePassAuthorizers g ON g.username = u.username WHERE g.locationid = $1`;
 const addApprover = `INSERT INTO GatepassAuthorizers (userid, locationid) VALUES ($1, $2);`;
 const addGateAuthorizer = 'INSERT INTO AuthorizeGatepass (username, gatepassid) VALUES ($1, $2)';
-const getPreviousGatePasses = `SELECT g.id, (SELECT name FROM User2 WHERE username = g.name), (SELECT name AS fromlocation FROM Location WHERE id = g.fromlocation), 
-                            (SELECT name AS tolocation FROM Location WHERE id = g.tolocation), g.date, a.barcode, g.reason, 
-                            g.approved FROM Gatepass g LEFT JOIN location l ON l.id = g.fromlocation LEFT JOIN location ON l.id = g.tolocation 
-                            JOIN gatepassasset ga ON ga.gatepassid = g.id JOIN Asset a ON a.assetid = ga.assetid WHERE g.name = $1;`
+const getPreviousGatePasses = `SELECT g.id, (SELECT username AS name FROM User2 WHERE userid = g.userid LIMIT 1), (SELECT name AS 
+    fromlocation FROM Location WHERE id = g.fromlocation), (SELECT name AS tolocation FROM Location WHERE id = 
+        g.tolocation), g.date, a.barcode, g.reason, g.approved FROM Gatepass g LEFT JOIN location l ON l.id = 
+        g.fromlocation LEFT JOIN location ON l.id = g.tolocation JOIN gatepassasset ga ON ga.gatepassid = g.id JOIN 
+        Asset a ON a.assetid = ga.assetid WHERE g.id IN (SELECT gatepassid FROM AuthorizeGatepass WHERE userid= $1) 
+        AND g.approved = false;
+`
 const getRequestedGatePasses = `SELECT g.id, g.name, (SELECT name AS fromlocation FROM Location WHERE id = g.fromlocation), 
                                 (SELECT name AS tolocation FROM Location WHERE id = g.tolocation), g.date, a.barcode, g.reason, g.approved 
                                 FROM Gatepass g LEFT JOIN location l ON l.id = g.fromlocation LEFT JOIN location ON l.id = g.tolocation JOIN gatepassasset ga 

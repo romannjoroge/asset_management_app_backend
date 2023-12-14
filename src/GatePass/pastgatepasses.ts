@@ -6,7 +6,7 @@ import gatePassTable from './db_gatepass.js'
 
 interface GatePassRequests {
     id: number;
-    name: string;
+    name: string; // Name of user who created gatepass
     fromlocation: string;
     tolocation: string;
     date: string;
@@ -21,19 +21,17 @@ interface GetGatePassFromDB {
     rows: GatePassRequests[]
 }
 
-export function getPastRequests(username: string): Promise<GatePassRequests[] | void> {
+export function getPastRequests(userid: number): Promise<GatePassRequests[] | void> {
     return new Promise((res, rej) => {
         // Check if user exists
-        console.log(username);
-        User.checkIfUserExists(username).then(exists => {
+        User.checkIfUserIDExists(userid).then(exists => {
             if (exists === false) {
                 console.log(1);
                 return rej(new MyError(Errors[30]));
             }
 
             // Get past requests
-            pool.query(gatePassTable.getPreviousGatePasses, [username]).then((data: GetGatePassFromDB) => {
-                console.log(3);
+            pool.query(gatePassTable.getPreviousGatePasses, [userid]).then((data: GetGatePassFromDB) => {
                 return res(data.rows);
             }).catch(err => {
                 console.log(err);
