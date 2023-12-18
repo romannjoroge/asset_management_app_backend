@@ -104,6 +104,7 @@ export var Logs;
     Logs[Logs["MOVEMENT_REPORT"] = 24] = "MOVEMENT_REPORT";
     Logs[Logs["REQUEST_GATEPASS"] = 25] = "REQUEST_GATEPASS";
     Logs[Logs["APPROVE_GATEPASS"] = 26] = "APPROVE_GATEPASS";
+    Logs[Logs["REJECT_GATEPASS"] = 27] = "REJECT_GATEPASS";
 })(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {

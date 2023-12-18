@@ -103,7 +103,8 @@ export enum Logs {
     "CHAIN_OF_CUSTODY_REPORT" = 23,
     "MOVEMENT_REPORT" = 24,
     "REQUEST_GATEPASS" = 25,
-    "APPROVE_GATEPASS" = 26
+    "APPROVE_GATEPASS" = 26,
+    "REJECT_GATEPASS" = 27
 }
 
 export enum MyErrors2 {

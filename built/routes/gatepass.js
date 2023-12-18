@@ -180,12 +180,22 @@ router.post('/handle', (req, res) => {
     let comment = req.body.comment;
     // Handle GatePass
     handleRequest(approved, comment, id).then(_ => {
-        // Add log
-        Log.createLog(req.ip, req.id, Logs.APPROVE_GATEPASS).then((_) => {
-            return res.json({ message: Succes[18] });
-        }).catch((err) => {
-            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-        });
+        if (approved) {
+            // Add log
+            Log.createLog(req.ip, req.id, Logs.APPROVE_GATEPASS).then((_) => {
+                return res.json({ message: Succes[18] });
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }
+        else {
+            // Add log
+            Log.createLog(req.ip, req.id, Logs.REJECT_GATEPASS).then((_) => {
+                return res.json({ message: Succes[18] });
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }
     }).catch(err => {
         if (err instanceof MyError) {
             return res.status(400).json({ message: err.message });
