@@ -16,7 +16,7 @@ export class Log {
     static createLog(ipaddress, userid, eventid, itemid) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((res, rej) => {
-                pool.query(logTable.insertLog, [ipaddress, userid, itemid, eventid]).then((_) => {
+                pool.query(logTable.insertLog, [ipaddress, userid, itemid !== null && itemid !== void 0 ? itemid : 0, eventid]).then((_) => {
                     return res();
                 }).catch((err) => {
                     return rej(new MyError(MyErrors2.NOT_GENERATE_LOG));
