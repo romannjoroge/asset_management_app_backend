@@ -16,6 +16,7 @@ import locationTable from '../Tracking/db_location.js';
 import _ from 'lodash';
 import { getTaggedAssets } from '../Reports/tagged_assets.js';
 import MyError from '../utility/myError.js';
+import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciations.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -105,31 +106,6 @@ router.get('/report/:type', (req, res) => {
     } else if (reportType == 'depreciationreport') {
         query = reportsTable.getDepreciationDetails;
         inputs = [];
-    } else if (reportType == 'depSchedule') {
-        query = reportsTable.depSchedule;
-        console.log("This is wierd");
-        pool.query("SELECT assetID FROM Asset WHERE barcode = $1", ['AUA5004']).then(data => {
-            inputs = [data.rows[0].assetid];
-
-            pool.query(query, inputs).then(data => {
-                if (data.rowCount <= 0) {
-                    return res.status(404).json({
-                        message: Errors[22]
-                    })
-                }
-                return res.json(data.rows);
-            }).catch(err => {
-                console.log(err);
-                return res.status(500).json({
-                    message: Errors[9]
-                })
-            });
-        }).catch(err => {
-            console.log(err);
-            return res.status(500).json({
-                message: Errors[9]
-            })
-        });
     }
     else {
         return res.status(404).json({
@@ -157,23 +133,17 @@ router.get('/depSchedule/:barcode', (req, res) => {
     let barcode = req.params.barcode;
 
     let query = reportsTable.depSchedule;
-    console.log("This is wierd");
     pool.query("SELECT assetID FROM Asset WHERE barcode = $1", [barcode]).then(data => {
-        let inputs = [data.rows[0].assetid];
+        let assetID = data.rows[0].assetid;
 
-        pool.query(query, inputs).then(data => {
-            if (data.rowCount <= 0) {
-                return res.status(404).json({
-                    message: Errors[22]
-                })
-            }
-            return res.json(data.rows);
-        }).catch(err => {
-            console.log(err);
-            return res.status(500).json({
-                message: Errors[9]
+        // Create depreciation schedule
+        createDeprecaitonScheduleEntries(assetID).then(entries => {
+            var returnedData: {year: number, openingbookvalue: number}[] = [];
+            entries.map((entry) => {
+                returnedData.push({year: entry.year, openingbookvalue: entry.openingbookvalue})
             })
-        });
+            return res.json(returnedData)
+        })
     }).catch(err => {
         console.log(err);
         return res.status(500).json({

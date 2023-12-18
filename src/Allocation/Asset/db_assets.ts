@@ -36,8 +36,8 @@ const searchBySerialNo = "SELECT a.barcode, a.description, a.condition, c.name A
 const updateAsset = "UPDATE Asset SET $1 = $2 WHERE assetid = $3";
 const searchForAsset = "SELECT a.assetid, a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.textsearchable_index_col @@ websearch_to_tsquery($1) AND a.deleted = false"
 const getAssetID = "SELECT assetid FROM Asset WHERE barcode = $1 ORDER BY acquisitiondate DESC LIMIT 1";
-const getDepreciationDetails = `SELECT a.usefulLife, a.acquisitionDate, a.acquisitionCost, d.percentage, a,residualvalue 
-                                FROM Asset a FULL JOIN DepreciationPercent d ON d.categoryID = a.categoryID WHERE assetID = $1`;
+const getDepreciationDetails = `SELECT a.usefulLife, a.acquisitionDate, a.acquisitionCost, a.depreciationpercent AS percentage, a,residualvalue 
+                                FROM Asset a WHERE assetID = $1`;
 const getDepreciationType = `SELECT a.depreciationType AS assetDep, c.depreciationType AS categDep FROM Asset a JOIN Category c ON c.id = a.categoryID WHERE assetID = $1`;
 const filterAssetsByLocation = `SELECT a.assetid, a.barcode, a.description, a.condition, c.name AS category, a.serialNumber, l.name AS location FROM Asset a 
                                 FULL JOIN Location l ON l.id = a.locationid FULL JOIN Category c ON a.categoryid = c.id WHERE a.assetid IS NOT NULL AND a.deleted = false
