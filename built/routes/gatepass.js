@@ -217,7 +217,12 @@ router.post('/createBatch', (req, res) => {
         dateToAdd = utility.checkIfValidDate(date, "Invalid Date");
         // Create Batch
         createBatch(dateToAdd, comments, locationID, assets).then(_ => {
-            return res.json({ message: Succes[20] });
+            // Add Log
+            Log.createLog(req.ip, req.id, Logs.CREATE_BATCH).then((_) => {
+                return res.json({ message: Succes[20] });
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
         }).catch(err => {
             if (err instanceof MyError) {
                 return res.status(501).json({ message: err.message });

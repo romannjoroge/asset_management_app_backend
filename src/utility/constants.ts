@@ -107,7 +107,8 @@ export enum Logs {
     "REJECT_GATEPASS" = 27,
     "CREATE_INVENTORY" = 28,
     "DELETE_INVENTORY" = 29,
-    "UPDATE_INVENTORY" = 30
+    "UPDATE_INVENTORY" = 30,
+    "CREATE_BATCH" = 31,
 }
 
 export enum MyErrors2 {
