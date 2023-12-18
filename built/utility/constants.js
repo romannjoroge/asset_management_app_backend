@@ -103,6 +103,7 @@ export var Logs;
     Logs[Logs["CHAIN_OF_CUSTODY_REPORT"] = 23] = "CHAIN_OF_CUSTODY_REPORT";
     Logs[Logs["MOVEMENT_REPORT"] = 24] = "MOVEMENT_REPORT";
     Logs[Logs["REQUEST_GATEPASS"] = 25] = "REQUEST_GATEPASS";
+    Logs[Logs["APPROVE_GATEPASS"] = 26] = "APPROVE_GATEPASS";
 })(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {
