@@ -24,9 +24,11 @@ class Auth {
                 __classPrivateFieldGet(this, _a, "m", _Auth_storeOtp).call(this, otp, userid, new Date()).then(_ => {
                     return res(otp);
                 }).catch((err) => {
+                    console.log(err);
                     return rej(new MyError(MyErrors2.NOT_GENERATE_OTP));
                 });
             }).catch(err => {
+                console.log(err);
                 return rej(new MyError(MyErrors2.NOT_GENERATE_OTP));
             });
         });

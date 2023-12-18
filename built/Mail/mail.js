@@ -20,6 +20,7 @@ class Mail {
             }).then(info => {
                 return res();
             }).catch((err) => {
+                console.log(err);
                 return rej(new MyError(MyErrors2.NOT_SEND_MAIL));
             });
         });
