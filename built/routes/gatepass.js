@@ -340,7 +340,12 @@ router.post('/createInventory', (req, res) => {
     const name = req.body.name;
     // Create inventory
     createInventory(name).then(_ => {
-        return res.json({ message: Succes[19] });
+        // Add log
+        Log.createLog(req.ip, req.id, Logs.CREATE_INVENTORY).then((_) => {
+            return res.json({ message: Succes[19] });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
     });
 });
 // Route for creating a gatepass

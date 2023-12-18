@@ -372,7 +372,12 @@ router.post('/createInventory', (req, res) => {
 
     // Create inventory
     createInventory(name).then(_ => {
-        return res.json({message: Succes[19]})
+        // Add log
+        Log.createLog(req.ip, req.id , Logs.CREATE_INVENTORY).then((_: any) => {
+            return res.json({message: Succes[19]})
+        }).catch((err: MyError) => {
+            return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+        })
     })
 });
 
