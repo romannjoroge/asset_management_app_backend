@@ -87,6 +87,7 @@ export var Logs;
     Logs[Logs["CREATE_LOCATION"] = 7] = "CREATE_LOCATION";
     Logs[Logs["DELETE_LOCATION"] = 8] = "DELETE_LOCATION";
     Logs[Logs["UPDATE_LOCATION"] = 9] = "UPDATE_LOCATION";
+    Logs[Logs["CREATE_READER"] = 10] = "CREATE_READER";
 })(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {

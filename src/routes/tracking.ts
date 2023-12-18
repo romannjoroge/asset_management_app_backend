@@ -353,7 +353,12 @@ router.post('/createReader', (req, res) => {
 
     // Call Create Reader
     createReader(hardwareKey, locationID, noantennae).then(_ => {
-        return res.json({message: Succes[9]});
+        // Add log
+        Log.createLog(req.ip, req.id , Logs.CREATE_READER).then((_: any) => {
+            return res.json({message: Succes[9]});
+        }).catch((err: MyError) => {
+            return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+        })
     }).catch(err => {
         console.log(err);
         return res.status(400).json({message: err.message});
