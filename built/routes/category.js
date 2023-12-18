@@ -2,9 +2,10 @@ import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
 import Category from '../Allocation/Category/category2.js';
-import { Errors, Succes } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2, Succes } from '../utility/constants.js';
 import categoryTable from '../Allocation/Category/db_category2.js';
 import updateCategory from '../Allocation/Category/updateCategory.js';
+import { Log } from '../Log/log.js';
 // View a specific category
 router.get('/view/:name', (req, res) => {
     let name = req.params.name;
@@ -55,8 +56,13 @@ router.post('/add', (req, res) => {
     // Call database query
     let categ = new Category(categoryName, parentCategoryID, depreciationType, depreciationPercentage);
     categ.initialize().then(data => {
-        return res.status(201).json({
-            message: 'Category Created'
+        // Add log
+        Log.createLog(req.ip, req.id, Logs.CREATE_CATEGORY).then((_) => {
+            return res.status(201).json({
+                message: 'Category Created'
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
         });
     }).catch(e => {
         console.log(e);

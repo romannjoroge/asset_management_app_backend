@@ -80,7 +80,8 @@ export const Errors = {
 export enum Logs {
     "CREATE_ASSET"= 1,
     "DELETE_ASSET" = 2,
-    "UPDATE_ASSET" = 3
+    "UPDATE_ASSET" = 3,
+    "CREATE_CATEGORY" = 4,
 }
 
 export enum MyErrors2 {
