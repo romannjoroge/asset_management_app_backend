@@ -32,6 +32,11 @@ interface GetUserNameFetchResult {
     rows: {username: string}[]
 }
 
+interface GetUserEmailFetchResult {
+    rowCount: number;
+    rows: {email: string}[]
+}
+
 
 
 class User {
@@ -126,6 +131,26 @@ class User {
                 }
 
                 return res(fetchResult.rows[0].username);
+            }).catch((err: any) => {
+                return rej(new MyError(MyErrors2.USER_NOT_EXIST));
+            })
+        })
+    }
+
+    /**
+     * 
+     * @param userid ID of the user to get email of
+     * @returns Email of user
+     * @description Returns the email of user with given ID
+     */
+    static getEmail(userid: number): Promise<string> {
+        return new Promise((res, rej) => {
+            pool.query(userTable.getEmail, [userid]).then((fetchResult: GetUserEmailFetchResult) => {
+                if(fetchResult.rowCount <= 0) {
+                    return rej(new MyError(MyErrors2.USER_NOT_EXIST));
+                }
+
+                return res(fetchResult.rows[0].email);
             }).catch((err: any) => {
                 return rej(new MyError(MyErrors2.USER_NOT_EXIST));
             })
