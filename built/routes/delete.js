@@ -39,6 +39,7 @@ router.delete('/delete/:item', (req, res) => {
         table = "Inventory";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
         arguements = [id];
+        eventid = Logs.DELETE_INVENTORY;
     }
     else if (item == "category") {
         table = "Category";

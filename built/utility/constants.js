@@ -106,6 +106,8 @@ export var Logs;
     Logs[Logs["APPROVE_GATEPASS"] = 26] = "APPROVE_GATEPASS";
     Logs[Logs["REJECT_GATEPASS"] = 27] = "REJECT_GATEPASS";
     Logs[Logs["CREATE_INVENTORY"] = 28] = "CREATE_INVENTORY";
+    Logs[Logs["DELETE_INVENTORY"] = 29] = "DELETE_INVENTORY";
+    Logs[Logs["UPDATE_INVENTORY"] = 30] = "UPDATE_INVENTORY";
 })(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {

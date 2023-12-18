@@ -106,7 +106,8 @@ export enum Logs {
     "APPROVE_GATEPASS" = 26,
     "REJECT_GATEPASS" = 27,
     "CREATE_INVENTORY" = 28,
-    
+    "DELETE_INVENTORY" = 29,
+    "UPDATE_INVENTORY" = 30
 }
 
 export enum MyErrors2 {

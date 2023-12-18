@@ -292,7 +292,12 @@ router.post('/editInventory/:id', (req, res) => {
     let id = Number.parseInt(req.params.id);
     // Update db
     pool.query(gatepasstable.updateInventory, [name, id]).then(_ => {
-        return res.json({ message: Succes[23] });
+        // Add log
+        Log.createLog(req.ip, req.id, Logs.UPDATE_INVENTORY, id).then((_) => {
+            return res.json({ message: Succes[23] });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
     }).catch(err => {
         return res.status(400).json({ message: Errors[71] });
     });
