@@ -84,7 +84,9 @@ export enum Logs {
     "CREATE_CATEGORY" = 4,
     "DELETE_CATEGORY" = 5,
     "UPDATE_CATEGORY" = 6,
-    "CREATE_LOCATION" = 7
+    "CREATE_LOCATION" = 7,
+    "DELETE_LOCATION" = 8,
+    "UPDATE_LOCATION" = 9,
 }
 
 export enum MyErrors2 {

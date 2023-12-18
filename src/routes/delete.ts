@@ -94,6 +94,7 @@ router.delete('/delete/:item', (req, res) => {
         table = "Location";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
         arguements = [id];
+        eventid = Logs.DELETE_LOCATION;
     } else if (item == "readerDevice") {
         table = "ReaderDevice";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;

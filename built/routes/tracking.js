@@ -287,7 +287,12 @@ router.post('/updateLocation', (req, res) => {
     }
     // Update Location
     updateLocation(locationID, updateLocationJSON).then(_ => {
-        return res.json({ message: Succes[14] });
+        // Add log
+        Log.createLog(req.ip, req.id, Logs.UPDATE_LOCATION, locationID).then((_) => {
+            return res.json({ message: Succes[14] });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
     }).catch(err => {
         console.log(err);
         return res.status(400).json({ message: err.message });
