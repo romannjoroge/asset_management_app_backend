@@ -106,6 +106,7 @@ router.get('/report/:type', (req, res) => {
         query = reportsTable.acquisitionReport;
         var year = Number.parseInt(req.query.year);
         inputs = [new Date(year, 0, 1), new Date(year + 1, 0, 1)];
+        eventid = Logs.ASSET_ACQUISITION_REPORT;
     } else if (reportType == 'depreciationreport') {
         query = reportsTable.getDepreciationDetails;
         inputs = [];

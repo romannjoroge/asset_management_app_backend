@@ -95,7 +95,7 @@ export enum Logs {
     "UPDATE_USER" = 15,
     "ASSET_REGISTER_REPORT" = 16,
     "ASSET_DEPRECIATION_SCHEDULE_REPORT" = 17,
-    
+    "ASSET_ACQUISITION_REPORT" = 18
 }
 
 export enum MyErrors2 {
