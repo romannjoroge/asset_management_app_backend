@@ -109,6 +109,8 @@ export enum Logs {
     "DELETE_INVENTORY" = 29,
     "UPDATE_INVENTORY" = 30,
     "CREATE_BATCH" = 31,
+    "DELETE_BATCH" = 32,
+    "UPDATE_BATCH" = 33
 }
 
 export enum MyErrors2 {

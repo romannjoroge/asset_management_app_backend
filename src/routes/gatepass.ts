@@ -339,7 +339,12 @@ router.post('/editBatch/:id', (req, res) => {
 
     // Update db
     pool.query(gatepasstable.updateBatch, [comment, id]).then(_ => {
-        return res.json({message: Succes[24]});
+        // Add Log
+        Log.createLog(req.ip, req.id, Logs.UPDATE_BATCH).then((_: any) => {
+            return res.json({message: Succes[24]});
+        }).catch((err: MyError) => {
+            return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+        })
     }).catch(err => {
         console.log(err);
         return res.status(400).json({message: Errors[72]});

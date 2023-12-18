@@ -109,6 +109,8 @@ export var Logs;
     Logs[Logs["DELETE_INVENTORY"] = 29] = "DELETE_INVENTORY";
     Logs[Logs["UPDATE_INVENTORY"] = 30] = "UPDATE_INVENTORY";
     Logs[Logs["CREATE_BATCH"] = 31] = "CREATE_BATCH";
+    Logs[Logs["DELETE_BATCH"] = 32] = "DELETE_BATCH";
+    Logs[Logs["UPDATE_BATCH"] = 33] = "UPDATE_BATCH";
 })(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {
