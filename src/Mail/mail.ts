@@ -25,6 +25,7 @@ export default class Mail {
             }).then(info => {
                 return res();
             }).catch((err: any) => {
+                console.log(err);
                 return rej(new MyError(MyErrors2.NOT_SEND_MAIL))
             })
         });

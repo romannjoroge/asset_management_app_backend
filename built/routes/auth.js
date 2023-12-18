@@ -48,10 +48,15 @@ router.post('/generateOTP', (req, res) => {
             Mail.sendMail(emailBody, from, to, subject).then((_) => {
                 return res.send("Done");
             }).catch((err) => {
+                console.log(err);
                 return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
             });
+        }).catch((err) => {
+            console.log(err);
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
         });
     }).catch((err) => {
+        console.log(err);
         return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
     });
 });
