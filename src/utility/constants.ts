@@ -92,6 +92,8 @@ export enum Logs {
     "UPDATE_READER" = 12,
     "CREATE_USER" = 13,
     "DELETE_USER" = 14,
+    "UPDATE_USER" = 15,
+    
 }
 
 export enum MyErrors2 {

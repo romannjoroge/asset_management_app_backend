@@ -92,6 +92,7 @@ export var Logs;
     Logs[Logs["UPDATE_READER"] = 12] = "UPDATE_READER";
     Logs[Logs["CREATE_USER"] = 13] = "CREATE_USER";
     Logs[Logs["DELETE_USER"] = 14] = "DELETE_USER";
+    Logs[Logs["UPDATE_USER"] = 15] = "UPDATE_USER";
 })(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {

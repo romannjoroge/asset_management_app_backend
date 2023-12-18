@@ -234,7 +234,12 @@ router.post('/update', (req, res) => {
     }
     // Update user
     updateUser(userid, updateBody).then(_ => {
-        return res.json({ message: Succes[17] });
+        // Add log
+        Log.createLog(req.ip, req.id, Logs.UPDATE_USER, userid).then((_) => {
+            return res.json({ message: Succes[17] });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
     }).catch(err => {
         console.log(err);
         if (err instanceof MyError) {
