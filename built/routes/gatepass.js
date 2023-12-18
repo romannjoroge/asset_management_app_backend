@@ -278,7 +278,12 @@ router.post('/addToBatch', (req, res) => {
     Asset._getAssetID(barcode).then(id => {
         // Insert into db
         pool.query(gatepasstable.insertBatchAsset, [id, batchID]).then(_ => {
-            return res.json({ message: Succes[22] });
+            // Add Log
+            Log.createLog(req.ip, req.id, Logs.ASSIGN_BATCH_INVENTORY, id).then((_) => {
+                return res.json({ message: Succes[22] });
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
         }).catch(err => {
             return res.status(400).json({ message: Errors[70] });
         });
