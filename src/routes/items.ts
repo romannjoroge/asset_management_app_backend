@@ -96,7 +96,12 @@ router.post('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Admini
         }
     }
 
-    return res.json({message: Succes[11]})
+    // Add log
+    Log.createLog(req.ip, req.id, Logs.UPDATE_ASSET, assetID).then((_: any) => {
+        return res.json({message: Succes[11]})
+    }).catch((err: any) => {
+        return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+    })
 });
 
 

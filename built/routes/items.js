@@ -70,7 +70,12 @@ router.post('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Admini
             return res.status(404).json({ message: Errors[43] });
         }
     }
-    return res.json({ message: Succes[11] });
+    // Add log
+    Log.createLog(req.ip, req.id, Logs.UPDATE_ASSET, assetID).then((_) => {
+        return res.json({ message: Succes[11] });
+    }).catch((err) => {
+        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+    });
 });
 router.get('/view', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     Asset.displayAllAssetTags().then(data => {
