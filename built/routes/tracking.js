@@ -2,7 +2,7 @@ import express from 'express';
 const router = express.Router();
 import pool from '../../db2.js';
 import locationTable from '../Tracking/db_location.js';
-import { Errors, MyErrors2, Succes, Success2 } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2, Succes, Success2 } from '../utility/constants.js';
 import reportsTable from '../Reports/db_reports.js';
 import { createAntennae } from '../Tracking/antennae.js';
 import { createReader } from '../Tracking/readers.js';
@@ -11,6 +11,7 @@ import { getAssetsLeavingLocationAndIfAuthorized } from '../Tracking/movements.j
 import MyError from '../utility/myError.js';
 import { createReaderDevice, editReaderDevice, getReaderDevices } from '../Tracking/rfidReader.js';
 import { syncTags } from '../Tracking/tags.js';
+import { Log } from '../Log/log.js';
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
     pool.query(locationTable.getLocations, []).then((data) => {
@@ -181,6 +182,7 @@ router.post('/create/:item', (req, res) => {
     let createItemQuery;
     let createItemParams;
     let successMessage;
+    let eventid;
     /**
      * @description This handles creating a location.
      * @param name is the name of the location to create. It must be unique in its site / parent location (to be decided if useful)
@@ -189,6 +191,7 @@ router.post('/create/:item', (req, res) => {
      */
     if (item == 'location') {
         let { name, site, companyName } = req.body;
+        eventid = Logs.CREATE_LOCATION;
         // Check if site is there
         if (!site) {
             itemExistParams = [name, companyName];
@@ -227,7 +230,12 @@ router.post('/create/:item', (req, res) => {
         }
         // Create item
         pool.query(createItemQuery, createItemParams).then(_ => {
-            return res.json({ message: successMessage });
+            // Add log
+            Log.createLog(req.ip, req.id, eventid).then((_) => {
+                return res.json({ message: successMessage });
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
         }).catch(err => {
             console.log(err);
             return res.status(400).json({ message: MyErrors2.NOT_CREATE_LOCATION });
@@ -279,7 +287,12 @@ router.post('/updateLocation', (req, res) => {
     }
     // Update Location
     updateLocation(locationID, updateLocationJSON).then(_ => {
-        return res.json({ message: Succes[14] });
+        // Add log
+        Log.createLog(req.ip, req.id, Logs.UPDATE_LOCATION, locationID).then((_) => {
+            return res.json({ message: Succes[14] });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
     }).catch(err => {
         console.log(err);
         return res.status(400).json({ message: err.message });
@@ -293,7 +306,12 @@ router.post('/createReader', (req, res) => {
     let noantennae = Number.parseInt(req.body.noantennae);
     // Call Create Reader
     createReader(hardwareKey, locationID, noantennae).then(_ => {
-        return res.json({ message: Succes[9] });
+        // Add log
+        Log.createLog(req.ip, req.id, Logs.CREATE_READER).then((_) => {
+            return res.json({ message: Succes[9] });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
     }).catch(err => {
         console.log(err);
         return res.status(400).json({ message: err.message });

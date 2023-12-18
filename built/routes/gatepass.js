@@ -1,6 +1,6 @@
 import express from 'express';
 import utility from '../utility/utility.js';
-import { Errors, MyErrors2, Succes } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2, Succes } from '../utility/constants.js';
 const router = express.Router();
 import pool from '../../db2.js';
 import { requestForGatepass } from '../GatePass/assignGatepass.js';
@@ -17,6 +17,7 @@ import { createInventory, returnInventories } from '../GatePass/createInventory.
 import { createBatch } from '../GatePass/createBatch.js';
 import { allocateBatch } from '../GatePass/allocateBatch.js';
 import gatepasstable from '../GatePass/db_gatepass.js';
+import { Log } from '../Log/log.js';
 router.get('/movements', (req, res) => {
     let { from, to } = req.query;
     // Check if they are valid dates
@@ -130,7 +131,12 @@ router.put('/updateReader', (req, res) => {
     // Update Reader
     console.log(id);
     updateReader(id, updateJSONToUse).then(_ => {
-        return res.json({ message: Succes[16] });
+        // Add log
+        Log.createLog(req.ip, req.id, Logs.UPDATE_READER, id).then((_) => {
+            return res.json({ message: Succes[16] });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
     }).catch(err => {
         console.log(err);
         if (err instanceof MyError) {
@@ -174,7 +180,22 @@ router.post('/handle', (req, res) => {
     let comment = req.body.comment;
     // Handle GatePass
     handleRequest(approved, comment, id).then(_ => {
-        return res.json({ message: Succes[18] });
+        if (approved) {
+            // Add log
+            Log.createLog(req.ip, req.id, Logs.APPROVE_GATEPASS).then((_) => {
+                return res.json({ message: Succes[18] });
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }
+        else {
+            // Add log
+            Log.createLog(req.ip, req.id, Logs.REJECT_GATEPASS).then((_) => {
+                return res.json({ message: Succes[18] });
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }
     }).catch(err => {
         if (err instanceof MyError) {
             return res.status(400).json({ message: err.message });
@@ -196,7 +217,12 @@ router.post('/createBatch', (req, res) => {
         dateToAdd = utility.checkIfValidDate(date, "Invalid Date");
         // Create Batch
         createBatch(dateToAdd, comments, locationID, assets).then(_ => {
-            return res.json({ message: Succes[20] });
+            // Add Log
+            Log.createLog(req.ip, req.id, Logs.CREATE_BATCH).then((_) => {
+                return res.json({ message: Succes[20] });
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
         }).catch(err => {
             if (err instanceof MyError) {
                 return res.status(501).json({ message: err.message });
@@ -252,7 +278,12 @@ router.post('/addToBatch', (req, res) => {
     Asset._getAssetID(barcode).then(id => {
         // Insert into db
         pool.query(gatepasstable.insertBatchAsset, [id, batchID]).then(_ => {
-            return res.json({ message: Succes[22] });
+            // Add Log
+            Log.createLog(req.ip, req.id, Logs.ASSIGN_BATCH_INVENTORY, id).then((_) => {
+                return res.json({ message: Succes[22] });
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
         }).catch(err => {
             return res.status(400).json({ message: Errors[70] });
         });
@@ -271,7 +302,12 @@ router.post('/editInventory/:id', (req, res) => {
     let id = Number.parseInt(req.params.id);
     // Update db
     pool.query(gatepasstable.updateInventory, [name, id]).then(_ => {
-        return res.json({ message: Succes[23] });
+        // Add log
+        Log.createLog(req.ip, req.id, Logs.UPDATE_INVENTORY, id).then((_) => {
+            return res.json({ message: Succes[23] });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
     }).catch(err => {
         return res.status(400).json({ message: Errors[71] });
     });
@@ -282,7 +318,12 @@ router.post('/editBatch/:id', (req, res) => {
     let id = Number.parseInt(req.params.id);
     // Update db
     pool.query(gatepasstable.updateBatch, [comment, id]).then(_ => {
-        return res.json({ message: Succes[24] });
+        // Add Log
+        Log.createLog(req.ip, req.id, Logs.UPDATE_BATCH).then((_) => {
+            return res.json({ message: Succes[24] });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
     }).catch(err => {
         console.log(err);
         return res.status(400).json({ message: Errors[72] });
@@ -319,7 +360,12 @@ router.post('/createInventory', (req, res) => {
     const name = req.body.name;
     // Create inventory
     createInventory(name).then(_ => {
-        return res.json({ message: Succes[19] });
+        // Add log
+        Log.createLog(req.ip, req.id, Logs.CREATE_INVENTORY).then((_) => {
+            return res.json({ message: Succes[19] });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
     });
 });
 // Route for creating a gatepass
@@ -341,7 +387,12 @@ router.post('/create', (req, res) => {
     let gatePass = { userid: id, date: date, fromLocation: fromLocation, toLocation: toLocation, barcode: barcode, reason: reason };
     // Create Gatepass
     requestForGatepass(gatePass, approvers).then(_ => {
-        return res.json({ message: Succes[13] });
+        // Add Log
+        Log.createLog(req.ip, req.id, Logs.REQUEST_GATEPASS).then((_) => {
+            return res.json({ message: Succes[13] });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
     }).catch(err => {
         console.log(err);
         if (err instanceof MyError) {

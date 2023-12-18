@@ -77,6 +77,44 @@ export const Errors = {
     '75': "Could Not Get Inventories",
 }
 
+export enum Logs {
+    "CREATE_ASSET"= 1,
+    "DELETE_ASSET" = 2,
+    "UPDATE_ASSET" = 3,
+    "CREATE_CATEGORY" = 4,
+    "DELETE_CATEGORY" = 5,
+    "UPDATE_CATEGORY" = 6,
+    "CREATE_LOCATION" = 7,
+    "DELETE_LOCATION" = 8,
+    "UPDATE_LOCATION" = 9,
+    "CREATE_READER" = 10,
+    "DELETE_READER" = 11,
+    "UPDATE_READER" = 12,
+    "CREATE_USER" = 13,
+    "DELETE_USER" = 14,
+    "UPDATE_USER" = 15,
+    "ASSET_REGISTER_REPORT" = 16,
+    "ASSET_DEPRECIATION_SCHEDULE_REPORT" = 17,
+    "ASSET_ACQUISITION_REPORT" = 18,
+    "STOCK_TAKE_RECONCILIATION_REPORT" = 19,
+    "CATEGORY_DERECIATION_CONFIGURATION_REPORT" = 20,
+    "ASSET_CATEGORY_REPORT" = 21,
+    "AUDIT_TRAIL_REPORT" = 22,
+    "CHAIN_OF_CUSTODY_REPORT" = 23,
+    "MOVEMENT_REPORT" = 24,
+    "REQUEST_GATEPASS" = 25,
+    "APPROVE_GATEPASS" = 26,
+    "REJECT_GATEPASS" = 27,
+    "CREATE_INVENTORY" = 28,
+    "DELETE_INVENTORY" = 29,
+    "UPDATE_INVENTORY" = 30,
+    "CREATE_BATCH" = 31,
+    "DELETE_BATCH" = 32,
+    "UPDATE_BATCH" = 33,
+    "ASSIGN_BATCH_INVENTORY" = 34,
+    "UNASSIGN_BATCH_INVENTORY" = 35,
+}
+
 export enum MyErrors2 {
     'NOT_GET_INVENTORIES' = "Could Not Get Inventories",
     'NOT_STORE_CONVERTED' = "Could Not Store Converted Assets",
@@ -120,7 +158,8 @@ export enum MyErrors2 {
     "NOT_GET_USER_ID" = "Could Not Get User ID",
     "NOT_GET_PARENT_CATEGORY" = "Could Not Get Parent Category",
     "NOT_ADD_CATEGORY_TO_ASSET" = "Could Not Add Category And Sub Category To Raw Asset",
-    "NOT_GET_CATEGORY_NAME" = "Could Not Get Category Name"
+    "NOT_GET_CATEGORY_NAME" = "Could Not Get Category Name",
+    "NOT_GENERATE_LOG" = "Could Not Generate Log"
 }
 
 export enum Success2 {

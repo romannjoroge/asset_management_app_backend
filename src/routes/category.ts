@@ -2,10 +2,12 @@ import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
 import Category from '../Allocation/Category/category2.js'
-import { Errors, Succes } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2, Succes } from '../utility/constants.js';
 import categoryTable from '../Allocation/Category/db_category2.js';
 import updateCategory from '../Allocation/Category/updateCategory.js';
 import { UpdateCategoryJSON } from '../Allocation/Category/updateCategory.js';
+import { Log } from '../Log/log.js';
+import MyError from '../utility/myError.js';
 
 // View a specific category
 router.get('/view/:name', (req, res) => {
@@ -68,9 +70,14 @@ router.post('/add', (req, res) => {
     // Call database query
     let categ = new Category(categoryName, parentCategoryID, depreciationType, depreciationPercentage);
     categ.initialize().then(data => {
-        return res.status(201).json({
-            message: 'Category Created'
-        });
+        // Add log
+        Log.createLog(req.ip, req.id, Logs.CREATE_CATEGORY).then((_: any) => {
+            return res.status(201).json({
+                message: 'Category Created'
+            });
+        }).catch((err: MyError) => {
+            return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+        })
     }).catch(e => {
         console.log(e);
         return res.status(500).json({
@@ -117,8 +124,13 @@ router.post('/update', (req, res) => {
     }
     
     updateCategory(id, updateBody).then(() => {
-        return res.json({
-            message: Succes[12],
+        // Add log
+        Log.createLog(req.ip, req.id, Logs.UPDATE_CATEGORY, id).then((_: any) => {
+            return res.json({
+                message: Succes[12],
+            })
+        }).catch((err: MyError) => {
+            return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
         })
     }).catch(err => {
         return res.status(500).json({

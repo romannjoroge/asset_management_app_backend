@@ -20,6 +20,11 @@ export default (role) => {
             }
 
             req.authorized = true;
+
+            // Get ip of user
+            const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+            req.ip = ip;
+
             next();
         })
     }

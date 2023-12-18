@@ -76,6 +76,44 @@ export const Errors = {
     '74': "Could Not Get Asset Movements",
     '75': "Could Not Get Inventories",
 };
+export var Logs;
+(function (Logs) {
+    Logs[Logs["CREATE_ASSET"] = 1] = "CREATE_ASSET";
+    Logs[Logs["DELETE_ASSET"] = 2] = "DELETE_ASSET";
+    Logs[Logs["UPDATE_ASSET"] = 3] = "UPDATE_ASSET";
+    Logs[Logs["CREATE_CATEGORY"] = 4] = "CREATE_CATEGORY";
+    Logs[Logs["DELETE_CATEGORY"] = 5] = "DELETE_CATEGORY";
+    Logs[Logs["UPDATE_CATEGORY"] = 6] = "UPDATE_CATEGORY";
+    Logs[Logs["CREATE_LOCATION"] = 7] = "CREATE_LOCATION";
+    Logs[Logs["DELETE_LOCATION"] = 8] = "DELETE_LOCATION";
+    Logs[Logs["UPDATE_LOCATION"] = 9] = "UPDATE_LOCATION";
+    Logs[Logs["CREATE_READER"] = 10] = "CREATE_READER";
+    Logs[Logs["DELETE_READER"] = 11] = "DELETE_READER";
+    Logs[Logs["UPDATE_READER"] = 12] = "UPDATE_READER";
+    Logs[Logs["CREATE_USER"] = 13] = "CREATE_USER";
+    Logs[Logs["DELETE_USER"] = 14] = "DELETE_USER";
+    Logs[Logs["UPDATE_USER"] = 15] = "UPDATE_USER";
+    Logs[Logs["ASSET_REGISTER_REPORT"] = 16] = "ASSET_REGISTER_REPORT";
+    Logs[Logs["ASSET_DEPRECIATION_SCHEDULE_REPORT"] = 17] = "ASSET_DEPRECIATION_SCHEDULE_REPORT";
+    Logs[Logs["ASSET_ACQUISITION_REPORT"] = 18] = "ASSET_ACQUISITION_REPORT";
+    Logs[Logs["STOCK_TAKE_RECONCILIATION_REPORT"] = 19] = "STOCK_TAKE_RECONCILIATION_REPORT";
+    Logs[Logs["CATEGORY_DERECIATION_CONFIGURATION_REPORT"] = 20] = "CATEGORY_DERECIATION_CONFIGURATION_REPORT";
+    Logs[Logs["ASSET_CATEGORY_REPORT"] = 21] = "ASSET_CATEGORY_REPORT";
+    Logs[Logs["AUDIT_TRAIL_REPORT"] = 22] = "AUDIT_TRAIL_REPORT";
+    Logs[Logs["CHAIN_OF_CUSTODY_REPORT"] = 23] = "CHAIN_OF_CUSTODY_REPORT";
+    Logs[Logs["MOVEMENT_REPORT"] = 24] = "MOVEMENT_REPORT";
+    Logs[Logs["REQUEST_GATEPASS"] = 25] = "REQUEST_GATEPASS";
+    Logs[Logs["APPROVE_GATEPASS"] = 26] = "APPROVE_GATEPASS";
+    Logs[Logs["REJECT_GATEPASS"] = 27] = "REJECT_GATEPASS";
+    Logs[Logs["CREATE_INVENTORY"] = 28] = "CREATE_INVENTORY";
+    Logs[Logs["DELETE_INVENTORY"] = 29] = "DELETE_INVENTORY";
+    Logs[Logs["UPDATE_INVENTORY"] = 30] = "UPDATE_INVENTORY";
+    Logs[Logs["CREATE_BATCH"] = 31] = "CREATE_BATCH";
+    Logs[Logs["DELETE_BATCH"] = 32] = "DELETE_BATCH";
+    Logs[Logs["UPDATE_BATCH"] = 33] = "UPDATE_BATCH";
+    Logs[Logs["ASSIGN_BATCH_INVENTORY"] = 34] = "ASSIGN_BATCH_INVENTORY";
+    Logs[Logs["UNASSIGN_BATCH_INVENTORY"] = 35] = "UNASSIGN_BATCH_INVENTORY";
+})(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {
     MyErrors2["NOT_GET_INVENTORIES"] = "Could Not Get Inventories";
@@ -121,6 +159,7 @@ export var MyErrors2;
     MyErrors2["NOT_GET_PARENT_CATEGORY"] = "Could Not Get Parent Category";
     MyErrors2["NOT_ADD_CATEGORY_TO_ASSET"] = "Could Not Add Category And Sub Category To Raw Asset";
     MyErrors2["NOT_GET_CATEGORY_NAME"] = "Could Not Get Category Name";
+    MyErrors2["NOT_GENERATE_LOG"] = "Could Not Generate Log";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

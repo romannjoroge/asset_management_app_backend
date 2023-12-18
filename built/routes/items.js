@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import Asset from '../Allocation/Asset/asset2.js';
-import { Errors, MyErrors2, Succes, Success2 } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2, Succes, Success2 } from '../utility/constants.js';
 import pool from '../../db2.js';
 import assetTable from '../Allocation/Asset/db_assets.js';
 import checkifAuthorized from '../../middleware/checkifAuthorized.js';
@@ -11,6 +11,7 @@ import MyError from '../utility/myError.js';
 import { filterAssetByDetails } from '../Allocation/Asset/filter.js';
 // import storage from '../Importing/multerSetup.js';
 import multer from 'multer';
+import { Log } from '../Log/log.js';
 const upload = multer({ dest: './attachments' });
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     let { barcode, locationID, noInBuilding, code, description, categoryName, usefulLife, serialNumber, condition, responsibleuserid, acquisitionDate, acquisitionCost, residualValue, depreciationType, depreciationPercent, attachments } = req.body;
@@ -27,7 +28,12 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
     }
     let asset = new Asset(barcode, usefulLife, acquisitionDate, locationID, condition, responsibleuserid, acquisitionCost, categoryName, attachments, noInBuilding, serialNumber, code, description, residualValue, depreciationType, depreciationPercent);
     asset.initialize().then(_ => {
-        return res.json({ message: Success2.CREATED_ASSET });
+        // Add log
+        Log.createLog(req.ip, req.id, Logs.CREATE_ASSET).then((_) => {
+            return res.json({ message: Success2.CREATED_ASSET });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
     }).catch(e => {
         console.log(e);
         if (e instanceof MyError) {
@@ -64,7 +70,12 @@ router.post('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Admini
             return res.status(404).json({ message: Errors[43] });
         }
     }
-    return res.json({ message: Succes[11] });
+    // Add log
+    Log.createLog(req.ip, req.id, Logs.UPDATE_ASSET, assetID).then((_) => {
+        return res.json({ message: Succes[11] });
+    }).catch((err) => {
+        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+    });
 });
 router.get('/view', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     Asset.displayAllAssetTags().then(data => {

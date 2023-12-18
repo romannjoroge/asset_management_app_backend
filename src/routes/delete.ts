@@ -4,7 +4,8 @@
 import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
-import { Errors, Succes } from '../utility/constants.js';
+import { Errors, Logs, Succes } from '../utility/constants.js';
+import { Log } from '../Log/log.js';
 
 router.delete('/delete/:item', (req, res) => {
     let item = req.params.item;
@@ -12,6 +13,7 @@ router.delete('/delete/:item', (req, res) => {
     let table;
     let query;
     let arguements;
+    let eventid: number;
 
     if (item == "DepreciationPercent") {
         table = "DepreciationPercent";
@@ -31,14 +33,17 @@ router.delete('/delete/:item', (req, res) => {
         table = "Batch";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
         arguements = [id];
+        eventid = Logs.DELETE_BATCH;
     } else if (item == "inventory") {
         table = "Inventory";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
         arguements = [id];
+        eventid = Logs.DELETE_INVENTORY;
     } else if (item == "category") {
         table = "Category";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
         arguements = [id];
+        eventid = Logs.DELETE_CATEGORY;
     } else if (item == "role") {
         table = "Role";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
@@ -66,12 +71,14 @@ router.delete('/delete/:item', (req, res) => {
         query = `UPDATE ${table} SET deleted = true WHERE assetid = $1`;
         let {assetID} = req.query;
         arguements = [assetID];
+        eventid = Logs.DELETE_ASSET;
 
         console.log("This asset is being deleted");
     } else if (item == "user") {
         table = "User2";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
         let {id} = req.query;
+        eventid = Logs.DELETE_USER;
         arguements = [id];
     } else if (item == "log") {
         table = "Log";
@@ -90,6 +97,7 @@ router.delete('/delete/:item', (req, res) => {
         table = "Location";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
         arguements = [id];
+        eventid = Logs.DELETE_LOCATION;
     } else if (item == "readerDevice") {
         table = "ReaderDevice";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
@@ -98,6 +106,7 @@ router.delete('/delete/:item', (req, res) => {
         table = "RFIDReader";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
         arguements = [id];
+        eventid = Logs.DELETE_READER;
     } else if (item == "antennae") {
         table = "Antennae";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
@@ -108,7 +117,8 @@ router.delete('/delete/:item', (req, res) => {
     }
 
     pool.query(query, arguements).then(fetchResult => {
-        return res.json({message: `${item} deleted successfully`})
+        // Add log
+        Log.createLog(req.ip, req.id, eventid, id);
     }).catch(err => {
         console.log(err);
         return res.status(500).json({message: Errors[9]})

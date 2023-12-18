@@ -2,7 +2,7 @@ import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
 import reportsTable from '../Reports/db_reports.js';
-import { Errors } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2 } from '../utility/constants.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import logTable from '../Log/db_log.js';
@@ -13,6 +13,7 @@ import utility from '../utility/utility.js';
 import locationTable from '../Tracking/db_location.js';
 import { getTaggedAssets } from '../Reports/tagged_assets.js';
 import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciations.js';
+import { Log } from '../Log/log.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // A route to get the tagged assets
@@ -57,23 +58,29 @@ router.get('/report/:type', (req, res) => {
     let reportType = req.params.type;
     let query;
     let inputs;
+    let eventid;
     if (reportType == "chain") {
         query = reportsTable.chainOfCustody;
         inputs = [req.query.barcode];
+        eventid = Logs.AUDIT_TRAIL_REPORT;
     }
     else if (reportType == "movement") {
         query = reportsTable.movements;
         inputs = [req.query.barcode];
+        eventid = Logs.MOVEMENT_REPORT;
     }
     else if (reportType == 'category') {
         query = reportsTable.categoryCount;
         inputs = [];
+        eventid = Logs.ASSET_CATEGORY_REPORT;
     }
     else if (reportType == 'assetRegister') {
         query = reportsTable.getAssetRegister;
         inputs = [];
+        eventid = Logs.ASSET_REGISTER_REPORT;
     }
     else if (reportType == 'audit') {
+        eventid = Logs.AUDIT_TRAIL_REPORT;
         try {
             query = logTable.selectUserLogs;
             let username = req.query.username;
@@ -99,10 +106,12 @@ router.get('/report/:type', (req, res) => {
         query = reportsTable.acquisitionReport;
         var year = Number.parseInt(req.query.year);
         inputs = [new Date(year, 0, 1), new Date(year + 1, 0, 1)];
+        eventid = Logs.ASSET_ACQUISITION_REPORT;
     }
     else if (reportType == 'depreciationreport') {
         query = reportsTable.getDepreciationDetails;
         inputs = [];
+        eventid = Logs.CATEGORY_DERECIATION_CONFIGURATION_REPORT;
     }
     else {
         return res.status(404).json({
@@ -116,7 +125,12 @@ router.get('/report/:type', (req, res) => {
                 message: Errors[22]
             });
         }
-        return res.json(data.rows);
+        // Add log
+        Log.createLog(req.ip, req.id, eventid).then((_) => {
+            return res.json(data.rows);
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
     }).catch(err => {
         console.log(err);
         return res.status(500).json({
@@ -135,7 +149,12 @@ router.get('/depSchedule/:barcode', (req, res) => {
             entries.map((entry) => {
                 returnedData.push({ year: entry.year, openingbookvalue: entry.openingbookvalue });
             });
-            return res.json(returnedData);
+            // Add log
+            Log.createLog(req.ip, req.id, Logs.ASSET_DEPRECIATION_SCHEDULE_REPORT).then((_) => {
+                return res.json(returnedData);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
         });
     }).catch(err => {
         console.log(err);
