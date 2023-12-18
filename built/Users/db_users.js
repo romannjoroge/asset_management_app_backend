@@ -23,7 +23,9 @@ const giveUserAllRoles = "INSERT INTO UserRole (userid, roleid) VALUES ($1, (SEL
 const getUserDetails = "SELECT name, id FROM User2 WHERE deleted = false";
 const getUserID = "SELECT id FROM User2 WHERE username = $1";
 const getUsername = "SELECT username FROM User2 WHERE id = $1";
+const getEmail = "SELECT email FROM User2 WHERE id = $1";
 let userTable = {
+    getEmail,
     getUsername,
     getUserID,
     getUserDetails,

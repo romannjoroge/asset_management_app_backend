@@ -113,6 +113,24 @@ class User {
             });
         });
     }
+    /**
+     *
+     * @param userid ID of the user to get email of
+     * @returns Email of user
+     * @description Returns the email of user with given ID
+     */
+    static getEmail(userid) {
+        return new Promise((res, rej) => {
+            pool.query(userTable.getEmail, [userid]).then((fetchResult) => {
+                if (fetchResult.rowCount <= 0) {
+                    return rej(new MyError(MyErrors2.USER_NOT_EXIST));
+                }
+                return res(fetchResult.rows[0].email);
+            }).catch((err) => {
+                return rej(new MyError(MyErrors2.USER_NOT_EXIST));
+            });
+        });
+    }
 }
 export default User;
 //# sourceMappingURL=users.js.map
