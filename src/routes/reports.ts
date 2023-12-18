@@ -150,7 +150,13 @@ router.get('/depSchedule/:barcode', (req, res) => {
             entries.map((entry) => {
                 returnedData.push({year: entry.year, openingbookvalue: entry.openingbookvalue})
             })
-            return res.json(returnedData)
+            
+            // Add log
+            Log.createLog(req.ip, req.id , Logs.ASSET_DEPRECIATION_SCHEDULE_REPORT).then((_: any) => {
+                return res.json(returnedData)
+            }).catch((err: MyError) => {
+                return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+            })
         })
     }).catch(err => {
         console.log(err);
