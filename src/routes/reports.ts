@@ -2,7 +2,7 @@ import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
 import reportsTable from '../Reports/db_reports.js';
-import { Errors, Succes } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2, Succes } from '../utility/constants.js';
 import { convertArrayToCSV } from 'convert-array-to-csv';
 import fs from 'fs/promises';
 import path from 'path';
@@ -17,6 +17,7 @@ import _ from 'lodash';
 import { getTaggedAssets } from '../Reports/tagged_assets.js';
 import MyError from '../utility/myError.js';
 import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciations.js';
+import { Log } from '../Log/log.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -68,6 +69,7 @@ router.get('/report/:type', (req, res) => {
     let reportType = req.params.type;
     let query;
     let inputs;
+    let eventid: number;
 
     if (reportType == "chain") {
         query = reportsTable.chainOfCustody;
@@ -81,6 +83,7 @@ router.get('/report/:type', (req, res) => {
     } else if (reportType == 'assetRegister') {
         query = reportsTable.getAssetRegister;
         inputs = [];
+        eventid = Logs.ASSET_REGISTER_REPORT;
     } else if (reportType == 'audit') {
         try {
             query = logTable.selectUserLogs;
@@ -120,7 +123,12 @@ router.get('/report/:type', (req, res) => {
                 message: Errors[22]
             })
         }
-        return res.json(data.rows);
+        // Add log
+        Log.createLog(req.ip, req.id , eventid).then((_: any) => {
+            return res.json(data.rows);
+        }).catch((err: MyError) => {
+            return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+        })
     }).catch(err => {
         console.log(err);
         return res.status(500).json({

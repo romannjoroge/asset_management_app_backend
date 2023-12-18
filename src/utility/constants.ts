@@ -93,6 +93,8 @@ export enum Logs {
     "CREATE_USER" = 13,
     "DELETE_USER" = 14,
     "UPDATE_USER" = 15,
+    "ASSET_REGISTER_REPORT" = 16,
+    "ASSET_DEPRECIATION_SCHEDULE_REPORT" = 17,
     
 }
 

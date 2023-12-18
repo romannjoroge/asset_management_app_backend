@@ -93,6 +93,8 @@ export var Logs;
     Logs[Logs["CREATE_USER"] = 13] = "CREATE_USER";
     Logs[Logs["DELETE_USER"] = 14] = "DELETE_USER";
     Logs[Logs["UPDATE_USER"] = 15] = "UPDATE_USER";
+    Logs[Logs["ASSET_REGISTER_REPORT"] = 16] = "ASSET_REGISTER_REPORT";
+    Logs[Logs["ASSET_DEPRECIATION_SCHEDULE_REPORT"] = 17] = "ASSET_DEPRECIATION_SCHEDULE_REPORT";
 })(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {
