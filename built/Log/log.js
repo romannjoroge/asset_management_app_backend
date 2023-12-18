@@ -19,6 +19,7 @@ export class Log {
                 pool.query(logTable.insertLog, [ipaddress, userid, itemid !== null && itemid !== void 0 ? itemid : 0, eventid]).then((_) => {
                     return res();
                 }).catch((err) => {
+                    console.log(err);
                     return rej(new MyError(MyErrors2.NOT_GENERATE_LOG));
                 });
             });

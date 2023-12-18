@@ -45,9 +45,9 @@ app.use('/assets/items', checkifAuthenticated, items)
 app.use('/assets/category', checkifAuthenticated, checkifAuthorized('Asset Administrator'), category)
 app.use('/tracking', checkifAuthenticated, tracking)
 app.use('/gatepass', checkifAuthenticated, gatepass)
-app.use('/reports',  reports)
+app.use('/reports',  checkifAuthenticated, reports)
 app.use('/users', checkifAuthenticated, checkifAuthorized('User Manager'), users)
-app.use('/delete', deleteRoute);
+app.use('/delete', checkifAuthenticated, deleteRoute);
 
 // app.use('/import', importModule);
 app.use('/tags', tags);

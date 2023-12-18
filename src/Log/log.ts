@@ -10,6 +10,7 @@ export class Log {
             pool.query(logTable.insertLog, [ipaddress, userid, itemid ?? 0, eventid]).then((_: any) => {
                 return res();
             }).catch((err: any) => {
+                console.log(err);
                 return rej(new MyError(MyErrors2.NOT_GENERATE_LOG));
             })
         })
