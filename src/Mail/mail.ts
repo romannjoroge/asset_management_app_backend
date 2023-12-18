@@ -23,7 +23,6 @@ export default class Mail {
                 subject,
                 html
             }).then(info => {
-                console.log("Sent!")
                 return res();
             }).catch((err: any) => {
                 console.log(err)

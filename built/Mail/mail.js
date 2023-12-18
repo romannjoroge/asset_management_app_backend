@@ -18,7 +18,6 @@ class Mail {
                 subject,
                 html
             }).then(info => {
-                console.log("Sent!");
                 return res();
             }).catch((err) => {
                 console.log(err);
