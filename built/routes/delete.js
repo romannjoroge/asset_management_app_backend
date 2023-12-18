@@ -118,6 +118,7 @@ router.delete('/delete/:item', (req, res) => {
         table = "RFIDReader";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
         arguements = [id];
+        eventid = Logs.DELETE_READER;
     }
     else if (item == "antennae") {
         table = "Antennae";
