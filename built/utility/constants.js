@@ -76,6 +76,12 @@ export const Errors = {
     '74': "Could Not Get Asset Movements",
     '75': "Could Not Get Inventories",
 };
+export var Logs;
+(function (Logs) {
+    Logs[Logs["CREATE_ASSET"] = 1] = "CREATE_ASSET";
+    Logs[Logs["DELETE_ASSET"] = 2] = "DELETE_ASSET";
+    Logs[Logs["UPDATE_ASSET"] = 3] = "UPDATE_ASSET";
+})(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {
     MyErrors2["NOT_GET_INVENTORIES"] = "Could Not Get Inventories";
@@ -121,6 +127,7 @@ export var MyErrors2;
     MyErrors2["NOT_GET_PARENT_CATEGORY"] = "Could Not Get Parent Category";
     MyErrors2["NOT_ADD_CATEGORY_TO_ASSET"] = "Could Not Add Category And Sub Category To Raw Asset";
     MyErrors2["NOT_GET_CATEGORY_NAME"] = "Could Not Get Category Name";
+    MyErrors2["NOT_GENERATE_LOG"] = "Could Not Generate Log";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

@@ -77,6 +77,12 @@ export const Errors = {
     '75': "Could Not Get Inventories",
 }
 
+export enum Logs {
+    "CREATE_ASSET"= 1,
+    "DELETE_ASSET" = 2,
+    "UPDATE_ASSET" = 3
+}
+
 export enum MyErrors2 {
     'NOT_GET_INVENTORIES' = "Could Not Get Inventories",
     'NOT_STORE_CONVERTED' = "Could Not Store Converted Assets",
@@ -120,7 +126,8 @@ export enum MyErrors2 {
     "NOT_GET_USER_ID" = "Could Not Get User ID",
     "NOT_GET_PARENT_CATEGORY" = "Could Not Get Parent Category",
     "NOT_ADD_CATEGORY_TO_ASSET" = "Could Not Add Category And Sub Category To Raw Asset",
-    "NOT_GET_CATEGORY_NAME" = "Could Not Get Category Name"
+    "NOT_GET_CATEGORY_NAME" = "Could Not Get Category Name",
+    "NOT_GENERATE_LOG" = "Could Not Generate Log"
 }
 
 export enum Success2 {

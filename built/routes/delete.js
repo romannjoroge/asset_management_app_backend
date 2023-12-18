@@ -4,13 +4,15 @@
 import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
-import { Errors } from '../utility/constants.js';
+import { Errors, Logs } from '../utility/constants.js';
+import { Log } from '../Log/log.js';
 router.delete('/delete/:item', (req, res) => {
     let item = req.params.item;
     let id = Number.parseInt(req.query.id);
     let table;
     let query;
     let arguements;
+    let eventid;
     if (item == "DepreciationPercent") {
         table = "DepreciationPercent";
         query = `UPDATE ${table} SET deleted = true WHERE categoryID = $1`;
@@ -75,6 +77,7 @@ router.delete('/delete/:item', (req, res) => {
         query = `UPDATE ${table} SET deleted = true WHERE assetid = $1`;
         let { assetID } = req.query;
         arguements = [assetID];
+        eventid = Logs.DELETE_ASSET;
         console.log("This asset is being deleted");
     }
     else if (item == "user") {
@@ -123,7 +126,8 @@ router.delete('/delete/:item', (req, res) => {
         return res.status(404).json({ message: Errors[0] });
     }
     pool.query(query, arguements).then(fetchResult => {
-        return res.json({ message: `${item} deleted successfully` });
+        // Add log
+        Log.createLog(req.ip, req.id, eventid, id);
     }).catch(err => {
         console.log(err);
         return res.status(500).json({ message: Errors[9] });

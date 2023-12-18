@@ -3,7 +3,7 @@ import pool from '../../db2.js';
 import MyError from '../utility/myError.js';
 import { MyErrors2 } from '../utility/constants.js';
 
-class Log {
+export class Log {
     // Create log
     static async createLog(ipaddress: string, userid: number, eventid: number, itemid?: number): Promise<void> {
         return new Promise((res, rej) => {

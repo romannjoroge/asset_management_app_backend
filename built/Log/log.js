@@ -11,7 +11,7 @@ import logTable from './db_log.js';
 import pool from '../../db2.js';
 import MyError from '../utility/myError.js';
 import { MyErrors2 } from '../utility/constants.js';
-class Log {
+export class Log {
     // Create log
     static createLog(ipaddress, userid, eventid, itemid) {
         return __awaiter(this, void 0, void 0, function* () {
