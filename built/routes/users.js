@@ -1,12 +1,13 @@
 import express from 'express';
 const router = express.Router();
 import userTable from '../Users/db_users.js';
-import { Errors, MyErrors2, Succes } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2, Succes } from '../utility/constants.js';
 import pool from '../../db2.js';
 import { updateUser } from '../Users/update.js';
 import MyError from '../utility/myError.js';
 import gatepasstable from '../GatePass/db_gatepass.js';
 import bcrypt from 'bcrypt';
+import { Log } from '../Log/log.js';
 router.get('/getUsers', (req, res) => {
     pool.query(userTable.getUsers, []).then(data => {
         if (data.rowCount <= 0) {
@@ -126,14 +127,24 @@ router.post('/addUser', (req, res) => {
                         if (gatepasslocation) {
                             // Add user as gatepass authorizer for location
                             pool.query(gatepasstable.addApprover, [id, gatepasslocation]).then(_ => {
-                                return res.json({ message: Succes[4] });
+                                // Add log
+                                Log.createLog(req.ip, req.id, Logs.CREATE_USER).then((_) => {
+                                    return res.json({ message: Succes[4] });
+                                }).catch((err) => {
+                                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+                                });
                             }).catch(err => {
                                 console.log(err);
                                 return res.status(501).json({ message: Errors[9] });
                             });
                         }
                         else {
-                            return res.json({ message: Succes[4] });
+                            // Add log
+                            Log.createLog(req.ip, req.id, Logs.CREATE_USER).then((_) => {
+                                return res.json({ message: Succes[4] });
+                            }).catch((err) => {
+                                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+                            });
                         }
                     }).catch(err => {
                         console.log(3);

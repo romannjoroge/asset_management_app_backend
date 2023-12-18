@@ -90,7 +90,7 @@ export enum Logs {
     "CREATE_READER" = 10,
     "DELETE_READER" = 11,
     "UPDATE_READER" = 12,
-    
+    "CREATE_USER" = 13,
 }
 
 export enum MyErrors2 {
