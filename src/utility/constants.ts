@@ -89,6 +89,8 @@ export enum Logs {
     "UPDATE_LOCATION" = 9,
     "CREATE_READER" = 10,
     "DELETE_READER" = 11,
+    "UPDATE_READER" = 12,
+    
 }
 
 export enum MyErrors2 {

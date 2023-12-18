@@ -1,6 +1,6 @@
 import express from 'express';
 import utility from '../utility/utility.js';
-import { Errors, MyErrors2, Succes } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2, Succes } from '../utility/constants.js';
 const router = express.Router();
 import pool from '../../db2.js';
 import { requestForGatepass } from '../GatePass/assignGatepass.js';
@@ -17,6 +17,7 @@ import { createInventory, returnInventories } from '../GatePass/createInventory.
 import { createBatch } from '../GatePass/createBatch.js';
 import { allocateBatch } from '../GatePass/allocateBatch.js';
 import gatepasstable from '../GatePass/db_gatepass.js';
+import { Log } from '../Log/log.js';
 
 router.get('/movements', (req, res) => {
     let {
@@ -147,7 +148,12 @@ router.put('/updateReader', (req, res) => {
     // Update Reader
     console.log(id);
     updateReader(id, updateJSONToUse).then(_ => {
-        return res.json({message: Succes[16]});
+        // Add log
+        Log.createLog(req.ip, req.id , Logs.UPDATE_READER, id).then((_: any) => {
+            return res.json({message: Succes[16]});
+        }).catch((err: MyError) => {
+            return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+        })
     }).catch(err => {
         console.log(err);
         if (err instanceof MyError) {
