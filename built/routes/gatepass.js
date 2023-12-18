@@ -347,7 +347,12 @@ router.post('/create', (req, res) => {
     let gatePass = { userid: id, date: date, fromLocation: fromLocation, toLocation: toLocation, barcode: barcode, reason: reason };
     // Create Gatepass
     requestForGatepass(gatePass, approvers).then(_ => {
-        return res.json({ message: Succes[13] });
+        // Add Log
+        Log.createLog(req.ip, req.id, Logs.REQUEST_GATEPASS).then((_) => {
+            return res.json({ message: Succes[13] });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
     }).catch(err => {
         console.log(err);
         if (err instanceof MyError) {

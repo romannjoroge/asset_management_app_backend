@@ -62,14 +62,17 @@ router.get('/report/:type', (req, res) => {
     if (reportType == "chain") {
         query = reportsTable.chainOfCustody;
         inputs = [req.query.barcode];
+        eventid = Logs.AUDIT_TRAIL_REPORT;
     }
     else if (reportType == "movement") {
         query = reportsTable.movements;
         inputs = [req.query.barcode];
+        eventid = Logs.MOVEMENT_REPORT;
     }
     else if (reportType == 'category') {
         query = reportsTable.categoryCount;
         inputs = [];
+        eventid = Logs.ASSET_CATEGORY_REPORT;
     }
     else if (reportType == 'assetRegister') {
         query = reportsTable.getAssetRegister;
@@ -77,6 +80,7 @@ router.get('/report/:type', (req, res) => {
         eventid = Logs.ASSET_REGISTER_REPORT;
     }
     else if (reportType == 'audit') {
+        eventid = Logs.AUDIT_TRAIL_REPORT;
         try {
             query = logTable.selectUserLogs;
             let username = req.query.username;
@@ -107,6 +111,7 @@ router.get('/report/:type', (req, res) => {
     else if (reportType == 'depreciationreport') {
         query = reportsTable.getDepreciationDetails;
         inputs = [];
+        eventid = Logs.CATEGORY_DERECIATION_CONFIGURATION_REPORT;
     }
     else {
         return res.status(404).json({
