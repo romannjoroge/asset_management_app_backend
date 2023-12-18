@@ -76,6 +76,7 @@ router.delete('/delete/:item', (req, res) => {
         table = "User2";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
         let {id} = req.query;
+        eventid = Logs.DELETE_USER;
         arguements = [id];
     } else if (item == "log") {
         table = "Log";
