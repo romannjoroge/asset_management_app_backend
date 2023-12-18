@@ -47,6 +47,8 @@ export default class Auth {
                 // Store details
                 this.#storeOtp(otp, userid, new Date()).then(_ => {
                     return res(otp);
+                }).catch((err: MyError) => {
+                    return rej(new MyError(MyErrors2.NOT_GENERATE_OTP));
                 })
             }).catch(err => {
                 return rej(new MyError(MyErrors2.NOT_GENERATE_OTP))

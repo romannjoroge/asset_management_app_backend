@@ -6,6 +6,7 @@ import User from '../Users/users.js';
 import Auth from '../Auth/auth.js';
 import JWT from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import Mail from '../Mail/mail.js';
 dotenv.config();
 router.post('/sendDetails', (req, res) => {
     // Accepts username and password from the user
@@ -29,9 +30,27 @@ router.post('/sendDetails', (req, res) => {
 router.post('/generateOTP', (req, res) => {
     const userid = Number.parseInt(req.body.id);
     Auth.generateOTP(userid).then(otp => {
-        // TO DO: Implement Send OTP to email
-        console.log(`OTP is ${otp}`);
-        return res.send("Done");
+        // Send message to users email with OTP
+        // Get email of user
+        User.getEmail(userid).then(email => {
+            // Send email
+            const emailBody = `
+            <p>Hi ${email}</p>
+            <p>We received your request for a single-use code to use with your Extreme Wireless Asset Management account.</p>
+            <p>Your single-use code is: ${otp}</p>
+            <p>If you didn't request this code, you can safely ignore this email. Someone else might have typed your email address by mistake.</p>
+            <p>Thanks,</p>
+            <p>The Extreme Wireless Asset Management account team</p>
+            `;
+            const from = "Extreme Wireless Asset Management account team <account-security-noreply@mail.extremeusers.com>";
+            const to = email;
+            const subject = "Your Single Use Code";
+            Mail.sendMail(emailBody, from, to, subject).then((_) => {
+                return res.send("Done");
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        });
     }).catch((err) => {
         return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
     });
@@ -57,7 +76,11 @@ router.post('/verifyOTP', (req, res) => {
                 username,
                 user_id: userid
             });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
         });
+    }).catch((err) => {
+        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
     });
 });
 export default router;
