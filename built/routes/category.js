@@ -94,8 +94,13 @@ router.post('/update', (req, res) => {
         updateBody.name = updateBodyFromJSON.name;
     }
     updateCategory(id, updateBody).then(() => {
-        return res.json({
-            message: Succes[12],
+        // Add log
+        Log.createLog(req.ip, req.id, Logs.UPDATE_CATEGORY, id).then((_) => {
+            return res.json({
+                message: Succes[12],
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
         });
     }).catch(err => {
         return res.status(500).json({
