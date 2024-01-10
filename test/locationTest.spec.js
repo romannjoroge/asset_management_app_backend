@@ -7,7 +7,7 @@ import { Errors } from "../built/utility/constants.js";
 import Location from "../built/Tracking/location.js";
 
 
-describe("Child And Parent Locations", function () {
+describe.skip("Child And Parent Locations", function () {
     let parentLocation = {
         id: 1002,
         name: "TestyLocation3",

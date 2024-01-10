@@ -17,8 +17,9 @@ import Location from '../../Tracking/location.js';
 import User from '../../Users/users.js';
 import Category from '../Category/category2.js';
 import assetTable from './db_assets.js';
-import { Errors } from '../../utility/constants.js';
+import { Errors, MyErrors2 } from '../../utility/constants.js';
 import { createDepreciationSchedules } from './depreciations.js';
+import generateBarcode from './generateBarcode.js';
 export var DepreciationTypes;
 (function (DepreciationTypes) {
     DepreciationTypes["StraightLine"] = "Straight Line";
@@ -33,7 +34,7 @@ export var assetStatusOptions;
     assetStatusOptions["Bad"] = "Bad";
 })(assetStatusOptions || (assetStatusOptions = {}));
 class Asset {
-    constructor(barCode, assetLifeSpan, acquisitionDate, locationID, condition, custodian_id, acquisitionCost, categoryName, attachments, noInBuilding, serialNumber, code, description, residualValue, depreciaitionType, depreciationPercent) {
+    constructor(assetLifeSpan, acquisitionDate, locationID, condition, custodian_id, acquisitionCost, categoryName, attachments, noInBuilding, serialNumber, code, description, residualValue, depreciaitionType, depreciationPercent) {
         // utility.checkIfBoolean(fixed, "Invalid Fixed Status");
         // this.fixed = fixed;
         utility.checkIfNumberisPositive(assetLifeSpan, "Invalid asset life span");
@@ -54,8 +55,6 @@ class Asset {
         this.description = description;
         utility.checkIfString(code, "Invalid Code");
         this.code = code;
-        utility.checkIfString(barCode, "Invalid Barcode");
-        this.barcode = barCode;
         utility.checkIfNumberisPositive(noInBuilding, "Invalid Number in Building");
         this.noInBuilding = noInBuilding;
         if (depreciaitionType) {
@@ -91,6 +90,18 @@ class Asset {
         }
         this.categoryID = 0;
     }
+    // Check is the asset status given is valid
+    static isAssetStatusValid(status) {
+        return Object.values(assetStatusOptions).includes(status) === true;
+    }
+    // Gets code of asset status
+    static getAssetStatusCode(status) {
+        if (this.isAssetStatusValid(status) == false) {
+            throw new MyError(MyErrors2.ASSET_STATUS_NOT_EXIST);
+        }
+        // Return location of status as code
+        return Object.values(assetStatusOptions).indexOf(status).toString();
+    }
     // Since the constructor cannot make asynchronous calls a seprate initialize function is needed to initialize
     // asynchronous values
     initialize() {
@@ -108,20 +119,42 @@ class Asset {
                         if (!doesUserExist) {
                             rej(new MyError(Errors[30]));
                         }
-                        this._storeAssetInAssetRegister().then(_ => {
-                            console.log("Asset Stored In Asset Register");
-                            res();
-                        }).catch(err => {
-                            rej(new MyError(Errors[6]));
+                        // Get ID of next asset
+                        Asset._getIDOfNextAsset().then(nextAssetID => {
+                            // Generate barcode
+                            generateBarcode(categoryID, this.locationID, nextAssetID, this.condition).then(genBarcode => {
+                                this.barcode = genBarcode;
+                                this._storeAssetInAssetRegister().then(_ => {
+                                    res();
+                                }).catch(err => {
+                                    return rej(new MyError(Errors[6]));
+                                });
+                            }).catch((err) => {
+                                return rej(new MyError(Errors[6]));
+                            });
+                        }).catch((err) => {
+                            return rej(new MyError(Errors[6]));
                         });
                     }).catch(err => {
-                        rej(new MyError(Errors[6]));
+                        return rej(new MyError(Errors[6]));
                     });
                 }).catch(err => {
-                    rej(new MyError(Errors[6]));
+                    return rej(new MyError(Errors[6]));
                 });
             }).catch(err => {
-                rej(new MyError(Errors[6]));
+                return rej(new MyError(Errors[6]));
+            });
+        });
+    }
+    static _getIDOfNextAsset() {
+        return new Promise((res, rej) => {
+            pool.query(assetTable.getNextAssetID).then((fetchResult) => {
+                if (fetchResult.rowCount <= 0) {
+                    return rej(new MyError(MyErrors2.NOT_GET_NEXT_ASSET_ID));
+                }
+                return res(fetchResult.rows[0].next);
+            }).catch((err) => {
+                return rej(new MyError(MyErrors2.NOT_GET_NEXT_ASSET_ID));
             });
         });
     }

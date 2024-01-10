@@ -159,7 +159,13 @@ export enum MyErrors2 {
     "NOT_GET_PARENT_CATEGORY" = "Could Not Get Parent Category",
     "NOT_ADD_CATEGORY_TO_ASSET" = "Could Not Add Category And Sub Category To Raw Asset",
     "NOT_GET_CATEGORY_NAME" = "Could Not Get Category Name",
-    "NOT_GENERATE_LOG" = "Could Not Generate Log"
+    "NOT_GENERATE_LOG" = "Could Not Generate Log",
+    "NOT_GENERATE_BARCODE" = "Could Not Generate Barcode",
+    "LOCATION_NOT_EXIST" = "Location Does Not Exist",
+    "ASSET_STATUS_NOT_EXIST" = "Asset Status Does Not Exist",
+    "INVALID_CHARACTER_LENGTH" = "Character Is Not Right Length",
+    "INVALID_BARCODE" = "Invalid Barcode",
+    "NOT_GET_NEXT_ASSET_ID" = "Could Not Get Next Asset ID",
 }
 
 export enum Success2 {

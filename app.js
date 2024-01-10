@@ -64,6 +64,10 @@ app.route('*', (req, res) => {
     res.status(404).json({ 'code': 404, 'message': 'Resource not found' })
 })
 
+app.get('/test', (req, res) => {
+    res.send("Can Reach System");
+})
+
 app.post('/signup', 
         body('password', "Password Should Be At Least 8 characters long").isLength({min: 8}), 
         body('email', "Enter a Valid Email").isEmail(),

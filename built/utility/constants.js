@@ -160,6 +160,12 @@ export var MyErrors2;
     MyErrors2["NOT_ADD_CATEGORY_TO_ASSET"] = "Could Not Add Category And Sub Category To Raw Asset";
     MyErrors2["NOT_GET_CATEGORY_NAME"] = "Could Not Get Category Name";
     MyErrors2["NOT_GENERATE_LOG"] = "Could Not Generate Log";
+    MyErrors2["NOT_GENERATE_BARCODE"] = "Could Not Generate Barcode";
+    MyErrors2["LOCATION_NOT_EXIST"] = "Location Does Not Exist";
+    MyErrors2["ASSET_STATUS_NOT_EXIST"] = "Asset Status Does Not Exist";
+    MyErrors2["INVALID_CHARACTER_LENGTH"] = "Character Is Not Right Length";
+    MyErrors2["INVALID_BARCODE"] = "Invalid Barcode";
+    MyErrors2["NOT_GET_NEXT_ASSET_ID"] = "Could Not Get Next Asset ID";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {
