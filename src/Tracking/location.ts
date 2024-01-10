@@ -95,6 +95,27 @@ class Location {
         });
     }
 
+    // Finds the ID of the site of the location of the given id
+    static async findIDOfSiteOfLocation(id: number): Promise<number> {
+        try {
+            let parentLocationID: number | void = 1;
+            let locationID = id;
+
+            while (!parentLocationID) {
+                // Get parent location
+                parentLocationID = await this.findParentLocation(locationID);
+                
+                if (parentLocationID) {
+                    locationID = parentLocationID
+                }
+            }
+
+            return locationID;
+        } catch(err) {
+            throw new MyError(MyErrors2.NOT_GET_PARENT_LOCATION);
+        }
+    }
+
     // A function to get the name of a location from an id
     static getLocationName(id: number): Promise<string> {
         return new Promise((res, rej) => {

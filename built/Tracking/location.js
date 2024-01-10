@@ -78,6 +78,26 @@ class Location {
             });
         });
     }
+    // Finds the ID of the site of the location of the given id
+    static findIDOfSiteOfLocation(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let parentLocationID = 1;
+                let locationID = id;
+                while (!parentLocationID) {
+                    // Get parent location
+                    parentLocationID = yield this.findParentLocation(locationID);
+                    if (parentLocationID) {
+                        locationID = parentLocationID;
+                    }
+                }
+                return locationID;
+            }
+            catch (err) {
+                throw new MyError(MyErrors2.NOT_GET_PARENT_LOCATION);
+            }
+        });
+    }
     // A function to get the name of a location from an id
     static getLocationName(id) {
         return new Promise((res, rej) => {
