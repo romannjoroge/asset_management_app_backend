@@ -10,7 +10,7 @@ import Location from '../../Tracking/location.js';
 import User from '../../Users/users.js';
 import Category from '../Category/category2.js';
 import assetTable from './db_assets.js';
-import { Errors } from '../../utility/constants.js';
+import { Errors, MyErrors2 } from '../../utility/constants.js';
 import { createDepreciationSchedules } from './depreciations.js';
 
 export enum DepreciationTypes {
@@ -124,6 +124,22 @@ class Asset {
 
         this.categoryID = 0;
     }
+
+    // Check is the asset status given is valid
+    static isAssetStatusValid(status: string): boolean {
+        return Object.values(assetStatusOptions).includes(status) === true;
+    }
+
+    // Gets code of asset status
+    static getAssetStatusCode(status: string): string {
+        if (this.isAssetStatusValid(status) == false) {
+            throw new MyError(MyErrors2.ASSET_STATUS_NOT_EXIST);
+        }
+
+        // Return location of status as code
+        return Object.values(assetStatusOptions).indexOf(status).toString();
+    }
+
     // Since the constructor cannot make asynchronous calls a seprate initialize function is needed to initialize
     // asynchronous values
     initialize(): Promise<void | never> {

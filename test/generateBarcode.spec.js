@@ -5,6 +5,8 @@ import { MyErrors2 } from "../built/utility/constants.js";
 import generateBarcode from '../built/Allocation/Asset/generateBarcode.js';
 import Sinon from "sinon";
 import Category from "../built/Allocation/Category/category2.js";
+import Location from "../built/Tracking/location.js";
+import Asset from "../built/Allocation/Asset/asset2.js";
 
 describe("Generate Barcode Test", function () {
     const nonExistentCategoryID = 1000;
@@ -28,6 +30,12 @@ describe("Generate Barcode Test", function () {
                                     .resolves(false)
                                     .withArgs(validCategoryID)
                                     .resolves(true);
+        const siteOfLocationStub = Sinon.stub(Location, "findIDOfSiteOfLocation")
+                                    .withArgs(existingLocation)
+                                    .resolves(existingLocation);
+        const assetStatusCode = Sinon.stub(Asset, "getAssetStatusCode")
+                                    .withArgs(validStatus)
+                                    .returns("1")
     })
 
     it ("should fail when an invalid category is given", async function() {
@@ -42,6 +50,46 @@ describe("Generate Barcode Test", function () {
                 console.log(err);
                 assert(false, "Wrong Error thrown");
             }
+        }
+    });
+
+    it("should fail when an invalid location is given", async function() {
+        try {
+            await generateBarcode(validCategoryID, nonExistentLocationID, assetID, validStatus);
+            assert(false, "Error Should Have Been Thrown")
+        } catch(err) {
+            if (err instanceof MyError && err.message === MyErrors2.LOCATION_NOT_EXIST) {
+                assert(true)
+            }
+            else {
+                console.log(err);
+                assert(false, "Wrong Error thrown");
+            }
+        }
+    });
+
+    it("should fail when an invalid status is given", async function() {
+        try {
+            await generateBarcode(validCategoryID, existingLocation, assetID, invalidStatus);
+            assert(false, "Error Should Have Been Thrown")
+        } catch(err) {
+            if (err instanceof MyError && err.message === MyErrors2.ASSET_STATUS_NOT_EXIST) {
+                assert(true)
+            }
+            else {
+                console.log(err);
+                assert(false, "Wrong Error thrown");
+            }
+        }
+    });
+
+    it("should generate the barcode if everything is valid", async function() {
+        try {
+            const result = await generateBarcode(validCategoryID, existingLocation, assetID, validStatus);
+            assert.equal(result, "020200050001", "Wrong Barcode");
+        } catch(err) {
+            console.log(err);
+            assert(false);
         }
     })
 })
