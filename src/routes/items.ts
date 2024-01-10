@@ -16,7 +16,6 @@ const upload = multer({dest: './attachments'});
 
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     let {
-        barcode,
         locationID,
         noInBuilding,
         code,
@@ -48,7 +47,7 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
         depreciationPercent = Number.parseFloat(depreciationPercent);
     }
 
-    let asset = new Asset(barcode, usefulLife, acquisitionDate, locationID, condition, responsibleuserid, acquisitionCost, categoryName, 
+    let asset = new Asset(usefulLife, acquisitionDate, locationID, condition, responsibleuserid, acquisitionCost, categoryName, 
         attachments, noInBuilding, serialNumber, code, description, residualValue, depreciationType, depreciationPercent);
     asset.initialize().then(_ => {
         // Add log
@@ -70,24 +69,19 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
 router.post('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     // Get barcode from request
     let assetID = req.params.id;
-    console.log(req.body);
 
     const updatableItems = ["barcode", "locationID", "noInBuilding", "code", "description", "categoryID", "usefulLife", "serialNumber", "condition", "responsibleUsername",
         "acquisitionDate", "acquisitionCost", "residualValue", "depreciationType"]
     const requestParams = Object.keys(req.body);
-    console.log("THE REQUEST PARAMS: ", requestParams);
 
     // Loop through the keys of request body to get aspects of item to update
     for (var i in requestParams) {
-        console.log("Loop entered")
         // Check if item is a valid parameter to update
         if (updatableItems.includes(requestParams[i])) {
             // Run update query
-            console.log(`UPDATE Asset SET ${requestParams[i]} = $1 WHERE assetID = $2`);
             pool.query(`UPDATE Asset SET ${requestParams[i]} = $1 WHERE assetID = $2`, [req.body[requestParams[i]], assetID]).then(fetchResult => {
                 
             }).catch(err => {
-                console.log(err);
                 return res.status(500).json({message: Errors[9]})
             });
         }else {
@@ -97,7 +91,7 @@ router.post('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Admini
     }
 
     // Add log
-    Log.createLog(req.ip, req.id, Logs.UPDATE_ASSET, assetID).then((_: any) => {
+    Log.createLog(req.ip, req.id, Logs.UPDATE_ASSET, Number.parseInt(assetID)).then((_: any) => {
         return res.json({message: Succes[11]})
     }).catch((err: any) => {
         return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
