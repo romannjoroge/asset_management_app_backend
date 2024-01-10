@@ -167,7 +167,6 @@ class Asset {
                             generateBarcode(categoryID, this.locationID, nextAssetID, this.condition).then(genBarcode => {
                                 this.barcode = genBarcode;
                                 this._storeAssetInAssetRegister().then(_ => {
-                                    console.log("Asset Stored In Asset Register");
                                     res();
                                 }).catch(err => {
                                     return rej(new MyError(Errors[6]));
@@ -197,8 +196,7 @@ class Asset {
                 if (fetchResult.rowCount <= 0) {
                     return rej(new MyError(MyErrors2.NOT_GET_NEXT_ASSET_ID));
                 }
-
-                return fetchResult.rows[0].next;
+                return res(fetchResult.rows[0].next);
             }).catch((err: any) => {
                 return rej(new MyError(MyErrors2.NOT_GET_NEXT_ASSET_ID));
             })
