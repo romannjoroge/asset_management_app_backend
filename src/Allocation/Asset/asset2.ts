@@ -22,7 +22,8 @@ export enum DepreciationTypes {
 export enum assetStatusOptions {
     Good = "Good",
     Excellent = "Excellent",
-    Fair = "Fair"
+    Fair = "Fair",
+    Bad = "Bad"
 }
 
 interface DoesAssetExistFetchResult {

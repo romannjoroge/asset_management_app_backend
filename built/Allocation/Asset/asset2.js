@@ -30,6 +30,7 @@ export var assetStatusOptions;
     assetStatusOptions["Good"] = "Good";
     assetStatusOptions["Excellent"] = "Excellent";
     assetStatusOptions["Fair"] = "Fair";
+    assetStatusOptions["Bad"] = "Bad";
 })(assetStatusOptions || (assetStatusOptions = {}));
 class Asset {
     constructor(barCode, assetLifeSpan, acquisitionDate, locationID, condition, custodian_id, acquisitionCost, categoryName, attachments, noInBuilding, serialNumber, code, description, residualValue, depreciaitionType, depreciationPercent) {
