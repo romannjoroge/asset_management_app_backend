@@ -164,6 +164,7 @@ export var MyErrors2;
     MyErrors2["LOCATION_NOT_EXIST"] = "Location Does Not Exist";
     MyErrors2["ASSET_STATUS_NOT_EXIST"] = "Asset Status Does Not Exist";
     MyErrors2["INVALID_CHARACTER_LENGTH"] = "Character Is Not Right Length";
+    MyErrors2["INVALID_BARCODE"] = "Invalid Barcode";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

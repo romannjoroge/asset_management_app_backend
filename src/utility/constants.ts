@@ -163,7 +163,8 @@ export enum MyErrors2 {
     "NOT_GENERATE_BARCODE" = "Could Not Generate Barcode",
     "LOCATION_NOT_EXIST" = "Location Does Not Exist",
     "ASSET_STATUS_NOT_EXIST" = "Asset Status Does Not Exist",
-    "INVALID_CHARACTER_LENGTH" = "Character Is Not Right Length"
+    "INVALID_CHARACTER_LENGTH" = "Character Is Not Right Length",
+    "INVALID_BARCODE" = "Invalid Barcode",
 }
 
 export enum Success2 {

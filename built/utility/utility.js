@@ -198,7 +198,7 @@ function padStringWithCharacter(string, character, length) {
     // Check if string is shorter than prefix
     if (string.length < length) {
         // If shorter find difference 
-        const difference = length = string.length;
+        const difference = length - string.length;
         // Generate strings of character of length of difference
         const padding = character.repeat(difference);
         // Prefix string with characters
