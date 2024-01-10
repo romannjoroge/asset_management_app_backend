@@ -1,5 +1,6 @@
 import { assert } from "chai";
 import MyError from "./myError.js";
+import { MyErrors2 } from "./constants.js";
 
 function getTimeDifferenceInSeconds(startTime: Date, endTime: Date): number {
     return (endTime.getTime() - startTime.getTime()) / 1000;
@@ -180,6 +181,31 @@ function arrayEquals(a: any[], b: any[]) {
 
 // }
 
+// This function takes a string and prefixes it with character till it reaches valid length
+// Function assumes that character is a single characther
+// The function returns string if it is not shorter than length
+function padStringWithCharacter(string: string, character: string, length: number): string {
+    if(character.length != 1) {
+        throw new MyError(MyErrors2.INVALID_CHARACTER_LENGTH);
+    }
+
+    // Check if string is shorter than prefix
+    if(string.length < length) {
+        // If shorter find difference 
+        const difference = length = string.length;
+
+        // Generate strings of character of length of difference
+        const padding = character.repeat(difference);
+
+        // Prefix string with characters
+        return padding + string;
+    } 
+    // If string is longer or equal to prefix return string
+    else {
+        return string;
+    }
+}
+    
 const utility = {
     arrayEquals,
     isAnyEmpty,
@@ -197,7 +223,8 @@ const utility = {
     assertThatFunctionWorks,
     returnFetchedResultsFromDatabase,
     checkIfString,
-    getTimeDifferenceInSeconds
+    getTimeDifferenceInSeconds,
+    padStringWithCharacter
 }
 
 export default utility;
