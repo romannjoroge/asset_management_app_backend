@@ -12,6 +12,7 @@ import Category from '../Category/category2.js';
 import assetTable from './db_assets.js';
 import { Errors, MyErrors2 } from '../../utility/constants.js';
 import { createDepreciationSchedules } from './depreciations.js';
+import generateBarcode from './generateBarcode.js';
 
 export enum DepreciationTypes {
     StraightLine = "Straight Line",
@@ -29,6 +30,11 @@ export enum assetStatusOptions {
 interface DoesAssetExistFetchResult {
     rowCount: number;
     rows: string[];
+}
+
+interface GetNextAssetIDResult {
+    rowCount: number;
+    rows: {next: number}[]
 }
 
 class Asset {
@@ -50,7 +56,7 @@ class Asset {
     depreciaitionType?: DepreciationTypes;
     depreciationPercent?: number;
 
-    constructor(barCode: string, assetLifeSpan: number, acquisitionDate: string | Date, locationID: number, condition: assetStatusOptions, custodian_id: number,
+    constructor(assetLifeSpan: number, acquisitionDate: string | Date, locationID: number, condition: assetStatusOptions, custodian_id: number,
         acquisitionCost: number, categoryName: string, attachments: string[], noInBuilding: number,
         serialNumber: string, code: string, description: string, residualValue?: number, depreciaitionType?: DepreciationTypes, depreciationPercent?: number) {
         // utility.checkIfBoolean(fixed, "Invalid Fixed Status");
@@ -80,9 +86,6 @@ class Asset {
 
         utility.checkIfString(code, "Invalid Code");
         this.code = code;
-
-        utility.checkIfString(barCode, "Invalid Barcode");
-        this.barcode = barCode;
 
         utility.checkIfNumberisPositive(noInBuilding, "Invalid Number in Building");
         this.noInBuilding = noInBuilding;
@@ -157,22 +160,49 @@ class Asset {
                         if (!doesUserExist) {
                             rej(new MyError(Errors[30]));
                         }
-                        this._storeAssetInAssetRegister().then(_ => {
-                            console.log("Asset Stored In Asset Register");
-                            res();
-                        }).catch(err => {
-                            rej(new MyError(Errors[6]));
-                        });
+                        
+                        // Get ID of next asset
+                        Asset._getIDOfNextAsset().then(nextAssetID => {
+                            // Generate barcode
+                            generateBarcode(categoryID, this.locationID, nextAssetID, this.condition).then(genBarcode => {
+                                this.barcode = genBarcode;
+                                this._storeAssetInAssetRegister().then(_ => {
+                                    console.log("Asset Stored In Asset Register");
+                                    res();
+                                }).catch(err => {
+                                    return rej(new MyError(Errors[6]));
+                                });
+                            }).catch((err: MyError) => {
+                                return rej(new MyError(Errors[6]));
+                            })
+                        }).catch((err: MyError) => {
+                            return rej(new MyError(Errors[6]));
+                        })
+                        
                     }).catch(err => {
-                        rej(new MyError(Errors[6]));
+                        return rej(new MyError(Errors[6]));
                     });
                 }).catch(err => {
-                    rej(new MyError(Errors[6]));
+                    return rej(new MyError(Errors[6]));
                 });
             }).catch(err => {
-                rej(new MyError(Errors[6]));
+                return rej(new MyError(Errors[6]));
             });
         })
+    }
+
+    static _getIDOfNextAsset(): Promise<number> {
+        return new Promise((res, rej) => {
+            pool.query(assetTable.getNextAssetID).then((fetchResult: GetNextAssetIDResult) => {
+                if (fetchResult.rowCount <= 0) {
+                    return rej(new MyError(MyErrors2.NOT_GET_NEXT_ASSET_ID));
+                }
+
+                return fetchResult.rows[0].next;
+            }).catch((err: any) => {
+                return rej(new MyError(MyErrors2.NOT_GET_NEXT_ASSET_ID));
+            })
+        });
     }
 
     static async _doesAssetIDExist(assetID: number): Promise<boolean | never> {

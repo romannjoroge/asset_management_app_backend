@@ -165,6 +165,7 @@ export enum MyErrors2 {
     "ASSET_STATUS_NOT_EXIST" = "Asset Status Does Not Exist",
     "INVALID_CHARACTER_LENGTH" = "Character Is Not Right Length",
     "INVALID_BARCODE" = "Invalid Barcode",
+    "NOT_GET_NEXT_ASSET_ID" = "Could Not Get Next Asset ID",
 }
 
 export enum Success2 {
