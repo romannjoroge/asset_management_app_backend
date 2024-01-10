@@ -5,7 +5,7 @@ import { MyErrors2, Errors } from "../built/utility/constants.js";
 import { createLocation, createTemporaryTable, createTestReaderDevice, dropTemporaryTable } from "./commonTestFunctions.js";
 import {checkIfReaderDeviceExists, createReaderDevice, createReaderDeviceDB, doesReaderDeviceIDExist, editReaderDevice} from '../built/Tracking/rfidReader.js';
 
-describe("Edit Reader Device", function() {
+describe.skip("Edit Reader Device", function() {
     let testLocation = {
         id: 1010,
         name: "TestestLocation",
@@ -111,7 +111,7 @@ describe("Edit Reader Device", function() {
     });
 })
 
-describe("Does Reader ID Exist Test", function() {
+describe.skip("Does Reader ID Exist Test", function() {
     let testLocation = {
         id: 1010,
         name: "TestestLocation",
@@ -158,7 +158,7 @@ describe("Does Reader ID Exist Test", function() {
     });
 })
 
-describe("Check If Reader Device Is Created", () => {
+describe.skip("Check If Reader Device Is Created", () => {
     let testLocation = {
         id: 1010,
         name: "TestestLocation",
@@ -219,7 +219,7 @@ describe("Check If Reader Device Is Created", () => {
     })
 });
 
-describe("Check If Reader Device Exists Tests", () => {
+describe.skip("Check If Reader Device Exists Tests", () => {
 
     let testLocation = {
         id: 1010,

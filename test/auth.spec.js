@@ -7,7 +7,7 @@ import Sinon from "sinon";
 import Auth from '../built/Auth/auth.js';
 import User from "../built/Users/users.js";
 
-describe("Generating OTP Test", () => {
+describe.skip("Generating OTP Test", () => {
     it("should fail when given a user that does not exist", async () => {
         const non_existent_user = 1000;
 

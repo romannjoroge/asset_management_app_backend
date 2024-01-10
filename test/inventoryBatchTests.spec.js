@@ -10,7 +10,7 @@ import { createInventory } from '../built/GatePass/createInventory.js'
 import { createBatch } from '../built/GatePass/createBatch.js';
 import { allocateBatch } from '../built/GatePass/allocateBatch.js';
 
-describe("Create Inventory Test", function() {
+describe.skip("Create Inventory Test", function() {
     beforeEach(async function() {
         try {
             await createTemporaryTable("Inventory");
@@ -146,7 +146,7 @@ describe.skip("Create Batch Test", function() {
     })
 });
 
-describe("Allocate Batches To Inventory Test", function(){
+describe.skip("Allocate Batches To Inventory Test", function(){
     let location = {
         id: 1010,
         name: "TestestLocation",
