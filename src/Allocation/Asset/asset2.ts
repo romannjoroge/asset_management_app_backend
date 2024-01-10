@@ -169,23 +169,23 @@ class Asset {
                                 this._storeAssetInAssetRegister().then(_ => {
                                     res();
                                 }).catch(err => {
-                                    return rej(new MyError(Errors[6]));
+                                    return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
                                 });
                             }).catch((err: MyError) => {
-                                return rej(new MyError(Errors[6]));
+                                return rej(new MyError(MyErrors2.NOT_GENERATE_BARCODE));
                             })
                         }).catch((err: MyError) => {
-                            return rej(new MyError(Errors[6]));
+                            return rej(new MyError(MyErrors2.NOT_GET_NEXT_ASSET_ID));
                         })
                         
                     }).catch(err => {
-                        return rej(new MyError(Errors[6]));
+                        return rej(new MyError(MyErrors2.USER_NOT_EXIST));
                     });
                 }).catch(err => {
-                    return rej(new MyError(Errors[6]));
+                    return rej(new MyError(MyErrors2.LOCATION_NOT_EXIST));
                 });
             }).catch(err => {
-                return rej(new MyError(Errors[6]));
+                return rej(new MyError(MyErrors2.CATEGORY_NOT_EXIST));
             });
         })
     }

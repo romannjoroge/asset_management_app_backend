@@ -166,6 +166,7 @@ export var MyErrors2;
     MyErrors2["INVALID_CHARACTER_LENGTH"] = "Character Is Not Right Length";
     MyErrors2["INVALID_BARCODE"] = "Invalid Barcode";
     MyErrors2["NOT_GET_NEXT_ASSET_ID"] = "Could Not Get Next Asset ID";
+    MyErrors2["NOT_STORE_ASSET"] = "Could Not Store Asset";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {
