@@ -105,7 +105,8 @@ router.get('/report/:type', (req, res) => {
         inputs = [req.query.stockTake];
     } else if (reportType == 'physical') {
         query = reportsTable.physical_valuation;
-        inputs = [req.query.stockTake];
+        inputs = [req.query.location];
+        eventid = Logs.MOVEMENT_REPORT;
     } else if (reportType == 'acquisition') {
         query = reportsTable.acquisitionReport;
         var year = Number.parseInt(req.query.year);

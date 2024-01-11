@@ -1,7 +1,5 @@
-const physical_valuation = `SELECT a.assetTag AS "Asset Tag", a.serialnumber AS "Serial Number", a.makeandmodelno AS 
-                            "Make And Model Number", c.name AS "Category", l.name AS "Location" FROM Asset a JOIN Category c 
-                            ON a.categoryid = c.id JOIN Location l ON l.id = a.locationid WHERE a.assettag IN (SELECT assetTag FROM 
-                            StockTakeAssets WHERE stockTakeID = $1)`;
+const physical_valuation = `SELECT a.barcode, a.serialNumber, c.name AS "Category", l.name AS "Location" FROM Asset a JOIN Category c 
+                            ON a.categoryid = c.id JOIN Location l ON l.id = a.locationid WHERE a.locationid  = $1`;
 const missingAssets = `SELECT assettag FROM Asset WHERE assettag NOT IN (SELECT assettag FROM StockTakeAssets WHERE stocktakeid = $1)`;
 const movements = `SELECT timestamp, username FROM Log WHERE logdescription ~* $1 AND eventtype = 'Movement' ORDER BY timestamp`;
 const chainOfCustody = `SELECT timestamp, logdescription, username FROM Log WHERE logdescription ~* $1 AND eventtype = 'Allocate Asset' 
