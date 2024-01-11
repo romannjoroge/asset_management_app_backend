@@ -74,7 +74,7 @@ router.post('/verifyOTP', (req, res) => {
         User.getUsername(userid).then(username => {
             var _a;
             // Send JWT token
-            const token = JWT.sign({ userid }, (_a = process.env.TOKEN_SECRET) !== null && _a !== void 0 ? _a : "", { expiresIn: 3600 });
+            const token = JWT.sign({ id: userid }, (_a = process.env.TOKEN_SECRET) !== null && _a !== void 0 ? _a : "", { expiresIn: 3600 });
             return res.json({
                 isCorrect: true,
                 token,
