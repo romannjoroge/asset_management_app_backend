@@ -4,12 +4,13 @@
 import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
-import { Errors, Logs, Succes } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2, Succes } from '../utility/constants.js';
 import { Log } from '../Log/log.js';
+import MyError from '../utility/myError.js';
 
 router.delete('/delete/:item', (req, res) => {
     let item = req.params.item;
-    let id = Number.parseInt(req.query.id);
+    let id: number = Number.parseInt(req.query.id);
     let table;
     let query;
     let arguements;
@@ -23,11 +24,13 @@ router.delete('/delete/:item', (req, res) => {
         table = "StockTakeAssets"
         query = `UPDATE ${table} SET deleted = true WHERE assetID = $1 AND stockTakeID = $2`;
         let {assetID, stockTakeID} = req.query;
+        id = assetID;
         arguements = [assetID, stockTakeID];
     } else if (item == "assetAttachment") {
         table = "Asset_File";
         query = `UPDATE ${table} SET deleted = true WHERE assetID = $1 AND stockTakeID = $2`;
         let {assetID, attachment} = req.query;
+        id = assetID;
         arguements = [assetID, attachment];
     } else if (item == "batch") {
         table = "Batch";
@@ -61,6 +64,7 @@ router.delete('/delete/:item', (req, res) => {
         table = "DepreciationSchedule";
         query = `UPDATE ${table} SET deleted = true WHERE assetID = $1 AND year = $2`;
         let {assetID, year} = req.query;
+        id = assetID;
         arguements = [assetID, year];
     } else if (item == "stocktake") {
         table = "StockTake";
@@ -70,10 +74,9 @@ router.delete('/delete/:item', (req, res) => {
         table = "Asset";
         query = `UPDATE ${table} SET deleted = true WHERE assetid = $1`;
         let {assetID} = req.query;
+        id = assetID;
         arguements = [assetID];
         eventid = Logs.DELETE_ASSET;
-
-        console.log("This asset is being deleted");
     } else if (item == "user") {
         table = "User2";
         query = `UPDATE ${table} SET deleted = true WHERE id = $1`;
@@ -92,6 +95,7 @@ router.delete('/delete/:item', (req, res) => {
         table = "GatePass_Asset";
         query = `UPDATE ${table} SET deleted = true WHERE assetID = $1 AND gatePassID = 2`;
         let {assetID, gatePassID} = req.query;
+        id = assetID;
         arguements = [assetID, gatePassID];
     } else if (item == "location") {
         table = "Location";
@@ -118,7 +122,11 @@ router.delete('/delete/:item', (req, res) => {
 
     pool.query(query, arguements).then(fetchResult => {
         // Add log
-        Log.createLog(req.ip, req.id, eventid, id);
+        Log.createLog(req.ip, req.id, eventid, id).then(_=> {
+            return res.json({message: `${item} deleted`});
+        }).catch((err: MyError) => {
+            return res.status(500).json({error: MyErrors2.INTERNAL_SERVER_ERROR});
+        })
     }).catch(err => {
         console.log(err);
         return res.status(500).json({message: Errors[9]})
