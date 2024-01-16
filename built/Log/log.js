@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import logTable from './db_log.js';
 import pool from '../../db2.js';
 import MyError from '../utility/myError.js';
-import { MyErrors2 } from '../utility/constants.js';
+import { Logs, MyErrors2 } from '../utility/constants.js';
 export class Log {
     // Create log
     static createLog(ipaddress, userid, eventid, itemid) {
@@ -23,6 +23,12 @@ export class Log {
                     return rej(new MyError(MyErrors2.NOT_GENERATE_LOG));
                 });
             });
+        });
+    }
+    // Check if log event type exists
+    static isLogEventValid(logEvent) {
+        return new Promise((res, rej) => {
+            return res(Object.keys(Logs).includes(logEvent));
         });
     }
 }
