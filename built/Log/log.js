@@ -27,9 +27,7 @@ export class Log {
     }
     // Check if log event type exists
     static isLogEventValid(logEvent) {
-        return new Promise((res, rej) => {
-            return res(Object.keys(Logs).includes(logEvent));
-        });
+        return Object.keys(Logs).includes(logEvent);
     }
 }
 //# sourceMappingURL=log.js.map

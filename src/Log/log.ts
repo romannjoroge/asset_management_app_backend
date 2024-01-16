@@ -17,9 +17,7 @@ export class Log {
     }
 
     // Check if log event type exists
-    static isLogEventValid(logEvent: string): Promise<boolean> {
-        return new Promise((res, rej) => {
-            return res(Object.keys(Logs).includes(logEvent));
-        })
+    static isLogEventValid(logEvent: string): boolean {
+        return Object.keys(Logs).includes(logEvent);
     }
 }
