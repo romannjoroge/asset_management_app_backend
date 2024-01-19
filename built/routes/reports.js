@@ -5,7 +5,6 @@ import reportsTable from '../Reports/db_reports.js';
 import { Errors, Logs, MyErrors2 } from '../utility/constants.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import logTable from '../Log/db_log.js';
 import userTable from '../Users/db_users.js';
 import checkifAuthenticated from '../../middleware/checkifAuthenticated.js';
 import checkifAuthorized from '../../middleware/checkifAuthorized.js';
@@ -14,6 +13,7 @@ import locationTable from '../Tracking/db_location.js';
 import { getTaggedAssets } from '../Reports/tagged_assets.js';
 import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciations.js';
 import { Log } from '../Log/log.js';
+import getAuditTrail from '../Reports/audit_trail.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // A route to get the tagged assets
@@ -82,12 +82,21 @@ router.get('/report/:type', (req, res) => {
     else if (reportType == 'audit') {
         eventid = Logs.AUDIT_TRAIL_REPORT;
         try {
-            query = logTable.selectUserLogs;
-            let username = req.query.username;
-            let to = utility.checkIfValidDate(req.query.to, "Invalid To Date");
-            let from = utility.checkIfValidDate(req.query.from, "Invalid From Date");
-            let eventtype = req.query.eventtype;
-            inputs = [username, from, to, eventtype];
+            // Get necessary arguements
+            const userid = Number.parseInt(req.query.userid);
+            const fromDate = utility.checkIfValidDate(req.query.from, "Invalid Date");
+            const toDate = utility.checkIfValidDate(req.query.to, "Invalid Date");
+            const eventtype = req.query.eventtype;
+            // Call function
+            getAuditTrail(userid, eventtype, fromDate, toDate).then(auditTrails => {
+                // Generate Log
+                Log.createLog(req.ip, req.id, eventid).then((_) => {
+                    // Send audit trail
+                    return res.json(auditTrails);
+                }).catch((err) => {
+                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+                });
+            });
         }
         catch (err) {
             console.log(err);
@@ -141,6 +150,7 @@ router.get('/report/:type', (req, res) => {
 });
 router.get('/depSchedule/:barcode', (req, res) => {
     let barcode = req.params.barcode;
+    console.log(barcode);
     let query = reportsTable.depSchedule;
     pool.query("SELECT assetID FROM Asset WHERE barcode = $1", [barcode]).then(data => {
         let assetID = data.rows[0].assetid;
@@ -151,11 +161,12 @@ router.get('/depSchedule/:barcode', (req, res) => {
                 returnedData.push({ year: entry.year, openingbookvalue: entry.openingbookvalue });
             });
             // Add log
-            Log.createLog(req.ip, req.id, Logs.ASSET_DEPRECIATION_SCHEDULE_REPORT).then((_) => {
-                return res.json(returnedData);
-            }).catch((err) => {
-                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-            });
+            // Log.createLog(req.ip, req.id , Logs.ASSET_DEPRECIATION_SCHEDULE_REPORT).then((_: any) => {
+            //     return res.json(returnedData)
+            // }).catch((err: MyError) => {
+            //     return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+            // })
+            return res.json(returnedData);
         });
     }).catch(err => {
         console.log(err);

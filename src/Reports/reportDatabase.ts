@@ -19,7 +19,7 @@ interface AuditTrailFetchResult {
     rows: RawAuditTrailResults[]
 }
 
-class ReportDatabase {
+export default class ReportDatabase {
     // Function to get audit trail details
     static getAuditTrails(userid: number, eventtype: string, fromDate: Date, toDate: Date): Promise<AuditTrailEntry[]> {
         return new Promise((res, rej) => {
@@ -59,9 +59,10 @@ class ReportDatabase {
                 default:
                     return rej(new MyError(MyErrors2.LOG_EVENT_NOT_EXIST));
             }
+            console.log(query);
 
             // Run query
-            pool.query(query, [userid, eventtype]).then((fetchResult: AuditTrailFetchResult) => {
+            pool.query(query, [userid, eventtype, fromDate, toDate]).then((fetchResult: AuditTrailFetchResult) => {
                 if (fetchResult.rowCount <= 0) {
                     return res([]);
                 }

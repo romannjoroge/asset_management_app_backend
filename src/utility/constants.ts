@@ -167,7 +167,8 @@ export enum MyErrors2 {
     "INVALID_BARCODE" = "Invalid Barcode",
     "NOT_GET_NEXT_ASSET_ID" = "Could Not Get Next Asset ID",
     "NOT_STORE_ASSET" = "Could Not Store Asset",
-    
+    "NOT_GENERATE_REPORT" = "Could Not Generate Report",
+    "LOG_EVENT_NOT_EXIST" = "The Log Event Type Does Not Exist"
 }
 
 export enum Success2 {

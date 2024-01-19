@@ -70,21 +70,24 @@ class User {
         });
     }
 
-    static async checkIfUserIDExists(userID: number): Promise<boolean> {
+    static checkIfUserIDExists(userID: number): Promise<boolean> {
         return new Promise((res, rej) => {
+            console.log(11);
             pool.query(userTable.checkIfUserIDExists, [userID]).then((data: UserFetchResult) => {
                 if (data.rowCount > 0) {
+                    console.log(12);
                     res(true);
                 } else {
+                    console.log(13);
                     res(false)
                 }
             }).catch(_ => {
-                throw(new MyError(MyErrors2.USER_NOT_EXIST))
+                rej(new MyError(MyErrors2.USER_NOT_EXIST))
             })
         });
     }
 
-    static async checkIfUserNameExists(username: string): Promise<boolean> {
+    static checkIfUserNameExists(username: string): Promise<boolean> {
         return new Promise((res, rej) => {
             pool.query(userTable.checkIfNameExists, [username]).then((data: UserFetchResult) => {
                 if (data.rowCount > 0) {

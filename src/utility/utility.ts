@@ -1,12 +1,18 @@
 import { assert } from "chai";
 import MyError from "./myError.js";
 import { MyErrors2 } from "./constants.js";
+import pool from "../../db2.js";
 
 function getTimeDifferenceInSeconds(startTime: Date, endTime: Date): number {
     return (endTime.getTime() - startTime.getTime()) / 1000;
 }
 
-function isAnyEmpty(arr){
+interface FetchResult {
+    rowCount: number;
+    rows: any[]
+}
+
+function isAnyEmpty(arr: any[]){
     /*
         arr - arr is an array of variables of any type
         RETURNS true if any element is empty and false if all items are full
@@ -21,32 +27,32 @@ function isAnyEmpty(arr){
    return isEmpty
 }
 
-function checkIfBoolean(x, errorMessage) {
+function checkIfBoolean(x: any, errorMessage: string) {
     if (typeof x !== "boolean"){
         throw new MyError(errorMessage);
     }
 }
 
-function checkIfNumberisPositive(x, errorMessage){
+function checkIfNumberisPositive(x: any, errorMessage: string){
     if (!Number.isInteger(x) || x < 0){
         throw new MyError(errorMessage);
     }
 }
 
-function checkIfNumberisGreaterThanZero(x, errorMessage){
+function checkIfNumberisGreaterThanZero(x: any, errorMessage: string){
     if (!Number.isInteger(x) || x <= 0){
         console.log(x);
         throw new MyError(errorMessage);
     } 
 }
 
-function checkIfString(x, errorMessage){
+function checkIfString(x: any, errorMessage: string){
     if (typeof x !== "string"){
         throw new MyError(errorMessage);
     }
 }
 
-function checkIfValidDate(x, errorMessage){
+function checkIfValidDate(x: any, errorMessage: string){
     let splitDate;
     if (x.includes('.')) {
         splitDate = x.split('.');
@@ -75,7 +81,7 @@ function checkIfValidDate(x, errorMessage){
     }
 }
 
-function verifyDatabaseFetchResults(fetchResult, errorMessage){
+function verifyDatabaseFetchResults(fetchResult: any, errorMessage: string){
     if (!'rowCount' in fetchResult){
         throw new MyError("rowCount is not in fetchResult");
     }else{
@@ -85,7 +91,7 @@ function verifyDatabaseFetchResults(fetchResult, errorMessage){
     }
 }
 
-function isFetchResultEmpty(fetchResult){
+function isFetchResultEmpty(fetchResult: FetchResult){
     if(fetchResult.rowCount === 0){
         return true;
     }else{
@@ -93,7 +99,7 @@ function isFetchResultEmpty(fetchResult){
     }
 }
 
-function checkIfInList(list, item, errorMessage){
+function checkIfInList(list: any[], item: any, errorMessage: string){
     // This function throws an error containing errorMessage if item is not in list
     if (!list.includes(item)){
         throw new MyError(errorMessage);
@@ -161,7 +167,7 @@ async function assertThatFunctionWorks(func, ...params){
     }
 }
 
-async function returnFetchedResultsFromDatabase(query, arguements, valueWanted){
+async function returnFetchedResultsFromDatabase(query: string, arguements: any[], valueWanted: any){
     let fetchResult;
 
     try{

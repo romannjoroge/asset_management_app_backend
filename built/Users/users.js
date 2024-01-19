@@ -47,35 +47,34 @@ class User {
         });
     }
     static checkIfUserIDExists(userID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((res, rej) => {
-                pool.query(userTable.checkIfUserIDExists, [userID]).then((data) => {
-                    if (data.rowCount > 0) {
-                        res(true);
-                    }
-                    else {
-                        res(false);
-                    }
-                }).catch(_ => {
-                    throw (new MyError(MyErrors2.USER_NOT_EXIST));
-                });
+        return new Promise((res, rej) => {
+            console.log(11);
+            pool.query(userTable.checkIfUserIDExists, [userID]).then((data) => {
+                if (data.rowCount > 0) {
+                    console.log(12);
+                    res(true);
+                }
+                else {
+                    console.log(13);
+                    res(false);
+                }
+            }).catch(_ => {
+                rej(new MyError(MyErrors2.USER_NOT_EXIST));
             });
         });
     }
     static checkIfUserNameExists(username) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((res, rej) => {
-                pool.query(userTable.checkIfNameExists, [username]).then((data) => {
-                    if (data.rowCount > 0) {
-                        res(true);
-                    }
-                    else {
-                        res(false);
-                    }
-                }).catch((err) => {
-                    console.log(err);
+        return new Promise((res, rej) => {
+            pool.query(userTable.checkIfNameExists, [username]).then((data) => {
+                if (data.rowCount > 0) {
+                    res(true);
+                }
+                else {
                     res(false);
-                });
+                }
+            }).catch((err) => {
+                console.log(err);
+                res(false);
             });
         });
     }

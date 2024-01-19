@@ -18,6 +18,7 @@ import { getTaggedAssets } from '../Reports/tagged_assets.js';
 import MyError from '../utility/myError.js';
 import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciations.js';
 import { Log } from '../Log/log.js';
+import getAuditTrail from '../Reports/audit_trail.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -90,12 +91,22 @@ router.get('/report/:type', (req, res) => {
     } else if (reportType == 'audit') {
         eventid = Logs.AUDIT_TRAIL_REPORT;
         try {
-            query = logTable.selectUserLogs;
-            let username = req.query.username;
-            let to = utility.checkIfValidDate(req.query.to, "Invalid To Date");
-            let from = utility.checkIfValidDate(req.query.from, "Invalid From Date");
-            let eventtype = req.query.eventtype;
-            inputs = [username, from, to, eventtype];
+            // Get necessary arguements
+            const userid = Number.parseInt(req.query.userid);
+            const fromDate = utility.checkIfValidDate(req.query.from, "Invalid Date");
+            const toDate = utility.checkIfValidDate(req.query.to, "Invalid Date");
+            const eventtype = req.query.eventtype;
+
+            // Call function
+            getAuditTrail(userid, eventtype, fromDate, toDate).then(auditTrails => {
+                // Generate Log
+                Log.createLog(req.ip, req.id , eventid).then((_: any) => {
+                    // Send audit trail
+                    return res.json(auditTrails);
+                }).catch((err: MyError) => {
+                    return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+                })
+            })
         } catch (err) {
             console.log(err);
             return res.status(400).json({ message: Errors[9] })
@@ -146,6 +157,7 @@ router.get('/report/:type', (req, res) => {
 
 router.get('/depSchedule/:barcode', (req, res) => {
     let barcode = req.params.barcode;
+    console.log(barcode);
 
     let query = reportsTable.depSchedule;
     pool.query("SELECT assetID FROM Asset WHERE barcode = $1", [barcode]).then(data => {
@@ -159,11 +171,12 @@ router.get('/depSchedule/:barcode', (req, res) => {
             })
             
             // Add log
-            Log.createLog(req.ip, req.id , Logs.ASSET_DEPRECIATION_SCHEDULE_REPORT).then((_: any) => {
-                return res.json(returnedData)
-            }).catch((err: MyError) => {
-                return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
-            })
+            // Log.createLog(req.ip, req.id , Logs.ASSET_DEPRECIATION_SCHEDULE_REPORT).then((_: any) => {
+            //     return res.json(returnedData)
+            // }).catch((err: MyError) => {
+            //     return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+            // })
+            return res.json(returnedData)
         })
     }).catch(err => {
         console.log(err);

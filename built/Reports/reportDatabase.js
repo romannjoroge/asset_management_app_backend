@@ -3,7 +3,7 @@ import reportTable from "./db_reports.js";
 import { EventItemTypes, Log } from "../Log/log.js";
 import MyError from "../utility/myError.js";
 import { MyErrors2 } from "../utility/constants.js";
-class ReportDatabase {
+export default class ReportDatabase {
     // Function to get audit trail details
     static getAuditTrails(userid, eventtype, fromDate, toDate) {
         return new Promise((res, rej) => {
@@ -42,8 +42,9 @@ class ReportDatabase {
                 default:
                     return rej(new MyError(MyErrors2.LOG_EVENT_NOT_EXIST));
             }
+            console.log(query);
             // Run query
-            pool.query(query, [userid, eventtype]).then((fetchResult) => {
+            pool.query(query, [userid, eventtype, fromDate, toDate]).then((fetchResult) => {
                 if (fetchResult.rowCount <= 0) {
                     return res([]);
                 }
