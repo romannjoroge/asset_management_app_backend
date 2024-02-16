@@ -25,6 +25,12 @@ describe("Finding site, building and office of location", function () {
                                     .resolves(false)
                                     .withArgs(existingLocation)
                                     .resolves(true)
+                                    .withArgs(siteLocation)
+                                    .resolves(true)
+                                    .withArgs(buildingLocation)
+                                    .resolves(true)
+                                    .withArgs(officeLocation)
+                                    .resolves(true)
             let locationParentStub = Sinon.stub(Location, "findParentLocation")
                                         .withArgs(siteLocation)
                                         .resolves()
@@ -62,11 +68,39 @@ describe("Finding site, building and office of location", function () {
 
     it ("should only return site name if the location is a site", async function () {
         try {
-            let result = await Location.getSiteBuildingOffice();
+            let result = await Location.getSiteBuildingOffice(siteLocation);
             assert.deepEqual(result, {
                 site: siteName,
                 building: "all",
                 office: "all"
+            })
+        } catch(err) {
+            console.log(err);
+            assert(false, "There should be no error")
+        }
+    })
+
+    it ("should return only site and building name if the location is a building", async function () {
+        try {
+            let result = await Location.getSiteBuildingOffice(buildingLocation);
+            assert.deepEqual(result, {
+                site: siteName,
+                building: buildingName,
+                office: "all"
+            })
+        } catch(err) {
+            console.log(err);
+            assert(false, "There should be no error")
+        }
+    })
+
+    it ("should return site, building and office name if the location is an office", async function () {
+        try {
+            let result = await Location.getSiteBuildingOffice(officeLocation);
+            assert.deepEqual(result, {
+                site: siteName,
+                building: buildingName,
+                office: officeName
             })
         } catch(err) {
             console.log(err);

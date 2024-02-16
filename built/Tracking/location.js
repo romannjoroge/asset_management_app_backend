@@ -122,6 +122,70 @@ class Location {
                 if (doesExist === false) {
                     return rej(new MyError(MyErrors2.LOCATION_NOT_EXIST));
                 }
+                // If the location is a site show only site
+                this.findParentLocation(locationid).then(parent1 => {
+                    // If location has no parent it is a site
+                    if (!parent1) {
+                        // Get name of site
+                        this.getLocationName(locationid).then(siteName => {
+                            return res({
+                                site: siteName,
+                                building: "all",
+                                office: "all"
+                            });
+                        }).catch((err) => {
+                            return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE));
+                        });
+                    }
+                    else {
+                        // If location has a parent it means it could either be a building or office
+                        this.findParentLocation(parent1).then(parent2 => {
+                            // If parent2 is null it means it means parent2 is the site and locationid is building
+                            if (!parent2) {
+                                this.getLocationName(locationid).then(buildingName => {
+                                    // Get name of site
+                                    this.getLocationName(parent1).then(siteName => {
+                                        // Return results
+                                        return res({
+                                            site: siteName,
+                                            building: buildingName,
+                                            office: "all"
+                                        });
+                                    }).catch((err) => {
+                                        return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE));
+                                    });
+                                }).catch((err) => {
+                                    console.log(err);
+                                    return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE));
+                                });
+                            }
+                            else {
+                                // parent2 is the site, parent1 is the building and locationid is the office
+                                this.getLocationName(parent2).then(siteName => {
+                                    this.getLocationName(parent1).then(buildingName => {
+                                        this.getLocationName(locationid).then(officeName => {
+                                            return res({
+                                                site: siteName,
+                                                building: buildingName,
+                                                office: officeName
+                                            });
+                                        }).catch((err) => {
+                                            return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE));
+                                        });
+                                    }).catch((err) => {
+                                        return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE));
+                                    });
+                                }).catch((err) => {
+                                    return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE));
+                                });
+                            }
+                        }).catch((err) => {
+                            return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE));
+                        });
+                    }
+                }).catch((err) => {
+                    return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE));
+                });
             }).catch((err) => {
                 return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE));
             });
