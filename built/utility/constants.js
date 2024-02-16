@@ -169,6 +169,7 @@ export var MyErrors2;
     MyErrors2["NOT_STORE_ASSET"] = "Could Not Store Asset";
     MyErrors2["NOT_GENERATE_REPORT"] = "Could Not Generate Report";
     MyErrors2["LOG_EVENT_NOT_EXIST"] = "The Log Event Type Does Not Exist";
+    MyErrors2["NOT_GET_FROM_DATABASE"] = "Could Not Get Data From Database";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

@@ -19,9 +19,26 @@ import MyError from '../utility/myError.js';
 import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciations.js';
 import { Log } from '../Log/log.js';
 import getAuditTrail from '../Reports/audit_trail.js';
+import { ReportsDatabaseHelper } from '../Reports/database_helper.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+
+/**
+ * Route for testing stuff
+ */
+router.get('/test', async (req, res) => {
+    try {
+        // Testing
+        let report = new ReportsDatabaseHelper();
+        report.getAssetRegisterData().then(data => console.log(data)).catch((err: MyError) => console.log(err.message))
+        return res.send("Done!");
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send("Shit Went Down!")
+    }
+})
 
 // A route to get the tagged assets
 router.get('/tagged/:istagged', (req, res) => {

@@ -168,7 +168,8 @@ export enum MyErrors2 {
     "NOT_GET_NEXT_ASSET_ID" = "Could Not Get Next Asset ID",
     "NOT_STORE_ASSET" = "Could Not Store Asset",
     "NOT_GENERATE_REPORT" = "Could Not Generate Report",
-    "LOG_EVENT_NOT_EXIST" = "The Log Event Type Does Not Exist"
+    "LOG_EVENT_NOT_EXIST" = "The Log Event Type Does Not Exist",
+    "NOT_GET_FROM_DATABASE" = "Could Not Get Data From Database",
 }
 
 export enum Success2 {

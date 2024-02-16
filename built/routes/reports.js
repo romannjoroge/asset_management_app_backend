@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
@@ -14,8 +23,24 @@ import { getTaggedAssets } from '../Reports/tagged_assets.js';
 import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciations.js';
 import { Log } from '../Log/log.js';
 import getAuditTrail from '../Reports/audit_trail.js';
+import { ReportsDatabaseHelper } from '../Reports/database_helper.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+/**
+ * Route for testing stuff
+ */
+router.get('/test', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Testing
+        let report = new ReportsDatabaseHelper();
+        report.getAssetRegisterData().then(data => console.log(data)).catch((err) => console.log(err.message));
+        return res.send("Done!");
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).send("Shit Went Down!");
+    }
+}));
 // A route to get the tagged assets
 router.get('/tagged/:istagged', (req, res) => {
     // Get is tagged from request parameter

@@ -1,5 +1,5 @@
 // Defines generic structure of data gotten from database
-interface ResultFromDatabase<Type> {
+export interface ResultFromDatabase<Type> {
     rowCount: number;
     rows: Type[]
 }
