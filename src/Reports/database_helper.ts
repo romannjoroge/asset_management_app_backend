@@ -3,7 +3,7 @@ import { MyErrors2 } from "../utility/constants.js";
 import { ResultFromDatabase } from "../utility/helper_types.js";
 import MyError from "../utility/myError.js";
 
-interface RawAssetRegisterData {
+export interface RawAssetRegisterData {
     serial_number: string;
     acquisition_date: string;
     condition: string;
