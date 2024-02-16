@@ -1,1 +1,1 @@
-{"version":3,"file":"asset_register.js","sourceRoot":"","sources":["../../src/Reports/asset_register.ts"],"names":[],"mappings":"AAkBA;;GAEG;AACH,MAAM,UAAU,gBAAgB;AAEhC,CAAC"}
+{"version":3,"file":"asset_register.js","sourceRoot":"","sources":["../../src/Reports/asset_register.ts"],"names":[],"mappings":"AAkBA;;GAEG;AACH,MAAM,UAAU,gBAAgB;IAC5B,OAAO,IAAI,OAAO,CAAC,CAAC,GAAG,EAAE,GAAG,EAAE,EAAE;QAC5B,yBAAyB;QAEzB,mDAAmD;QAEnD,iBAAiB;IACrB,CAAC,CAAC,CAAA;AACN,CAAC"}

@@ -30,11 +30,17 @@ export interface selectLocationResults {
     rowCount: number;
 }
 
+interface SiteBuildingOffice {
+    site: string;
+    building: string;
+    office: string;
+}
+
 
 class Location {
     constructor (){}
 
-    static async verifyLocationID(id: number): Promise<boolean | never>{
+    static async verifyLocationID(id: number): Promise<boolean>{
         // Returns true if locationID exists in the database, false otherwise
         let fetchResult;
         try{
@@ -128,6 +134,20 @@ class Location {
                 }
             }).catch((err: any) => {
                 return rej(new MyError(MyErrors2.NOT_GET_LOCATION_NAME))
+            })
+        });
+    }
+
+    // Find the site, building and office of a location from its ID
+    static getSiteBuildingOffice(locationid: number): Promise<SiteBuildingOffice> {
+        return new Promise((res, rej) => {
+            // Throw error if location does not exist
+            this.verifyLocationID(locationid).then(doesExist => {
+                if (doesExist === false) {
+                    return rej(new MyError(MyErrors2.LOCATION_NOT_EXIST))
+                }
+            }).catch((err: MyError) => {
+                return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE))
             })
         });
     }

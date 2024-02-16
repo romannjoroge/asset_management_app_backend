@@ -1,11 +1,79 @@
 import pool from "../db2.js";
 import utility from "../built/utility/utility.js";
-import { createTemporaryTable, dropTemporaryTable, createTestUser, createLocation, createGatePassAuthorization } from "./commonTestFunctions.js";
+import { createTemporaryTable, dropTemporaryTable, createLocation } from "./commonTestFunctions.js";
 import { assert } from "chai";
 import MyError from "../built/utility/myError.js";
-import { Errors } from "../built/utility/constants.js";
+import { Errors, MyErrors2 } from "../built/utility/constants.js";
 import Location from "../built/Tracking/location.js";
+import Sinon from "sinon";
 
+describe("Finding site, building and office of location", function () {
+    const nonExistentLocation = 100;
+    const existingLocation = 1;
+    const siteLocation = 1;
+    const buildingLocation = 2;
+    const officeLocation = 3;
+
+    const siteName = "Test Site";
+    const buildingName = "Test Building";
+    const officeName = "Test Office";
+
+    this.beforeEach(async function () {
+        try {
+            let locationExistStub = Sinon.stub(Location, "verifyLocationID")
+                                    .withArgs(nonExistentLocation)
+                                    .resolves(false)
+                                    .withArgs(existingLocation)
+                                    .resolves(true)
+            let locationParentStub = Sinon.stub(Location, "findParentLocation")
+                                        .withArgs(siteLocation)
+                                        .resolves()
+                                        .withArgs(buildingLocation)
+                                        .resolves(siteLocation)
+                                        .withArgs(officeLocation)
+                                        .resolves(buildingLocation)
+
+            let locationNameStub = Sinon.stub(Location, "getLocationName")
+                                    .withArgs(siteLocation)
+                                    .resolves(siteName)
+                                    .withArgs(buildingLocation)
+                                    .resolves(buildingName)
+                                    .withArgs(officeLocation)
+                                    .resolves(officeName);
+        } catch(err) {
+            console.log(err);
+            assert(false, "Could Not Set Up Tests")
+        }
+    })
+
+    it ("should return error if location does not exist", async function () {
+        try {
+            await Location.getSiteBuildingOffice(nonExistentLocation);
+            assert(false, "Should have said location does not exist");
+        } catch(err) {
+            if (err instanceof MyError && err.message === MyErrors2.LOCATION_NOT_EXIST) {
+                assert(true)
+            } else {
+                console.log(err);
+                assert(false, "Wrong Error Thrown")
+            }
+        }
+    });
+
+    it ("should only return site name if the location is a site", async function () {
+        try {
+            let result = await Location.getSiteBuildingOffice();
+            assert.deepEqual(result, {
+                site: siteName,
+                building: "all",
+                office: "all"
+            })
+        } catch(err) {
+            console.log(err);
+            assert(false, "There should be no error")
+        }
+    })
+})
 
 describe.skip("Child And Parent Locations", function () {
     let parentLocation = {

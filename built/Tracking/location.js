@@ -114,6 +114,19 @@ class Location {
             });
         });
     }
+    // Find the site, building and office of a location from its ID
+    static getSiteBuildingOffice(locationid) {
+        return new Promise((res, rej) => {
+            // Throw error if location does not exist
+            this.verifyLocationID(locationid).then(doesExist => {
+                if (doesExist === false) {
+                    return rej(new MyError(MyErrors2.LOCATION_NOT_EXIST));
+                }
+            }).catch((err) => {
+                return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE));
+            });
+        });
+    }
     // Find parent locations
     static findParentLocations(id, locationIDs) {
         return new Promise((res, rej) => {
