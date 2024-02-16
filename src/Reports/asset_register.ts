@@ -1,6 +1,7 @@
 import { RawAssetRegisterData } from "./database_helper.js";
 import Location from "../Tracking/location.js";
 import MyError from "../utility/myError.js";
+import ReportDatabase from "./reportDatabase.js";
 
 interface AssetRegisterData {
     serial_number: string;
@@ -43,6 +44,7 @@ export function convertDatabaseResultToAssetRegisterEntry(rawData: RawAssetRegis
 export function getAssetRegister(): Promise<AssetRegisterData[]> {
     return new Promise((res, rej) => {
         // Get data from database
+        ReportDatabase.g
 
         // Add missing fields i.e site, building and office
 

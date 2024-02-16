@@ -10,6 +10,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 import Location from "../Tracking/location.js";
+import ReportDatabase from "./reportDatabase.js";
 /**
  * This function converts a raw asset register entry from database to assetregisterdata
  */
@@ -32,6 +33,7 @@ export function convertDatabaseResultToAssetRegisterEntry(rawData) {
 export function getAssetRegister() {
     return new Promise((res, rej) => {
         // Get data from database
+        ReportDatabase.g;
         // Add missing fields i.e site, building and office
         // Return updated
     });
