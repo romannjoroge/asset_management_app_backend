@@ -3,16 +3,31 @@ import reportTable from "./db_reports.js";
 import { EventItemTypes, Log } from "../Log/log.js";
 import MyError from "../utility/myError.js";
 import { MyErrors2 } from "../utility/constants.js";
+const baseAssetRegisterQuery = `SELECT a.serialnumber AS serial_number, TO_CHAR(a.acquisitiondate, 'YYYY-MM-DD') AS acquisition_date, a.condition, (SELECT name AS responsible_users_name FROM User2 
+    WHERE id = a.responsibleuserid LIMIT 1), a.acquisitioncost AS acquisition_cost, a.residualvalue AS residual_value, c.name AS category_name, 
+    a.usefullife AS useful_life, a.barcode, a.description, a.locationid AS location_id, TO_CHAR(a.disposaldate, 'YYYY-MM-DD') AS expected_depreciation_date, 
+    GREATEST(DATE_PART('day', disposaldate - NOW()), 0) AS days_to_disposal FROM Asset a FULL JOIN Category c ON c.id = a.categoryid WHERE a.deleted = false `;
 export default class ReportDatabase {
-    getAssetRegisterData() {
+    static getAssetRegisterData() {
         return new Promise((res, rej) => {
             // Query to get data from database
-            let query = `SELECT a.serialnumber AS serial_number, TO_CHAR(a.acquisitiondate, 'YYYY-MM-DD') AS acquisition_date, a.condition, (SELECT name AS responsible_users_name FROM User2 
-                WHERE id = a.responsibleuserid LIMIT 1), a.acquisitioncost AS acquisition_cost, a.residualvalue AS residual_value, c.name AS category_name, 
-                a.usefullife AS useful_life, a.barcode, a.description, a.locationid AS location_id, TO_CHAR(a.disposaldate, 'YYYY-MM-DD') AS expected_depreciation_date, 
-                GREATEST(DATE_PART('day', disposaldate - NOW()), 0) AS days_to_disposal FROM Asset a FULL JOIN Category c ON c.id = a.categoryid`;
+            let query = baseAssetRegisterQuery;
             // Call query and return results
             pool.query(query, []).then((fetchResult) => {
+                return res(fetchResult.rows);
+            }).catch((err) => {
+                // Throw database error
+                console.log(err);
+                return rej(new MyError(MyErrors2.NOT_GET_FROM_DATABASE));
+            });
+        });
+    }
+    static getAssetDisposalData(startDate, endDate) {
+        return new Promise((res, rej) => {
+            let query = baseAssetRegisterQuery + `AND a.disposaldate BETWEEN $1 AND $2`;
+            console.log(query);
+            // Call query and return results
+            pool.query(query, [startDate, endDate]).then((fetchResult) => {
                 return res(fetchResult.rows);
             }).catch((err) => {
                 // Throw database error

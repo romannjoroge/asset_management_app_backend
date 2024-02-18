@@ -23,7 +23,7 @@ import { getTaggedAssets } from '../Reports/tagged_assets.js';
 import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciations.js';
 import { Log } from '../Log/log.js';
 import getAuditTrail from '../Reports/audit_trail.js';
-import { ReportsDatabaseHelper } from '../Reports/database_helper.js';
+import ReportDatabase from '../Reports/reportDatabase.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 /**
@@ -32,9 +32,10 @@ const __dirname = path.dirname(__filename);
 router.get('/test', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Testing
-        let report = new ReportsDatabaseHelper();
-        report.getAssetRegisterData().then(data => console.log(data)).catch((err) => console.log(err.message));
-        return res.send("Done!");
+        ReportDatabase.getAssetRegisterData().then(data => {
+            console.log(data);
+            return res.json(data);
+        }).catch(err => console.log(err));
     }
     catch (err) {
         console.log(err);
