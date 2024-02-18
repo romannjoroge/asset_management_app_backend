@@ -5,6 +5,7 @@ import { AuditTrailEntry } from "./audit_trail.js";
 import MyError from "../utility/myError.js";
 import { MyErrors2 } from "../utility/constants.js";
 import { ResultFromDatabase } from "../utility/helper_types.js";
+import { RawAssetRegisterData } from "./helpers.js";
 
 interface RawAuditTrailResults {
     name: string;
@@ -18,22 +19,6 @@ interface RawAuditTrailResults {
 interface AuditTrailFetchResult {
     rowCount: number;
     rows: RawAuditTrailResults[]
-}
-
-export interface RawAssetRegisterData {
-    serial_number: string;
-    acquisition_date: string;
-    condition: string;
-    responsible_users_name: string;
-    acquisition_cost: number;
-    residual_value: number;
-    category_name: string;
-    useful_life: number;
-    barcode: string;
-    description: string;
-    location_id: number;
-    expected_depreciation_date: string;
-    days_to_disposal: number
 }
 
 const baseAssetRegisterQuery = `SELECT a.serialnumber AS serial_number, TO_CHAR(a.acquisitiondate, 'YYYY-MM-DD') AS acquisition_date, a.condition, (SELECT name AS responsible_users_name FROM User2 
