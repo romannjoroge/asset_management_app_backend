@@ -10,6 +10,38 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 import Location from "../Tracking/location.js";
+import { MyErrors2 } from "../utility/constants.js";
+import MyError from "../utility/myError.js";
+/**
+ *
+ * @param rawData A list of RawAssetRegister data to convert
+ * @returns converted list of AssetRegisterData
+ */
+export function batchConvertRawAssetRegister(rawData) {
+    return new Promise((res, rej) => {
+        // Add missing fields i.e site, building and office
+        function getMissingFields(raw) {
+            return new Promise((res, rej) => {
+                convertDatabaseResultToAssetRegisterEntry(raw).then(converted => {
+                    return res(converted);
+                }).catch((err) => {
+                    return res();
+                });
+            });
+        }
+        let promises = [];
+        rawData.forEach((elem) => {
+            promises.push(getMissingFields(elem));
+        });
+        Promise.all(promises).then(data => {
+            // Return updated
+            let dataToReturn = data.filter((elem) => elem);
+            return res(dataToReturn);
+        }).catch((err) => {
+            return rej(new MyError(MyErrors2.NOT_GENERATE_REPORT));
+        });
+    });
+}
 /**
  * This function converts a raw asset register entry from database to assetregisterdata
  */

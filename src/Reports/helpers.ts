@@ -1,4 +1,5 @@
 import Location from "../Tracking/location.js";
+import { MyErrors2 } from "../utility/constants.js";
 import MyError from "../utility/myError.js";
 
 export interface AssetRegisterData {
@@ -33,6 +34,39 @@ export interface RawAssetRegisterData {
     location_id: number;
     expected_depreciation_date: string;
     days_to_disposal: number
+}
+
+/**
+ * 
+ * @param rawData A list of RawAssetRegister data to convert
+ * @returns converted list of AssetRegisterData
+ */
+export function batchConvertRawAssetRegister(rawData: RawAssetRegisterData[]): Promise<AssetRegisterData[]> {
+    return new Promise((res, rej) => {
+        // Add missing fields i.e site, building and office
+        function getMissingFields(raw: RawAssetRegisterData): Promise<AssetRegisterData | void> {
+            return new Promise((res, rej) => {
+                convertDatabaseResultToAssetRegisterEntry(raw).then(converted => {
+                    return res(converted);
+                }).catch((err: MyError) => {
+                    return res();
+                })
+            })
+        }
+
+        let promises: Promise<AssetRegisterData | void>[] = [];
+        rawData.forEach((elem) => {
+            promises.push(getMissingFields(elem))
+        })
+
+        Promise.all(promises).then(data => {
+            // Return updated
+            let dataToReturn: AssetRegisterData[] = data.filter((elem) => elem);
+            return res(dataToReturn);
+        }).catch((err: MyError) => {
+            return rej(new MyError(MyErrors2.NOT_GENERATE_REPORT));
+        })
+    })
 }
 
 /**
