@@ -113,6 +113,8 @@ export enum Logs {
     "UPDATE_BATCH" = 33,
     "ASSIGN_BATCH_INVENTORY" = 34,
     "UNASSIGN_BATCH_INVENTORY" = 35,
+    "UNKOWN" = 36,
+    "ALLOCATE_ASSET" = 37
 }
 
 export enum MyErrors2 {

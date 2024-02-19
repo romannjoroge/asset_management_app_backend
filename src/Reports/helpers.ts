@@ -36,6 +36,14 @@ export interface RawAssetRegisterData {
     days_to_disposal: number
 }
 
+export interface ChainOfCustody {
+    username: string;
+    name_of_user: string;
+    time_allocated: string;
+    event_description: string;
+    asset_description: string;
+}
+
 /**
  * 
  * @param rawData A list of RawAssetRegister data to convert

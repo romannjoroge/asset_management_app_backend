@@ -21,6 +21,27 @@ function getResultsFromDatabase(query, args) {
     });
 }
 export default class ReportDatabase {
+    /**
+     *
+     * @param assetid The id of the asset you want to see chain of custody of
+     * @returns Details of times asset has been allocated
+     */
+    static getChainOfCustody(assetid) {
+        return new Promise((res, rej) => {
+            let query = `SELECT u.username AS username, u.name AS name_of_user, TO_CHAR(l.timestamp, 'YYYY-MM-DD') AS time_allocated, e.description AS event_description, 
+                        a.description AS asset_description FROM Log l INNER JOIN Events e ON e.id = l.eventid INNER JOIN Asset a ON a.assetid = l.itemid INNER JOIN User2 u 
+                        ON u.id = l.toid WHERE l.eventid = 37 AND l.itemid = $1`;
+            getResultsFromDatabase(query, [assetid]).then(data => {
+                return res(data);
+            }).catch((err) => {
+                return rej(err);
+            });
+        });
+    }
+    /**
+     *
+     * @returns assets that are in the stock takes but not in the asset register
+     */
     static getStockTakeAssetsNotInRegister() {
         return new Promise((res, rej) => {
             // Gets all assets from non deleted batches

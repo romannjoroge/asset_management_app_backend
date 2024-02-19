@@ -113,6 +113,8 @@ export var Logs;
     Logs[Logs["UPDATE_BATCH"] = 33] = "UPDATE_BATCH";
     Logs[Logs["ASSIGN_BATCH_INVENTORY"] = 34] = "ASSIGN_BATCH_INVENTORY";
     Logs[Logs["UNASSIGN_BATCH_INVENTORY"] = 35] = "UNASSIGN_BATCH_INVENTORY";
+    Logs[Logs["UNKOWN"] = 36] = "UNKOWN";
+    Logs[Logs["ALLOCATE_ASSET"] = 37] = "ALLOCATE_ASSET";
 })(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {
