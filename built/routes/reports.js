@@ -24,6 +24,7 @@ import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciati
 import { Log } from '../Log/log.js';
 import getAuditTrail from '../Reports/audit_trail.js';
 import ReportDatabase from '../Reports/reportDatabase.js';
+import { assetAcquisition } from '../Reports/asset_acquisition.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 /**
@@ -35,9 +36,9 @@ router.get('/test', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         // let assetRegister = await getAssetDisposalReport(new Date(2023, 7, 12), new Date(2023, 7, 15));
         // console.log(assetRegister);
         // return res.json(assetRegister);
-        // let assetRegister = await assetsInLocation(3);
-        // console.log(assetRegister);
-        // return res.json(assetRegister);
+        let assetRegister = yield assetAcquisition(new Date(2023, 4, 1), new Date(2023, 7, 1), 3);
+        console.log(assetRegister);
+        return res.json(assetRegister);
         // let assetRegister = await assetMovementReport('AUA1000');
         // console.log(assetRegister);
         // return res.json(assetRegister);
