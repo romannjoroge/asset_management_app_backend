@@ -23,6 +23,7 @@ import { getAssetDisposalReport } from '../Reports/asset_disposal.js';
 import { assetsNotInRegister, assetsPresentInRegister } from '../Reports/state_physical_valuation.js';
 import { getChainOfCustody } from '../Reports/chain_custody.js';
 import { assetMovementReport } from '../Reports/asset_movement.js';
+import { assetsInLocation } from '../Reports/location_asset_value.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,7 +39,7 @@ router.get('/test', async (req, res) => {
         // console.log(assetRegister);
         // return res.json(assetRegister);
 
-        // let assetRegister = await assetsPresentInRegister();
+        // let assetRegister = await assetsInLocation(3);
         // console.log(assetRegister);
         // return res.json(assetRegister);
 
@@ -46,7 +47,11 @@ router.get('/test', async (req, res) => {
         // console.log(assetRegister);
         // return res.json(assetRegister);
 
-        let data = await ReportDatabase.getAssetsInLocation(2);
+        // let data = await ReportDatabase.getAssetsInLocation(3);
+        // console.log(data);
+        // return res.json(data);
+
+        let data = await ReportDatabase.getAcquiredAssetsInLocation(new Date(2023, 4, 1), new Date(2023, 7, 1), 3);
         console.log(data);
         return res.json(data);
     } catch(err) {

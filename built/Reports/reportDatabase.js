@@ -19,6 +19,29 @@ function getResultsFromDatabase(query, args) {
     });
 }
 export default class ReportDatabase {
+    /**
+     *
+     * @param startDate The start of acquisition period
+     * @param endDate End of acquisition period
+     * @param locationid Location of assets
+     * @returns The list of assets that were purchased in specified period and in the specific location
+     */
+    static getAcquiredAssetsInLocation(startDate, endDate, locationid) {
+        return new Promise((res, rej) => {
+            let query = baseAssetRegisterQueryWithNonDeletedAssets + " AND a.locationid = $1 AND a.acquisitiondate BETWEEN $2 AND $3";
+            // Call query
+            getResultsFromDatabase(query, [locationid, startDate, endDate]).then(data => {
+                return res(data);
+            }).catch((err) => {
+                return rej(err);
+            });
+        });
+    }
+    /**
+     *
+     * @param locationid Location to get assets of
+     * @returns The details of assets in specified location
+     */
     static getAssetsInLocation(locationid) {
         return new Promise((res, rej) => {
             let query = baseAssetRegisterQueryWithNonDeletedAssets + " AND a.locationid = $1";
