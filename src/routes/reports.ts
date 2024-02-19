@@ -3,8 +3,6 @@ import pool from '../../db2.js';
 const router = express.Router();
 import reportsTable from '../Reports/db_reports.js';
 import { Errors, Logs, MyErrors2, Succes } from '../utility/constants.js';
-import { convertArrayToCSV } from 'convert-array-to-csv';
-import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import logTable from '../Log/db_log.js';
@@ -23,6 +21,7 @@ import { getAssetRegister } from '../Reports/asset_register.js';
 import ReportDatabase from '../Reports/reportDatabase.js';
 import { getAssetDisposalReport } from '../Reports/asset_disposal.js';
 import { assetsNotInRegister, assetsPresentInRegister } from '../Reports/state_physical_valuation.js';
+import { getChainOfCustody } from '../Reports/chain_custody.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,11 +37,11 @@ router.get('/test', async (req, res) => {
         // console.log(assetRegister);
         // return res.json(assetRegister);
 
-        let assetRegister = await assetsNotInRegister();
+        let assetRegister = await getChainOfCustody('AUA1000');
         console.log(assetRegister);
         return res.json(assetRegister);
 
-        // let data = await ReportDatabase.getStockTakeAssetsNotInRegister();
+        // let data = await ReportDatabase.getChainOfCustody(15);
         // console.log(data);
         // return res.json(data);
     } catch(err) {
