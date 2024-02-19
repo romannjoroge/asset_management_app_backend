@@ -1,4 +1,4 @@
-import { batchConvertRawAssetRegister } from "./helpers.js";
+import { batchAddSiteBuildingLocation } from "./helpers.js";
 import MyError from "../utility/myError.js";
 import ReportDatabase from "./reportDatabase.js";
 import { MyErrors2 } from "../utility/constants.js";
@@ -9,7 +9,7 @@ export function getAssetRegister() {
     return new Promise((res, rej) => {
         // Get data from database
         ReportDatabase.getAssetRegisterData().then(rawData => {
-            batchConvertRawAssetRegister(rawData).then(converted => {
+            batchAddSiteBuildingLocation(rawData).then(converted => {
                 return res(converted);
             }).catch((err) => {
                 return rej(new MyError(MyErrors2.NOT_GENERATE_REPORT));

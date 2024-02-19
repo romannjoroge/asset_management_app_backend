@@ -23,7 +23,7 @@ import { getTaggedAssets } from '../Reports/tagged_assets.js';
 import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciations.js';
 import { Log } from '../Log/log.js';
 import getAuditTrail from '../Reports/audit_trail.js';
-import ReportDatabase from '../Reports/reportDatabase.js';
+import { assetsPresentInRegister } from '../Reports/state_physical_valuation.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 /**
@@ -35,12 +35,15 @@ router.get('/test', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         // let assetRegister = await getAssetDisposalReport(new Date(2023, 7, 12), new Date(2023, 7, 15));
         // console.log(assetRegister);
         // return res.json(assetRegister);
+        let assetRegister = yield assetsPresentInRegister();
+        console.log(assetRegister);
+        return res.json(assetRegister);
         // let assetRegister = await getChainOfCustody('AUA1000');
         // console.log(assetRegister);
         // return res.json(assetRegister);
-        let data = yield ReportDatabase.getAssetMovements(15);
-        console.log(data);
-        return res.json(data);
+        // let data = await ReportDatabase.getAssetMovements(15);
+        // console.log(data);
+        // return res.json(data);
     }
     catch (err) {
         console.log(err);
