@@ -1,8 +1,8 @@
-import Location from "../Tracking/location.js";
+import Location, { SiteBuildingOffice } from "../Tracking/location.js";
 import { MyErrors2 } from "../utility/constants.js";
 import MyError from "../utility/myError.js";
 
-export interface AssetRegisterData {
+export interface AssetRegisterData extends SiteBuildingOffice{
     serial_number: string;
     acquisition_date: string;
     condition: string;
@@ -13,14 +13,11 @@ export interface AssetRegisterData {
     useful_life: number;
     barcode: string;
     description: string;
-    site: string;
-    building: string;
-    office: string;
     expected_depreciation_date: string;
     days_to_disposal: number
 }
 
-export interface RawAssetRegisterData {
+export interface RawAssetRegisterData extends HasLocationID{
     serial_number: string;
     acquisition_date: string;
     condition: string;
@@ -31,7 +28,6 @@ export interface RawAssetRegisterData {
     useful_life: number;
     barcode: string;
     description: string;
-    location_id: number;
     expected_depreciation_date: string;
     days_to_disposal: number
 }
@@ -44,32 +40,32 @@ export interface ChainOfCustody {
     asset_description: string;
 }
 
-export interface AssetMovement {
-    site: string;
-    building: string;
-    office: string;
+export interface AssetMovement extends SiteBuildingOffice{
     time_moved: string;
     barcode: string;
     asset_description: string;
 }
 
-export interface RawAssetMovement {
+interface HasLocationID {
     locationid: number;
+}
+
+export interface RawAssetMovement extends HasLocationID {
     time_moved: string;
     asset_description: string;
     barcode: string;
 }
 /**
  * 
- * @param rawData A list of RawAssetRegister data to convert
- * @returns converted list of AssetRegisterData
+ * @param rawData A list of type T that has locationid and wants to add details of site, building, office
+ * @returns converted list of type that has site building office
  */
-export function batchConvertRawAssetRegister(rawData: RawAssetRegisterData[]): Promise<AssetRegisterData[]> {
+export function batchAddSiteBuildingLocation<T extends HasLocationID, S extends SiteBuildingOffice>(rawData: T[]): Promise<S[]> {
     return new Promise((res, rej) => {
         // Add missing fields i.e site, building and office
-        function getMissingFields(raw: RawAssetRegisterData): Promise<AssetRegisterData | void> {
+        function getMissingFields(raw: T): Promise<S | void> {
             return new Promise((res, rej) => {
-                convertDatabaseResultToAssetRegisterEntry(raw).then(converted => {
+                convertHasLocationToSiteBuilding<T, S>(raw).then(converted => {
                     return res(converted);
                 }).catch((err: MyError) => {
                     return res();
@@ -77,14 +73,14 @@ export function batchConvertRawAssetRegister(rawData: RawAssetRegisterData[]): P
             })
         }
 
-        let promises: Promise<AssetRegisterData | void>[] = [];
+        let promises: Promise<S | void>[] = [];
         rawData.forEach((elem) => {
             promises.push(getMissingFields(elem))
         })
 
         Promise.all(promises).then(data => {
             // Return updated
-            let dataToReturn: AssetRegisterData[] = data.filter((elem) => elem);
+            let dataToReturn: S[] = data.filter((elem) => elem);
             return res(dataToReturn);
         }).catch((err: MyError) => {
             return rej(new MyError(MyErrors2.NOT_GENERATE_REPORT));
@@ -93,15 +89,14 @@ export function batchConvertRawAssetRegister(rawData: RawAssetRegisterData[]): P
 }
 
 /**
- * This function converts a raw asset register entry from database to assetregisterdata
+ * This function converts an element that has locationid to one that has site, building, office
  */
-export function convertDatabaseResultToAssetRegisterEntry(rawData: RawAssetRegisterData): Promise<AssetRegisterData> {
+export function convertHasLocationToSiteBuilding<T extends HasLocationID, S extends SiteBuildingOffice>(rawData: T): Promise<S> {
     return new Promise((res, rej) => {
         // Get site, building and location of location in rawData
-        Location.getSiteBuildingOffice(rawData.location_id).then(locationData => {
-            console.log(locationData);
-            let {location_id, ...rawDataWithNoLocationID} = rawData;
-            let dataToReturn: AssetRegisterData = {...rawDataWithNoLocationID, site: locationData.site, building: locationData.building, office: locationData.office};
+        Location.getSiteBuildingOffice(rawData.locationid).then(locationData => {
+            let {locationid, ...rawDataWithNoLocationID} = rawData;
+            let dataToReturn: S = {...rawDataWithNoLocationID, site: locationData.site, building: locationData.building, office: locationData.office};
             return res(dataToReturn);
         }).catch((err: MyError) => {
             return rej(err)

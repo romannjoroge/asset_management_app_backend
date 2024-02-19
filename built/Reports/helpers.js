@@ -14,15 +14,15 @@ import { MyErrors2 } from "../utility/constants.js";
 import MyError from "../utility/myError.js";
 /**
  *
- * @param rawData A list of RawAssetRegister data to convert
- * @returns converted list of AssetRegisterData
+ * @param rawData A list of type T that has locationid and wants to add details of site, building, office
+ * @returns converted list of type that has site building office
  */
-export function batchConvertRawAssetRegister(rawData) {
+export function batchAddSiteBuildingLocation(rawData) {
     return new Promise((res, rej) => {
         // Add missing fields i.e site, building and office
         function getMissingFields(raw) {
             return new Promise((res, rej) => {
-                convertDatabaseResultToAssetRegisterEntry(raw).then(converted => {
+                convertHasLocationToSiteBuilding(raw).then(converted => {
                     return res(converted);
                 }).catch((err) => {
                     return res();
@@ -43,14 +43,13 @@ export function batchConvertRawAssetRegister(rawData) {
     });
 }
 /**
- * This function converts a raw asset register entry from database to assetregisterdata
+ * This function converts an element that has locationid to one that has site, building, office
  */
-export function convertDatabaseResultToAssetRegisterEntry(rawData) {
+export function convertHasLocationToSiteBuilding(rawData) {
     return new Promise((res, rej) => {
         // Get site, building and location of location in rawData
-        Location.getSiteBuildingOffice(rawData.location_id).then(locationData => {
-            console.log(locationData);
-            let { location_id } = rawData, rawDataWithNoLocationID = __rest(rawData, ["location_id"]);
+        Location.getSiteBuildingOffice(rawData.locationid).then(locationData => {
+            let { locationid } = rawData, rawDataWithNoLocationID = __rest(rawData, ["locationid"]);
             let dataToReturn = Object.assign(Object.assign({}, rawDataWithNoLocationID), { site: locationData.site, building: locationData.building, office: locationData.office });
             return res(dataToReturn);
         }).catch((err) => {

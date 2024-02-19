@@ -1,1 +1,1 @@
-{"version":3,"file":"asset_movement.js","sourceRoot":"","sources":["../../src/Reports/asset_movement.ts"],"names":[],"mappings":""}
+{"version":3,"file":"asset_movement.js","sourceRoot":"","sources":["../../src/Reports/asset_movement.ts"],"names":[],"mappings":"AAEA,MAAM,UAAU,mBAAmB,CAAC,OAAe;IAC/C,OAAO,IAAI,OAAO,CAAC,CAAC,GAAG,EAAE,GAAG,EAAE,EAAE;QAC5B,WAAW;QAEX,+BAA+B;IACnC,CAAC,CAAC,CAAA;AACN,CAAC"}

@@ -3,14 +3,12 @@ import reportTable from "./db_reports.js";
 import { EventItemTypes, Log } from "../Log/log.js";
 import MyError from "../utility/myError.js";
 import { MyErrors2 } from "../utility/constants.js";
-const baseAssetRegisterQueryWithDeletedAssets = `SELECT a.serialnumber AS serial_number, TO_CHAR(a.acquisitiondate, 'YYYY-MM-DD') AS acquisition_date, a.condition, (SELECT name AS responsible_users_name FROM User2 
+const baseAssetRegister = `SELECT a.serialnumber AS serial_number, TO_CHAR(a.acquisitiondate, 'YYYY-MM-DD') AS acquisition_date, a.condition, (SELECT name AS responsible_users_name FROM User2 
     WHERE id = a.responsibleuserid LIMIT 1), a.acquisitioncost AS acquisition_cost, a.residualvalue AS residual_value, c.name AS category_name, 
-    a.usefullife AS useful_life, a.barcode, a.description, a.locationid AS location_id, TO_CHAR(a.disposaldate, 'YYYY-MM-DD') AS expected_depreciation_date, 
-    GREATEST(DATE_PART('day', disposaldate - NOW()), 0) AS days_to_disposal FROM Asset a FULL JOIN Category c ON c.id = a.categoryid WHERE a.deleted = true `;
-const baseAssetRegisterQueryWithNonDeletedAssets = `SELECT a.serialnumber AS serial_number, TO_CHAR(a.acquisitiondate, 'YYYY-MM-DD') AS acquisition_date, a.condition, (SELECT name AS responsible_users_name FROM User2 
-    WHERE id = a.responsibleuserid LIMIT 1), a.acquisitioncost AS acquisition_cost, a.residualvalue AS residual_value, c.name AS category_name, 
-    a.usefullife AS useful_life, a.barcode, a.description, a.locationid AS location_id, TO_CHAR(a.disposaldate, 'YYYY-MM-DD') AS expected_depreciation_date, 
-    GREATEST(DATE_PART('day', disposaldate - NOW()), 0) AS days_to_disposal FROM Asset a FULL JOIN Category c ON c.id = a.categoryid WHERE a.deleted = false `;
+    a.usefullife AS useful_life, a.barcode, a.description, a.locationid AS locationid, TO_CHAR(a.disposaldate, 'YYYY-MM-DD') AS expected_depreciation_date, 
+    GREATEST(DATE_PART('day', disposaldate - NOW()), 0) AS days_to_disposal FROM Asset a FULL JOIN Category c ON c.id = a.categoryid`;
+const baseAssetRegisterQueryWithDeletedAssets = baseAssetRegister + ' WHERE a.deleted = true ';
+const baseAssetRegisterQueryWithNonDeletedAssets = baseAssetRegister + ' WHERE a.deleted = false ';
 function getResultsFromDatabase(query, args) {
     return new Promise((res, rej) => {
         pool.query(query, args).then((data) => {

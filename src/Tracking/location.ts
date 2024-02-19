@@ -30,7 +30,7 @@ export interface selectLocationResults {
     rowCount: number;
 }
 
-interface SiteBuildingOffice {
+export interface SiteBuildingOffice {
     site: string;
     building: string;
     office: string;
