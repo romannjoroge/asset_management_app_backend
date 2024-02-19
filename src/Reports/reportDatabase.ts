@@ -5,7 +5,7 @@ import { AuditTrailEntry } from "./audit_trail.js";
 import MyError from "../utility/myError.js";
 import { MyErrors2 } from "../utility/constants.js";
 import { ResultFromDatabase } from "../utility/helper_types.js";
-import { ChainOfCustody, RawAssetRegisterData } from "./helpers.js";
+import { ChainOfCustody, RawAssetMovement, RawAssetRegisterData } from "./helpers.js";
 
 interface RawAuditTrailResults {
     name: string;
@@ -42,6 +42,20 @@ function getResultsFromDatabase<T>(query: string, args: any[]): Promise<T[]> {
 }
 
 export default class ReportDatabase {
+
+    static getAssetMovements(assetid: number): Promise<RawAssetMovement[]> {
+        return new Promise((res, rej) => {
+            let query = `SELECT a.barcode, a.description AS asset_description, locationid, TO_CHAR(scannedtime, 'YYYY-MM-DD') AS time_moved FROM Processedtags p 
+                        INNER JOIN Asset a ON p.assetid = a.assetid WHERE a.assetid = $1`;
+
+            // Call and get data
+            getResultsFromDatabase<RawAssetMovement>(query, [assetid]).then(data => {
+                return res(data);
+            }).catch((err: MyError) => {
+                return rej(err);
+            })
+        })
+    }
 
     /**
      * 

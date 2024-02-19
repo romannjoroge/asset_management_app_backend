@@ -462,3 +462,4 @@ ALTER USER asset_management WITH PASSWORD 'the password';
 INSERT INTO Events (id, type, description) VALUES (37, 'ALLOCATE_ASSET', 'Asset Has Been Allocated');
 ALTER TABLE Log ADD COLUMN toid INTEGER;
 ALTER TABLE Log ALTER COLUMN timestamp SET DEFAULT NOW();
+INSERT INTO Events (id, type, description) VALUES (38, 'ASSET_MOVEMENT', 'Asset Has Been Moved');

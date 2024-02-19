@@ -44,6 +44,21 @@ export interface ChainOfCustody {
     asset_description: string;
 }
 
+export interface AssetMovement {
+    site: string;
+    building: string;
+    office: string;
+    time_moved: string;
+    barcode: string;
+    asset_description: string;
+}
+
+export interface RawAssetMovement {
+    locationid: number;
+    time_moved: string;
+    asset_description: string;
+    barcode: string;
+}
 /**
  * 
  * @param rawData A list of RawAssetRegister data to convert

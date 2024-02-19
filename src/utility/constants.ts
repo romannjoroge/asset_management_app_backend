@@ -114,7 +114,8 @@ export enum Logs {
     "ASSIGN_BATCH_INVENTORY" = 34,
     "UNASSIGN_BATCH_INVENTORY" = 35,
     "UNKOWN" = 36,
-    "ALLOCATE_ASSET" = 37
+    "ALLOCATE_ASSET" = 37,
+    "ASSET_MOVEMENT" = 38,
 }
 
 export enum MyErrors2 {

@@ -21,6 +21,18 @@ function getResultsFromDatabase(query, args) {
     });
 }
 export default class ReportDatabase {
+    static getAssetMovements(assetid) {
+        return new Promise((res, rej) => {
+            let query = `SELECT a.barcode, a.description AS asset_description, locationid, TO_CHAR(scannedtime, 'YYYY-MM-DD') AS time_moved FROM Processedtags p 
+                        INNER JOIN Asset a ON p.assetid = a.assetid WHERE a.assetid = $1`;
+            // Call and get data
+            getResultsFromDatabase(query, [assetid]).then(data => {
+                return res(data);
+            }).catch((err) => {
+                return rej(err);
+            });
+        });
+    }
     /**
      *
      * @param assetid The id of the asset you want to see chain of custody of
