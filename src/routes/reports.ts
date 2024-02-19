@@ -22,6 +22,7 @@ import getAuditTrail from '../Reports/audit_trail.js';
 import { getAssetRegister } from '../Reports/asset_register.js';
 import ReportDatabase from '../Reports/reportDatabase.js';
 import { getAssetDisposalReport } from '../Reports/asset_disposal.js';
+import { assetsNotInRegister, assetsPresentInRegister } from '../Reports/state_physical_valuation.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,9 +38,13 @@ router.get('/test', async (req, res) => {
         // console.log(assetRegister);
         // return res.json(assetRegister);
 
-        let data = await ReportDatabase.getStockTakeAssetsNotInRegister();
-        console.log(data);
-        return res.json(data);
+        let assetRegister = await assetsNotInRegister();
+        console.log(assetRegister);
+        return res.json(assetRegister);
+
+        // let data = await ReportDatabase.getStockTakeAssetsNotInRegister();
+        // console.log(data);
+        // return res.json(data);
     } catch(err) {
         console.log(err);
         return res.status(500).send("Shit Went Down!")
