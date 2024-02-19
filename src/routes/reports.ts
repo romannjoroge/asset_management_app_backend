@@ -25,6 +25,7 @@ import { getChainOfCustody } from '../Reports/chain_custody.js';
 import { assetMovementReport } from '../Reports/asset_movement.js';
 import { assetsInLocation } from '../Reports/location_asset_value.js';
 import { assetAcquisition } from '../Reports/asset_acquisition.js';
+import { getDepreciationDetails } from '../Reports/asset_depreciation.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,7 +41,11 @@ router.get('/test', async (req, res) => {
         // console.log(assetRegister);
         // return res.json(assetRegister);
 
-        let assetRegister = await assetAcquisition(new Date(2023, 4, 1), new Date(2023, 7, 1), 3);
+        // let assetRegister = await assetAcquisition(new Date(2023, 4, 1), new Date(2023, 7, 1), 3);
+        // console.log(assetRegister);
+        // return res.json(assetRegister);
+
+        let assetRegister = await getDepreciationDetails('AUA1002');
         console.log(assetRegister);
         return res.json(assetRegister);
 
