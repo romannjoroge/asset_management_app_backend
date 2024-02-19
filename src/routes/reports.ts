@@ -22,6 +22,7 @@ import ReportDatabase from '../Reports/reportDatabase.js';
 import { getAssetDisposalReport } from '../Reports/asset_disposal.js';
 import { assetsNotInRegister, assetsPresentInRegister } from '../Reports/state_physical_valuation.js';
 import { getChainOfCustody } from '../Reports/chain_custody.js';
+import { assetMovementReport } from '../Reports/asset_movement.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,13 +38,13 @@ router.get('/test', async (req, res) => {
         // console.log(assetRegister);
         // return res.json(assetRegister);
 
-        let assetRegister = await assetsPresentInRegister();
-        console.log(assetRegister);
-        return res.json(assetRegister);
-
-        // let assetRegister = await getChainOfCustody('AUA1000');
+        // let assetRegister = await assetsPresentInRegister();
         // console.log(assetRegister);
         // return res.json(assetRegister);
+
+        let assetRegister = await assetMovementReport('AUA1000');
+        console.log(assetRegister);
+        return res.json(assetRegister);
 
         // let data = await ReportDatabase.getAssetMovements(15);
         // console.log(data);
