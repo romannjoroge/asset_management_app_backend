@@ -19,6 +19,22 @@ function getResultsFromDatabase(query, args) {
     });
 }
 export default class ReportDatabase {
+    static getAssetsInLocation(locationid) {
+        return new Promise((res, rej) => {
+            let query = baseAssetRegisterQueryWithNonDeletedAssets + " AND a.locationid = $1";
+            // Run query and return results
+            getResultsFromDatabase(query, [locationid]).then(data => {
+                return res(data);
+            }).catch((err) => {
+                return rej(err);
+            });
+        });
+    }
+    /**
+     *
+     * @param assetid ID of the asset you want to see movements of
+     * @returns Movement data
+     */
     static getAssetMovements(assetid) {
         return new Promise((res, rej) => {
             let query = `SELECT a.barcode, a.description AS asset_description, locationid, TO_CHAR(scannedtime, 'YYYY-MM-DD') AS time_moved FROM Processedtags p 

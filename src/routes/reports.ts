@@ -42,13 +42,13 @@ router.get('/test', async (req, res) => {
         // console.log(assetRegister);
         // return res.json(assetRegister);
 
-        let assetRegister = await assetMovementReport('AUA1000');
-        console.log(assetRegister);
-        return res.json(assetRegister);
+        // let assetRegister = await assetMovementReport('AUA1000');
+        // console.log(assetRegister);
+        // return res.json(assetRegister);
 
-        // let data = await ReportDatabase.getAssetMovements(15);
-        // console.log(data);
-        // return res.json(data);
+        let data = await ReportDatabase.getAssetsInLocation(2);
+        console.log(data);
+        return res.json(data);
     } catch(err) {
         console.log(err);
         return res.status(500).send("Shit Went Down!")
