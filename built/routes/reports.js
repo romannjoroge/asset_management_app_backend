@@ -35,7 +35,7 @@ router.get('/test', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         // let assetRegister = await getAssetDisposalReport(new Date(2023, 7, 12), new Date(2023, 7, 15));
         // console.log(assetRegister);
         // return res.json(assetRegister);
-        let data = yield ReportDatabase.getStockTakeAssetsInRegister();
+        let data = yield ReportDatabase.getStockTakeAssetsNotInRegister();
         console.log(data);
         return res.json(data);
     }

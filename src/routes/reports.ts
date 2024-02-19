@@ -37,7 +37,7 @@ router.get('/test', async (req, res) => {
         // console.log(assetRegister);
         // return res.json(assetRegister);
 
-        let data = await ReportDatabase.getStockTakeAssetsInRegister();
+        let data = await ReportDatabase.getStockTakeAssetsNotInRegister();
         console.log(data);
         return res.json(data);
     } catch(err) {

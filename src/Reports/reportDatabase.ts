@@ -21,18 +21,41 @@ interface AuditTrailFetchResult {
     rows: RawAuditTrailResults[]
 }
 
-const baseAssetRegisterQuery = `SELECT a.serialnumber AS serial_number, TO_CHAR(a.acquisitiondate, 'YYYY-MM-DD') AS acquisition_date, a.condition, (SELECT name AS responsible_users_name FROM User2 
+const baseAssetRegisterQueryWithDeletedAssets = `SELECT a.serialnumber AS serial_number, TO_CHAR(a.acquisitiondate, 'YYYY-MM-DD') AS acquisition_date, a.condition, (SELECT name AS responsible_users_name FROM User2 
+    WHERE id = a.responsibleuserid LIMIT 1), a.acquisitioncost AS acquisition_cost, a.residualvalue AS residual_value, c.name AS category_name, 
+    a.usefullife AS useful_life, a.barcode, a.description, a.locationid AS location_id, TO_CHAR(a.disposaldate, 'YYYY-MM-DD') AS expected_depreciation_date, 
+    GREATEST(DATE_PART('day', disposaldate - NOW()), 0) AS days_to_disposal FROM Asset a FULL JOIN Category c ON c.id = a.categoryid WHERE a.deleted = true `;
+
+const baseAssetRegisterQueryWithNonDeletedAssets = `SELECT a.serialnumber AS serial_number, TO_CHAR(a.acquisitiondate, 'YYYY-MM-DD') AS acquisition_date, a.condition, (SELECT name AS responsible_users_name FROM User2 
     WHERE id = a.responsibleuserid LIMIT 1), a.acquisitioncost AS acquisition_cost, a.residualvalue AS residual_value, c.name AS category_name, 
     a.usefullife AS useful_life, a.barcode, a.description, a.locationid AS location_id, TO_CHAR(a.disposaldate, 'YYYY-MM-DD') AS expected_depreciation_date, 
     GREATEST(DATE_PART('day', disposaldate - NOW()), 0) AS days_to_disposal FROM Asset a FULL JOIN Category c ON c.id = a.categoryid WHERE a.deleted = false `;
 
 function getResultsFromDatabase<T>(query: string, args: any[]): Promise<T[]> {
     return new Promise((res, rej) => {
-
+        pool.query(query, args).then((data: ResultFromDatabase<T>) => {
+            return res(data.rows);
+        }).catch((err: any) => {
+            return rej(new MyError(MyErrors2.NOT_GET_FROM_DATABASE));
+        })
     })
 }
 
 export default class ReportDatabase {
+
+    static getStockTakeAssetsNotInRegister(): Promise<RawAssetRegisterData[]> {
+        return new Promise((res, rej) => {
+            // Gets all assets from non deleted batches
+            let query = baseAssetRegisterQueryWithDeletedAssets + " AND a.assetid IN (SELECT ba.assetid FROM batchasset ba INNER JOIN Batch b ON b.id = ba.batchid WHERE b.deleted = false)";
+
+            // Call query and return results
+            getResultsFromDatabase<RawAssetRegisterData>(query, []).then(data => {
+                return res(data);
+            }).catch((err: MyError) => {
+                return rej(err);
+            });
+        });
+    }
 
     /**
      * Gets all of the assets that are in any batch in the system that also appears in the asset register
@@ -40,46 +63,42 @@ export default class ReportDatabase {
     static getStockTakeAssetsInRegister(): Promise<RawAssetRegisterData[]> {
         return new Promise((res, rej) => {
             // Gets all assets from non deleted batches
-            let query = baseAssetRegisterQuery + " AND a.assetid IN (SELECT ba.assetid FROM batchasset ba INNER JOIN Batch b ON b.id = ba.batchid WHERE b.deleted = false)";
+            let query = baseAssetRegisterQueryWithNonDeletedAssets + " AND a.assetid IN (SELECT ba.assetid FROM batchasset ba INNER JOIN Batch b ON b.id = ba.batchid WHERE b.deleted = false)";
 
             // Call query and return results
-            pool.query(query, []).then((data: ResultFromDatabase<RawAssetRegisterData>) => {
-                return res(data.rows);
-            }).catch((err: any) => {
-                return rej(new MyError(MyErrors2.NOT_GET_FROM_DATABASE));
-            })
+            getResultsFromDatabase<RawAssetRegisterData>(query, []).then(data => {
+                return res(data);
+            }).catch((err: MyError) => {
+                return rej(err);
+            });
         })
     }
 
     static getAssetRegisterData(): Promise<RawAssetRegisterData[]> {
         return new Promise((res, rej) => {
             // Query to get data from database
-            let query = baseAssetRegisterQuery;
+            let query = baseAssetRegisterQueryWithNonDeletedAssets;
 
             // Call query and return results
-            pool.query(query, []).then((fetchResult: ResultFromDatabase<RawAssetRegisterData>) => {
-                return res(fetchResult.rows);
-            }).catch((err: any) => {
-                // Throw database error
-                console.log(err);
-                return rej(new MyError(MyErrors2.NOT_GET_FROM_DATABASE));
-            })
+            getResultsFromDatabase<RawAssetRegisterData>(query, []).then(data => {
+                return res(data);
+            }).catch((err: MyError) => {
+                return rej(err);
+            });
         })
     }
 
     static getAssetDisposalData(startDate: Date, endDate: Date): Promise<RawAssetRegisterData[]> {
         return new Promise((res, rej) => {
-            let query = baseAssetRegisterQuery + `AND a.disposaldate BETWEEN $1 AND $2`;
+            let query = baseAssetRegisterQueryWithNonDeletedAssets + `AND a.disposaldate BETWEEN $1 AND $2`;
             console.log(query);
 
             // Call query and return results
-            pool.query(query, [startDate, endDate]).then((fetchResult: ResultFromDatabase<RawAssetRegisterData>) => {
-                return res(fetchResult.rows);
-            }).catch((err: any) => {
-                // Throw database error
-                console.log(err);
-                return rej(new MyError(MyErrors2.NOT_GET_FROM_DATABASE));
-            })
+            getResultsFromDatabase<RawAssetRegisterData>(query, [startDate, endDate]).then(data => {
+                return res(data);
+            }).catch((err: MyError) => {
+                return rej(err);
+            });
         })
     }
     
@@ -122,7 +141,6 @@ export default class ReportDatabase {
                 default:
                     return rej(new MyError(MyErrors2.LOG_EVENT_NOT_EXIST));
             }
-            console.log(query);
 
             // Run query
             pool.query(query, [userid, eventtype, fromDate, toDate]).then((fetchResult: AuditTrailFetchResult) => {
