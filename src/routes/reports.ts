@@ -33,9 +33,13 @@ const __dirname = path.dirname(__filename);
 router.get('/test', async (req, res) => {
     try {
         // Testing
-        let assetRegister = await getAssetDisposalReport(new Date(2023, 7, 12), new Date(2023, 7, 15));
-        console.log(assetRegister);
-        return res.json(assetRegister);
+        // let assetRegister = await getAssetDisposalReport(new Date(2023, 7, 12), new Date(2023, 7, 15));
+        // console.log(assetRegister);
+        // return res.json(assetRegister);
+
+        let data = await ReportDatabase.getStockTakeAssetsInRegister();
+        console.log(data);
+        return res.json(data);
     } catch(err) {
         console.log(err);
         return res.status(500).send("Shit Went Down!")

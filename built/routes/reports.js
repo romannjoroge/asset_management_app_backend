@@ -23,7 +23,7 @@ import { getTaggedAssets } from '../Reports/tagged_assets.js';
 import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciations.js';
 import { Log } from '../Log/log.js';
 import getAuditTrail from '../Reports/audit_trail.js';
-import { getAssetDisposalReport } from '../Reports/asset_disposal.js';
+import ReportDatabase from '../Reports/reportDatabase.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 /**
@@ -32,9 +32,12 @@ const __dirname = path.dirname(__filename);
 router.get('/test', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Testing
-        let assetRegister = yield getAssetDisposalReport(new Date(2023, 7, 12), new Date(2023, 7, 15));
-        console.log(assetRegister);
-        return res.json(assetRegister);
+        // let assetRegister = await getAssetDisposalReport(new Date(2023, 7, 12), new Date(2023, 7, 15));
+        // console.log(assetRegister);
+        // return res.json(assetRegister);
+        let data = yield ReportDatabase.getStockTakeAssetsInRegister();
+        console.log(data);
+        return res.json(data);
     }
     catch (err) {
         console.log(err);
