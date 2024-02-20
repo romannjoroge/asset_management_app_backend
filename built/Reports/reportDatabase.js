@@ -19,6 +19,22 @@ function getResultsFromDatabase(query, args) {
     });
 }
 export default class ReportDatabase {
+    static getCategoryReport() {
+        return new Promise((res, rej) => {
+            let query = `SELECT c.name, foo.count FROM Category c FULL JOIN (SELECT COUNT(*), c.name FROM Asset a JOIN Category c ON c.id = a.categoryid WHERE a.locationID = $1 GROUP BY c.name) AS foo ON foo.name = c.name`;
+            // Get data
+            getResultsFromDatabase(query, []).then(data => {
+                return res(data);
+            }).catch((err) => {
+                return rej(err);
+            });
+        });
+    }
+    /**
+     *
+     * @param assetID ID of asset to get gatepasses of
+     * @returns Gatepass data
+     */
     static getGatepassReport(assetID) {
         return new Promise((res, rej) => {
             let query = `SELECT g.reason AS gatepass_reason, g.fromlocation, g.tolocation, TO_CHAR(g.date, 'YYYY-MM-DD') AS leaving_time, g.comment AS 

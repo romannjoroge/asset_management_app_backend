@@ -109,6 +109,24 @@ router.get('/inventory/:type', (req, res) => {
     }
 });
 
+// Enum To Store Types Of Reports
+enum ReportType {
+    "FIXED_ASSET_REGISTER" = "register",
+    "PHYSICAL_VERIFICATION" = "physical",
+    "AUDIT_TRAIL" = "audit",
+    "ASSET_DISPOSAL" = "disposal",
+    "MISSING_ASSETS" = "missing",
+    "UNACCOUNTED_ASSETS" = "unaccounted",
+    "STATE_PHYSICAL_VERIFICATION" = "state",
+    "CHAIN_OF_CUSTODY" = "chain",
+    "ASSET_MOVEMENT_REPORT" = "movement",
+    "GATEPASS_REPORT" = "gatepass",
+    "LOCATION_ASSET_VALUE_REPORT" = "value",
+    "ASSET_ACQUISITION" = "acquisiton",
+    "ASSET_DEPRECIATION" = "depreciation",
+    "ASSET_CATEGORY" = "category"
+}
+
 router.get('/report/:type', (req, res) => {
     // Get report type from request params
     let reportType = req.params.type;

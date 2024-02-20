@@ -93,6 +93,24 @@ router.get('/inventory/:type', (req, res) => {
         });
     }
 });
+// Enum To Store Types Of Reports
+var ReportType;
+(function (ReportType) {
+    ReportType["FIXED_ASSET_REGISTER"] = "register";
+    ReportType["PHYSICAL_VERIFICATION"] = "physical";
+    ReportType["AUDIT_TRAIL"] = "audit";
+    ReportType["ASSET_DISPOSAL"] = "disposal";
+    ReportType["MISSING_ASSETS"] = "missing";
+    ReportType["UNACCOUNTED_ASSETS"] = "unaccounted";
+    ReportType["STATE_PHYSICAL_VERIFICATION"] = "state";
+    ReportType["CHAIN_OF_CUSTODY"] = "chain";
+    ReportType["ASSET_MOVEMENT_REPORT"] = "movement";
+    ReportType["GATEPASS_REPORT"] = "gatepass";
+    ReportType["LOCATION_ASSET_VALUE_REPORT"] = "value";
+    ReportType["ASSET_ACQUISITION"] = "acquisiton";
+    ReportType["ASSET_DEPRECIATION"] = "depreciation";
+    ReportType["ASSET_CATEGORY"] = "category";
+})(ReportType || (ReportType = {}));
 router.get('/report/:type', (req, res) => {
     // Get report type from request params
     let reportType = req.params.type;
