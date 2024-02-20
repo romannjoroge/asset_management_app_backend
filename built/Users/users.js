@@ -13,6 +13,17 @@ import pool from '../../db2.js';
 import userTable from './db_users.js';
 import MyError from '../utility/myError.js';
 import { Errors, MyErrors2 } from '../utility/constants.js';
+export var UserRoles;
+(function (UserRoles) {
+    UserRoles["COMPANY_ADMIN"] = "Company Administrator";
+    UserRoles["USER_MANAGER"] = "User Manager";
+    UserRoles["ASSET_ADMIN"] = "Asset Administrator";
+    UserRoles["ASSET_RECONCILER"] = "Asset Reconciler";
+    UserRoles["RFID_READER"] = "RFID Reader";
+    UserRoles["ASSET_USER"] = "Asset User";
+    UserRoles["GATEPASS_AUTH"] = "GatePass Authorizer";
+    UserRoles["REPORT_GEN"] = "Report Generator";
+})(UserRoles || (UserRoles = {}));
 class User {
     constructor() { }
     static getName(username) {

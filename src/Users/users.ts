@@ -37,6 +37,17 @@ interface GetUserEmailFetchResult {
     rows: {email: string}[]
 }
 
+export enum UserRoles {
+    "COMPANY_ADMIN" = "Company Administrator",
+    "USER_MANAGER" = "User Manager",
+    "ASSET_ADMIN" = "Asset Administrator",
+    "ASSET_RECONCILER" = "Asset Reconciler",
+    "RFID_READER" = "RFID Reader",
+    "ASSET_USER" = "Asset User",
+    "GATEPASS_AUTH" = "GatePass Authorizer",
+    "REPORT_GEN" = "Report Generator"
+}
+
 
 
 class User {
