@@ -59,14 +59,11 @@ class User {
     }
     static checkIfUserIDExists(userID) {
         return new Promise((res, rej) => {
-            console.log(11);
             pool.query(userTable.checkIfUserIDExists, [userID]).then((data) => {
                 if (data.rowCount > 0) {
-                    console.log(12);
                     res(true);
                 }
                 else {
-                    console.log(13);
                     res(false);
                 }
             }).catch(_ => {

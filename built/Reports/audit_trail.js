@@ -15,22 +15,18 @@ import ReportDatabase from "./reportDatabase.js";
 export default function getAuditTrail(userid, eventtype, fromDate, toDate) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log(1);
             // Throw error if user does not exist
             const userExist = yield User.checkIfUserIDExists(userid);
             if (userExist === false) {
                 throw new MyError(MyErrors2.USER_NOT_EXIST);
             }
-            console.log(2);
             // Throw error if log event type does not exist
             const logEventExists = Log.isLogEventValid(eventtype);
             if (logEventExists === false) {
                 throw new MyError(MyErrors2.LOG_EVENT_NOT_EXIST);
             }
-            console.log(3);
             // Get and return audit trails
             const audittrails = yield ReportDatabase.getAuditTrails(userid, eventtype, fromDate, toDate);
-            console.log(4);
             return audittrails;
         }
         catch (err) {

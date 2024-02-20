@@ -35,27 +35,36 @@ export class Log {
 
     // Get type of item that event type belongs to
     static getLogEventItemType(logEvent: string): EventItemTypes {
-        switch (logEvent) {
-            case "CREATE_ASSET" || "DELETE_ASSET" || "UPDATE_ASSET":
-                return EventItemTypes.Asset;
-            case "CREATE_CATEGORY" || "DELETE_CATEGORY" || "UPDATE_CATEGORY":
-                return EventItemTypes.Category;
-            case "CREATE_LOCATION" || "DELETE_LOCATION" || "UPDATE_LOCATION":
-                return EventItemTypes.Location;
-            case "CREATE_READER" || "DELETE_READER" || "UPDATE_READER":
-                return EventItemTypes.Reader;
-            case "CREATE_USER" || "DELETE_USER" || "UPDATE_USER":
-                return EventItemTypes.User;
-            case "ASSET_REGISTER_REPORT" || "ASSET_DEPRECIATION_SCHEDULE_REPORT" || "ASSET_ACQUISITION_REPORT" || "STOCK_TAKE_RECONCILIATION_REPORT" || "CATEGORY_DERECIATION_CONFIGURATION_REPORT" || "ASSET_CATEGORY_REPORT" || "AUDIT_TRAIL_REPORT" || "CHAIN_OF_CUSTODY_REPORT" || "MOVEMENT_REPORT":
-                return EventItemTypes.Report;
-            case "REQUEST_GATEPASS" || "APPROVE_GATEPASS" || "REJECT_GATEPASS":
-                return EventItemTypes.GatePass;
-            case "CREATE_INVENTORY" || "DELETE_INVENTORY" || "UPDATE_INVENTORY":
-                return EventItemTypes.Inventory;
-            case "CREATE_BATCH" || "DELETE_BATCH" || "UPDATE_BATCH" || "ASSIGN_BATCH_INVENTORY" || "UNASSIGN_BATCH_INVENTORY":
-                return EventItemTypes.Batch;
-            default:
-                throw new MyError(MyErrors2.LOG_EVENT_NOT_EXIST);
+        console.log(logEvent);
+
+        if (["CREATE_ASSET", "DELETE_ASSET", "UPDATE_ASSET"].includes(logEvent)) {
+            return EventItemTypes.Asset;
+        }
+        else if (["CREATE_CATEGORY" , "DELETE_CATEGORY" , "UPDATE_CATEGORY"].includes(logEvent)) {
+            return EventItemTypes.Category;
+        }
+        else if (["CREATE_LOCATION", "DELETE_LOCATION", "UPDATE_LOCATION"].includes(logEvent)) {
+            return EventItemTypes.Location;
+        }
+        else if (["CREATE_READER", "DELETE_READER", "UPDATE_READER"].includes(logEvent)) {
+            return EventItemTypes.Reader;
+        }
+        else if (["CREATE_USER", "DELETE_USER", "UPDATE_USER"].includes(logEvent)) {
+            return EventItemTypes.User;
+        }
+        else if (["ASSET_REGISTER_REPORT", "ASSET_DEPRECIATION_SCHEDULE_REPORT", "ASSET_ACQUISITION_REPORT", "STOCK_TAKE_RECONCILIATION_REPORT", "CATEGORY_DERECIATION_CONFIGURATION_REPORT", "ASSET_CATEGORY_REPORT", "AUDIT_TRAIL_REPORT", "CHAIN_OF_CUSTODY_REPORT", "MOVEMENT_REPORT", "ASSET_DISPOSAL_REPORT", "GATEPASS_REPORT", "STATE_PHYSICAL_VERIFICATION_MISSING", "STATE_PHYSICAL_VERIFICATION_PRESENT"].includes(logEvent)) {
+            return EventItemTypes.Report;
+        }
+        else if (["REQUEST_GATEPASS", "APPROVE_GATEPASS", "REJECT_GATEPASS"].includes(logEvent)) {
+            return EventItemTypes.GatePass;
+        }
+        else if (["CREATE_INVENTORY", "DELETE_INVENTORY", "UPDATE_INVENTORY"].includes(logEvent)) {
+            return EventItemTypes.Inventory;
+        }
+        else if (["CREATE_BATCH" , "DELETE_BATCH" , "UPDATE_BATCH" , "ASSIGN_BATCH_INVENTORY" , "UNASSIGN_BATCH_INVENTORY"].includes(logEvent)) {
+            return EventItemTypes.Batch;
+        } else {
+            throw new MyError(MyErrors2.LOG_EVENT_NOT_EXIST);
         }
     }
 }

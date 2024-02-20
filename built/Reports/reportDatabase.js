@@ -2,7 +2,7 @@ import pool from "../../db2.js";
 import reportTable from "./db_reports.js";
 import { EventItemTypes, Log } from "../Log/log.js";
 import MyError from "../utility/myError.js";
-import { MyErrors2 } from "../utility/constants.js";
+import { Logs, MyErrors2 } from "../utility/constants.js";
 const baseAssetRegister = `SELECT a.serialnumber AS serial_number, TO_CHAR(a.acquisitiondate, 'YYYY-MM-DD') AS acquisition_date, a.condition, (SELECT name AS responsible_users_name FROM User2 
     WHERE id = a.responsibleuserid LIMIT 1), a.acquisitioncost AS acquisition_cost, a.residualvalue AS residual_value, c.name AS category_name, 
     a.usefullife AS useful_life, a.barcode, a.description, a.locationid AS locationid, TO_CHAR(a.disposaldate, 'YYYY-MM-DD') AS expected_depreciation_date, 
@@ -19,11 +19,11 @@ function getResultsFromDatabase(query, args) {
     });
 }
 export default class ReportDatabase {
-    static getCategoryReport() {
+    static getCategoryReport(locationid) {
         return new Promise((res, rej) => {
             let query = `SELECT c.name, foo.count FROM Category c FULL JOIN (SELECT COUNT(*), c.name FROM Asset a JOIN Category c ON c.id = a.categoryid WHERE a.locationID = $1 GROUP BY c.name) AS foo ON foo.name = c.name`;
             // Get data
-            getResultsFromDatabase(query, []).then(data => {
+            getResultsFromDatabase(query, [locationid]).then(data => {
                 return res(data);
             }).catch((err) => {
                 return rej(err);
@@ -161,7 +161,6 @@ export default class ReportDatabase {
     static getAssetDisposalData(startDate, endDate) {
         return new Promise((res, rej) => {
             let query = baseAssetRegisterQueryWithNonDeletedAssets + `AND a.disposaldate BETWEEN $1 AND $2`;
-            console.log(query);
             // Call query and return results
             getResultsFromDatabase(query, [startDate, endDate]).then(data => {
                 return res(data);
@@ -175,6 +174,7 @@ export default class ReportDatabase {
         return new Promise((res, rej) => {
             // Get the type of item the audit trail is 
             let itemtype = Log.getLogEventItemType(eventtype);
+            console.log(itemtype);
             // Get the query to use based on itemtype
             let query;
             switch (itemtype) {
@@ -208,8 +208,9 @@ export default class ReportDatabase {
                 default:
                     return rej(new MyError(MyErrors2.LOG_EVENT_NOT_EXIST));
             }
+            let eventid = Logs[eventtype];
             // Run query
-            pool.query(query, [userid, eventtype, fromDate, toDate]).then((fetchResult) => {
+            pool.query(query, [userid, eventid, fromDate, toDate]).then((fetchResult) => {
                 if (fetchResult.rowCount <= 0) {
                     return res([]);
                 }

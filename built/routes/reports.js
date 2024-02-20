@@ -131,175 +131,175 @@ router.get('/report/:type', checkifAuthorized(UserRoles.REPORT_GEN), (req, res) 
     let barcode;
     let userid;
     let eventtype;
-    try {
-        switch (reportType) {
-            case ReportType.ASSET_ACQUISITION:
-                // Get fields of report
-                startDate = utility.checkIfValidDate(req.query.startDate, "Invalid Date");
-                endDate = utility.checkIfValidDate(req.query.endDate, "Invalid Date");
-                locationid = Number.parseInt(req.query.locationid);
-                // Generate report
-                assetAcquisition(startDate, endDate, locationid).then(results => {
-                    // Add log entry
-                    Log.createLog(req.ip, req.id, Logs.ASSET_ACQUISITION_REPORT).then(_ => {
-                        return res.json(results);
-                    }).catch((err) => {
-                        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                    });
-                });
-            case ReportType.ASSET_CATEGORY:
-                categoryReport().then(results => {
-                    // Add log entry
-                    Log.createLog(req.ip, req.id, Logs.CATEGORY_DERECIATION_CONFIGURATION_REPORT).then(_ => {
-                        return res.json(results);
-                    }).catch((err) => {
-                        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                    });
-                }).catch((err) => {
-                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                });
-            case ReportType.ASSET_DEPRECIATION:
-                barcode = req.query.barcode;
-                getDepreciationDetails(barcode).then(results => {
-                    // Add log entry
-                    Log.createLog(req.ip, req.id, Logs.ASSET_DEPRECIATION_SCHEDULE_REPORT).then(_ => {
-                        return res.json(results);
-                    }).catch((err) => {
-                        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                    });
-                }).catch((err) => {
-                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                });
-            case ReportType.ASSET_DISPOSAL:
-                // Get fields of report
-                startDate = utility.checkIfValidDate(req.query.startDate, "Invalid Date");
-                endDate = utility.checkIfValidDate(req.query.endDate, "Invalid Date");
-                getAssetDisposalReport(startDate, endDate).then(results => {
-                    // Add log entry
-                    Log.createLog(req.ip, req.id, Logs.ASSET_DISPOSAL_REPORT).then(_ => {
-                        return res.json(results);
-                    }).catch((err) => {
-                        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                    });
-                }).catch((err) => {
-                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                });
-            case ReportType.ASSET_MOVEMENT_REPORT:
-                // Get fields of report
-                barcode = req.query.barcode;
-                assetMovementReport(barcode).then(results => {
-                    // Add log entry
-                    Log.createLog(req.ip, req.id, Logs.MOVEMENT_REPORT).then(_ => {
-                        return res.json(results);
-                    }).catch((err) => {
-                        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                    });
-                }).catch((err) => {
-                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                });
-            case ReportType.AUDIT_TRAIL:
-                // Get fields of report
-                userid = Number.parseInt(req.query.userid);
-                eventtype = req.query.eventtype;
-                startDate = utility.checkIfValidDate(req.query.startDate, "Invalid Date");
-                endDate = utility.checkIfValidDate(req.query.endDate, "Invalid Date");
-                getAuditTrail(userid, eventtype, startDate, endDate).then(results => {
-                    // Add log entry
-                    Log.createLog(req.ip, req.id, Logs.AUDIT_TRAIL_REPORT).then(_ => {
-                        return res.json(results);
-                    }).catch((err) => {
-                        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                    });
-                }).catch((err) => {
-                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                });
-            case ReportType.CHAIN_OF_CUSTODY:
-                // Get fields of report
-                barcode = req.query.barcode;
-                getChainOfCustody(barcode).then(results => {
-                    // Add log entry
-                    Log.createLog(req.ip, req.id, Logs.CHAIN_OF_CUSTODY_REPORT).then(_ => {
-                        return res.json(results);
-                    }).catch((err) => {
-                        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                    });
-                }).catch((err) => {
-                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                });
-            case ReportType.FIXED_ASSET_REGISTER:
-                getAssetRegister().then(data => {
-                    // Add log entry
-                    Log.createLog(req.ip, req.id, Logs.ASSET_REGISTER_REPORT).then(_ => {
-                        return res.json(results);
-                    }).catch((err) => {
-                        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                    });
-                }).catch((err) => {
-                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                });
-            case ReportType.GATEPASS_REPORT:
-                // Get fields of report
-                barcode = req.query.barcode;
-                getGatepassReport(barcode).then(results => {
-                    // Add log entry
-                    Log.createLog(req.ip, req.id, Logs.GATEPASS_REPORT).then(_ => {
-                        return res.json(results);
-                    }).catch((err) => {
-                        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                    });
-                }).catch((err) => {
-                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                });
-            case ReportType.LOCATION_ASSET_VALUE_REPORT:
-                // Get fields of report
-                locationid = Number.parseInt(req.query.locationid);
-                assetsInLocation(locationid).then(results => {
-                    // Add log entry
-                    Log.createLog(req.ip, req.id, Logs.ASSET_DEPRECIATION_SCHEDULE_REPORT).then(_ => {
-                        return res.json(results);
-                    }).catch((err) => {
-                        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                    });
-                }).catch((err) => {
-                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                });
-            case ReportType.STATE_PHYSICAL_VERIFICATION_MISSING:
-                assetsNotInRegister().then(results => {
-                    // Add log entry
-                    Log.createLog(req.ip, req.id, Logs.STATE_PHYSICAL_VERIFICATION_MISSING).then(_ => {
-                        return res.json(results);
-                    }).catch((err) => {
-                        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                    });
-                }).catch((err) => {
-                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                });
-            case ReportType.STATE_PHYSICAL_VERIFICATION_PRESENT:
-                assetsPresentInRegister().then(results => {
-                    // Add log entry
-                    Log.createLog(req.ip, req.id, Logs.STATE_PHYSICAL_VERIFICATION_PRESENT).then(_ => {
-                        return res.json(results);
-                    }).catch((err) => {
-                        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                    });
-                }).catch((err) => {
-                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                });
-            case ReportType.:
-                assetsPresentInRegister().then(results => {
-                    // Add log entry
-                    Log.createLog(req.ip, req.id, Logs.STATE_PHYSICAL_VERIFICATION_PRESENT).then(_ => {
-                        return res.json(results);
-                    }).catch((err) => {
-                        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                    });
-                }).catch((err) => {
-                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-                });
-        }
+    if (reportType === ReportType.ASSET_ACQUISITION) {
+        // Get fields of report
+        startDate = utility.checkIfValidDate(req.query.startDate, "Invalid Date");
+        endDate = utility.checkIfValidDate(req.query.endDate, "Invalid Date");
+        locationid = Number.parseInt(req.query.locationid);
+        // Generate report
+        assetAcquisition(startDate, endDate, locationid).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.ASSET_ACQUISITION_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        });
     }
-    catch (err) {
-        return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+    else if (reportType === ReportType.ASSET_CATEGORY) {
+        locationid = Number.parseInt(req.query.locationid);
+        categoryReport(locationid).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.ASSET_CATEGORY_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                console.log(err);
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            console.log(err);
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.ASSET_DEPRECIATION) {
+        barcode = req.query.barcode;
+        getDepreciationDetails(barcode).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.ASSET_DEPRECIATION_SCHEDULE_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.ASSET_DISPOSAL) {
+        // Get fields of report
+        startDate = utility.checkIfValidDate(req.query.startDate, "Invalid Date");
+        endDate = utility.checkIfValidDate(req.query.endDate, "Invalid Date");
+        getAssetDisposalReport(startDate, endDate).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.ASSET_DISPOSAL_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.ASSET_MOVEMENT_REPORT) {
+        // Get fields of report
+        barcode = req.query.barcode;
+        assetMovementReport(barcode).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.MOVEMENT_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.AUDIT_TRAIL) {
+        // Get fields of report
+        userid = Number.parseInt(req.query.userid);
+        eventtype = req.query.eventtype;
+        startDate = utility.checkIfValidDate(req.query.startDate, "Invalid Date");
+        endDate = utility.checkIfValidDate(req.query.endDate, "Invalid Date");
+        getAuditTrail(userid, eventtype, startDate, endDate).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.AUDIT_TRAIL_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.CHAIN_OF_CUSTODY) {
+        // Get fields of report
+        barcode = req.query.barcode;
+        getChainOfCustody(barcode).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.CHAIN_OF_CUSTODY_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.FIXED_ASSET_REGISTER) {
+        getAssetRegister().then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.ASSET_REGISTER_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.GATEPASS_REPORT) {
+        // Get fields of report
+        barcode = req.query.barcode;
+        getGatepassReport(barcode).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.GATEPASS_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.LOCATION_ASSET_VALUE_REPORT) {
+        // Get fields of report
+        locationid = Number.parseInt(req.query.locationid);
+        assetsInLocation(locationid).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.ASSET_DEPRECIATION_SCHEDULE_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.STATE_PHYSICAL_VERIFICATION_MISSING) {
+        assetsNotInRegister().then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.STATE_PHYSICAL_VERIFICATION_MISSING).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.STATE_PHYSICAL_VERIFICATION_PRESENT) {
+        assetsPresentInRegister().then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.STATE_PHYSICAL_VERIFICATION_PRESENT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else {
+        return res.status(400).json({ message: MyErrors2.REPORT_NOT_SUPPPORTED });
     }
 });
 router.get('/depSchedule/:barcode', (req, res) => {
