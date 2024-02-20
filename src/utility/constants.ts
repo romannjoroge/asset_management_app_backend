@@ -113,6 +113,12 @@ export enum Logs {
     "UPDATE_BATCH" = 33,
     "ASSIGN_BATCH_INVENTORY" = 34,
     "UNASSIGN_BATCH_INVENTORY" = 35,
+    "UNKOWN" = 36,
+    "ALLOCATE_ASSET" = 37,
+    "ASSET_DISPOSAL_REPORT" = 38,
+    "GATEPASS_REPORT" = 39,
+    "STATE_PHYSICAL_VERIFICATION_MISSING" = 40,
+    "STATE_PHYSICAL_VERIFICATION_PRESENT" = 41
 }
 
 export enum MyErrors2 {
@@ -167,7 +173,11 @@ export enum MyErrors2 {
     "INVALID_BARCODE" = "Invalid Barcode",
     "NOT_GET_NEXT_ASSET_ID" = "Could Not Get Next Asset ID",
     "NOT_STORE_ASSET" = "Could Not Store Asset",
-    
+    "NOT_GENERATE_REPORT" = "Could Not Generate Report",
+    "LOG_EVENT_NOT_EXIST" = "The Log Event Type Does Not Exist",
+    "NOT_GET_FROM_DATABASE" = "Could Not Get Data From Database",
+    "NOT_GET_SITE_BUILDING_OFFICE" = "Could Not Get The Site, Building and Office of Location",
+    "REPORT_NOT_SUPPPORTED" = "The report chosen is not supported by system"
 }
 
 export enum Success2 {

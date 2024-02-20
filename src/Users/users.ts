@@ -37,6 +37,17 @@ interface GetUserEmailFetchResult {
     rows: {email: string}[]
 }
 
+export enum UserRoles {
+    "COMPANY_ADMIN" = "Company Administrator",
+    "USER_MANAGER" = "User Manager",
+    "ASSET_ADMIN" = "Asset Administrator",
+    "ASSET_RECONCILER" = "Asset Reconciler",
+    "RFID_READER" = "RFID Reader",
+    "ASSET_USER" = "Asset User",
+    "GATEPASS_AUTH" = "GatePass Authorizer",
+    "REPORT_GEN" = "Report Generator"
+}
+
 
 
 class User {
@@ -70,7 +81,7 @@ class User {
         });
     }
 
-    static async checkIfUserIDExists(userID: number): Promise<boolean> {
+    static checkIfUserIDExists(userID: number): Promise<boolean> {
         return new Promise((res, rej) => {
             pool.query(userTable.checkIfUserIDExists, [userID]).then((data: UserFetchResult) => {
                 if (data.rowCount > 0) {
@@ -79,12 +90,12 @@ class User {
                     res(false)
                 }
             }).catch(_ => {
-                throw(new MyError(MyErrors2.USER_NOT_EXIST))
+                rej(new MyError(MyErrors2.USER_NOT_EXIST))
             })
         });
     }
 
-    static async checkIfUserNameExists(username: string): Promise<boolean> {
+    static checkIfUserNameExists(username: string): Promise<boolean> {
         return new Promise((res, rej) => {
             pool.query(userTable.checkIfNameExists, [username]).then((data: UserFetchResult) => {
                 if (data.rowCount > 0) {

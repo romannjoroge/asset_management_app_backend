@@ -17,12 +17,12 @@ interface selectLocation {
 
 interface GetParentLocationFetchResult {
     rowCount: number;
-    rows: {parentlocationid: number}[]
+    rows: { parentlocationid: number }[]
 }
 
 interface GetLocationNameFetchResult {
     rowCount: number;
-    rows: {name: string}[]
+    rows: { name: string }[]
 }
 
 export interface selectLocationResults {
@@ -30,16 +30,22 @@ export interface selectLocationResults {
     rowCount: number;
 }
 
+export interface SiteBuildingOffice {
+    site: string;
+    building: string;
+    office: string;
+}
+
 
 class Location {
-    constructor (){}
+    constructor() { }
 
-    static async verifyLocationID(id: number): Promise<boolean | never>{
+    static async verifyLocationID(id: number): Promise<boolean> {
         // Returns true if locationID exists in the database, false otherwise
         let fetchResult;
-        try{
+        try {
             fetchResult = await pool.query(locationTable.getLocation, [id]);
-        }catch(err){
+        } catch (err) {
             throw new MyError(Errors[3]);
         }
         return (fetchResult.rowCount > 0);
@@ -104,14 +110,14 @@ class Location {
             while (!parentLocationID) {
                 // Get parent location
                 parentLocationID = await this.findParentLocation(locationID);
-                
+
                 if (parentLocationID) {
                     locationID = parentLocationID
                 }
             }
 
             return locationID;
-        } catch(err) {
+        } catch (err) {
             throw new MyError(MyErrors2.NOT_GET_PARENT_LOCATION);
         }
     }
@@ -128,6 +134,83 @@ class Location {
                 }
             }).catch((err: any) => {
                 return rej(new MyError(MyErrors2.NOT_GET_LOCATION_NAME))
+            })
+        });
+    }
+
+    // Find the site, building and office of a location from its ID
+    static getSiteBuildingOffice(locationid: number): Promise<SiteBuildingOffice> {
+        return new Promise((res, rej) => {
+            // Throw error if location does not exist
+            this.verifyLocationID(locationid).then(doesExist => {
+                if (doesExist === false) {
+                    return rej(new MyError(MyErrors2.LOCATION_NOT_EXIST))
+                }
+
+                // If the location is a site show only site
+                this.findParentLocation(locationid).then(parent1 => {
+                    // If location has no parent it is a site
+                    if (!parent1) {
+                        // Get name of site
+                        this.getLocationName(locationid).then(siteName => {
+                            return res({
+                                site: siteName,
+                                building: "all",
+                                office: "all"
+                            });
+                        }).catch((err: MyError) => {
+                            return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE))
+                        })
+                    } else {
+                        // If location has a parent it means it could either be a building or office
+                        this.findParentLocation(parent1).then(parent2 => {
+                            // If parent2 is null it means it means parent2 is the site and locationid is building
+                            if (!parent2) {
+                                this.getLocationName(locationid).then(buildingName => {
+                                    // Get name of site
+                                    this.getLocationName(parent1).then(siteName => {
+                                        // Return results
+                                        return res({
+                                            site: siteName,
+                                            building: buildingName,
+                                            office: "all"
+                                        })
+                                    }).catch((err: MyError) => {
+                                        return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE))
+                                    })
+                                }).catch((err: MyError) => {
+                                    console.log(err);
+                                    return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE))
+                                })
+                            } else {
+                                // parent2 is the site, parent1 is the building and locationid is the office
+                                this.getLocationName(parent2).then(siteName => {
+                                    this.getLocationName(parent1).then(buildingName => {
+                                        this.getLocationName(locationid).then(officeName => {
+                                            return res({
+                                                site: siteName,
+                                                building: buildingName,
+                                                office: officeName
+                                            })
+                                        }).catch((err: MyError) => {
+                                            return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE))
+                                        })
+                                    }).catch((err: MyError) => {
+                                        return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE))
+                                    })
+                                }).catch((err: MyError) => {
+                                    return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE))
+                                })
+                            }
+                        }).catch((err: MyError) => {
+                            return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE))
+                        })
+                    }
+                }).catch((err: MyError) => {
+                    return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE));
+                })
+            }).catch((err: MyError) => {
+                return rej(new MyError(MyErrors2.NOT_GET_SITE_BUILDING_OFFICE))
             })
         });
     }

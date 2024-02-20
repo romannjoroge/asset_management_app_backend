@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
@@ -5,7 +14,6 @@ import reportsTable from '../Reports/db_reports.js';
 import { Errors, Logs, MyErrors2 } from '../utility/constants.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import logTable from '../Log/db_log.js';
 import userTable from '../Users/db_users.js';
 import checkifAuthenticated from '../../middleware/checkifAuthenticated.js';
 import checkifAuthorized from '../../middleware/checkifAuthorized.js';
@@ -14,8 +22,50 @@ import locationTable from '../Tracking/db_location.js';
 import { getTaggedAssets } from '../Reports/tagged_assets.js';
 import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciations.js';
 import { Log } from '../Log/log.js';
+import getAuditTrail from '../Reports/audit_trail.js';
+import { getAssetRegister } from '../Reports/asset_register.js';
+import { getAssetDisposalReport } from '../Reports/asset_disposal.js';
+import { assetsNotInRegister, assetsPresentInRegister } from '../Reports/state_physical_valuation.js';
+import { getChainOfCustody } from '../Reports/chain_custody.js';
+import { assetMovementReport } from '../Reports/asset_movement.js';
+import { assetsInLocation } from '../Reports/location_asset_value.js';
+import { assetAcquisition } from '../Reports/asset_acquisition.js';
+import { getDepreciationDetails } from '../Reports/asset_depreciation.js';
+import { getGatepassReport } from '../Reports/gatepass_report.js';
+import { UserRoles } from '../Users/users.js';
+import { categoryReport } from '../Reports/category_report.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+/**
+ * Route for testing stuff
+ */
+router.get('/test', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Testing
+        // let assetRegister = await getAssetDisposalReport(new Date(2023, 7, 12), new Date(2023, 7, 15));
+        // console.log(assetRegister);
+        // return res.json(assetRegister);
+        // let assetRegister = await assetAcquisition(new Date(2023, 4, 1), new Date(2023, 7, 1), 3);
+        // console.log(assetRegister);
+        // return res.json(assetRegister);
+        // let assetRegister = await getDepreciationDetails('AUA1002');
+        // console.log(assetRegister);
+        // return res.json(assetRegister);
+        // let assetRegister = await assetMovementReport('AUA1000');
+        // console.log(assetRegister);
+        // return res.json(assetRegister);
+        let data = yield getGatepassReport('010200000150');
+        console.log(data);
+        return res.json(data);
+        // let data = await ReportDatabase.getAcquiredAssetsInLocation(new Date(2023, 4, 1), new Date(2023, 7, 1), 3);
+        // console.log(data);
+        // return res.json(data);
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).send("Shit Went Down!");
+    }
+}));
 // A route to get the tagged assets
 router.get('/tagged/:istagged', (req, res) => {
     // Get is tagged from request parameter
@@ -53,94 +103,208 @@ router.get('/inventory/:type', (req, res) => {
         });
     }
 });
-router.get('/report/:type', (req, res) => {
+// Enum To Store Types Of Reports
+var ReportType;
+(function (ReportType) {
+    ReportType["FIXED_ASSET_REGISTER"] = "register";
+    ReportType["PHYSICAL_VERIFICATION"] = "physical";
+    ReportType["AUDIT_TRAIL"] = "audit";
+    ReportType["ASSET_DISPOSAL"] = "disposal";
+    ReportType["MISSING_ASSETS"] = "missing";
+    ReportType["UNACCOUNTED_ASSETS"] = "unaccounted";
+    ReportType["STATE_PHYSICAL_VERIFICATION_MISSING"] = "state_missing";
+    ReportType["STATE_PHYSICAL_VERIFICATION_PRESENT"] = "state_present";
+    ReportType["CHAIN_OF_CUSTODY"] = "chain";
+    ReportType["ASSET_MOVEMENT_REPORT"] = "movement";
+    ReportType["GATEPASS_REPORT"] = "gatepass";
+    ReportType["LOCATION_ASSET_VALUE_REPORT"] = "value";
+    ReportType["ASSET_ACQUISITION"] = "acquisiton";
+    ReportType["ASSET_DEPRECIATION"] = "depreciation";
+    ReportType["ASSET_CATEGORY"] = "category";
+})(ReportType || (ReportType = {}));
+router.get('/report/:type', checkifAuthorized(UserRoles.REPORT_GEN), (req, res) => {
     // Get report type from request params
     let reportType = req.params.type;
-    let query;
-    let inputs;
-    let eventid;
-    if (reportType == "chain") {
-        query = reportsTable.chainOfCustody;
-        inputs = [req.query.barcode];
-        eventid = Logs.AUDIT_TRAIL_REPORT;
-    }
-    else if (reportType == "movement") {
-        query = reportsTable.movements;
-        inputs = [req.query.barcode];
-        eventid = Logs.MOVEMENT_REPORT;
-    }
-    else if (reportType == 'category') {
-        query = reportsTable.categoryCount;
-        inputs = [];
-        eventid = Logs.ASSET_CATEGORY_REPORT;
-    }
-    else if (reportType == 'assetRegister') {
-        query = reportsTable.getAssetRegister;
-        inputs = [];
-        eventid = Logs.ASSET_REGISTER_REPORT;
-    }
-    else if (reportType == 'audit') {
-        eventid = Logs.AUDIT_TRAIL_REPORT;
-        try {
-            query = logTable.selectUserLogs;
-            let username = req.query.username;
-            let to = utility.checkIfValidDate(req.query.to, "Invalid To Date");
-            let from = utility.checkIfValidDate(req.query.from, "Invalid From Date");
-            let eventtype = req.query.eventtype;
-            inputs = [username, from, to, eventtype];
-        }
-        catch (err) {
-            console.log(err);
-            return res.status(400).json({ message: Errors[9] });
-        }
-    }
-    else if (reportType == "missing") {
-        query = reportsTable.missingAssets;
-        inputs = [req.query.stockTake];
-    }
-    else if (reportType == 'physical') {
-        query = reportsTable.physical_valuation;
-        inputs = [req.query.location];
-        eventid = Logs.MOVEMENT_REPORT;
-    }
-    else if (reportType == 'acquisition') {
-        query = reportsTable.acquisitionReport;
-        var year = Number.parseInt(req.query.year);
-        inputs = [new Date(year, 0, 1), new Date(year + 1, 0, 1)];
-        eventid = Logs.ASSET_ACQUISITION_REPORT;
-    }
-    else if (reportType == 'depreciationreport') {
-        query = reportsTable.getDepreciationDetails;
-        inputs = [];
-        eventid = Logs.CATEGORY_DERECIATION_CONFIGURATION_REPORT;
-    }
-    else {
-        return res.status(404).json({
-            message: Errors[0]
+    let startDate;
+    let endDate;
+    let locationid;
+    let barcode;
+    let userid;
+    let eventtype;
+    if (reportType === ReportType.ASSET_ACQUISITION) {
+        // Get fields of report
+        startDate = utility.checkIfValidDate(req.query.startDate, "Invalid Date");
+        endDate = utility.checkIfValidDate(req.query.endDate, "Invalid Date");
+        locationid = Number.parseInt(req.query.locationid);
+        // Generate report
+        assetAcquisition(startDate, endDate, locationid).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.ASSET_ACQUISITION_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
         });
     }
-    // Get all log entries that have asset tag and allocate asset event
-    pool.query(query, inputs).then(data => {
-        if (data.rowCount <= 0) {
-            return res.status(404).json({
-                message: Errors[22]
+    else if (reportType === ReportType.ASSET_CATEGORY) {
+        locationid = Number.parseInt(req.query.locationid);
+        categoryReport(locationid).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.ASSET_CATEGORY_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                console.log(err);
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
             });
-        }
-        // Add log
-        Log.createLog(req.ip, req.id, eventid).then((_) => {
-            return res.json(data.rows);
+        }).catch((err) => {
+            console.log(err);
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.ASSET_DEPRECIATION) {
+        barcode = req.query.barcode;
+        getDepreciationDetails(barcode).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.ASSET_DEPRECIATION_SCHEDULE_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
         }).catch((err) => {
             return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
         });
-    }).catch(err => {
-        console.log(err);
-        return res.status(500).json({
-            message: Errors[9]
+    }
+    else if (reportType === ReportType.ASSET_DISPOSAL) {
+        // Get fields of report
+        startDate = utility.checkIfValidDate(req.query.startDate, "Invalid Date");
+        endDate = utility.checkIfValidDate(req.query.endDate, "Invalid Date");
+        getAssetDisposalReport(startDate, endDate).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.ASSET_DISPOSAL_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
         });
-    });
+    }
+    else if (reportType === ReportType.ASSET_MOVEMENT_REPORT) {
+        // Get fields of report
+        barcode = req.query.barcode;
+        assetMovementReport(barcode).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.MOVEMENT_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.AUDIT_TRAIL) {
+        // Get fields of report
+        userid = Number.parseInt(req.query.userid);
+        eventtype = req.query.eventtype;
+        startDate = utility.checkIfValidDate(req.query.startDate, "Invalid Date");
+        endDate = utility.checkIfValidDate(req.query.endDate, "Invalid Date");
+        getAuditTrail(userid, eventtype, startDate, endDate).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.AUDIT_TRAIL_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.CHAIN_OF_CUSTODY) {
+        // Get fields of report
+        barcode = req.query.barcode;
+        getChainOfCustody(barcode).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.CHAIN_OF_CUSTODY_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.FIXED_ASSET_REGISTER) {
+        getAssetRegister().then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.ASSET_REGISTER_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.GATEPASS_REPORT) {
+        // Get fields of report
+        barcode = req.query.barcode;
+        getGatepassReport(barcode).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.GATEPASS_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.LOCATION_ASSET_VALUE_REPORT) {
+        // Get fields of report
+        locationid = Number.parseInt(req.query.locationid);
+        assetsInLocation(locationid).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.ASSET_DEPRECIATION_SCHEDULE_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.STATE_PHYSICAL_VERIFICATION_MISSING) {
+        assetsNotInRegister().then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.STATE_PHYSICAL_VERIFICATION_MISSING).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.STATE_PHYSICAL_VERIFICATION_PRESENT) {
+        assetsPresentInRegister().then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.STATE_PHYSICAL_VERIFICATION_PRESENT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        }).catch((err) => {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else {
+        return res.status(400).json({ message: MyErrors2.REPORT_NOT_SUPPPORTED });
+    }
 });
 router.get('/depSchedule/:barcode', (req, res) => {
     let barcode = req.params.barcode;
+    console.log(barcode);
     let query = reportsTable.depSchedule;
     pool.query("SELECT assetID FROM Asset WHERE barcode = $1", [barcode]).then(data => {
         let assetID = data.rows[0].assetid;
@@ -151,11 +315,12 @@ router.get('/depSchedule/:barcode', (req, res) => {
                 returnedData.push({ year: entry.year, openingbookvalue: entry.openingbookvalue });
             });
             // Add log
-            Log.createLog(req.ip, req.id, Logs.ASSET_DEPRECIATION_SCHEDULE_REPORT).then((_) => {
-                return res.json(returnedData);
-            }).catch((err) => {
-                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-            });
+            // Log.createLog(req.ip, req.id , Logs.ASSET_DEPRECIATION_SCHEDULE_REPORT).then((_: any) => {
+            //     return res.json(returnedData)
+            // }).catch((err: MyError) => {
+            //     return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+            // })
+            return res.json(returnedData);
         });
     }).catch(err => {
         console.log(err);

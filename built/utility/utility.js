@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { assert } from "chai";
 import MyError from "./myError.js";
 import { MyErrors2 } from "./constants.js";
+import pool from "../../db2.js";
 function getTimeDifferenceInSeconds(startTime, endTime) {
     return (endTime.getTime() - startTime.getTime()) / 1000;
 }

@@ -264,7 +264,7 @@ export const createDeprecaitonScheduleEntries = (assetID: number): Promise<Depre
     });
 }
 
-interface DepreciaitionScheduleEntry {
+export interface DepreciaitionScheduleEntry {
     year: number,
     assetid: number,
     openingbookvalue: number,

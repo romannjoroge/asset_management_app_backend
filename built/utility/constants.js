@@ -113,6 +113,12 @@ export var Logs;
     Logs[Logs["UPDATE_BATCH"] = 33] = "UPDATE_BATCH";
     Logs[Logs["ASSIGN_BATCH_INVENTORY"] = 34] = "ASSIGN_BATCH_INVENTORY";
     Logs[Logs["UNASSIGN_BATCH_INVENTORY"] = 35] = "UNASSIGN_BATCH_INVENTORY";
+    Logs[Logs["UNKOWN"] = 36] = "UNKOWN";
+    Logs[Logs["ALLOCATE_ASSET"] = 37] = "ALLOCATE_ASSET";
+    Logs[Logs["ASSET_DISPOSAL_REPORT"] = 38] = "ASSET_DISPOSAL_REPORT";
+    Logs[Logs["GATEPASS_REPORT"] = 39] = "GATEPASS_REPORT";
+    Logs[Logs["STATE_PHYSICAL_VERIFICATION_MISSING"] = 40] = "STATE_PHYSICAL_VERIFICATION_MISSING";
+    Logs[Logs["STATE_PHYSICAL_VERIFICATION_PRESENT"] = 41] = "STATE_PHYSICAL_VERIFICATION_PRESENT";
 })(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {
@@ -167,6 +173,11 @@ export var MyErrors2;
     MyErrors2["INVALID_BARCODE"] = "Invalid Barcode";
     MyErrors2["NOT_GET_NEXT_ASSET_ID"] = "Could Not Get Next Asset ID";
     MyErrors2["NOT_STORE_ASSET"] = "Could Not Store Asset";
+    MyErrors2["NOT_GENERATE_REPORT"] = "Could Not Generate Report";
+    MyErrors2["LOG_EVENT_NOT_EXIST"] = "The Log Event Type Does Not Exist";
+    MyErrors2["NOT_GET_FROM_DATABASE"] = "Could Not Get Data From Database";
+    MyErrors2["NOT_GET_SITE_BUILDING_OFFICE"] = "Could Not Get The Site, Building and Office of Location";
+    MyErrors2["REPORT_NOT_SUPPPORTED"] = "The report chosen is not supported by system";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {
