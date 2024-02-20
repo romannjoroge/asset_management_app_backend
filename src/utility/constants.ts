@@ -115,7 +115,10 @@ export enum Logs {
     "UNASSIGN_BATCH_INVENTORY" = 35,
     "UNKOWN" = 36,
     "ALLOCATE_ASSET" = 37,
-    "ASSET_MOVEMENT" = 38,
+    "ASSET_DISPOSAL_REPORT" = 38,
+    "GATEPASS_REPORT" = 39,
+    "STATE_PHYSICAL_VERIFICATION_MISSING" = 40,
+    "STATE_PHYSICAL_VERIFICATION_PRESENT" = 41
 }
 
 export enum MyErrors2 {
@@ -173,7 +176,8 @@ export enum MyErrors2 {
     "NOT_GENERATE_REPORT" = "Could Not Generate Report",
     "LOG_EVENT_NOT_EXIST" = "The Log Event Type Does Not Exist",
     "NOT_GET_FROM_DATABASE" = "Could Not Get Data From Database",
-    "NOT_GET_SITE_BUILDING_OFFICE" = "Could Not Get The Site, Building and Office of Location"
+    "NOT_GET_SITE_BUILDING_OFFICE" = "Could Not Get The Site, Building and Office of Location",
+    "REPORT_NOT_SUPPPORTED" = "The report chosen is not supported by system"
 }
 
 export enum Success2 {
