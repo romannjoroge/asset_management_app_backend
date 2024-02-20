@@ -23,8 +23,7 @@ import { getTaggedAssets } from '../Reports/tagged_assets.js';
 import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciations.js';
 import { Log } from '../Log/log.js';
 import getAuditTrail from '../Reports/audit_trail.js';
-import ReportDatabase from '../Reports/reportDatabase.js';
-import { getDepreciationDetails } from '../Reports/asset_depreciation.js';
+import { getGatepassReport } from '../Reports/gatepass_report.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 /**
@@ -39,18 +38,18 @@ router.get('/test', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         // let assetRegister = await assetAcquisition(new Date(2023, 4, 1), new Date(2023, 7, 1), 3);
         // console.log(assetRegister);
         // return res.json(assetRegister);
-        let assetRegister = yield getDepreciationDetails('AUA1002');
-        console.log(assetRegister);
-        return res.json(assetRegister);
+        // let assetRegister = await getDepreciationDetails('AUA1002');
+        // console.log(assetRegister);
+        // return res.json(assetRegister);
         // let assetRegister = await assetMovementReport('AUA1000');
         // console.log(assetRegister);
         // return res.json(assetRegister);
-        // let data = await ReportDatabase.getAssetsInLocation(3);
-        // console.log(data);
-        // return res.json(data);
-        let data = yield ReportDatabase.getAcquiredAssetsInLocation(new Date(2023, 4, 1), new Date(2023, 7, 1), 3);
+        let data = yield getGatepassReport('010200000150');
         console.log(data);
         return res.json(data);
+        // let data = await ReportDatabase.getAcquiredAssetsInLocation(new Date(2023, 4, 1), new Date(2023, 7, 1), 3);
+        // console.log(data);
+        // return res.json(data);
     }
     catch (err) {
         console.log(err);

@@ -19,8 +19,20 @@ function getResultsFromDatabase(query, args) {
     });
 }
 export default class ReportDatabase {
+    static getGatepassReport(assetID) {
+        return new Promise((res, rej) => {
+            let query = `SELECT g.reason AS gatepass_reason, g.fromlocation, g.tolocation, TO_CHAR(g.date, 'YYYY-MM-DD') AS leaving_time, g.comment AS 
+            gatepass_comment, g.approved AS is_gatepass_approved, u.username AS assigned_user_username, u.name AS assigned_user_name, a.description AS 
+            asset_description, a.barcode FROM GatepassAsset ga INNER JOIN Gatepass g ON g.id = ga.gatepassid INNER JOIN Asset a ON a.assetid = ga.assetid 
+            INNER JOIN User2 u ON u.id = g.userid WHERE g.deleted = false AND ga.assetid = $1`;
+            getResultsFromDatabase(query, [assetID]).then(data => {
+                return res(data);
+            }).catch((err) => {
+                return rej(err);
+            });
+        });
+    }
     /**
-     *
      * @param startDate The start of acquisition period
      * @param endDate End of acquisition period
      * @param locationid Location of assets

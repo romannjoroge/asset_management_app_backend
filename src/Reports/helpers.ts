@@ -55,6 +55,36 @@ export interface RawAssetMovement extends HasLocationID {
     asset_description: string;
     barcode: string;
 }
+
+export interface GatepassReport {
+    barcode: string;
+    asset_description: string;
+    gatepass_reason: string;
+    from_site: string;
+    from_building: string;
+    from_office: string;
+    to_site: string;
+    to_building: string;
+    to_office: string;
+    leaving_time: string;
+    assigned_user_username: string;
+    assigned_user_name: string;
+    is_gatepass_approved: boolean;
+    gatepass_comment: string;
+}
+
+export interface RawGatepassReport {
+    barcode: string;
+    asset_description: string;
+    gatepass_reason: string;
+    fromlocation: number;
+    tolocation: number;
+    leaving_time: string;
+    assigned_user_username: string;
+    assigned_user_name: string;
+    is_gatepass_approved: boolean;
+    gatepass_comment: string;
+}
 /**
  * 
  * @param rawData A list of type T that has locationid and wants to add details of site, building, office

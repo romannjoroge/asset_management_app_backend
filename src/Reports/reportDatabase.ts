@@ -5,7 +5,7 @@ import { AuditTrailEntry } from "./audit_trail.js";
 import MyError from "../utility/myError.js";
 import { MyErrors2 } from "../utility/constants.js";
 import { ResultFromDatabase } from "../utility/helper_types.js";
-import { AssetRegisterData, ChainOfCustody, RawAssetMovement, RawAssetRegisterData } from "./helpers.js";
+import { AssetRegisterData, ChainOfCustody, RawAssetMovement, RawAssetRegisterData, RawGatepassReport } from "./helpers.js";
 
 interface RawAuditTrailResults {
     name: string;
@@ -40,8 +40,22 @@ function getResultsFromDatabase<T>(query: string, args: any[]): Promise<T[]> {
 }
 
 export default class ReportDatabase {
+    static getGatepassReport(assetID: number): Promise<RawGatepassReport[]> {
+        return new Promise((res, rej) => {
+            let query = `SELECT g.reason AS gatepass_reason, g.fromlocation, g.tolocation, TO_CHAR(g.date, 'YYYY-MM-DD') AS leaving_time, g.comment AS 
+            gatepass_comment, g.approved AS is_gatepass_approved, u.username AS assigned_user_username, u.name AS assigned_user_name, a.description AS 
+            asset_description, a.barcode FROM GatepassAsset ga INNER JOIN Gatepass g ON g.id = ga.gatepassid INNER JOIN Asset a ON a.assetid = ga.assetid 
+            INNER JOIN User2 u ON u.id = g.userid WHERE g.deleted = false AND ga.assetid = $1`;
+
+            getResultsFromDatabase<RawGatepassReport>(query, [assetID]).then(data => {
+                return res(data);
+            }).catch((err: MyError) => {
+                return rej(err);
+            })
+        })
+    }
+
     /**
-     * 
      * @param startDate The start of acquisition period
      * @param endDate End of acquisition period
      * @param locationid Location of assets
