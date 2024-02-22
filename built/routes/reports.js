@@ -67,16 +67,16 @@ router.get('/test', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 }));
 // A route to get the tagged assets
-router.get('/tagged/:istagged', (req, res) => {
-    // Get is tagged from request parameter
-    const istagged = Number.parseInt(req.params.istagged);
-    let tagged = istagged === 1;
-    getTaggedAssets(tagged).then(data => {
-        return res.send(data);
-    }).catch((err) => {
-        return res.status(400).json({ message: err.message });
-    });
-});
+// router.get('/tagged/:istagged', (req, res) => {
+//     // Get is tagged from request parameter
+//     const istagged = Number.parseInt(req.params.istagged);
+//     let tagged: boolean = istagged === 1;
+//     getTaggedAssets(tagged).then(data => {
+//         return res.send(data);
+//     }).catch((err: MyError) => {
+//         return res.status(400).json({message: err.message})
+//     })
+// });
 router.get('/inventory/:type', (req, res) => {
     let type = req.params.type;
     let inventoryID = Number.parseInt(req.query.inventoryID);
@@ -121,6 +121,8 @@ var ReportType;
     ReportType["ASSET_ACQUISITION"] = "acquisiton";
     ReportType["ASSET_DEPRECIATION"] = "depreciation";
     ReportType["ASSET_CATEGORY"] = "category";
+    ReportType["TAGGED_ASSETS"] = "tagged";
+    ReportType["UNTAGGED_ASSETS"] = "untagged";
 })(ReportType || (ReportType = {}));
 router.get('/report/:type', checkifAuthorized(UserRoles.REPORT_GEN), (req, res) => {
     // Get report type from request params
@@ -296,6 +298,26 @@ router.get('/report/:type', checkifAuthorized(UserRoles.REPORT_GEN), (req, res) 
             });
         }).catch((err) => {
             return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        });
+    }
+    else if (reportType === ReportType.TAGGED_ASSETS) {
+        getTaggedAssets(true).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.TAGGED_ASSETS).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        });
+    }
+    else if (reportType === ReportType.UNTAGGED_ASSETS) {
+        getTaggedAssets(false).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.TAGGED_ASSETS).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
         });
     }
     else {

@@ -459,11 +459,4 @@ SET datestyle TO MDY;
 ALTER USER asset_management WITH PASSWORD 'the password';
 
 -- Commands to do on server
-INSERT INTO Events (id, type, description) VALUES (37, 'ALLOCATE_ASSET', 'Asset Has Been Allocated');
-ALTER TABLE Log ADD COLUMN toid INTEGER;
-ALTER TABLE Log ALTER COLUMN timestamp SET DEFAULT NOW();
-INSERT INTO Role (name) VALUES ('Report Generator');
-INSERT INTO Events(id, type, description) VALUES (38, 'ASSET_DISPOSAL_REPORT', 'Asset Disposal Report Has Been Generated');
-INSERT INTO Events(id, type, description) VALUES (39, 'GATEPASS_REPORT', 'Gatepass Report Has Been Generated');
-INSERT INTO Events(id, type, description) VALUES (40, 'STATE_PHYSICAL_VERIFICATION_MISSING', 'State Of Physical Verification Missing Has Been Generated');
-INSERT INTO Events(id, type, description) VALUES (41, 'STATE_PHYSICAL_VERIFICATION_PRESENT', 'State Of Physical Verification Present Has Been Generated');
+INSERT INTO Events(id, type, description) VALUES (42, 'TAGGED_ASSETS', 'Generated Tagged Assets Report'), (43, 'UNTAGGED_ASSETS', 'Generated Untagged Assets Report');
