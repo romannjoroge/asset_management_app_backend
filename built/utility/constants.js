@@ -119,6 +119,8 @@ export var Logs;
     Logs[Logs["GATEPASS_REPORT"] = 39] = "GATEPASS_REPORT";
     Logs[Logs["STATE_PHYSICAL_VERIFICATION_MISSING"] = 40] = "STATE_PHYSICAL_VERIFICATION_MISSING";
     Logs[Logs["STATE_PHYSICAL_VERIFICATION_PRESENT"] = 41] = "STATE_PHYSICAL_VERIFICATION_PRESENT";
+    Logs[Logs["TAGGED_ASSETS"] = 42] = "TAGGED_ASSETS";
+    Logs[Logs["UNTAGGED_ASSETS"] = 43] = "UNTAGGED_ASSETS";
 })(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {

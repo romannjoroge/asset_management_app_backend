@@ -19,6 +19,42 @@ function getResultsFromDatabase(query, args) {
     });
 }
 export default class ReportDatabase {
+    static getCategoryDepreciationConfigReport() {
+        return new Promise((res, rej) => {
+            let query = "SELECT depreciationtype, name from category";
+            getResultsFromDatabase(query, []).then(results => {
+                return res(results);
+            }).catch((err) => {
+                return rej(err);
+            });
+        });
+    }
+    /**
+     *
+     * @param istagged If true get tagged assets otherwise gets untagged assets
+     * @returns Details of tagged or untagged assets
+     */
+    static getTaggedAssets(istagged) {
+        return new Promise((res, rej) => {
+            let query;
+            if (istagged === true) {
+                query = baseAssetRegisterQueryWithNonDeletedAssets + " AND a.istagged = true";
+            }
+            else {
+                query = baseAssetRegisterQueryWithNonDeletedAssets + " AND a.istagged = false";
+            }
+            getResultsFromDatabase(query, []).then(data => {
+                return res(data);
+            }).catch((err) => {
+                return rej(err);
+            });
+        });
+    }
+    /**
+     *
+     * @param locationid Location to get category of assets of
+     * @returns Number of items of each category in each location
+     */
     static getCategoryReport(locationid) {
         return new Promise((res, rej) => {
             let query = `SELECT c.name, foo.count FROM Category c FULL JOIN (SELECT COUNT(*), c.name FROM Asset a JOIN Category c ON c.id = a.categoryid WHERE a.locationID = $1 GROUP BY c.name) AS foo ON foo.name = c.name`;

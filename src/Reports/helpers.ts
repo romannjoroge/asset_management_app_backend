@@ -2,6 +2,11 @@ import Location, { SiteBuildingOffice } from "../Tracking/location.js";
 import { MyErrors2 } from "../utility/constants.js";
 import MyError from "../utility/myError.js";
 
+export interface CategoryDepreciationConfig {
+    depreciationtype: string;
+    name: string;
+}
+
 export interface AssetRegisterData extends SiteBuildingOffice{
     serial_number: string;
     acquisition_date: string;

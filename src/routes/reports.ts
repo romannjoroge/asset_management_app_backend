@@ -29,6 +29,7 @@ import { getDepreciationDetails } from '../Reports/asset_depreciation.js';
 import { getGatepassReport } from '../Reports/gatepass_report.js';
 import { UserRoles } from '../Users/users.js';
 import { categoryReport } from '../Reports/category_report.js';
+import { getCategoryDepreciation } from '../Reports/category_depreciation.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -70,18 +71,18 @@ router.get('/test', async (req, res) => {
 })
 
 // A route to get the tagged assets
-router.get('/tagged/:istagged', (req, res) => {
-    // Get is tagged from request parameter
-    const istagged = Number.parseInt(req.params.istagged);
+// router.get('/tagged/:istagged', (req, res) => {
+//     // Get is tagged from request parameter
+//     const istagged = Number.parseInt(req.params.istagged);
 
-    let tagged: boolean = istagged === 1;
+//     let tagged: boolean = istagged === 1;
 
-    getTaggedAssets(tagged).then(data => {
-        return res.send(data);
-    }).catch((err: MyError) => {
-        return res.status(400).json({message: err.message})
-    })
-});
+//     getTaggedAssets(tagged).then(data => {
+//         return res.send(data);
+//     }).catch((err: MyError) => {
+//         return res.status(400).json({message: err.message})
+//     })
+// });
 
 router.get('/inventory/:type', (req, res) => {
     let type = req.params.type
@@ -127,7 +128,10 @@ enum ReportType {
     "LOCATION_ASSET_VALUE_REPORT" = "value",
     "ASSET_ACQUISITION" = "acquisiton",
     "ASSET_DEPRECIATION" = "depreciation",
-    "ASSET_CATEGORY" = "category"
+    "ASSET_CATEGORY" = "category",
+    "TAGGED_ASSETS" = "tagged",
+    "UNTAGGED_ASSETS" = "untagged",
+    "CATEGORY_DEPRECIATION_REPORT" = "categdepreciation"
 }
 
 router.get('/report/:type', checkifAuthorized(UserRoles.REPORT_GEN), (req, res) => {
@@ -315,6 +319,36 @@ router.get('/report/:type', checkifAuthorized(UserRoles.REPORT_GEN), (req, res) 
             })
         }).catch((err: MyError) => {
             return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR})
+        })
+    }
+    else if (reportType === ReportType.TAGGED_ASSETS) {
+        getTaggedAssets(true).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.TAGGED_ASSETS).then(_ => {
+                return res.json(results);
+            }).catch((err: MyError) => {
+                return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR})
+            })
+        })
+    }
+    else if (reportType === ReportType.UNTAGGED_ASSETS) {
+        getTaggedAssets(false).then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.TAGGED_ASSETS).then(_ => {
+                return res.json(results);
+            }).catch((err: MyError) => {
+                return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR})
+            })
+        })
+    }
+    else if (reportType == ReportType.CATEGORY_DEPRECIATION_REPORT) {
+        getCategoryDepreciation().then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.CATEGORY_DERECIATION_CONFIGURATION_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err: MyError) => {
+                return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR})
+            })
         })
     }
     else {
