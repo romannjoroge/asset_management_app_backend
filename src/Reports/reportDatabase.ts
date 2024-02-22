@@ -5,7 +5,7 @@ import { AuditTrailEntry } from "./audit_trail.js";
 import MyError from "../utility/myError.js";
 import { Logs, MyErrors2 } from "../utility/constants.js";
 import { ResultFromDatabase } from "../utility/helper_types.js";
-import { AssetRegisterData, ChainOfCustody, RawAssetMovement, RawAssetRegisterData, RawGatepassReport } from "./helpers.js";
+import { AssetRegisterData, CategoryDepreciationConfig, ChainOfCustody, RawAssetMovement, RawAssetRegisterData, RawGatepassReport } from "./helpers.js";
 
 interface RawAuditTrailResults {
     name: string;
@@ -34,13 +34,25 @@ function getResultsFromDatabase<T>(query: string, args: any[]): Promise<T[]> {
         pool.query(query, args).then((data: ResultFromDatabase<T>) => {
             return res(data.rows);
         }).catch((err: any) => {
-            console.log(err);
             return rej(new MyError(MyErrors2.NOT_GET_FROM_DATABASE));
         })
     })
 }
 
 export default class ReportDatabase {
+
+    static getCategoryDepreciationConfigReport(): Promise<CategoryDepreciationConfig[]> {
+        return new Promise((res, rej) => {
+            let query = "SELECT depreciationtype, name from category";
+
+            getResultsFromDatabase<CategoryDepreciationConfig>(query, []).then(results => {
+                return res(results);
+            }).catch((err: MyError) => {
+                return rej(err);
+            })
+        })
+    }
+
     /**
      * 
      * @param istagged If true get tagged assets otherwise gets untagged assets

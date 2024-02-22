@@ -29,6 +29,7 @@ import { getDepreciationDetails } from '../Reports/asset_depreciation.js';
 import { getGatepassReport } from '../Reports/gatepass_report.js';
 import { UserRoles } from '../Users/users.js';
 import { categoryReport } from '../Reports/category_report.js';
+import { getCategoryDepreciation } from '../Reports/category_depreciation.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -130,6 +131,7 @@ enum ReportType {
     "ASSET_CATEGORY" = "category",
     "TAGGED_ASSETS" = "tagged",
     "UNTAGGED_ASSETS" = "untagged",
+    "CATEGORY_DEPRECIATION_REPORT" = "categdepreciation"
 }
 
 router.get('/report/:type', checkifAuthorized(UserRoles.REPORT_GEN), (req, res) => {
@@ -333,6 +335,16 @@ router.get('/report/:type', checkifAuthorized(UserRoles.REPORT_GEN), (req, res) 
         getTaggedAssets(false).then(results => {
             // Add log entry
             Log.createLog(req.ip, req.id, Logs.TAGGED_ASSETS).then(_ => {
+                return res.json(results);
+            }).catch((err: MyError) => {
+                return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR})
+            })
+        })
+    }
+    else if (reportType == ReportType.CATEGORY_DEPRECIATION_REPORT) {
+        getCategoryDepreciation().then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.CATEGORY_DERECIATION_CONFIGURATION_REPORT).then(_ => {
                 return res.json(results);
             }).catch((err: MyError) => {
                 return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR})

@@ -14,12 +14,21 @@ function getResultsFromDatabase(query, args) {
         pool.query(query, args).then((data) => {
             return res(data.rows);
         }).catch((err) => {
-            console.log(err);
             return rej(new MyError(MyErrors2.NOT_GET_FROM_DATABASE));
         });
     });
 }
 export default class ReportDatabase {
+    static getCategoryDepreciationConfigReport() {
+        return new Promise((res, rej) => {
+            let query = "SELECT depreciationtype, name from category";
+            getResultsFromDatabase(query, []).then(results => {
+                return res(results);
+            }).catch((err) => {
+                return rej(err);
+            });
+        });
+    }
     /**
      *
      * @param istagged If true get tagged assets otherwise gets untagged assets
