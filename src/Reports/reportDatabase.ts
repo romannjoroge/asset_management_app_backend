@@ -195,7 +195,7 @@ export default class ReportDatabase {
     static getStockTakeAssetsNotInRegister(): Promise<RawAssetRegisterData[]> {
         return new Promise((res, rej) => {
             // Gets all assets from non deleted batches
-            let query = baseAssetRegisterQueryWithDeletedAssets + " AND a.assetid IN (SELECT ba.assetid FROM batchasset ba INNER JOIN Batch b ON b.id = ba.batchid WHERE b.deleted = false)";
+            let query = baseAssetRegisterQueryWithNonDeletedAssets + " AND a.assetid NOT IN (SELECT ba.assetid FROM batchasset ba INNER JOIN Batch b ON b.id = ba.batchid WHERE b.deleted = false)";
 
             // Call query and return results
             getResultsFromDatabase<RawAssetRegisterData>(query, []).then(data => {

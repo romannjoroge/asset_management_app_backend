@@ -459,4 +459,3 @@ SET datestyle TO MDY;
 ALTER USER asset_management WITH PASSWORD 'the password';
 
 -- Commands to do on server
-INSERT INTO Events(id, type, description) VALUES (42, 'TAGGED_ASSETS', 'Generated Tagged Assets Report'), (43, 'UNTAGGED_ASSETS', 'Generated Untagged Assets Report');
