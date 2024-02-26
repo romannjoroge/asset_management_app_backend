@@ -1,20 +1,20 @@
 import { MyErrors2 } from "../utility/constants.js";
 import MyError from "../utility/myError.js";
-import { AssetRegisterData, RawAssetRegisterData, batchAddSiteBuildingLocation } from "./helpers.js";
+import { batchAddSiteBuildingLocation } from "./helpers.js";
 import ReportDatabase from "./reportDatabase.js";
-
-export default function depreciateAssetPerCategory(category_id: number, startDate: Date, endDate: Date): Promise<AssetRegisterData[]> {
+export default function depreciateAssetPerCategory(category_id, startDate, endDate) {
     return new Promise((res, rej) => {
         // Get data
         ReportDatabase.getDepreciationPerCategory(category_id, startDate, endDate).then(rawData => {
             // Get location details
-            batchAddSiteBuildingLocation<RawAssetRegisterData, AssetRegisterData>(rawData).then(converted => {
+            batchAddSiteBuildingLocation(rawData).then(converted => {
                 return res(converted);
-            }).catch((err: MyError) => {
+            }).catch((err) => {
                 return rej(new MyError(MyErrors2.NOT_GENERATE_REPORT));
-            })
-        }).catch((err: MyError) => {
+            });
+        }).catch((err) => {
             return rej(new MyError(MyErrors2.NOT_GENERATE_REPORT));
-        })
-    })
+        });
+    });
 }
+//# sourceMappingURL=depreciation_per_category.js.map

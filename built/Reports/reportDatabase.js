@@ -19,6 +19,16 @@ function getResultsFromDatabase(query, args) {
     });
 }
 export default class ReportDatabase {
+    static getDepreciationPerCategory(category_id, startDate, endDate) {
+        return new Promise((res, rej) => {
+            let query = baseAssetRegisterQueryWithNonDeletedAssets + "AND a.categoryid = $1 AND a.disposaldate BETWEEN $2 AND $3";
+            getResultsFromDatabase(query, [category_id, startDate, endDate]).then(data => {
+                return res(data);
+            }).catch((err) => {
+                return rej(err);
+            });
+        });
+    }
     static getCategoryDepreciationConfigReport() {
         return new Promise((res, rej) => {
             let query = "SELECT depreciationtype, name from category";

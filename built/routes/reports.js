@@ -35,6 +35,7 @@ import { getGatepassReport } from '../Reports/gatepass_report.js';
 import { UserRoles } from '../Users/users.js';
 import { categoryReport } from '../Reports/category_report.js';
 import { getCategoryDepreciation } from '../Reports/category_depreciation.js';
+import depreciateAssetPerCategory from '../Reports/depreciation_per_category.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 /**
@@ -125,6 +126,7 @@ var ReportType;
     ReportType["TAGGED_ASSETS"] = "tagged";
     ReportType["UNTAGGED_ASSETS"] = "untagged";
     ReportType["CATEGORY_DEPRECIATION_REPORT"] = "categdepreciation";
+    ReportType["ASSET_CATEGORY_DEPRECIATION_REPORT"] = "assetcategdep";
 })(ReportType || (ReportType = {}));
 router.get('/report/:type', checkifAuthorized(UserRoles.REPORT_GEN), (req, res) => {
     // Get report type from request params
@@ -135,6 +137,7 @@ router.get('/report/:type', checkifAuthorized(UserRoles.REPORT_GEN), (req, res) 
     let barcode;
     let userid;
     let eventtype;
+    let categoryid;
     if (reportType === ReportType.ASSET_ACQUISITION) {
         // Get fields of report
         startDate = utility.checkIfValidDate(req.query.startDate, "Invalid Date");
@@ -324,6 +327,19 @@ router.get('/report/:type', checkifAuthorized(UserRoles.REPORT_GEN), (req, res) 
     }
     else if (reportType == ReportType.CATEGORY_DEPRECIATION_REPORT) {
         getCategoryDepreciation().then(results => {
+            // Add log entry
+            Log.createLog(req.ip, req.id, Logs.CATEGORY_DERECIATION_CONFIGURATION_REPORT).then(_ => {
+                return res.json(results);
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+            });
+        });
+    }
+    else if (reportType == ReportType.ASSET_CATEGORY_DEPRECIATION_REPORT) {
+        categoryid = Number.parseInt(req.query.categoryid);
+        startDate = utility.checkIfValidDate(req.query.startDate, "Invalid Date");
+        endDate = utility.checkIfValidDate(req.query.endDate, "Invalid Date");
+        depreciateAssetPerCategory(categoryid, startDate, endDate).then(results => {
             // Add log entry
             Log.createLog(req.ip, req.id, Logs.CATEGORY_DERECIATION_CONFIGURATION_REPORT).then(_ => {
                 return res.json(results);
