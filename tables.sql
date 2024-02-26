@@ -459,3 +459,4 @@ SET datestyle TO MDY;
 ALTER USER asset_management WITH PASSWORD 'the password';
 
 -- Commands to do on server
+INSERT INTO Events(id, type, description) VALUES(44, 'ASSET_CATEGORY_DEPRECIATION_REPORT', 'Generate Reports of assets depreciation per category')

@@ -40,6 +40,16 @@ function getResultsFromDatabase<T>(query: string, args: any[]): Promise<T[]> {
 }
 
 export default class ReportDatabase {
+    static getDepreciationPerCategory(category_id: number, startDate: Date, endDate: Date): Promise<RawAssetRegisterData[]> {
+        return new Promise((res, rej) => {
+            let query = baseAssetRegisterQueryWithNonDeletedAssets + "AND a.categoryid = $1 AND a.disposaldate BETWEEN $2 AND $3";
+            getResultsFromDatabase<RawAssetRegisterData>(query, [category_id, startDate, endDate]).then(data => {
+                return res(data);
+            }).catch((err: MyError) => {
+                return rej(err);
+            })
+        })
+    }
 
     static getCategoryDepreciationConfigReport(): Promise<CategoryDepreciationConfig[]> {
         return new Promise((res, rej) => {

@@ -121,6 +121,7 @@ export var Logs;
     Logs[Logs["STATE_PHYSICAL_VERIFICATION_PRESENT"] = 41] = "STATE_PHYSICAL_VERIFICATION_PRESENT";
     Logs[Logs["TAGGED_ASSETS"] = 42] = "TAGGED_ASSETS";
     Logs[Logs["UNTAGGED_ASSETS"] = 43] = "UNTAGGED_ASSETS";
+    Logs[Logs["ASSET_CATEGORY_DEPRECIATION_REPORT"] = 44] = "ASSET_CATEGORY_DEPRECIATION_REPORT";
 })(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {
