@@ -248,11 +248,6 @@ class Asset {
             yield pool.query(assetTable.updateAssetFixedStatus, [newFixedStatus, assetTag]);
         });
     }
-    static _updateAssetLifeSpan(assetTag, newLifeSpan) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield pool.query(assetTable.updateAssetLifeSpan, [newLifeSpan, assetTag]);
-        });
-    }
     static _updateAssetLocation(assetTag, newLocation) {
         return __awaiter(this, void 0, void 0, function* () {
             yield pool.query(assetTable.updateAssetLocation, [newLocation, assetTag]);
@@ -304,10 +299,6 @@ class Asset {
             if ('fixed' in updateAssetDict) {
                 utility.checkIfBoolean(updateAssetDict.fixed, "Invalid Fixed Status");
                 yield utility.addErrorHandlingToAsyncFunction(Asset._updateAssetFixedStatus, "Invalid Fixed Status", assetTag, updateAssetDict.fixed);
-            }
-            else if ('assetLifeSpan' in updateAssetDict) {
-                utility.checkIfNumberisPositive(updateAssetDict.assetLifeSpan, "Invalid asset life span");
-                yield utility.addErrorHandlingToAsyncFunction(Asset._updateAssetLifeSpan, "Invalid asset life span", assetTag, updateAssetDict.assetLifeSpan);
             }
             else if ('acquisitionDate' in updateAssetDict) {
                 newDate = utility.checkIfValidDate(updateAssetDict.acquisitionDate, "Invalid acquisition date");

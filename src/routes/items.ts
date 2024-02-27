@@ -70,7 +70,7 @@ router.post('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Admini
     // Get barcode from request
     let assetID = req.params.id;
 
-    const updatableItems = ["barcode", "locationID", "noInBuilding", "code", "description", "categoryID", "usefulLife", "serialNumber", "condition", "responsibleUsername",
+    const updatableItems = ["barcode", "locationID", "noInBuilding", "code", "description", "categoryID", "serialNumber", "condition", "responsibleUsername",
         "acquisitionDate", "acquisitionCost", "residualValue", "depreciationType"]
     const requestParams = Object.keys(req.body);
 

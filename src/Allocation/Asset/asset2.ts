@@ -290,10 +290,6 @@ class Asset {
         await pool.query(assetTable.updateAssetFixedStatus, [newFixedStatus, assetTag]);
     }
 
-    static async _updateAssetLifeSpan(assetTag, newLifeSpan) {
-        await pool.query(assetTable.updateAssetLifeSpan, [newLifeSpan, assetTag]);
-    }
-
     static async _updateAssetLocation(assetTag, newLocation) {
         await pool.query(assetTable.updateAssetLocation, [newLocation, assetTag]);
     }
@@ -339,11 +335,6 @@ class Asset {
             await utility.addErrorHandlingToAsyncFunction(Asset._updateAssetFixedStatus,
                 "Invalid Fixed Status", assetTag,
                 updateAssetDict.fixed);
-        }
-        else if ('assetLifeSpan' in updateAssetDict) {
-            utility.checkIfNumberisPositive(updateAssetDict.assetLifeSpan, "Invalid asset life span");
-            await utility.addErrorHandlingToAsyncFunction(Asset._updateAssetLifeSpan, "Invalid asset life span",
-                assetTag, updateAssetDict.assetLifeSpan);
         }
         else if ('acquisitionDate' in updateAssetDict) {
             newDate = utility.checkIfValidDate(updateAssetDict.acquisitionDate, "Invalid acquisition date");
