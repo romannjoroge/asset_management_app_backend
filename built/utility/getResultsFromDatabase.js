@@ -6,6 +6,7 @@ export default function getResultsFromDatabase(query, args) {
         pool.query(query, args).then((data) => {
             return res(data.rows);
         }).catch((err) => {
+            console.log(err);
             return rej(new MyError(MyErrors2.NOT_GET_FROM_DATABASE));
         });
     });

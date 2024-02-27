@@ -31,6 +31,7 @@ import { UserRoles } from '../Users/users.js';
 import { categoryReport } from '../Reports/category_report.js';
 import { getCategoryDepreciation } from '../Reports/category_depreciation.js';
 import depreciateAssetPerCategory from '../Reports/depreciation_per_category.js';
+import { getAdditionalAssetsInInventory, getAssetsMissingInInventory, getAssetsPresentInInventory } from '../Reports/inventory.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -90,25 +91,25 @@ router.get('/inventory/:type', (req, res) => {
     let inventoryID = Number.parseInt(req.query.inventoryID);
 
     if (type === "present") {
-        pool.query(reportsTable.getAssetsInInventory, [inventoryID]).then(data => {
-            res.json(data.rows);
-        }).catch(err => {
-            return res.status(500).json({message: Errors[9]});
-        })
+        getAssetsPresentInInventory(inventoryID).then(results => {
+            res.json(results);
+        }).catch((err: MyError) => {
+            return res.status(500).json({message: Errors[9]})
+        });
+
     }
     else if (type == 'missing') {
-        pool.query(reportsTable.getAssetsNotInInventory, [inventoryID]).then(data => {
-            res.json(data.rows);
-        }).catch(err => {
-            return res.status(500).json({message: Errors[9]});
-        })
+        getAssetsMissingInInventory(inventoryID).then(results => {
+            res.json(results);
+        }).catch((err: MyError) => {
+            return res.status(500).json({message: Errors[9]})
+        });
     }
     else if (type == 'additional') {
-        pool.query(reportsTable.getAdditionalAssetsInInventory, [inventoryID]).then(data => {
-            res.json(data.rows);
-        }).catch(err => {
-            console.log(err);
-            return res.status(500).json({message: Errors[9]});
+        getAdditionalAssetsInInventory(inventoryID).then(results => {
+            res.json(results);
+        }).catch((err: MyError) => {
+            return res.status(500).json({message: Errors[9]})
         });
     }
 });

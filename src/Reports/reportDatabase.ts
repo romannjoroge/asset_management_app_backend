@@ -33,6 +33,42 @@ const baseAssetRegisterQueryWithNonDeletedAssets = baseAssetRegister + ' WHERE a
 
 
 export default class ReportDatabase {
+    static getAdditionalAssetsInInventory(inventoryID: number): Promise<RawAssetRegisterData[]> {
+        return new Promise((res, rej) => {
+            let query = "SELECT assetID FROM BatchAsset WHERE batchID IN (SELECT batchID FROM InventoryBatch WHERE inventoryID = $1) AND assetID NOT IN (SELECT assetID From Asset)";
+
+            getResultsFromDatabase<RawAssetRegisterData>(query, [inventoryID]).then(converted => {
+                return res(converted);
+            }).catch((err: MyError) => {
+                return rej(err);
+            })
+        })
+    }
+
+    static getAssetsMissingInInventory(inventoryid: number): Promise<RawAssetRegisterData[]> {
+        return new Promise((res, rej) => {
+            let query = baseAssetRegisterQueryWithNonDeletedAssets + "AND a.assetid NOT IN (SELECT assetID FROM BatchAsset WHERE batchID IN (SELECT batchID FROM InventoryBatch WHERE inventoryID = $1))";
+
+            getResultsFromDatabase<RawAssetRegisterData>(query, [inventoryid]).then(converted => {
+                return res(converted);
+            }).catch((err: MyError) => {
+                return rej(err);
+            })
+        })
+    }
+
+    static getAssetsInInventory(inventoryid: number): Promise<RawAssetRegisterData[]> {
+        return new Promise((res, rej) => {
+            let query = baseAssetRegisterQueryWithNonDeletedAssets + "AND a.assetid IN (SELECT assetID FROM BatchAsset WHERE batchID IN (SELECT batchID FROM InventoryBatch WHERE inventoryID = $1))";
+
+            getResultsFromDatabase<RawAssetRegisterData>(query, [inventoryid]).then(results => {
+                return res(results);
+            }).catch((err: MyError) => {
+                return rej(err)
+            })
+        })
+    }
+
     static getDepreciationPerCategory(category_id: number, startDate: Date, endDate: Date): Promise<RawAssetRegisterData[]> {
         return new Promise((res, rej) => {
             let query = baseAssetRegisterQueryWithNonDeletedAssets + "AND a.categoryid = $1 AND a.disposaldate BETWEEN $2 AND $3";

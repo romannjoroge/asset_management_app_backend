@@ -17,6 +17,7 @@ export default function generateDepreciatedAssetsInMonth() {
             // Send mail
             getUsersSubscribedToMailSubscription(1).then(users => {
                 let emails = users.map((e) => e.email);
+                console.log(emails);
                 const html = `
                     <p>These are the assets that have depreciated for this month</p>
                     <p>If you weren't meant to receive this email please ignore it</p>

@@ -11,6 +11,36 @@ const baseAssetRegister = `SELECT a.serialnumber AS serial_number, TO_CHAR(a.acq
 const baseAssetRegisterQueryWithDeletedAssets = baseAssetRegister + ' WHERE a.deleted = true ';
 const baseAssetRegisterQueryWithNonDeletedAssets = baseAssetRegister + ' WHERE a.deleted = false ';
 export default class ReportDatabase {
+    static getAdditionalAssetsInInventory(inventoryID) {
+        return new Promise((res, rej) => {
+            let query = "SELECT assetID FROM BatchAsset WHERE batchID IN (SELECT batchID FROM InventoryBatch WHERE inventoryID = $1) AND assetID NOT IN (SELECT assetID From Asset)";
+            getResultsFromDatabase(query, [inventoryID]).then(converted => {
+                return res(converted);
+            }).catch((err) => {
+                return rej(err);
+            });
+        });
+    }
+    static getAssetsMissingInInventory(inventoryid) {
+        return new Promise((res, rej) => {
+            let query = baseAssetRegisterQueryWithNonDeletedAssets + "AND a.assetid NOT IN (SELECT assetID FROM BatchAsset WHERE batchID IN (SELECT batchID FROM InventoryBatch WHERE inventoryID = $1))";
+            getResultsFromDatabase(query, [inventoryid]).then(converted => {
+                return res(converted);
+            }).catch((err) => {
+                return rej(err);
+            });
+        });
+    }
+    static getAssetsInInventory(inventoryid) {
+        return new Promise((res, rej) => {
+            let query = baseAssetRegisterQueryWithNonDeletedAssets + "AND a.assetid IN (SELECT assetID FROM BatchAsset WHERE batchID IN (SELECT batchID FROM InventoryBatch WHERE inventoryID = $1))";
+            getResultsFromDatabase(query, [inventoryid]).then(results => {
+                return res(results);
+            }).catch((err) => {
+                return rej(err);
+            });
+        });
+    }
     static getDepreciationPerCategory(category_id, startDate, endDate) {
         return new Promise((res, rej) => {
             let query = baseAssetRegisterQueryWithNonDeletedAssets + "AND a.categoryid = $1 AND a.disposaldate BETWEEN $2 AND $3";
