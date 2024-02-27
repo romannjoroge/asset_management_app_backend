@@ -34,7 +34,7 @@ export var assetStatusOptions;
     assetStatusOptions["Bad"] = "Bad";
 })(assetStatusOptions || (assetStatusOptions = {}));
 class Asset {
-    constructor(assetLifeSpan, acquisitionDate, locationID, condition, custodian_id, acquisitionCost, categoryName, attachments, noInBuilding, serialNumber, code, description, residualValue, depreciaitionType, depreciationPercent) {
+    constructor(assetLifeSpan, acquisitionDate, locationID, condition, custodian_id, acquisitionCost, categoryName, attachments, serialNumber, description, residualValue, depreciaitionType, depreciationPercent) {
         // utility.checkIfBoolean(fixed, "Invalid Fixed Status");
         // this.fixed = fixed;
         utility.checkIfNumberisPositive(assetLifeSpan, "Invalid asset life span");
@@ -53,15 +53,12 @@ class Asset {
         this.acquisitionCost = acquisitionCost;
         utility.checkIfString(description, "Invalid Description");
         this.description = description;
-        utility.checkIfString(code, "Invalid Code");
-        this.code = code;
-        utility.checkIfNumberisPositive(noInBuilding, "Invalid Number in Building");
-        this.noInBuilding = noInBuilding;
         if (depreciaitionType) {
             if (Object.values(DepreciationTypes).includes(depreciaitionType) == true) {
                 this.depreciaitionType = depreciaitionType;
             }
             else {
+                console.log(Object.values(DepreciationTypes));
                 throw new MyError(Errors[50]);
             }
         }
@@ -190,7 +187,7 @@ class Asset {
     _storeAssetInAssetRegister() {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((res, rej) => {
-                pool.query(assetTable.addAssetToAssetRegister, [this.barcode, this.noInBuilding, this.code, this.description,
+                pool.query(assetTable.addAssetToAssetRegister, [this.barcode, this.description,
                     this.serialNumber, this.acquisitionDate, this.locationID, this.residualValue, this.condition, this.custodian_id, this.acquisitionCost, this.categoryID,
                     this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent]).catch(err => {
                     console.log(err);

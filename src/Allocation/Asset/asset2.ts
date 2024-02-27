@@ -48,17 +48,14 @@ class Asset {
     categoryName: string;
     categoryID: number;
     attachments?: string[];
-    noInBuilding: number;
     serialNumber: string;
     residualValue?: number;
-    code: string;
     description: string;
     depreciaitionType?: DepreciationTypes;
     depreciationPercent?: number;
 
     constructor(assetLifeSpan: number, acquisitionDate: string | Date, locationID: number, condition: assetStatusOptions, custodian_id: number,
-        acquisitionCost: number, categoryName: string, attachments: string[], noInBuilding: number,
-        serialNumber: string, code: string, description: string, residualValue?: number, depreciaitionType?: DepreciationTypes, depreciationPercent?: number) {
+        acquisitionCost: number, categoryName: string, attachments: string[], serialNumber: string, description: string, residualValue?: number, depreciaitionType?: DepreciationTypes, depreciationPercent?: number) {
         // utility.checkIfBoolean(fixed, "Invalid Fixed Status");
         // this.fixed = fixed;
 
@@ -84,16 +81,12 @@ class Asset {
         utility.checkIfString(description, "Invalid Description");
         this.description = description;
 
-        utility.checkIfString(code, "Invalid Code");
-        this.code = code;
-
-        utility.checkIfNumberisPositive(noInBuilding, "Invalid Number in Building");
-        this.noInBuilding = noInBuilding;
-
         if (depreciaitionType) {
             if (Object.values(DepreciationTypes).includes(depreciaitionType) == true) {
+                
                 this.depreciaitionType = depreciaitionType;
             } else {
+                console.log(Object.values(DepreciationTypes));
                 throw new MyError(Errors[50])
             }
         }
@@ -233,7 +226,7 @@ class Asset {
 
     async _storeAssetInAssetRegister(): Promise<void> {
         return new Promise((res, rej) => {
-            pool.query(assetTable.addAssetToAssetRegister, [this.barcode, this.noInBuilding, this.code, this.description,
+            pool.query(assetTable.addAssetToAssetRegister, [this.barcode, this.description,
                 this.serialNumber, this.acquisitionDate, this.locationID, this.residualValue, this.condition, this.custodian_id, this.acquisitionCost, this.categoryID,
                 this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent]).catch(err => {
                     console.log(err);

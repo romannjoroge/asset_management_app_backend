@@ -14,19 +14,18 @@ import multer from 'multer';
 import { Log } from '../Log/log.js';
 const upload = multer({ dest: './attachments' });
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
-    let { locationID, noInBuilding, code, description, categoryName, usefulLife, serialNumber, condition, responsibleuserid, acquisitionDate, acquisitionCost, residualValue, depreciationType, depreciationPercent, attachments } = req.body;
+    let { locationID, description, categoryName, usefulLife, serialNumber, condition, responsibleuserid, acquisitionDate, acquisitionCost, residualValue, depreciationType, depreciationPercent, attachments } = req.body;
     // Temporary attachements fix
     attachments = [];
     // Convert values to right type
     responsibleuserid = Number.parseInt(responsibleuserid);
-    noInBuilding = Number.parseInt(noInBuilding);
     usefulLife = Number.parseInt(usefulLife);
     acquisitionCost = Number.parseFloat(acquisitionCost);
     residualValue = Number.parseFloat(residualValue);
     if (depreciationPercent) {
         depreciationPercent = Number.parseFloat(depreciationPercent);
     }
-    let asset = new Asset(usefulLife, acquisitionDate, locationID, condition, responsibleuserid, acquisitionCost, categoryName, attachments, noInBuilding, serialNumber, code, description, residualValue, depreciationType, depreciationPercent);
+    let asset = new Asset(usefulLife, acquisitionDate, locationID, condition, responsibleuserid, acquisitionCost, categoryName, attachments, serialNumber, description, residualValue, depreciationType, depreciationPercent);
     asset.initialize().then(_ => {
         // Add log
         Log.createLog(req.ip, req.id, Logs.CREATE_ASSET).then((_) => {
