@@ -180,7 +180,8 @@ export enum MyErrors2 {
     "LOG_EVENT_NOT_EXIST" = "The Log Event Type Does Not Exist",
     "NOT_GET_FROM_DATABASE" = "Could Not Get Data From Database",
     "NOT_GET_SITE_BUILDING_OFFICE" = "Could Not Get The Site, Building and Office of Location",
-    "REPORT_NOT_SUPPPORTED" = "The report chosen is not supported by system"
+    "REPORT_NOT_SUPPPORTED" = "The report chosen is not supported by system",
+    "NOT_GET_ROLES" = "Could Not Get Roles";
 }
 
 export enum Success2 {

@@ -6,6 +6,7 @@ import MyError from "../utility/myError.js";
 import { Logs, MyErrors2 } from "../utility/constants.js";
 import { ResultFromDatabase } from "../utility/helper_types.js";
 import { AssetRegisterData, CategoryDepreciationConfig, ChainOfCustody, RawAssetMovement, RawAssetRegisterData, RawGatepassReport } from "./helpers.js";
+import getResultsFromDatabase from "../utility/getResultsFromDatabase.js";
 
 interface RawAuditTrailResults {
     name: string;
@@ -29,15 +30,7 @@ const baseAssetRegisterQueryWithDeletedAssets = baseAssetRegister + ' WHERE a.de
 
 const baseAssetRegisterQueryWithNonDeletedAssets = baseAssetRegister + ' WHERE a.deleted = false ';
 
-function getResultsFromDatabase<T>(query: string, args: any[]): Promise<T[]> {
-    return new Promise((res, rej) => {
-        pool.query(query, args).then((data: ResultFromDatabase<T>) => {
-            return res(data.rows);
-        }).catch((err: any) => {
-            return rej(new MyError(MyErrors2.NOT_GET_FROM_DATABASE));
-        })
-    })
-}
+
 
 export default class ReportDatabase {
     static getDepreciationPerCategory(category_id: number, startDate: Date, endDate: Date): Promise<RawAssetRegisterData[]> {

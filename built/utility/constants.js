@@ -181,6 +181,7 @@ export var MyErrors2;
     MyErrors2["NOT_GET_FROM_DATABASE"] = "Could Not Get Data From Database";
     MyErrors2["NOT_GET_SITE_BUILDING_OFFICE"] = "Could Not Get The Site, Building and Office of Location";
     MyErrors2["REPORT_NOT_SUPPPORTED"] = "The report chosen is not supported by system";
+    MyErrors2["NOT_GET_ROLES"] = "Could Not Get Roles";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

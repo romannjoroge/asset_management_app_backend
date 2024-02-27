@@ -8,6 +8,7 @@ import MyError from '../utility/myError.js';
 import gatepasstable from '../GatePass/db_gatepass.js';
 import bcrypt from 'bcrypt';
 import { Log } from '../Log/log.js';
+import getRolesFromDB from '../Users/roles.js';
 router.get('/getUsers', (req, res) => {
     pool.query(userTable.getUsers, []).then(data => {
         if (data.rowCount <= 0) {
@@ -167,6 +168,24 @@ router.post('/addUser', (req, res) => {
     }).catch(err => {
         console.log(err);
         return res.status(501).json({ message: Errors[9] });
+    });
+});
+router.get('/test', (req, res) => {
+    getRolesFromDB().then(data => res.json(data)).catch(err => {
+        console.log(err);
+        return res.status(500).send("OHH SHIT");
+    });
+});
+router.get('/getRoles', (req, res) => {
+    getRolesFromDB().then(roles => {
+        return res.json(roles);
+    }).catch((err) => {
+        if (err instanceof MyError) {
+            return res.status(400).json({ message: err.message });
+        }
+        else {
+            return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+        }
     });
 });
 router.get('/', (req, res) => {
