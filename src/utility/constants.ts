@@ -182,7 +182,8 @@ export enum MyErrors2 {
     "NOT_GET_SITE_BUILDING_OFFICE" = "Could Not Get The Site, Building and Office of Location",
     "REPORT_NOT_SUPPPORTED" = "The report chosen is not supported by system",
     "NOT_GET_ROLES" = "Could Not Get Roles",
-    "NOT_GET_EVENTS" = "Could Not Get Events"
+    "NOT_GET_EVENTS" = "Could Not Get Events",
+    "NOT_GENERATE_MONTLY_DEPRECIATED_ASSETS" = "Could Not Get List of Assets That Have Fully Depreciated This Month"
 }
 
 export enum Success2 {

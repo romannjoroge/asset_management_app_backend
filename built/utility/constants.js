@@ -183,6 +183,7 @@ export var MyErrors2;
     MyErrors2["REPORT_NOT_SUPPPORTED"] = "The report chosen is not supported by system";
     MyErrors2["NOT_GET_ROLES"] = "Could Not Get Roles";
     MyErrors2["NOT_GET_EVENTS"] = "Could Not Get Events";
+    MyErrors2["NOT_GENERATE_MONTLY_DEPRECIATED_ASSETS"] = "Could Not Get List of Assets That Have Fully Depreciated This Month";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

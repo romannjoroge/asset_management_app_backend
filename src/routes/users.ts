@@ -11,6 +11,7 @@ import bcrypt from 'bcrypt';
 import { Log } from '../Log/log.js';
 import getRolesFromDB from '../Users/roles.js';
 import getEventsFromDatabase from '../Log/events.js';
+import generateDepreciatedAssetsInMonth from '../Mail/generateDepreciatedAssetsMail.js';
 
 router.get('/getUsers', (req, res) => {
     pool.query(userTable.getUsers, []).then(data => {
@@ -235,10 +236,8 @@ interface UserDetailsFetch {
 }
 
 router.get('/test', (req, res) => {
-    getRolesFromDB().then(data => res.json(data)).catch(err => {
-        console.log(err);
-        return res.status(500).send("OHH SHIT");
-    });
+    generateDepreciatedAssetsInMonth();
+    return res.send("Done");
 })
 
 router.get('/getRoles', (req, res) => {
