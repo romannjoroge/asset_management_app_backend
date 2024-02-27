@@ -25,11 +25,8 @@ let tags = new Set();
 // Create job for adding tags to database
 schedule.scheduleJob('*/1 * * * * *', () => {
     addProcessedTag(tags, eventEmitter).then(_ => {
-        console.log("Added tags to database");
-        console.log(tags);
         tags.clear();
     }).catch(err => {
-        console.log(err);
         if (err instanceof MyError) {
             eventEmitter.emit('error', { message: err.message });
         }

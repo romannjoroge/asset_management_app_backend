@@ -475,6 +475,3 @@ SET datestyle TO MDY;
 ALTER USER asset_management WITH PASSWORD 'the password';
 
 -- Commands to do on server
-MailSubscriptions
-MailingList
-INSERT INTO MailSubscriptions(name, description) VALUES ('Monthly Depreciated Assets', 'Mail those subscribed the assets that have depreciated during the given month');
