@@ -30,4 +30,24 @@ export default class Mail {
             })
         });
     }
+
+    static sendMailWithAttachmentsToMultipleRecepients(html: string, from: string, to: string[], subject: string, fileContent: Buffer, filename: string): Promise<void> {
+        return new Promise((res, rej) => {
+            this.#transport.sendMail({
+                from,
+                to,
+                subject,
+                html,
+                attachments: [{
+                    filename,
+                    content: fileContent
+                }]
+            }).then(info => {
+                return res();
+            }).catch((err: any) => {
+                console.log(err);
+                return rej(new MyError(MyErrors2.NOT_SEND_MAIL))
+            })
+        });
+    }
 }

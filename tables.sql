@@ -448,6 +448,22 @@ CREATE TABLE ProcessedTags (
   deleted boolean NOT NULL DEFAULT false
 );
 
+CREATE TABLE MailSubscriptions (
+  id serial,
+  name text NOT NULL,
+  description text NOT NULL,
+  deleted boolean NOT NULL DEFAULT false,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE MailingList (
+  mailsubscriptionid int NOT NULL,
+  userid int NOT NULL,
+  deleted boolean NOT NULL DEFAULT false,
+  PRIMARY KEY (mailsubscriptionid, userid),
+  CONSTRAINT "FK_MailingList.userid" FOREIGN KEY (userid) REFERENCES User2(id),
+  CONSTRAINT "FK_MailingList.mailsubscriptionid" FOREIGN KEY (mailsubscriptionid) REFERENCES MailSubscriptions(id)
+);
 
 -- Creates the home folder when the database is created. This is the topmost folder in the system
 INSERT INTO Folder(name) VALUES('home');
@@ -459,4 +475,6 @@ SET datestyle TO MDY;
 ALTER USER asset_management WITH PASSWORD 'the password';
 
 -- Commands to do on server
-INSERT INTO Events(id, type, description) VALUES(44, 'ASSET_CATEGORY_DEPRECIATION_REPORT', 'Generate Reports of assets depreciation per category')
+MailSubscriptions
+MailingList
+INSERT INTO MailSubscriptions(name, description) VALUES ('Monthly Depreciated Assets', 'Mail those subscribed the assets that have depreciated during the given month');

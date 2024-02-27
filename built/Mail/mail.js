@@ -25,6 +25,25 @@ class Mail {
             });
         });
     }
+    static sendMailWithAttachmentsToMultipleRecepients(html, from, to, subject, fileContent, filename) {
+        return new Promise((res, rej) => {
+            __classPrivateFieldGet(this, _a, "f", _Mail_transport).sendMail({
+                from,
+                to,
+                subject,
+                html,
+                attachments: [{
+                        filename,
+                        content: fileContent
+                    }]
+            }).then(info => {
+                return res();
+            }).catch((err) => {
+                console.log(err);
+                return rej(new MyError(MyErrors2.NOT_SEND_MAIL));
+            });
+        });
+    }
 }
 _a = Mail;
 _Mail_transport = { value: createTransport({

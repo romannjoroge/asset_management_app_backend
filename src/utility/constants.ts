@@ -183,7 +183,9 @@ export enum MyErrors2 {
     "REPORT_NOT_SUPPPORTED" = "The report chosen is not supported by system",
     "NOT_GET_ROLES" = "Could Not Get Roles",
     "NOT_GET_EVENTS" = "Could Not Get Events",
-    "NOT_GENERATE_MONTLY_DEPRECIATED_ASSETS" = "Could Not Get List of Assets That Have Fully Depreciated This Month"
+    "NOT_GENERATE_MONTLY_DEPRECIATED_ASSETS" = "Could Not Get List of Assets That Have Fully Depreciated This Month",
+    "NOT_GET_MAIL_SUBSCRIPTIONS" = "Could Not Get Mail Subscriptions",
+    "NOT_GET_MAIL_LIST" = "Could Not Get People Subscribed To Mail";
 }
 
 export enum Success2 {

@@ -184,6 +184,8 @@ export var MyErrors2;
     MyErrors2["NOT_GET_ROLES"] = "Could Not Get Roles";
     MyErrors2["NOT_GET_EVENTS"] = "Could Not Get Events";
     MyErrors2["NOT_GENERATE_MONTLY_DEPRECIATED_ASSETS"] = "Could Not Get List of Assets That Have Fully Depreciated This Month";
+    MyErrors2["NOT_GET_MAIL_SUBSCRIPTIONS"] = "Could Not Get Mail Subscriptions";
+    MyErrors2["NOT_GET_MAIL_LIST"] = "Could Not Get People Subscribed To Mail";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

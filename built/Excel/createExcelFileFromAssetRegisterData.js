@@ -1,7 +1,5 @@
 import * as XLSX from 'xlsx/xlsx.mjs';
-import * as fs from 'fs';
-XLSX.set_fs(fs);
-export default function createExcelFileFromAssetRegisterData(data) {
+export default function createExcelFileBufferFromAssetRegisterData(data) {
     // Create a worksheet with the data
     const worksheet = XLSX.utils.json_to_sheet(data);
     // Attach worksheet to workbook
@@ -13,8 +11,9 @@ export default function createExcelFileFromAssetRegisterData(data) {
     const max_width = data.reduce((w, r) => Math.max(w, r.description.length), 10);
     worksheet["!cols"] = [{ wch: max_width }];
     // Save to file
-    // fs.readFileSync()
-    // var savelocation = path.format({base: "data.xlsx"})
-    XLSX.writeFileXLSX(workbook, "data.xlsx");
+    // XLSX.writeFileXLSX(workbook, "data.xlsx");
+    return (XLSX.write(workbook, {
+        type: 'buffer'
+    }));
 }
 //# sourceMappingURL=createExcelFileFromAssetRegisterData.js.map

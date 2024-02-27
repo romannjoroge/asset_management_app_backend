@@ -1,9 +1,7 @@
 import { AssetRegisterData } from "../Reports/helpers.js";
 import * as XLSX from 'xlsx/xlsx.mjs';
-import * as fs from 'fs';
-XLSX.set_fs(fs);
 
-export default function createExcelFileFromAssetRegisterData(data: AssetRegisterData[]): void {
+export default function createExcelFileBufferFromAssetRegisterData(data: AssetRegisterData[]): Buffer {
     // Create a worksheet with the data
     const worksheet = XLSX.utils.json_to_sheet(data);
 
@@ -19,7 +17,8 @@ export default function createExcelFileFromAssetRegisterData(data: AssetRegister
     worksheet["!cols"] = [ { wch: max_width } ];
 
     // Save to file
-    // fs.readFileSync()
-    // var savelocation = path.format({base: "data.xlsx"})
-    XLSX.writeFileXLSX(workbook, "data.xlsx");
+    // XLSX.writeFileXLSX(workbook, "data.xlsx");
+    return(XLSX.write(workbook, {
+        type: 'buffer'
+    }))
 }
