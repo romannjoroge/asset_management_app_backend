@@ -12,6 +12,9 @@ import { filterAssetByDetails } from '../Allocation/Asset/filter.js';
 // import storage from '../Importing/multerSetup.js';
 import multer from 'multer';
 import { Log } from '../Log/log.js';
+import { UserRoles } from '../Users/users.js';
+import createAssetStatus from '../Allocation/Asset/addAssetStatus.js';
+import handleError from '../utility/handleError.js';
 const upload = multer({dest: './attachments'});
 
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
@@ -62,6 +65,20 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
         }
     });
 });
+
+router.post('/createAssetStatus', checkifAuthorized(UserRoles.ASSET_ADMIN), (req, res) => {
+    let {
+        name,
+        description
+    } = req.body;
+
+    createAssetStatus(name, description).then((_: any) => {
+        return res.json({message: Success2.CREATED_STATUS});
+    }).catch((err: MyError) => {
+        let {errorMessage, errorCode} = handleError(err);
+        return res.status(errorCode).json({message: errorMessage});
+    })
+})
 
 router.post('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     // Get barcode from request

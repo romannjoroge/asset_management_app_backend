@@ -1,7 +1,6 @@
 import express from 'express';
 const router = express.Router();
 import userTable from '../Users/db_users.js';
-import Asset from '../Allocation/Asset/asset2.js';
 import { Errors, Logs, MyErrors2, Succes } from '../utility/constants.js';
 import pool from '../../db2.js';
 import { updateUser, UpdateUser } from '../Users/update.js';

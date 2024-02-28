@@ -185,7 +185,10 @@ export enum MyErrors2 {
     "NOT_GET_EVENTS" = "Could Not Get Events",
     "NOT_GENERATE_MONTLY_DEPRECIATED_ASSETS" = "Could Not Get List of Assets That Have Fully Depreciated This Month",
     "NOT_GET_MAIL_SUBSCRIPTIONS" = "Could Not Get Mail Subscriptions",
-    "NOT_GET_MAIL_LIST" = "Could Not Get People Subscribed To Mail";
+    "NOT_GET_MAIL_LIST" = "Could Not Get People Subscribed To Mail",
+    "NOT_CHECK_IF_EVENT_EXISTS" = "Could Not Check If Event Exists In System",
+    "NOT_ADD_EVENT" = "Could Not Create Event",
+    "EVENT_ALREADY_EXISTS" = "The Event Already Exists"
 }
 
 export enum Success2 {
@@ -194,6 +197,7 @@ export enum Success2 {
     'SYNC_CONVERTED' = "Synced Converted Assets Succesfully",
     'CREATED_ASSET' = 'Asset Created Successfuly',
     'CREATED_LOCATION' = "Location Created",
+    'CREATED_STATUS' = "Asset Status Created",
 }
 
 export const Succes = {

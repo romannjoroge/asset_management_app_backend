@@ -12,6 +12,9 @@ import { filterAssetByDetails } from '../Allocation/Asset/filter.js';
 // import storage from '../Importing/multerSetup.js';
 import multer from 'multer';
 import { Log } from '../Log/log.js';
+import { UserRoles } from '../Users/users.js';
+import createAssetStatus from '../Allocation/Asset/addAssetStatus.js';
+import handleError from '../utility/handleError.js';
 const upload = multer({ dest: './attachments' });
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     let { locationID, description, categoryName, usefulLife, serialNumber, condition, responsibleuserid, acquisitionDate, acquisitionCost, residualValue, depreciationType, depreciationPercent, attachments } = req.body;
@@ -41,6 +44,15 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
         else {
             return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
         }
+    });
+});
+router.post('/createAssetStatus', checkifAuthorized(UserRoles.ASSET_ADMIN), (req, res) => {
+    let { name, description } = req.body;
+    createAssetStatus(name, description).then((_) => {
+        return res.json({ message: Success2.CREATED_STATUS });
+    }).catch((err) => {
+        let { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
     });
 });
 router.post('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {

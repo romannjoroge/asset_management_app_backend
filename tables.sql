@@ -465,6 +465,13 @@ CREATE TABLE MailingList (
   CONSTRAINT "FK_MailingList.mailsubscriptionid" FOREIGN KEY (mailsubscriptionid) REFERENCES MailSubscriptions(id)
 );
 
+CREATE TABLE AssetStatus (
+  name text NOT NULL,
+  description text NOT NULL,
+  delete boolean NOT NULL DEFAULT FALSE,
+  PRIMARY KEY (name)
+);
+
 -- Creates the home folder when the database is created. This is the topmost folder in the system
 INSERT INTO Folder(name) VALUES('home');
 
@@ -475,3 +482,4 @@ SET datestyle TO MDY;
 ALTER USER asset_management WITH PASSWORD 'the password';
 
 -- Commands to do on server
+AssetStatus
