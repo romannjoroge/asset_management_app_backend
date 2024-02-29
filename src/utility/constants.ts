@@ -188,7 +188,9 @@ export enum MyErrors2 {
     "NOT_GET_MAIL_LIST" = "Could Not Get People Subscribed To Mail",
     "NOT_CHECK_IF_EVENT_EXISTS" = "Could Not Check If Event Exists In System",
     "NOT_ADD_EVENT" = "Could Not Create Event",
-    "EVENT_ALREADY_EXISTS" = "The Event Already Exists"
+    "EVENT_ALREADY_EXISTS" = "The Event Already Exists",
+    "NOT_ADD_USER_MAILING_LIST" = "Could Not Add User To Mailing List",
+    "ROUTE_NOT_EXIST" = "This Route Does Not Exist"
 }
 
 export enum Success2 {
@@ -198,6 +200,7 @@ export enum Success2 {
     'CREATED_ASSET' = 'Asset Created Successfuly',
     'CREATED_LOCATION' = "Location Created",
     'CREATED_STATUS' = "Asset Status Created",
+    "ADDED_USER_MAIL" = "Added User To Mailing List"
 }
 
 export const Succes = {

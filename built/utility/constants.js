@@ -189,6 +189,8 @@ export var MyErrors2;
     MyErrors2["NOT_CHECK_IF_EVENT_EXISTS"] = "Could Not Check If Event Exists In System";
     MyErrors2["NOT_ADD_EVENT"] = "Could Not Create Event";
     MyErrors2["EVENT_ALREADY_EXISTS"] = "The Event Already Exists";
+    MyErrors2["NOT_ADD_USER_MAILING_LIST"] = "Could Not Add User To Mailing List";
+    MyErrors2["ROUTE_NOT_EXIST"] = "This Route Does Not Exist";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {
@@ -198,6 +200,7 @@ export var Success2;
     Success2["CREATED_ASSET"] = "Asset Created Successfuly";
     Success2["CREATED_LOCATION"] = "Location Created";
     Success2["CREATED_STATUS"] = "Asset Status Created";
+    Success2["ADDED_USER_MAIL"] = "Added User To Mailing List";
 })(Success2 || (Success2 = {}));
 export const Succes = {
     '1': 'Asset Created Successfuly',
