@@ -3,6 +3,8 @@ import getMailSubscriptionIDs from "../Mail/getMailSubscriptions.js";
 import handleError from "../utility/handleError.js";
 import { MyErrors2, Success2 } from "../utility/constants.js";
 import { insertUserToMailingList } from "../Mail/insertUserToMailingList.js";
+import checkIfAuthorized from "../../middleware/checkifAuthorized.js";
+import { UserRoles } from "../Users/users.js";
 let router = express.Router();
 router.get('/subscriptions', (req, res) => {
     getMailSubscriptionIDs().then(subscribtions => {
@@ -12,7 +14,7 @@ router.get('/subscriptions', (req, res) => {
         return res.status(errorCode).json({ message: errorMessage });
     });
 });
-router.post('/addUserToMail', (req, res) => {
+router.post('/addUserToMail', checkIfAuthorized(UserRoles.REPORT_GEN), (req, res) => {
     let { userid, mailsubscriptionid } = req.body;
     userid = Number.parseInt(userid);
     mailsubscriptionid = Number.parseInt(mailsubscriptionid);
