@@ -32,10 +32,19 @@ import { categoryReport } from '../Reports/category_report.js';
 import { getCategoryDepreciation } from '../Reports/category_depreciation.js';
 import depreciateAssetPerCategory from '../Reports/depreciation_per_category.js';
 import { getAdditionalAssetsInInventory, getAssetsMissingInInventory, getAssetsPresentInInventory } from '../Reports/inventory.js';
+import schedule from 'node-schedule';
+import generateDepreciatedAssetsInMonth from '../Mail/generateDepreciatedAssetsMail.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+var rule = new schedule.RecurrenceRule();
+rule.month = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+rule.date = 1;
+rule.hour = 0;
+rule.minute = 0;
+
+var j = schedule.scheduleJob(rule, generateDepreciatedAssetsInMonth);
 
 /**
  * Route for testing stuff
@@ -71,20 +80,6 @@ router.get('/test', async (req, res) => {
         return res.status(500).send("Shit Went Down!")
     }
 })
-
-// A route to get the tagged assets
-// router.get('/tagged/:istagged', (req, res) => {
-//     // Get is tagged from request parameter
-//     const istagged = Number.parseInt(req.params.istagged);
-
-//     let tagged: boolean = istagged === 1;
-
-//     getTaggedAssets(tagged).then(data => {
-//         return res.send(data);
-//     }).catch((err: MyError) => {
-//         return res.status(400).json({message: err.message})
-//     })
-// });
 
 router.get('/inventory/:type', (req, res) => {
     let type = req.params.type
