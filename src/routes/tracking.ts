@@ -10,7 +10,6 @@ import { updateLocationJSON, updateLocation } from '../Tracking/update.js';
 import { getAssetsLeavingLocationAndIfAuthorized } from '../Tracking/movements.js';
 import MyError from '../utility/myError.js';
 import { createReaderDevice, editReaderDevice, getReaderDevices } from '../Tracking/rfidReader.js';
-import { update } from 'lodash';
 import { syncTags, SyncItem } from '../Tracking/tags.js';
 import { Log } from '../Log/log.js';
 
