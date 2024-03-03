@@ -13,6 +13,7 @@ import { createReaderDevice, editReaderDevice, getReaderDevices } from '../Track
 import { syncTags } from '../Tracking/tags.js';
 import { Log } from '../Log/log.js';
 import createLocation from '../Tracking/create_location.js';
+import handleError from '../utility/handleError.js';
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
     pool.query(locationTable.getLocations, []).then((data) => {
@@ -181,6 +182,9 @@ router.post('/create', (req, res) => {
     // Create location
     createLocation(name, parentlocationid, companyName).then(_ => {
         return res.status(201).json({ message: Success2.CREATED_LOCATION });
+    }).catch((err) => {
+        const { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
     });
 });
 // router.post('/create/:item', (req, res) => {

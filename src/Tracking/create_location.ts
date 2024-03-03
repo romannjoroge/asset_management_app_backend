@@ -14,9 +14,10 @@ export default function createLocation(name: string, parentlocationid: number, c
             if (parentlocationid === -1) {
                 let query ="INSERT INTO Location (name, companyname) VALUES ($1, $2)";
                 
-                pool.query(query, [name, parentlocationid]).then((_: any) => {
+                pool.query(query, [name, companyName]).then((_: any) => {
                     return res();
                 }).catch((err: any) => {
+                    console.log(err);
                     return rej(new MyError(MyErrors2.NOT_CREATE_LOCATION));
                 })
             } else {
