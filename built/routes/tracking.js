@@ -12,6 +12,7 @@ import MyError from '../utility/myError.js';
 import { createReaderDevice, editReaderDevice, getReaderDevices } from '../Tracking/rfidReader.js';
 import { syncTags } from '../Tracking/tags.js';
 import { Log } from '../Log/log.js';
+import createLocation from '../Tracking/create_location.js';
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
     pool.query(locationTable.getLocations, []).then((data) => {
@@ -174,77 +175,93 @@ router.post('/reader', (req, res) => {
     });
 });
 // Route for creating locations or sites
-router.post('/create/:item', (req, res) => {
-    const item = req.params.item;
-    let itemExistParams;
-    let itemExistQuery;
-    let ExistErrorMessage;
-    let createItemQuery;
-    let createItemParams;
-    let successMessage;
-    let eventid;
-    /**
-     * @description This handles creating a location.
-     * @param name is the name of the location to create. It must be unique in its site / parent location (to be decided if useful)
-     * @param companyName the name of the organization
-     * @param site name of the parent location. This is optional
-     */
-    if (item == 'location') {
-        let { name, site, companyName } = req.body;
-        eventid = Logs.CREATE_LOCATION;
-        // Check if site is there
-        if (!site) {
-            itemExistParams = [name, companyName];
-            itemExistQuery = locationTable.doesSiteExist;
-            ExistErrorMessage = MyErrors2.EXISTS_LOCATION;
-            createItemQuery = locationTable.createLocationWithNoParent,
-                createItemParams = [name, companyName];
-            successMessage = Success2.CREATED_LOCATION;
-        }
-        else {
-            itemExistParams = [name, site, companyName];
-            itemExistQuery = locationTable.doesLocationExist;
-            ExistErrorMessage = MyErrors2.EXISTS_LOCATION;
-            createItemQuery = locationTable.createLocation;
-            createItemParams = [name, companyName, site, companyName];
-            successMessage = Success2.CREATED_LOCATION;
-        }
-    }
-    else if (item == 'site') {
-        let { name, county, city, address, companyName } = req.body;
-        itemExistParams = [name, companyName];
-        itemExistQuery = locationTable.doesSiteExist;
-        ExistErrorMessage = Errors[33];
-        createItemQuery = locationTable.createSite;
-        createItemParams = [name, county, city, address, companyName];
-        successMessage = Succes[6];
-    }
-    else {
-        return res.status(400).json({ message: Errors[0] });
-    }
-    // Confirm if item exists
-    pool.query(itemExistQuery, itemExistParams).then(fetchResult => {
-        // If item exists return error
-        if (fetchResult.rowCount > 0) {
-            return res.status(400).json({ message: ExistErrorMessage });
-        }
-        // Create item
-        pool.query(createItemQuery, createItemParams).then(_ => {
-            // Add log
-            Log.createLog(req.ip, req.id, eventid).then((_) => {
-                return res.json({ message: successMessage });
-            }).catch((err) => {
-                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
-            });
-        }).catch(err => {
-            console.log(err);
-            return res.status(400).json({ message: MyErrors2.NOT_CREATE_LOCATION });
-        });
-    }).catch(err => {
-        console.log(err);
-        return res.status(500).json({ message: Errors[9] });
+router.post('/create', (req, res) => {
+    let { parentlocationid, name, companyName } = req.body;
+    parentlocationid = Number.parseInt(parentlocationid);
+    // Create location
+    createLocation(name, parentlocationid, companyName).then(_ => {
+        return res.status(201).json({ message: Success2.CREATED_LOCATION });
     });
 });
+// router.post('/create/:item', (req, res) => {
+//     const item = req.params.item;
+//     let itemExistParams;
+//     let itemExistQuery;
+//     let ExistErrorMessage;
+//     let createItemQuery;
+//     let createItemParams;
+//     let successMessage;
+//     let eventid: number;
+//     /**
+//      * @description This handles creating a location.
+//      * @param name is the name of the location to create. It must be unique in its site / parent location (to be decided if useful)
+//      * @param companyName the name of the organization
+//      * @param site name of the parent location. This is optional
+//      */
+//     if(item == 'location') {
+//         let {
+//             name,
+//             site, 
+//             companyName
+//         } = req.body   
+//         eventid = Logs.CREATE_LOCATION;
+//         // Check if site is there
+//         if (!site) {
+//             itemExistParams = [name, companyName];
+//             itemExistQuery = locationTable.doesSiteExist;
+//             ExistErrorMessage = MyErrors2.EXISTS_LOCATION;
+//             createItemQuery = locationTable.createLocationWithNoParent,
+//             createItemParams = [name, companyName];
+//             successMessage = Success2.CREATED_LOCATION;
+//         } else {
+//             itemExistParams = [name, site, companyName]
+//             itemExistQuery = locationTable.doesLocationExist
+//             ExistErrorMessage = MyErrors2.EXISTS_LOCATION;
+//             createItemQuery = locationTable.createLocation
+//             createItemParams = [name, companyName, site, companyName]
+//             successMessage = Success2.CREATED_LOCATION;
+//         }
+//     } else if(item == 'site') {
+//         let {
+//             name,
+//             county,
+//             city,
+//             address,
+//             companyName
+//         } = req.body
+//         itemExistParams = [name, companyName]
+//         itemExistQuery = locationTable.doesSiteExist
+//         ExistErrorMessage = Errors[33]
+//         createItemQuery = locationTable.createSite
+//         createItemParams = [name, county, city, address, companyName]
+//         successMessage = Succes[6]
+//     } 
+//     else {
+//         return res.status(400).json({message: Errors[0]})
+//     }
+//     // Confirm if item exists
+//     pool.query(itemExistQuery, itemExistParams).then(fetchResult => {
+//         // If item exists return error
+//         if (fetchResult.rowCount > 0) {
+//             return res.status(400).json({message: ExistErrorMessage})
+//         }
+//         // Create item
+//         pool.query(createItemQuery, createItemParams).then(_ => {
+//             // Add log
+//             Log.createLog(req.ip, req.id, eventid).then((_: any) => {
+//                 return res.json({message: successMessage})
+//             }).catch((err: MyError) => {
+//                 return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+//             })
+//         }).catch(err => {
+//             console.log(err);
+//             return res.status(400).json({message: MyErrors2.NOT_CREATE_LOCATION})
+//         })
+//     }).catch(err => {
+//         console.log(err)
+//         return res.status(500).json({message: Errors[9]})
+//     })
+// });
 // Route for creating an antenna
 router.post('/createAntennae', (req, res) => {
     // Get Data From Request

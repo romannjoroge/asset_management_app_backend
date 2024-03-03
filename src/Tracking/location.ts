@@ -6,6 +6,7 @@ import MyError from '../utility/myError.js';
 import locationTable from './db_location.js';
 import { Errors, MyErrors2 } from '../utility/constants.js';
 import reportsTable from '../Reports/db_reports.js';
+import { ResultFromDatabase } from '../utility/helper_types.js';
 
 interface selectLocation {
     id: number;
@@ -238,6 +239,37 @@ class Location {
                 rej(Errors[9]);
             });
         });
+    }
+
+    static doesLocationExist(name: string, parentlocationid: number): Promise<boolean> {
+        return new Promise((res, rej) => {
+            if (parentlocationid === -1) {
+                let query = "SELECT name FROM Location WHERE name = $1 AND parentlocationid = null";
+
+                pool.query(query, [name]).then((result: ResultFromDatabase<{ name: string }>) => {
+                    if (result.rowCount <= 0) {
+                        return res(false);
+                    } else {
+                        return res(true);
+                    }
+                }).catch((err: any) => {
+                    return rej(new MyError(MyErrors2.NOT_FIND_LOCATION))
+                })
+
+            } else {
+                let query = "SELECT name FROM Location WHERE name = $1 AND parentlocationid = $2";
+                 
+                pool.query(query, [name, parentlocationid]).then((result: ResultFromDatabase<{ name: string }>) => {
+                    if (result.rowCount <= 0) {
+                        return res(false);
+                    } else {
+                        return res(true);
+                    }
+                }).catch((err: any) => {
+                    return rej(new MyError(MyErrors2.NOT_FIND_LOCATION))
+                })
+            }
+        })
     }
 }
 

@@ -190,7 +190,8 @@ export enum MyErrors2 {
     "NOT_ADD_EVENT" = "Could Not Create Event",
     "EVENT_ALREADY_EXISTS" = "The Event Already Exists",
     "NOT_ADD_USER_MAILING_LIST" = "Could Not Add User To Mailing List",
-    "ROUTE_NOT_EXIST" = "This Route Does Not Exist"
+    "ROUTE_NOT_EXIST" = "This Route Does Not Exist",
+    "NOT_FIND_LOCATION" = "Could Not Check If Location Exists"
 }
 
 export enum Success2 {

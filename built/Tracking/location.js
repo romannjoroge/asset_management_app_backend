@@ -214,6 +214,36 @@ class Location {
             });
         });
     }
+    static doesLocationExist(name, parentlocationid) {
+        return new Promise((res, rej) => {
+            if (parentlocationid === -1) {
+                let query = "SELECT name FROM Location WHERE name = $1 AND parentlocationid = null";
+                pool.query(query, [name]).then((result) => {
+                    if (result.rowCount <= 0) {
+                        return res(false);
+                    }
+                    else {
+                        return res(true);
+                    }
+                }).catch((err) => {
+                    return rej(new MyError(MyErrors2.NOT_FIND_LOCATION));
+                });
+            }
+            else {
+                let query = "SELECT name FROM Location WHERE name = $1 AND parentlocationid = $2";
+                pool.query(query, [name, parentlocationid]).then((result) => {
+                    if (result.rowCount <= 0) {
+                        return res(false);
+                    }
+                    else {
+                        return res(true);
+                    }
+                }).catch((err) => {
+                    return rej(new MyError(MyErrors2.NOT_FIND_LOCATION));
+                });
+            }
+        });
+    }
 }
 export default Location;
 //# sourceMappingURL=location.js.map
