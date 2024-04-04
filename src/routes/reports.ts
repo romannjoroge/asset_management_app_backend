@@ -18,7 +18,6 @@ import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciati
 import { Log } from '../Log/log.js';
 import getAuditTrail from '../Reports/audit_trail.js';
 import { getAssetRegister } from '../Reports/asset_register.js';
-import ReportDatabase from '../Reports/reportDatabase.js';
 import { getAssetDisposalReport } from '../Reports/asset_disposal.js';
 import { assetsNotInRegister, assetsPresentInRegister } from '../Reports/state_physical_valuation.js';
 import { getChainOfCustody } from '../Reports/chain_custody.js';
