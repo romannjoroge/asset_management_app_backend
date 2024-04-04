@@ -22,7 +22,7 @@ export default function generateDepreciatedAssetsInMonth() {
                     <p>These are the assets that have depreciated for this month</p>
                     <p>If you weren't meant to receive this email please ignore it</p>
                 `;
-                Mail.sendMailWithAttachmentsToMultipleRecepients(html, "Extreme Wireless Asset Management account team <account-security-noreply@mail.extremeusers.com>", emails, "Assets That Have Fully Depreciated This Month", excelfilebuffer, "fully_depreciated.xlsx").then((_) => {
+                Mail.sendMailWithAttachmentsToMultipleRecepients(html, "Extreme Wireless Asset Management <support@extremewireless.co.ke>", emails, "Assets That Have Fully Depreciated This Month", excelfilebuffer, "fully_depreciated.xlsx").then((_) => {
                     return res();
                 }).catch((err) => {
                     console.log(err);

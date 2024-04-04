@@ -30,7 +30,7 @@ export default function generateDepreciatedAssetsInMonth(): Promise<void> {
 
                 Mail.sendMailWithAttachmentsToMultipleRecepients(
                     html, 
-                    "Extreme Wireless Asset Management account team <account-security-noreply@mail.extremeusers.com>", 
+                    "Extreme Wireless Asset Management <support@extremewireless.co.ke>", 
                     emails, 
                     "Assets That Have Fully Depreciated This Month", 
                     excelfilebuffer, 

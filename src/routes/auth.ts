@@ -49,7 +49,7 @@ router.post('/generateOTP', (req, res) => {
             <p>Thanks,</p>
             <p>The Extreme Wireless Asset Management account team</p>
             `;
-            const from = "Extreme Wireless Asset Management account team <account-security-noreply@mail.extremeusers.com>";
+            const from = "Extreme Wireless Asset Management <support@extremewireless.co.ke>";
             const to = email;
             const subject = "Your Single Use Code"
             Mail.sendMail(emailBody, from, to, subject).then((_: any) => {
