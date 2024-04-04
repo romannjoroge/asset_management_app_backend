@@ -1,4 +1,4 @@
-import express from 'express';
+import express from 'express'
 const router = express.Router();
 import Asset from '../Allocation/Asset/asset2.js';
 import { Errors, Logs, MyErrors2, Succes, Success2 } from '../utility/constants.js';
@@ -15,6 +15,7 @@ import { Log } from '../Log/log.js';
 import { UserRoles } from '../Users/users.js';
 import createAssetStatus from '../Allocation/Asset/addAssetStatus.js';
 import handleError from '../utility/handleError.js';
+import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 const upload = multer({dest: './attachments'});
 
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
@@ -78,6 +79,16 @@ router.post('/createAssetStatus', checkifAuthorized(UserRoles.ASSET_ADMIN), (req
         let {errorMessage, errorCode} = handleError(err);
         return res.status(errorCode).json({message: errorMessage});
     })
+})
+
+router.get("/assetStatus", (req, res) => {
+  let query = "SELECT name FROM AssetStatus WHERE deleted = false";
+  getResultsFromDatabase<{name: string}>(query, []).then(data => {
+    return res.json(data);
+  }).catch((err: MyError) => {
+    let {errorMessage, errorCode} = handleError(err);
+    return res.status(errorCode).json({message: errorMessage});
+  })
 })
 
 router.post('/update/:id', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
