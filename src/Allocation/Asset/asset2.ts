@@ -144,15 +144,18 @@ class Asset {
                                   this._storeAssetInAssetRegister().then(_ => {
                                     res();
                                   }).catch(err => {
+                                    console.log(err)
                                     return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
                                   });
 
                                 }).catch((err) => {
+                                  console.log(err)
                                   return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
                                 })
 
                                 
                             }).catch((err: MyError) => {
+                                console.log(err);
                                 return rej(new MyError(MyErrors2.NOT_GENERATE_BARCODE));
                             })
                         }).catch((err: MyError) => {
