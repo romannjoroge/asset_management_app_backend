@@ -2,13 +2,12 @@ import { Errors } from "../../utility/constants.js";
 import MyError from "../../utility/myError.js";
 import assetTable from "./db_assets.js";
 import pool from '../../../db2.js';
-import { assetStatusOptions } from "./asset2.js";
 
 interface AssetDetails {
     assetID: number;
     barcode: string;
     description: string;
-    condition: assetStatusOptions;
+    condition: string;
     category: string;
     serialnumber: string;
     location: string;
