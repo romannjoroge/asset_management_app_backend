@@ -192,6 +192,7 @@ export var MyErrors2;
     MyErrors2["NOT_ADD_USER_MAILING_LIST"] = "Could Not Add User To Mailing List";
     MyErrors2["ROUTE_NOT_EXIST"] = "This Route Does Not Exist";
     MyErrors2["NOT_FIND_LOCATION"] = "Could Not Check If Location Exists";
+    MyErrors2["NOT_GET_USER_MAIL_SUBSCRIPTIONS"] = "Could Not Get User Mail Subscriptions";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {
