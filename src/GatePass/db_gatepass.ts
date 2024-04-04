@@ -11,9 +11,7 @@ const getPreviousGatePasses = `SELECT g.id, u.name, (SELECT name AS
         g.tolocation), g.date, a.barcode, g.reason, g.approved FROM Gatepass g JOIN gatepassasset ga ON ga.gatepassid = g.id JOIN 
         Asset a ON a.assetid = ga.assetid LEFT JOIN User2 u ON u.id = g.userid WHERE g.userid = $1 AND g.deleted = false;
 `
-const getRequestedGatePasses = `SELECT g.id,(SELECT name FROM User2 WHERE userid = g.userid LIMIT 1), (SELECT name AS fromlocation FROM Location WHERE id = g.fromlocation), (SELECT name AS tolocation FROM Location WHERE id = g.tolocation), g.date, a.barcode, g.reason, g.approved 
-                                FROM Gatepass g LEFT JOIN location l ON l.id = g.fromlocation LEFT JOIN location ON l.id = g.tolocation JOIN gatepassasset ga  
-ON ga.gatepassid = g.id JOIN Asset a ON a.assetid = ga.assetid WHERE g.id IN (SELECT gatepassid FROM AuthorizeGatepass WHERE userid = $1) AND g.approved = false;`;
+const getRequestedGatePasses = `SELECT g.id, u.name, (SELECT name AS fromlocation FROM Location WHERE id = g.fromlocation), (SELECT name AS tolocation FROM Location WHERE id = g.tolocation), g.date, a.barcode, g.reason, g.approved FROM Gatepass g JOIN gatepassasset ga ON ga.gatepassid = g.id LEFT JOIN User2 u ON u.id = g.userid JOIN Asset a ON a.assetid = ga.assetid WHERE g.id IN (SELECT gatepassid FROM AuthorizeGatepass WHERE userid = $1) AND g.approved = false;`;
 const doesGatePassExist = `SELECT * FROM Gatepass WHERE id = $1`;
 const handleGatePass = `UPDATE Gatepass SET approved = $1, comment = $2 WHERE id = $3;`;
 const createInventory = "INSERT INTO Inventory (name) VALUES ($1)";
