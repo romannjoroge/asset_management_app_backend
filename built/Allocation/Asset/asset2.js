@@ -81,25 +81,20 @@ class Asset {
     initialize() {
         return new Promise((res, rej) => {
             // Get category ID
-            console.log("Initialize");
             Category._getCategoryID(this.categoryName).then(categoryID => {
-                console.log("Category ID");
                 this.categoryID = categoryID;
                 // Check that location exists
                 Location.verifyLocationID(this.locationID).then(doesExist => {
                     if (!doesExist) {
                         rej(new MyError(Errors[3]));
                     }
-                    console.log("Location ID");
                     // Check if user exists
                     User.checkIfUserIDExists(this.custodian_id).then(doesUserExist => {
                         if (!doesUserExist) {
                             rej(new MyError(Errors[30]));
                         }
-                        console.log("User Exists");
                         // Get ID of next asset
                         Asset._getIDOfNextAsset().then(nextAssetID => {
-                            console.log("ID of Next Asset");
                             // Generate barcode
                             generateBarcode(categoryID, this.locationID, nextAssetID, this.condition).then(genBarcode => {
                                 this.barcode = genBarcode;
