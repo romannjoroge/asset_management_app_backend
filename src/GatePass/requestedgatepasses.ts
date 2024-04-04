@@ -29,7 +29,7 @@ export function getRequestedGatePasses(userid: number): Promise<GatePassRequests
             }
 
             // Get requested requests
-            pool.query(gatePassTable.getPreviousGatePasses, [userid]).then((data: GetGatePassFromDB) => {
+            pool.query(gatePassTable.getRequestedGatePasses, [userid]).then((data: GetGatePassFromDB) => {
                 return res(data.rows);
             }).catch(err => {
                 console.log(err);
