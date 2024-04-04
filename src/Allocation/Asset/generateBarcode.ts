@@ -13,18 +13,22 @@ export default async function generateBarcode(categoryid: number, locationid: nu
             if(categExist === false) {
                 return rej(new MyError(MyErrors2.CATEGORY_NOT_EXIST));
             }
+            console.log("Category Exist");
 
             // Check if location exists
             Location.verifyLocationID(locationid).then(locationExists => {
                 if(locationExists === false) {
                     return rej(new MyError(MyErrors2.LOCATION_NOT_EXIST));
                 }
+                console.log("Loction Exits")
+                console.log(assetStatus)
 
                 // Check if status exists
                 checkIfAssetStatusExists(assetStatus).then(isAssetStatusValid => {
                   if (isAssetStatusValid === false) {
                     return rej(new MyError(MyErrors2.ASSET_STATUS_NOT_EXIST));
                   }
+                  console.log("Asset Status Exists")
 
                   // Get site of location
                   Location.findIDOfSiteOfLocation(locationid).then(siteID => {
@@ -32,9 +36,11 @@ export default async function generateBarcode(categoryid: number, locationid: nu
                     const paddedCategoryID = utility.padStringWithCharacter(categoryid.toString(), '0', 2);
                     const paddedSiteID = utility.padStringWithCharacter(siteID.toString(), '0', 2);
                     const paddedAssetID = utility.padStringWithCharacter(assetid.toString(), '0', 7);
-                    const statusCode = Math.floor(Math.random() * 10);
+                    const statusCode = Math.floor(Math.random() * 10).toString();
+                    console.log(statusCode)
 
                     const barcode = paddedCategoryID + paddedSiteID + paddedAssetID + statusCode;
+                    console.log(`Barcode ${barcode}`);
 
                     if (barcode.length > 12) {
                       throw new MyError(MyErrors2.INVALID_BARCODE);
