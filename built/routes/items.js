@@ -15,6 +15,7 @@ import { Log } from '../Log/log.js';
 import { UserRoles } from '../Users/users.js';
 import createAssetStatus from '../Allocation/Asset/addAssetStatus.js';
 import handleError from '../utility/handleError.js';
+import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 const upload = multer({ dest: './attachments' });
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     let { locationID, description, categoryName, usefulLife, serialNumber, condition, responsibleuserid, acquisitionDate, acquisitionCost, residualValue, depreciationType, depreciationPercent, attachments } = req.body;
@@ -50,6 +51,15 @@ router.post('/createAssetStatus', checkifAuthorized(UserRoles.ASSET_ADMIN), (req
     let { name, description } = req.body;
     createAssetStatus(name, description).then((_) => {
         return res.json({ message: Success2.CREATED_STATUS });
+    }).catch((err) => {
+        let { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    });
+});
+router.get("/assetStatus", (req, res) => {
+    let query = "SELECT name FROM AssetStatus WHERE deleted = false";
+    getResultsFromDatabase(query, []).then(data => {
+        return res.json(data);
     }).catch((err) => {
         let { errorMessage, errorCode } = handleError(err);
         return res.status(errorCode).json({ message: errorMessage });
