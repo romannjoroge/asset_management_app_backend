@@ -57,7 +57,7 @@ router.post('/createAssetStatus', checkifAuthorized(UserRoles.ASSET_ADMIN), (req
     });
 });
 router.get("/assetStatus", (req, res) => {
-    let query = "SELECT name FROM AssetStatus WHERE deleted = false";
+    let query = "SELECT name FROM AssetStatus WHERE delete = false";
     getResultsFromDatabase(query, []).then(data => {
         return res.json(data);
     }).catch((err) => {
