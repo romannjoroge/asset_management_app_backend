@@ -9,7 +9,7 @@ const addGateAuthorizer = 'INSERT INTO AuthorizeGatepass (userid, gatepassid) VA
 const getPreviousGatePasses = `SELECT g.id, u.name, (SELECT name AS 
     fromlocation FROM Location WHERE id = g.fromlocation), (SELECT name AS tolocation FROM Location WHERE id = 
         g.tolocation), g.date, a.barcode, g.reason, g.approved FROM Gatepass g JOIN gatepassasset ga ON ga.gatepassid = g.id JOIN 
-        Asset a ON a.assetid = ga.assetid LEFT JOIN User2 u ON u.id = g.userid WHERE g.userid = &1 AND g.deleted = false;
+        Asset a ON a.assetid = ga.assetid LEFT JOIN User2 u ON u.id = g.userid WHERE g.userid = $1 AND g.deleted = false;
 `;
 const getRequestedGatePasses = `SELECT g.id,(SELECT name FROM User2 WHERE userid = g.userid LIMIT 1), (SELECT name AS fromlocation FROM Location WHERE id = g.fromlocation), (SELECT name AS tolocation FROM Location WHERE id = g.tolocation), g.date, a.barcode, g.reason, g.approved 
                                 FROM Gatepass g LEFT JOIN location l ON l.id = g.fromlocation LEFT JOIN location ON l.id = g.tolocation JOIN gatepassasset ga  
