@@ -11,7 +11,7 @@ export function getRequestedGatePasses(userid) {
                 return rej(new MyError(Errors[30]));
             }
             // Get requested requests
-            pool.query(gatePassTable.getPreviousGatePasses, [userid]).then((data) => {
+            pool.query(gatePassTable.getRequestedGatePasses, [userid]).then((data) => {
                 return res(data.rows);
             }).catch(err => {
                 console.log(err);
