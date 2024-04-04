@@ -33,6 +33,7 @@ class Asset {
         // this.fixed = fixed;
         utility.checkIfNumberisPositive(assetLifeSpan, "Invalid asset life span");
         this.assetLifeSpan = assetLifeSpan;
+        console.log(`Asset Status is ${condition}`);
         this.condition = condition;
         this.acquisitionDate = utility.checkIfValidDate(acquisitionDate, "Invalid acquisition date");
         utility.checkIfNumberisPositive(locationID, "Invalid location ID");
