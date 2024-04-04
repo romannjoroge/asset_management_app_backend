@@ -5,8 +5,8 @@ import MyError from "../../utility/myError.js";
 export default function createAssetStatus(name, description) {
     return new Promise((res, rej) => {
         // Check if asset already exists
-        checkIfEventExists(name).then(eventExists => {
-            if (eventExists == true) {
+        checkIfAssetStatusExists(name).then(statusExists => {
+            if (statusExists == true) {
                 return rej(new MyError(MyErrors2.EVENT_ALREADY_EXISTS));
             }
             // Create event
@@ -21,7 +21,7 @@ export default function createAssetStatus(name, description) {
         });
     });
 }
-function checkIfEventExists(name) {
+export function checkIfAssetStatusExists(name) {
     return new Promise((res, rej) => {
         let query = "SELECT name FROM AssetStatus WHERE name = $1";
         getResultsFromDatabase(query, [name]).then(results => {

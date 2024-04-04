@@ -13,18 +13,12 @@ import assetTable from './db_assets.js';
 import { Errors, MyErrors2 } from '../../utility/constants.js';
 import { createDepreciationSchedules } from './depreciations.js';
 import generateBarcode from './generateBarcode.js';
+import {checkIfAssetStatusExists} from './addAssetStatus.js';
 
 export enum DepreciationTypes {
     StraightLine = "Straight Line",
     DoubleDecliningBalance = "Double Declining Balance",
     WrittenDownValue = "Written Down Value"
-}
-
-export enum assetStatusOptions {
-    Good = "Good",
-    Excellent = "Excellent",
-    Fair = "Fair",
-    Bad = "Bad"
 }
 
 interface DoesAssetExistFetchResult {
@@ -42,7 +36,7 @@ class Asset {
     assetLifeSpan: number;
     acquisitionDate: Date;
     locationID: number;
-    condition: assetStatusOptions;
+    condition: string;
     custodian_id: number;
     acquisitionCost: number;
     categoryName: string;
@@ -54,24 +48,19 @@ class Asset {
     depreciaitionType?: DepreciationTypes;
     depreciationPercent?: number;
 
-    constructor(assetLifeSpan: number, acquisitionDate: string | Date, locationID: number, condition: assetStatusOptions, custodian_id: number,
+    constructor(assetLifeSpan: number, acquisitionDate: string | Date, locationID: number, condition: string, custodian_id: number,
         acquisitionCost: number, categoryName: string, attachments: string[], serialNumber: string, description: string, residualValue?: number, depreciaitionType?: DepreciationTypes, depreciationPercent?: number) {
         // utility.checkIfBoolean(fixed, "Invalid Fixed Status");
         // this.fixed = fixed;
 
         utility.checkIfNumberisPositive(assetLifeSpan, "Invalid asset life span");
         this.assetLifeSpan = assetLifeSpan;
+        this.condition = condition;
 
         this.acquisitionDate = utility.checkIfValidDate(acquisitionDate, "Invalid acquisition date");
 
         utility.checkIfNumberisPositive(locationID, "Invalid location ID");
         this.locationID = locationID;
-
-        if (Object.values(assetStatusOptions).includes(condition) === true) {
-            this.condition = condition;
-        } else {
-            throw new MyError(Errors[49])
-        }
 
         this.custodian_id = custodian_id;
 
@@ -121,20 +110,6 @@ class Asset {
         this.categoryID = 0;
     }
 
-    // Check is the asset status given is valid
-    static isAssetStatusValid(status: string): boolean {
-        return Object.values(assetStatusOptions).includes(status) === true;
-    }
-
-    // Gets code of asset status
-    static getAssetStatusCode(status: string): string {
-        if (this.isAssetStatusValid(status) == false) {
-            throw new MyError(MyErrors2.ASSET_STATUS_NOT_EXIST);
-        }
-
-        // Return location of status as code
-        return Object.values(assetStatusOptions).indexOf(status).toString();
-    }
 
     // Since the constructor cannot make asynchronous calls a seprate initialize function is needed to initialize
     // asynchronous values
@@ -159,11 +134,24 @@ class Asset {
                             // Generate barcode
                             generateBarcode(categoryID, this.locationID, nextAssetID, this.condition).then(genBarcode => {
                                 this.barcode = genBarcode;
-                                this._storeAssetInAssetRegister().then(_ => {
-                                    res();
-                                }).catch(err => {
+                                
+                                // Check if status exists
+                                checkIfAssetStatusExists(this.condition).then(exists => {
+                                  if (!exists) {
                                     return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
-                                });
+                                  }
+
+                                  this._storeAssetInAssetRegister().then(_ => {
+                                    res();
+                                  }).catch(err => {
+                                    return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
+                                  });
+
+                                }).catch((err) => {
+                                  return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
+                                })
+
+                                
                             }).catch((err: MyError) => {
                                 return rej(new MyError(MyErrors2.NOT_GENERATE_BARCODE));
                             })

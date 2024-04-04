@@ -20,34 +20,23 @@ import assetTable from './db_assets.js';
 import { Errors, MyErrors2 } from '../../utility/constants.js';
 import { createDepreciationSchedules } from './depreciations.js';
 import generateBarcode from './generateBarcode.js';
+import { checkIfAssetStatusExists } from './addAssetStatus.js';
 export var DepreciationTypes;
 (function (DepreciationTypes) {
     DepreciationTypes["StraightLine"] = "Straight Line";
     DepreciationTypes["DoubleDecliningBalance"] = "Double Declining Balance";
     DepreciationTypes["WrittenDownValue"] = "Written Down Value";
 })(DepreciationTypes || (DepreciationTypes = {}));
-export var assetStatusOptions;
-(function (assetStatusOptions) {
-    assetStatusOptions["Good"] = "Good";
-    assetStatusOptions["Excellent"] = "Excellent";
-    assetStatusOptions["Fair"] = "Fair";
-    assetStatusOptions["Bad"] = "Bad";
-})(assetStatusOptions || (assetStatusOptions = {}));
 class Asset {
     constructor(assetLifeSpan, acquisitionDate, locationID, condition, custodian_id, acquisitionCost, categoryName, attachments, serialNumber, description, residualValue, depreciaitionType, depreciationPercent) {
         // utility.checkIfBoolean(fixed, "Invalid Fixed Status");
         // this.fixed = fixed;
         utility.checkIfNumberisPositive(assetLifeSpan, "Invalid asset life span");
         this.assetLifeSpan = assetLifeSpan;
+        this.condition = condition;
         this.acquisitionDate = utility.checkIfValidDate(acquisitionDate, "Invalid acquisition date");
         utility.checkIfNumberisPositive(locationID, "Invalid location ID");
         this.locationID = locationID;
-        if (Object.values(assetStatusOptions).includes(condition) === true) {
-            this.condition = condition;
-        }
-        else {
-            throw new MyError(Errors[49]);
-        }
         this.custodian_id = custodian_id;
         utility.checkIfNumberisPositive(acquisitionCost, "Invalid acquisition cost");
         this.acquisitionCost = acquisitionCost;
@@ -87,18 +76,6 @@ class Asset {
         }
         this.categoryID = 0;
     }
-    // Check is the asset status given is valid
-    static isAssetStatusValid(status) {
-        return Object.values(assetStatusOptions).includes(status) === true;
-    }
-    // Gets code of asset status
-    static getAssetStatusCode(status) {
-        if (this.isAssetStatusValid(status) == false) {
-            throw new MyError(MyErrors2.ASSET_STATUS_NOT_EXIST);
-        }
-        // Return location of status as code
-        return Object.values(assetStatusOptions).indexOf(status).toString();
-    }
     // Since the constructor cannot make asynchronous calls a seprate initialize function is needed to initialize
     // asynchronous values
     initialize() {
@@ -121,9 +98,17 @@ class Asset {
                             // Generate barcode
                             generateBarcode(categoryID, this.locationID, nextAssetID, this.condition).then(genBarcode => {
                                 this.barcode = genBarcode;
-                                this._storeAssetInAssetRegister().then(_ => {
-                                    res();
-                                }).catch(err => {
+                                // Check if status exists
+                                checkIfAssetStatusExists(this.condition).then(exists => {
+                                    if (!exists) {
+                                        return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
+                                    }
+                                    this._storeAssetInAssetRegister().then(_ => {
+                                        res();
+                                    }).catch(err => {
+                                        return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
+                                    });
+                                }).catch((err) => {
                                     return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
                                 });
                             }).catch((err) => {
