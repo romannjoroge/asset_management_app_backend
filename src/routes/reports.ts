@@ -35,6 +35,7 @@ import schedule from 'node-schedule';
 import generateDepreciatedAssetsInMonth from '../Mail/generateDepreciatedAssetsMail.js';
 import { storeGenerateReportStatement } from '../Reports/generateReport.js';
 import handleError from '../utility/handleError.js';
+import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -97,7 +98,25 @@ router.post('/storeGen', (req, res) => {
         const {errorMessage, errorCode} = handleError(err);
         return res.status(errorCode).json({message: errorMessage});
     })
-})
+});
+
+interface StoredReports {
+    name: string,
+    period: string,
+    username: string,
+    report: string,
+}
+
+// Get stored generated reports
+router.get('/storedReports', (req, res) => {
+    let query = "SELECT * FROM GenerateReports WHERE deleted = false";
+    getResultsFromDatabase<StoredReports>(query, []).then(data => {
+        return res.json(data);
+    }).catch((err: MyError) => {
+        let {errorMessage, errorCode} = handleError(err);
+        return res.status(errorCode).json({message: errorMessage});
+    })
+});
 
 router.get('/inventory/:type', (req, res) => {
     let type = req.params.type
