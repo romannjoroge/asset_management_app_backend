@@ -41,6 +41,7 @@ import schedule from 'node-schedule';
 import generateDepreciatedAssetsInMonth from '../Mail/generateDepreciatedAssetsMail.js';
 import { storeGenerateReportStatement } from '../Reports/generateReport.js';
 import handleError from '../utility/handleError.js';
+import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 var rule = new schedule.RecurrenceRule();
@@ -87,6 +88,16 @@ router.post('/storeGen', (req, res) => {
     }).catch((err) => {
         console.log(err);
         const { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    });
+});
+// Get stored generated reports
+router.get('/storedReports', (req, res) => {
+    let query = "SELECT * FROM GenerateReports WHERE deleted = false";
+    getResultsFromDatabase(query, []).then(data => {
+        return res.json(data);
+    }).catch((err) => {
+        let { errorMessage, errorCode } = handleError(err);
         return res.status(errorCode).json({ message: errorMessage });
     });
 });
