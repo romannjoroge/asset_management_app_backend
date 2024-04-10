@@ -93,7 +93,7 @@ router.post('/storeGen', (req, res) => {
 });
 // Get stored generated reports
 router.get('/storedReports', (req, res) => {
-    let query = "SELECT * FROM GenerateReports WHERE deleted = false";
+    let query = "SELECT g.name, u.username, period, report FROM GenerateReports g INNER JOIN User2 u ON u.id = g.creator_id WHERE g.deleted = false;";
     getResultsFromDatabase(query, []).then(data => {
         return res.json(data);
     }).catch((err) => {
