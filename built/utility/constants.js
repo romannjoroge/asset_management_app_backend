@@ -206,6 +206,7 @@ export var Success2;
     Success2["CREATED_LOCATION"] = "Location Created";
     Success2["CREATED_STATUS"] = "Asset Status Created";
     Success2["ADDED_USER_MAIL"] = "Added User To Mailing List";
+    Success2["GEN_REPORT"] = "Generated Report Stored Successfully";
 })(Success2 || (Success2 = {}));
 export const Succes = {
     '1': 'Asset Created Successfuly',
