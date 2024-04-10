@@ -42,6 +42,7 @@ import generateDepreciatedAssetsInMonth from '../Mail/generateDepreciatedAssetsM
 import { storeGenerateReportStatement } from '../Reports/generateReport.js';
 import handleError from '../utility/handleError.js';
 import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
+import createMailSubscription from '../Mail/createMailSubscription.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 var rule = new schedule.RecurrenceRule();
@@ -84,7 +85,15 @@ router.get('/test', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 router.post('/storeGen', (req, res) => {
     let { items, name, period, } = req.body;
     storeGenerateReportStatement(items, name, period, req.id).then(() => {
-        return res.status(201).json({ message: Success2.GEN_REPORT });
+        // Insert subscription
+        createMailSubscription(name, `Generate ${name} report ${period}`).then(() => {
+            return res.status(201).json({ message: Success2.GEN_REPORT });
+        })
+            .catch((err) => {
+            console.log(err);
+            const { errorMessage, errorCode } = handleError(err);
+            return res.status(errorCode).json({ message: errorMessage });
+        });
     }).catch((err) => {
         console.log(err);
         const { errorMessage, errorCode } = handleError(err);

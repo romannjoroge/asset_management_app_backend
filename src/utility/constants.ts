@@ -195,7 +195,8 @@ export enum MyErrors2 {
     "NOT_GET_USER_MAIL_SUBSCRIPTIONS" = "Could Not Get User Mail Subscriptions",
     "GENERATE_ASSET_REPORT_NOT_SUPPORTED" = "Selected Field Is Not Supported",
     "NOT_GET_GENERATE_REPORT_STRUCT" = "Could Not Generate Generate Report Struct",
-    "NOT_GENERATE_SELECT_STATEMENT" = "Could Not Generate SELECT STATEMENT"
+    "NOT_GENERATE_SELECT_STATEMENT" = "Could Not Generate SELECT STATEMENT",
+    "NOT_CREATE_MAIL_SUBSCRIPTION" = "Could Not Create Mail Subscription"
 }
 
 export enum Success2 {
