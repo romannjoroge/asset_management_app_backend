@@ -241,16 +241,16 @@ function generateSelectStatementFromGenerateReportStruct(struct: GenerateReportS
     }
 }
 
-async function test2() {
-    try {
-        await storeGenerateReportStatement([SupportedGenerateAssetReportFields.ACQUISITION_COST], "Test Report", "monthly", 6);
-        console.log("Done");
-    } catch(err) {
-        console.log("OHH SHIT", err);
-    }
-}
+// async function test2() {
+//     try {
+//         await storeGenerateReportStatement([SupportedGenerateAssetReportFields.ACQUISITION_COST], "Test Report", "monthly", 6);
+//         console.log("Done");
+//     } catch(err) {
+//         console.log("OHH SHIT", err);
+//     }
+// }
 
-test2();
+// test2();
 
 // async function test() {
 //     let listWithUnsupportedField = ['height', 'barcode'];

@@ -2,7 +2,7 @@ import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
 import reportsTable from '../Reports/db_reports.js';
-import { Errors, Logs, MyErrors2, Succes } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2, Succes, Success2 } from '../utility/constants.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import logTable from '../Log/db_log.js';
@@ -33,6 +33,8 @@ import depreciateAssetPerCategory from '../Reports/depreciation_per_category.js'
 import { getAdditionalAssetsInInventory, getAssetsMissingInInventory, getAssetsPresentInInventory } from '../Reports/inventory.js';
 import schedule from 'node-schedule';
 import generateDepreciatedAssetsInMonth from '../Mail/generateDepreciatedAssetsMail.js';
+import { storeGenerateReportStatement } from '../Reports/generateReport.js';
+import handleError from '../utility/handleError.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -78,6 +80,23 @@ router.get('/test', async (req, res) => {
         console.log(err);
         return res.status(500).send("Shit Went Down!")
     }
+})
+
+// Route to store generate report stuff
+router.post('/storeGen', (req, res) => {
+    let {
+        items,
+        name,
+        period,
+    } = req.body;
+
+    storeGenerateReportStatement(items, name, period, req.id).then(() => {
+        return res.status(201).json({message: Success2.GEN_REPORT})
+    }).catch((err: MyError) => {
+        console.log(err);
+        const {errorMessage, errorCode} = handleError(err);
+        return res.status(errorCode).json({message: errorMessage});
+    })
 })
 
 router.get('/inventory/:type', (req, res) => {

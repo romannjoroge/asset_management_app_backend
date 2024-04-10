@@ -205,7 +205,8 @@ export enum Success2 {
     'CREATED_ASSET' = 'Asset Created Successfuly',
     'CREATED_LOCATION' = "Location Created",
     'CREATED_STATUS' = "Asset Status Created",
-    "ADDED_USER_MAIL" = "Added User To Mailing List"
+    "ADDED_USER_MAIL" = "Added User To Mailing List",
+    "GEN_REPORT" = "Generated Report Stored Successfully"
 }
 
 export const Succes = {
