@@ -211,10 +211,6 @@ function padStringWithCharacter(string: string, character: string, length: numbe
         return string;
     }
 }
-
-function checkIfItemInEnum<T implements enum>(item: string, enum: T): boolean {
-    return Object.values(enum).includes(item);
-}
     
 const utility = {
     arrayEquals,
