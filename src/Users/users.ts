@@ -69,6 +69,7 @@ class User {
     static async checkIfUserExists(username: string): Promise<boolean> {
         return new Promise((res, rej) => {
             pool.query(userTable.checkIfUserInDB, [username]).then((data: UserFetchResult) => {
+                console.log(data);
                 if (data.rowCount > 0) {
                     res(true);
                 } else {

@@ -193,6 +193,9 @@ export var MyErrors2;
     MyErrors2["ROUTE_NOT_EXIST"] = "This Route Does Not Exist";
     MyErrors2["NOT_FIND_LOCATION"] = "Could Not Check If Location Exists";
     MyErrors2["NOT_GET_USER_MAIL_SUBSCRIPTIONS"] = "Could Not Get User Mail Subscriptions";
+    MyErrors2["GENERATE_ASSET_REPORT_NOT_SUPPORTED"] = "Selected Field Is Not Supported";
+    MyErrors2["NOT_GET_GENERATE_REPORT_STRUCT"] = "Could Not Generate Generate Report Struct";
+    MyErrors2["NOT_GENERATE_SELECT_STATEMENT"] = "Could Not Generate SELECT STATEMENT";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

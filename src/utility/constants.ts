@@ -192,7 +192,10 @@ export enum MyErrors2 {
     "NOT_ADD_USER_MAILING_LIST" = "Could Not Add User To Mailing List",
     "ROUTE_NOT_EXIST" = "This Route Does Not Exist",
     "NOT_FIND_LOCATION" = "Could Not Check If Location Exists",
-    "NOT_GET_USER_MAIL_SUBSCRIPTIONS" = "Could Not Get User Mail Subscriptions"
+    "NOT_GET_USER_MAIL_SUBSCRIPTIONS" = "Could Not Get User Mail Subscriptions",
+    "GENERATE_ASSET_REPORT_NOT_SUPPORTED" = "Selected Field Is Not Supported",
+    "NOT_GET_GENERATE_REPORT_STRUCT" = "Could Not Generate Generate Report Struct",
+    "NOT_GENERATE_SELECT_STATEMENT" = "Could Not Generate SELECT STATEMENT"
 }
 
 export enum Success2 {
