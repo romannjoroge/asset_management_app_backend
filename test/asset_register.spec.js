@@ -2,7 +2,7 @@ import Sinon from "sinon";
 import { assert } from "chai";
 import MyError from "../built/utility/myError.js";
 import { MyErrors2 } from "../built/utility/constants.js";
-import {convertDatabaseResultToAssetRegisterEntry} from '../built/Reports/asset_register.js';
+import {batchAddSiteBuildingLocation} from "../built/Reports/helpers.js";
 import Location from "../built/Tracking/location.js";
 
 describe("Convert RawAssetRegisterData to AssetRegisterData", function () {
@@ -96,7 +96,7 @@ describe("Convert RawAssetRegisterData to AssetRegisterData", function () {
 
     it("should fail if location does not exist", async function() {
         try {
-            await convertDatabaseResultToAssetRegisterEntry(rawDataWithNonExistentLocation);
+            await batchAddSiteBuildingLocation(rawDataWithNonExistentLocation);
             assert(false, "Error Meant To Be Thrown")
         } catch(err) {
             if (err instanceof MyError && err.message === MyErrors2.LOCATION_NOT_EXIST) {
@@ -110,7 +110,7 @@ describe("Convert RawAssetRegisterData to AssetRegisterData", function () {
 
     it("should return data with building, site and office", async function() {
         try {
-            const converted = await convertDatabaseResultToAssetRegisterEntry(rawData);
+            const converted = await batchAddSiteBuildingLocation(rawData);
             assert.deepEqual(converted, expectedData)
         } catch(err) {
             console.log(err);

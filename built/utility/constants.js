@@ -197,6 +197,11 @@ export var MyErrors2;
     MyErrors2["NOT_GET_GENERATE_REPORT_STRUCT"] = "Could Not Generate Generate Report Struct";
     MyErrors2["NOT_GENERATE_SELECT_STATEMENT"] = "Could Not Generate SELECT STATEMENT";
     MyErrors2["NOT_CREATE_MAIL_SUBSCRIPTION"] = "Could Not Create Mail Subscription";
+    MyErrors2["NOT_GET_DEPRECIATION_TYPE_OF_ASSET"] = "Could Not Get Depreciation Type Of Asset";
+    MyErrors2["INVALID_DEPRECIATION_TYPE"] = "Invalid Depreciation Type";
+    MyErrors2["NOT_GET_DEPRECIATION_SCHEDULE"] = "Could Not Get Depreciation Schedule Of Asset";
+    MyErrors2["NOT_GET_DEPRECIATION_DETAILS"] = "Could Not Get Depreciation Details";
+    MyErrors2["INVALID_DEPRECIATION_DETAILS"] = "Invalid Depreciation Details";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

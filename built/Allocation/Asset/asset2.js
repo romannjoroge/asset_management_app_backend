@@ -153,6 +153,7 @@ class Asset {
                     }
                     return res(true);
                 }).catch(err => {
+                    console.log(err);
                     return rej(new MyError(Errors[9]));
                 });
             });

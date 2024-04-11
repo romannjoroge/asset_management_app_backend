@@ -36,6 +36,7 @@ if (env.match('test')){
         password: 'postgres'
     })
 }else{
+    console.log("THERE")
     pool = new Pool({
         user: process.env.DATABASEUSER,
         database: process.env.DATABASE,

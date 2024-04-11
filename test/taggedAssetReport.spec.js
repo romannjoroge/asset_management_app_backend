@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import MyError from '../built/utility/myError.js';
-import {addOfficeBuildingLocationToAsset} from '../built/Reports/tagged_assets.js'
+// import {addOfficeBuildingLocationToAsset} from '../built/Reports/tagged_assets.js'
 import { Errors } from '../built/utility/constants.js';
 import utility from "../built/utility/utility.js";
 import pool from "../db2.js";
