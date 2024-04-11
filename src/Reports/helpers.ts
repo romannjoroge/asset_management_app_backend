@@ -23,6 +23,8 @@ export interface AssetRegisterData extends SiteBuildingOffice{
 }
 
 export interface RawAssetRegisterData extends HasLocationID{
+    current_market_value: number;
+    latestvaluationdate: string;
     serial_number: string;
     acquisition_date: string;
     condition: string;
