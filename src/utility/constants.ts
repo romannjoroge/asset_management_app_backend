@@ -196,7 +196,12 @@ export enum MyErrors2 {
     "GENERATE_ASSET_REPORT_NOT_SUPPORTED" = "Selected Field Is Not Supported",
     "NOT_GET_GENERATE_REPORT_STRUCT" = "Could Not Generate Generate Report Struct",
     "NOT_GENERATE_SELECT_STATEMENT" = "Could Not Generate SELECT STATEMENT",
-    "NOT_CREATE_MAIL_SUBSCRIPTION" = "Could Not Create Mail Subscription"
+    "NOT_CREATE_MAIL_SUBSCRIPTION" = "Could Not Create Mail Subscription",
+    "NOT_GET_DEPRECIATION_TYPE_OF_ASSET" = "Could Not Get Depreciation Type Of Asset",
+    "INVALID_DEPRECIATION_TYPE" = "Invalid Depreciation Type",
+    "NOT_GET_DEPRECIATION_SCHEDULE" = "Could Not Get Depreciation Schedule Of Asset",
+    "NOT_GET_DEPRECIATION_DETAILS" = "Could Not Get Depreciation Details",
+    "INVALID_DEPRECIATION_DETAILS" = "Invalid Depreciation Details"
 }
 
 export enum Success2 {
