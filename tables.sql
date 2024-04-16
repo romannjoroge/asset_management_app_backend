@@ -116,6 +116,22 @@ CREATE TABLE AssetValuationHistory(
       REFERENCES Asset(assetID)
 );
 
+CREATE TABLE AssetInsuranceValue(
+  ID serial,
+  assetID int,
+  insuranceValue float,
+  insuranceDate date,
+  insurerID int,
+  deleted BOOLEAN DEFAULT FALSE,
+  PRIMARY KEY (ID),
+  CONSTRAINT "FK_AssetInsuranceValue.insurerID"
+    FOREIGN KEY(insurerID)
+      REFERENCES User2(id),
+  CONSTRAINT "FK_AssetInsuranceValue.assetID"
+    FOREIGN KEY (assetID)
+      REFERENCES Asset(assetID)
+);
+
 CREATE TABLE Asset (
   barcode VARCHAR(20),
   code VARCHAR(255),

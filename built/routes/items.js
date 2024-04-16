@@ -18,6 +18,8 @@ import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 import { getValuations } from '../AssetValuation/getValuations.js';
 import utility from '../utility/utility.js';
 import { addValuation } from '../AssetValuation/addValuation.js';
+import { getInsurances } from '../AssetInsurance/getInsurance.js';
+import { addInsurance } from '../AssetInsurance/addInsurance.js';
 const upload = multer({ dest: './attachments' });
 router.get('/valuations/:barcode', (req, res) => {
     const barcode = req.params.barcode;
@@ -36,6 +38,29 @@ router.post("/valuation", (req, res) => {
         let valuation_value = Number.parseFloat(value);
         addValuation(barcode, assetValuerID, valuation_value, valuation_date);
         return res.status(201).json({ message: Success2.ADD_VALUATION });
+    }
+    catch (err) {
+        const { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    }
+});
+router.get('/insurance/:barcode', (req, res) => {
+    const barcode = req.params.barcode;
+    getInsurances(barcode).then(data => {
+        return res.json(data);
+    }).catch((err) => {
+        const { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    });
+});
+router.post("/insurance", (req, res) => {
+    const { barcode, insurer_id, date, value } = req.body;
+    try {
+        let assetInsurerID = Number.parseInt(insurer_id);
+        let insurance_date = utility.checkIfValidDate(date, "Invalid Insurance Date");
+        let insurance_value = Number.parseFloat(value);
+        addInsurance(barcode, assetInsurerID, insurance_value, insurance_date);
+        return res.status(201).json({ message: Success2.ADD_INSURANCE });
     }
     catch (err) {
         const { errorMessage, errorCode } = handleError(err);

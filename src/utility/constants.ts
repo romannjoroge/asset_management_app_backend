@@ -194,7 +194,9 @@ export enum MyErrors2 {
     "NOT_FIND_LOCATION" = "Could Not Check If Location Exists",
     "NOT_GET_USER_MAIL_SUBSCRIPTIONS" = "Could Not Get User Mail Subscriptions",
     "NOT_ADD_VALUATION" = "Could Not Add Asset Valuation",
-    "NOT_GET_VALUATION" = "Could Not Get Asset Valuations"
+    "NOT_GET_VALUATION" = "Could Not Get Asset Valuations",
+    "NOT_ADD_INSURANCE" = "Could Not Add Asset Insurance",
+    "NOT_GET_INSURANCE" = "Could Not Get Asset Insurance"
 }
 
 export enum Success2 {
@@ -205,7 +207,8 @@ export enum Success2 {
     'CREATED_LOCATION' = "Location Created",
     'CREATED_STATUS' = "Asset Status Created",
     "ADDED_USER_MAIL" = "Added User To Mailing List",
-    "ADD_VALUATION" = "Valuation Added Succesfully"
+    "ADD_VALUATION" = "Valuation Added Succesfully",
+    "ADD_INSURANCE" = "Insurance Added Succesfully"
 }
 
 export const Succes = {
