@@ -106,7 +106,11 @@ CREATE TABLE AssetValuationHistory(
   assetID int,
   valuationValue float,
   valuationDate date,
+  valuerID int,
   PRIMARY KEY (ID),
+  CONSTRAINT "FK_AssetValuationHistory.valuerID"
+    FOREIGN KEY(valuerID)
+      REFERENCES User2(id),
   CONSTRAINT "FK_AssetValuationHistory.assetID"
     FOREIGN KEY (assetID)
       REFERENCES Asset(assetID)

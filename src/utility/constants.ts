@@ -192,7 +192,9 @@ export enum MyErrors2 {
     "NOT_ADD_USER_MAILING_LIST" = "Could Not Add User To Mailing List",
     "ROUTE_NOT_EXIST" = "This Route Does Not Exist",
     "NOT_FIND_LOCATION" = "Could Not Check If Location Exists",
-    "NOT_GET_USER_MAIL_SUBSCRIPTIONS" = "Could Not Get User Mail Subscriptions"
+    "NOT_GET_USER_MAIL_SUBSCRIPTIONS" = "Could Not Get User Mail Subscriptions",
+    "NOT_ADD_VALUATION" = "Could Not Add Asset Valuation",
+    "NOT_GET_VALUATION" = "Could Not Get Asset Valuations"
 }
 
 export enum Success2 {
@@ -202,7 +204,8 @@ export enum Success2 {
     'CREATED_ASSET' = 'Asset Created Successfuly',
     'CREATED_LOCATION' = "Location Created",
     'CREATED_STATUS' = "Asset Status Created",
-    "ADDED_USER_MAIL" = "Added User To Mailing List"
+    "ADDED_USER_MAIL" = "Added User To Mailing List",
+    "ADD_VALUATION" = "Valuation Added Succesfully"
 }
 
 export const Succes = {

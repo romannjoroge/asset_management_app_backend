@@ -1,0 +1,1 @@
+{"version":3,"file":"addValuation.js","sourceRoot":"","sources":["../../src/AssetValuation/addValuation.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,+BAA+B,CAAA;AAEjD,MAAM,UAAU,YAAY,CAAC,OAAe,EAAE,QAAgB,EAAE,eAAuB,EAAE,cAAoB;IAC3G,OAAO,IAAI,OAAO,CAAC,CAAC,GAAG,EAAE,GAAG,EAAE,EAAE;QAC9B,wBAAwB;QACxB,KAAK;YACP,AADQ,JAAA,CAAA;IACR,CAAC,CAAC,CAAC;AACL,CAAC"}
