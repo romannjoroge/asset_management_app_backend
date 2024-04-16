@@ -20,6 +20,7 @@ import utility from '../utility/utility.js';
 import { addValuation } from '../AssetValuation/addValuation.js';
 import { getInsurances } from '../AssetInsurance/getInsurance.js';
 import { addInsurance } from '../AssetInsurance/addInsurance.js';
+import { disposeAsset } from '../Allocation/Asset/disposeAsset.js';
 const upload = multer({ dest: './attachments' });
 router.get('/valuations/:barcode', (req, res) => {
     const barcode = req.params.barcode;
@@ -43,6 +44,15 @@ router.post("/valuation", (req, res) => {
         const { errorMessage, errorCode } = handleError(err);
         return res.status(errorCode).json({ message: errorMessage });
     }
+});
+router.post("/dispose/:id", (req, res) => {
+    const assetID = Number.parseInt(req.params.id);
+    disposeAsset(assetID).then(_ => {
+        return res.status(201).json({ message: Success2.DISPOSE_ASSET });
+    }).catch((err) => {
+        const { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    });
 });
 router.get('/insurance/:barcode', (req, res) => {
     const barcode = req.params.barcode;

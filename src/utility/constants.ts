@@ -206,7 +206,8 @@ export enum MyErrors2 {
     "NOT_GET_DEPRECIATION_SCHEDULE" = "Could Not Get Depreciation Schedule Of Asset",
     "NOT_GET_DEPRECIATION_DETAILS" = "Could Not Get Depreciation Details",
     "INVALID_DEPRECIATION_DETAILS" = "Invalid Depreciation Details",
-    "NOT_GET_CURRENT_MARKET_VALUE" = "Could Not Get Current Market Value"
+    "NOT_GET_CURRENT_MARKET_VALUE" = "Could Not Get Current Market Value",
+    "NOT_DISPOSE_ASSET" = "Could Not Dispose Asset",
 }
 
 export enum Success2 {
@@ -219,7 +220,8 @@ export enum Success2 {
     "ADDED_USER_MAIL" = "Added User To Mailing List",
     "ADD_VALUATION" = "Valuation Added Succesfully",
     "ADD_INSURANCE" = "Insurance Added Succesfully",
-    "GEN_REPORT" = "Generated Report Stored Successfully"
+    "GEN_REPORT" = "Generated Report Stored Successfully",
+    "DISPOSE_ASSET" = "Disposed Asset Successfully"
 }
 
 export const Succes = {
