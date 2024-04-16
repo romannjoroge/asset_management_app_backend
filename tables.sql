@@ -502,4 +502,6 @@ SET datestyle TO MDY;
 ALTER USER asset_management WITH PASSWORD 'the password';
 
 -- Commands to do on server
-AssetStatus
+-- create assetvaluation and insurance tables
+ALTER TABLE Asset ADD COLUMN make TEXT;
+ALTER TABLE Asset ADD COLUMN modelnumber TEXT;

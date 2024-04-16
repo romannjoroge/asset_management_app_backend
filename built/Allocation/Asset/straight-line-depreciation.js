@@ -5,7 +5,7 @@ export function getStraightLineDepreciationScheduleEntries(assetID) {
     return new Promise((res, rej) => {
         let depreciationScheduleEntries = [];
         getAssetDepreciationDetails(assetID).then(depDetails => {
-            if (!depDetails.residualvalue) {
+            if (depDetails.residualvalue == null || depDetails.residualvalue == undefined) {
                 return rej(new MyError(MyErrors2.INVALID_DEPRECIATION_DETAILS));
             }
             let year = depDetails.acquisitiondate.getFullYear();

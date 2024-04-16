@@ -102,6 +102,8 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
         residualValue,
         depreciationType,
         depreciationPercent,
+        make,
+        modelnumber,
         attachments
     } = req.body;
 
@@ -119,7 +121,7 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
     }
 
     let asset = new Asset(usefulLife, acquisitionDate, locationID, condition, responsibleuserid, acquisitionCost, categoryName, 
-        attachments, serialNumber, description, residualValue, depreciationType, depreciationPercent);
+        attachments, serialNumber, description, residualValue, depreciationType, depreciationPercent, make, modelnumber);
     asset.initialize().then(_ => {
         // Add log
         Log.createLog(req.ip, req.id, Logs.CREATE_ASSET).then((_: any) => {

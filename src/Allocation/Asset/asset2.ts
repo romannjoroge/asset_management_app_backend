@@ -33,6 +33,8 @@ interface GetNextAssetIDResult {
 
 class Asset {
     barcode: string;
+    make: string;
+    modelnumber: string;
     assetLifeSpan: number;
     acquisitionDate: Date;
     locationID: number;
@@ -49,13 +51,11 @@ class Asset {
     depreciationPercent?: number;
 
     constructor(assetLifeSpan: number, acquisitionDate: string | Date, locationID: number, condition: string, custodian_id: number,
-        acquisitionCost: number, categoryName: string, attachments: string[], serialNumber: string, description: string, residualValue?: number, depreciaitionType?: DepreciationTypes, depreciationPercent?: number) {
-        // utility.checkIfBoolean(fixed, "Invalid Fixed Status");
-        // this.fixed = fixed;
+        acquisitionCost: number, categoryName: string, attachments: string[], serialNumber: string, description: string, 
+        residualValue?: number, depreciaitionType?: DepreciationTypes, depreciationPercent?: number, make: string, modelnumber: string) {
 
         utility.checkIfNumberisPositive(assetLifeSpan, "Invalid asset life span");
         this.assetLifeSpan = assetLifeSpan;
-        console.log(`Asset Status is ${condition}`);
         this.condition = condition;
 
         this.acquisitionDate = utility.checkIfValidDate(acquisitionDate, "Invalid acquisition date");
@@ -64,6 +64,9 @@ class Asset {
         this.locationID = locationID;
 
         this.custodian_id = custodian_id;
+
+        this.make = make;
+        this.modelnumber = modelnumber;
 
         utility.checkIfNumberisPositive(acquisitionCost, "Invalid acquisition cost");
         this.acquisitionCost = acquisitionCost;
@@ -76,7 +79,6 @@ class Asset {
                 
                 this.depreciaitionType = depreciaitionType;
             } else {
-                console.log(Object.values(DepreciationTypes));
                 throw new MyError(Errors[50])
             }
         }
@@ -103,7 +105,7 @@ class Asset {
 
         this.serialNumber = serialNumber;
 
-        if (residualValue) {
+        if (residualValue != null && residualValue != undefined) {
             utility.checkIfNumberisPositive(residualValue, Errors[52]);
             this.residualValue = residualValue;
         }
@@ -219,9 +221,10 @@ class Asset {
 
     async _storeAssetInAssetRegister(): Promise<void> {
         return new Promise((res, rej) => {
+            console.log("Residual Value is", this.residualValue);
             pool.query(assetTable.addAssetToAssetRegister, [this.barcode, this.description,
                 this.serialNumber, this.acquisitionDate, this.locationID, this.residualValue, this.condition, this.custodian_id, this.acquisitionCost, this.categoryID,
-                this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent]).catch(err => {
+                this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent, this.make, this.modelnumber]).catch(err => {
                     console.log(err);
                     return rej(new MyError(Errors[6]));
                 }).then(_ => {
