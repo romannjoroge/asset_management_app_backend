@@ -206,6 +206,7 @@ export var MyErrors2;
     MyErrors2["NOT_GET_DEPRECIATION_SCHEDULE"] = "Could Not Get Depreciation Schedule Of Asset";
     MyErrors2["NOT_GET_DEPRECIATION_DETAILS"] = "Could Not Get Depreciation Details";
     MyErrors2["INVALID_DEPRECIATION_DETAILS"] = "Invalid Depreciation Details";
+    MyErrors2["NOT_GET_CURRENT_MARKET_VALUE"] = "Could Not Get Current Market Value";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

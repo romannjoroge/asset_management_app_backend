@@ -1,6 +1,6 @@
 const doesAssetIDExist = "SELECT barcode FROM Asset WHERE assetID = $1";
 const addAssetToAssetRegister =`INSERT INTO Asset (barcode, description, serialNumber, acquisitionDate, locationID, residualValue,
-    condition, responsibleuserid, acquisitionCost, categoryID, usefulLife, depreciationType, depreciationPercent) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`;
+    condition, responsibleuserid, acquisitionCost, categoryID, usefulLife, depreciationType, depreciationPercent, make, modelnumber) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`;
 const addAssetFileAttachment = "INSERT INTO Asset_File (assetTag, attachment) VALUES ($1, $2)";
 const updateAssetFixedStatus = "UPDATE Asset SET isFixed = $1 WHERE assetTag = $2";
 const updateAssetLifeSpan = "UPDATE Asset SET assetLifeSpan = $1 WHERE assetTag = $2";
