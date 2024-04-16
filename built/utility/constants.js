@@ -193,6 +193,8 @@ export var MyErrors2;
     MyErrors2["ROUTE_NOT_EXIST"] = "This Route Does Not Exist";
     MyErrors2["NOT_FIND_LOCATION"] = "Could Not Check If Location Exists";
     MyErrors2["NOT_GET_USER_MAIL_SUBSCRIPTIONS"] = "Could Not Get User Mail Subscriptions";
+    MyErrors2["NOT_ADD_VALUATION"] = "Could Not Add Asset Valuation";
+    MyErrors2["NOT_GET_VALUATION"] = "Could Not Get Asset Valuations";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {
@@ -203,6 +205,7 @@ export var Success2;
     Success2["CREATED_LOCATION"] = "Location Created";
     Success2["CREATED_STATUS"] = "Asset Status Created";
     Success2["ADDED_USER_MAIL"] = "Added User To Mailing List";
+    Success2["ADD_VALUATION"] = "Valuation Added Succesfully";
 })(Success2 || (Success2 = {}));
 export const Succes = {
     '1': 'Asset Created Successfuly',

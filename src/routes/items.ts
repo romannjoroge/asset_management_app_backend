@@ -9,7 +9,6 @@ import checkifAuthenticated from '../../middleware/checkifAuthenticated.js';
 import userTable from '../Users/db_users.js';
 import MyError from '../utility/myError.js';
 import { filterAssetByDetails } from '../Allocation/Asset/filter.js';
-// import storage from '../Importing/multerSetup.js';
 import multer from 'multer';
 import { Log } from '../Log/log.js';
 import { UserRoles } from '../Users/users.js';
@@ -35,16 +34,16 @@ router.get('/valuations/:barcode', (req, res) => {
 router.post("/valuation", (req, res) => {
     const {
         barcode,
-        valuerID,
+        valuer_id,
         date,
         value
     } = req.body;
     
     try {
-        let assetValuerID = Number.parseInt(valuerID);
+        let assetValuerID = Number.parseInt(valuer_id);
         let valuation_date = utility.checkIfValidDate(date, "Invalid Valuation Date");
         let valuation_value = Number.parseFloat(value);
-        
+
         addValuation(barcode, assetValuerID, valuation_value, valuation_date);
         return res.status(201).json({message: Success2.ADD_VALUATION});
     } catch(err) {

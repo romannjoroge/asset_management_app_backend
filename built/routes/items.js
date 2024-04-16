@@ -9,14 +9,39 @@ import checkifAuthenticated from '../../middleware/checkifAuthenticated.js';
 import userTable from '../Users/db_users.js';
 import MyError from '../utility/myError.js';
 import { filterAssetByDetails } from '../Allocation/Asset/filter.js';
-// import storage from '../Importing/multerSetup.js';
 import multer from 'multer';
 import { Log } from '../Log/log.js';
 import { UserRoles } from '../Users/users.js';
 import createAssetStatus from '../Allocation/Asset/addAssetStatus.js';
 import handleError from '../utility/handleError.js';
 import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
+import { getValuations } from '../AssetValuation/getValuations.js';
+import utility from '../utility/utility.js';
+import { addValuation } from '../AssetValuation/addValuation.js';
 const upload = multer({ dest: './attachments' });
+router.get('/valuations/:barcode', (req, res) => {
+    const barcode = req.params.barcode;
+    getValuations(barcode).then(data => {
+        return res.json(data);
+    }).catch((err) => {
+        const { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    });
+});
+router.post("/valuation", (req, res) => {
+    const { barcode, valuer_id, date, value } = req.body;
+    try {
+        let assetValuerID = Number.parseInt(valuer_id);
+        let valuation_date = utility.checkIfValidDate(date, "Invalid Valuation Date");
+        let valuation_value = Number.parseFloat(value);
+        addValuation(barcode, assetValuerID, valuation_value, valuation_date);
+        return res.status(201).json({ message: Success2.ADD_VALUATION });
+    }
+    catch (err) {
+        const { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    }
+});
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     let { locationID, description, categoryName, usefulLife, serialNumber, condition, responsibleuserid, acquisitionDate, acquisitionCost, residualValue, depreciationType, depreciationPercent, attachments } = req.body;
     // Temporary attachements fix
