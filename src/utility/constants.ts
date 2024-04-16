@@ -205,7 +205,8 @@ export enum MyErrors2 {
     "INVALID_DEPRECIATION_TYPE" = "Invalid Depreciation Type",
     "NOT_GET_DEPRECIATION_SCHEDULE" = "Could Not Get Depreciation Schedule Of Asset",
     "NOT_GET_DEPRECIATION_DETAILS" = "Could Not Get Depreciation Details",
-    "INVALID_DEPRECIATION_DETAILS" = "Invalid Depreciation Details"
+    "INVALID_DEPRECIATION_DETAILS" = "Invalid Depreciation Details",
+    "NOT_GET_CURRENT_MARKET_VALUE" = "Could Not Get Current Market Value"
 }
 
 export enum Success2 {
