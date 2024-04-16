@@ -196,7 +196,16 @@ export enum MyErrors2 {
     "NOT_ADD_VALUATION" = "Could Not Add Asset Valuation",
     "NOT_GET_VALUATION" = "Could Not Get Asset Valuations",
     "NOT_ADD_INSURANCE" = "Could Not Add Asset Insurance",
-    "NOT_GET_INSURANCE" = "Could Not Get Asset Insurance"
+    "NOT_GET_INSURANCE" = "Could Not Get Asset Insurance",
+    "GENERATE_ASSET_REPORT_NOT_SUPPORTED" = "Selected Field Is Not Supported",
+    "NOT_GET_GENERATE_REPORT_STRUCT" = "Could Not Generate Generate Report Struct",
+    "NOT_GENERATE_SELECT_STATEMENT" = "Could Not Generate SELECT STATEMENT",
+    "NOT_CREATE_MAIL_SUBSCRIPTION" = "Could Not Create Mail Subscription",
+    "NOT_GET_DEPRECIATION_TYPE_OF_ASSET" = "Could Not Get Depreciation Type Of Asset",
+    "INVALID_DEPRECIATION_TYPE" = "Invalid Depreciation Type",
+    "NOT_GET_DEPRECIATION_SCHEDULE" = "Could Not Get Depreciation Schedule Of Asset",
+    "NOT_GET_DEPRECIATION_DETAILS" = "Could Not Get Depreciation Details",
+    "INVALID_DEPRECIATION_DETAILS" = "Invalid Depreciation Details"
 }
 
 export enum Success2 {
@@ -208,7 +217,8 @@ export enum Success2 {
     'CREATED_STATUS' = "Asset Status Created",
     "ADDED_USER_MAIL" = "Added User To Mailing List",
     "ADD_VALUATION" = "Valuation Added Succesfully",
-    "ADD_INSURANCE" = "Insurance Added Succesfully"
+    "ADD_INSURANCE" = "Insurance Added Succesfully",
+    "GEN_REPORT" = "Generated Report Stored Successfully"
 }
 
 export const Succes = {

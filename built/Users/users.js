@@ -44,6 +44,7 @@ class User {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((res, rej) => {
                 pool.query(userTable.checkIfUserInDB, [username]).then((data) => {
+                    console.log(data);
                     if (data.rowCount > 0) {
                         res(true);
                     }

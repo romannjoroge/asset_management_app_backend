@@ -7,11 +7,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Errors } from '../../utility/constants.js';
+import { Errors, MyErrors2 } from '../../utility/constants.js';
 import MyError from '../../utility/myError.js';
 import Asset, { DepreciationTypes } from './asset2.js';
 import assetTable from './db_assets.js';
 import pool from '../../../db2.js';
+import getResultsFromDatabase from '../../utility/getResultsFromDatabase.js';
+import { getStraightLineDepreciationScheduleEntries } from './straight-line-depreciation.js';
+import { getWrittenDownValueDepreciationScheduleEntries } from './written-down-value-depreciation.js';
+import { getDoubleDecliningBalanceDepreciationEntries } from './double-declining-balance-depreciation.js';
 export const createDepreciationSchedules = (barcode) => __awaiter(void 0, void 0, void 0, function* () {
     return new Promise((res, rej) => {
         // Get assetID from barcode
@@ -38,6 +42,44 @@ export const createDepreciationSchedules = (barcode) => __awaiter(void 0, void 0
         });
     });
 });
+// Function assumes that asset with asset ID exists
+function getAssetDepreciationType(assetID) {
+    return new Promise((res, rej) => {
+        let query = "SELECT depreciationtype FROM Category WHERE id = (SELECT categoryid FROM Asset WHERE assetid = $1 LIMIT 1)";
+        getResultsFromDatabase(query, [assetID]).then((data) => {
+            if (data.length <= 0) {
+                return rej(new MyError(MyErrors2.NOT_GET_DEPRECIATION_TYPE_OF_ASSET));
+            }
+            switch (data[0].depreciationtype) {
+                case "Written Down Value":
+                    return res(DepreciationTypes.WrittenDownValue);
+                case "Double Declining Balance":
+                    return res(DepreciationTypes.DoubleDecliningBalance);
+                case "Straight Line":
+                    return res(DepreciationTypes.StraightLine);
+                default:
+                    return rej(new MyError(MyErrors2.INVALID_DEPRECIATION_TYPE));
+            }
+        })
+            .catch((err) => {
+            return rej(new MyError(MyErrors2.NOT_GET_DEPRECIATION_TYPE_OF_ASSET));
+        });
+    });
+}
+// Function assumes that asset with asset ID exists
+export function getAssetDepreciationDetails(assetID) {
+    return new Promise((res, rej) => {
+        let query = "SELECT usefullife as lifespan, acquisitiondate, residualvalue, acquisitioncost, d.percentage AS depreciation_percentage FROM Asset a LEFT JOIN DepreciationPercent d ON d.categoryid = a.categoryid WHERE assetID = $1";
+        getResultsFromDatabase(query, [assetID]).then(data => {
+            if (data.length <= 0) {
+                return rej(new MyError(MyErrors2.NOT_GET_DEPRECIATION_DETAILS));
+            }
+            return res(data[0]);
+        }).catch((err) => {
+            return rej(new MyError(MyErrors2.NOT_GET_DEPRECIATION_DETAILS));
+        });
+    });
+}
 export const createDeprecaitonScheduleEntries = (assetID) => {
     return new Promise((res, rej) => {
         // Reject if asset does not exist
@@ -45,180 +87,37 @@ export const createDeprecaitonScheduleEntries = (assetID) => {
             if (doesExist === false) {
                 rej(new MyError(Errors[29]));
             }
-            // Get The Depreciation Type
-            pool.query(assetTable.getDepreciationType, [assetID]).then((data) => {
-                if (data.rowCount <= 0) {
-                    return rej(new MyError(Errors[47]));
+            getAssetDepreciationType(assetID).then(depType => {
+                if (depType === DepreciationTypes.WrittenDownValue) {
+                    getWrittenDownValueDepreciationScheduleEntries(assetID).then(depreciationEntries => {
+                        return res(depreciationEntries);
+                    }).catch((err) => {
+                        console.log(err);
+                        return rej(new MyError(MyErrors2.NOT_GET_DEPRECIATION_SCHEDULE));
+                    });
+                }
+                else if (depType === DepreciationTypes.StraightLine) {
+                    getStraightLineDepreciationScheduleEntries(assetID).then(depreciationScheduleEntries => {
+                        return res(depreciationScheduleEntries);
+                    }).catch((err) => {
+                        console.log(err);
+                        return rej(new MyError(MyErrors2.NOT_GET_DEPRECIATION_SCHEDULE));
+                    });
+                }
+                else if (depType === DepreciationTypes.DoubleDecliningBalance) {
+                    getDoubleDecliningBalanceDepreciationEntries(assetID).then(depEntries => {
+                        return res(depEntries);
+                    }).catch((err) => {
+                        console.log(err);
+                        return rej(new MyError(MyErrors2.NOT_GET_DEPRECIATION_SCHEDULE));
+                    });
                 }
                 else {
-                    let depType;
-                    if (data.rows[0].assetdep) {
-                        depType = data.rows[0].assetdep;
-                    }
-                    else {
-                        depType = data.rows[0].categdep;
-                    }
-                    let depreciationScheduleEntries = [];
-                    if (depType === DepreciationTypes.WrittenDownValue) {
-                        // Get assets lifespan, acqusitionDate, depreciationPercentage and acquisitionCost
-                        pool.query(assetTable.getDepreciationDetails, [assetID]).then((fetchResults) => {
-                            if (fetchResults.rowCount === 0) {
-                                rej(new MyError(Errors[8]));
-                            }
-                            else {
-                                let { usefullife, acquisitiondate, acquisitioncost, percentage } = fetchResults.rows[0];
-                                if (percentage === undefined) {
-                                    return rej(new MyError(Errors[50]));
-                                }
-                                let year = acquisitiondate.getFullYear();
-                                let closingBookValue = 0;
-                                let accumulatedDepreciation = 0;
-                                let yearToAdd;
-                                let openToAdd;
-                                let depreciationExpense;
-                                let accumDepToAdd;
-                                let closeToAdd;
-                                // Create depreciation schedule entries
-                                for (let i = 0; i < usefullife; i++) {
-                                    yearToAdd = year + i;
-                                    // Opening book value is that of previous year
-                                    if (yearToAdd == year) {
-                                        openToAdd = acquisitioncost;
-                                    }
-                                    else {
-                                        openToAdd = closingBookValue;
-                                    }
-                                    // Depreciation Expense is percentage of opening book value
-                                    depreciationExpense = openToAdd * (percentage / 100);
-                                    // Accumulated Depreciation is depreciation expense of previous year + depreciation expense of current year
-                                    accumDepToAdd = accumulatedDepreciation + depreciationExpense;
-                                    // Closing book value is opening book value - depreciation expense
-                                    closeToAdd = openToAdd - depreciationExpense;
-                                    let props = {
-                                        year: yearToAdd,
-                                        assetid: assetID,
-                                        openingbookvalue: openToAdd,
-                                        depreciationexpense: depreciationExpense,
-                                        accumulateddepreciation: accumDepToAdd,
-                                        closingbookvalue: closeToAdd
-                                    };
-                                    // Insert Depreciation Details
-                                    depreciationScheduleEntries.push(props);
-                                    // Update values for next iteration
-                                    closingBookValue = closeToAdd;
-                                    accumulatedDepreciation = accumDepToAdd;
-                                }
-                                return res(depreciationScheduleEntries);
-                            }
-                        }).catch(err => {
-                            console.log(err);
-                            return rej(new MyError(Errors[48]));
-                        });
-                    }
-                    else if (depType === DepreciationTypes.StraightLine) {
-                        // Get asset lifespan, acquisition Cost, residual value and acquisition date
-                        pool.query(assetTable.getDepreciationDetails, [assetID]).then((fetchResults) => {
-                            if (fetchResults.rowCount <= 0) {
-                                return rej(new MyError(Errors[8]));
-                            }
-                            else {
-                                // Extract data from fetchResults
-                                let { usefullife, acquisitiondate, acquisitioncost, residualvalue } = fetchResults.rows[0];
-                                let year = acquisitiondate.getFullYear();
-                                let closingBookValue;
-                                let accumulatedDepreciation = 0;
-                                let yearToAdd;
-                                let openToAdd;
-                                let depreciationExpense = (acquisitioncost - residualvalue) / usefullife;
-                                // Compute depreciation schedule
-                                for (var i = 0; i < usefullife; i++) {
-                                    yearToAdd = year + i;
-                                    // Getting opening book value
-                                    if (i == 0) {
-                                        openToAdd = acquisitioncost;
-                                    }
-                                    else {
-                                        openToAdd = closingBookValue;
-                                    }
-                                    // Getting Accumulated Depreciation
-                                    accumulatedDepreciation = accumulatedDepreciation + depreciationExpense;
-                                    // Getting Closing Book Value
-                                    closingBookValue = openToAdd - depreciationExpense;
-                                    let props = {
-                                        year: yearToAdd,
-                                        assetid: assetID,
-                                        openingbookvalue: openToAdd,
-                                        depreciationexpense: depreciationExpense,
-                                        accumulateddepreciation: accumulatedDepreciation,
-                                        closingbookvalue: closingBookValue
-                                    };
-                                    depreciationScheduleEntries.push(props);
-                                }
-                                return res(depreciationScheduleEntries);
-                            }
-                        }).catch(err => {
-                            console.log(err);
-                            return rej(new MyError(Errors[48]));
-                        });
-                    }
-                    else if (depType === DepreciationTypes.DoubleDecliningBalance) {
-                        // Get Depreciation Details
-                        pool.query(assetTable.getDepreciationDetails, [assetID]).then((fetchResults) => {
-                            if (fetchResults.rowCount <= 0) {
-                                console.log(fetchResults.rows);
-                                return rej(new MyError(Errors[8]));
-                            }
-                            // Extract data from fetchResults
-                            let { acquisitiondate, acquisitioncost, usefullife } = fetchResults.rows[0];
-                            // Calculate needed values
-                            let basicDepreciationValue = acquisitioncost / usefullife;
-                            let basicDepreciationRate = (basicDepreciationValue / acquisitioncost);
-                            // Depreciation Schedule Value to keep track of 
-                            let year = acquisitiondate.getFullYear();
-                            let yearToAdd;
-                            let openToAdd;
-                            let depreciationExpense;
-                            let accumDepToAdd = 0;
-                            let closeToAdd;
-                            for (var i = 0; i < usefullife; i++) {
-                                yearToAdd = year + i;
-                                // Open Book Value
-                                if (i == 0) {
-                                    openToAdd = acquisitioncost;
-                                }
-                                else {
-                                    openToAdd = closeToAdd;
-                                }
-                                // Depreciation Expense
-                                depreciationExpense = 2 * basicDepreciationRate * openToAdd;
-                                // Accumulated Depreciation
-                                accumDepToAdd = depreciationExpense + accumDepToAdd;
-                                // Closing Book Value
-                                closeToAdd = openToAdd - depreciationExpense;
-                                let props = {
-                                    year: yearToAdd,
-                                    assetid: assetID,
-                                    openingbookvalue: openToAdd,
-                                    depreciationexpense: depreciationExpense,
-                                    accumulateddepreciation: accumDepToAdd,
-                                    closingbookvalue: closeToAdd
-                                };
-                                depreciationScheduleEntries.push(props);
-                            }
-                            return res(depreciationScheduleEntries);
-                        }).catch(err => {
-                            console.log(err);
-                            return rej(new MyError(Errors[48]));
-                        });
-                    }
-                    else {
-                        console.log(depType);
-                        return rej(new MyError(Errors[50]));
-                    }
+                    console.log(depType);
+                    return rej(new MyError(Errors[50]));
                 }
-            }).catch(err => {
-                console.log(err);
-                return rej(new MyError(Errors[47]));
+            }).catch((err) => {
+                return rej(new MyError(MyErrors2.NOT_GET_DEPRECIATION_SCHEDULE));
             });
         });
     });
@@ -238,4 +137,13 @@ function insertDepreciationSchedule(props) {
         });
     });
 }
+// async function test() {
+//     try {
+//         let depEntries = await createDeprecaitonScheduleEntries(12);
+//         console.log(depEntries);
+//     } catch(err) {
+//         console.log("OHH SHIT", err);
+//     }
+// }
+// test();
 //# sourceMappingURL=depreciations.js.map
