@@ -222,6 +222,7 @@ export var Success2;
     Success2["ADD_INSURANCE"] = "Insurance Added Succesfully";
     Success2["GEN_REPORT"] = "Generated Report Stored Successfully";
     Success2["DISPOSE_ASSET"] = "Disposed Asset Successfully";
+    Success2["SET_TIMEOUT"] = "Timeout Updated Successfully";
 })(Success2 || (Success2 = {}));
 export const Succes = {
     '1': 'Asset Created Successfuly',
