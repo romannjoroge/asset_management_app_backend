@@ -1,7 +1,16 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import express from 'express';
 const router = express.Router();
 import userTable from '../Users/db_users.js';
-import { Errors, Logs, MyErrors2, Succes } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2, Succes, Success2 } from '../utility/constants.js';
 import pool from '../../db2.js';
 import { updateUser } from '../Users/update.js';
 import MyError from '../utility/myError.js';
@@ -11,6 +20,8 @@ import { Log } from '../Log/log.js';
 import getRolesFromDB from '../Users/roles.js';
 import getEventsFromDatabase from '../Log/events.js';
 import generateDepreciatedAssetsInMonth from '../Mail/generateDepreciatedAssetsMail.js';
+import { Lama } from '../Lama/lama.js';
+import handleError from '../utility/handleError.js';
 router.get('/getUsers', (req, res) => {
     pool.query(userTable.getUsers, []).then(data => {
         if (data.rowCount <= 0) {
@@ -172,6 +183,19 @@ router.post('/addUser', (req, res) => {
         return res.status(501).json({ message: Errors[9] });
     });
 });
+router.post('/setTimeout', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const settingsStore = yield Lama.init("settings");
+        const { newTimeoutInMinutes } = req.body;
+        yield settingsStore.put("timeout", newTimeoutInMinutes.toString());
+        return res.status(201).json({ message: Success2.SET_TIMEOUT });
+    }
+    catch (err) {
+        console.log(err, "OHH SHIT");
+        const { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    }
+}));
 router.get('/test', (req, res) => {
     generateDepreciatedAssetsInMonth();
     return res.send("Done");

@@ -7,6 +7,7 @@ import Auth from '../Auth/auth.js';
 import JWT from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import Mail from '../Mail/mail.js';
+import { Lama } from '../Lama/lama.js';
 dotenv.config();
 router.post('/sendDetails', (req, res) => {
     // Accepts username and password from the user
@@ -72,14 +73,30 @@ router.post('/verifyOTP', (req, res) => {
         }
         // Get username of user to be returned in webtoken
         User.getUsername(userid).then(username => {
-            var _a;
             // Send JWT token
-            const token = JWT.sign({ id: userid }, (_a = process.env.TOKEN_SECRET) !== null && _a !== void 0 ? _a : "", { expiresIn: 3600 });
-            return res.json({
-                isCorrect: true,
-                token,
-                username,
-                user_id: userid
+            Lama.init("settings").then(settingsStore => {
+                settingsStore.get("timeout").then(timeout => {
+                    var _a;
+                    let expirationTime;
+                    if (timeout) {
+                        expirationTime = Number.parseInt(timeout) * 60;
+                    }
+                    else {
+                        expirationTime = 3600;
+                    }
+                    const token = JWT.sign({ id: userid }, (_a = process.env.TOKEN_SECRET) !== null && _a !== void 0 ? _a : "", { expiresIn: expirationTime });
+                    return res.json({
+                        isCorrect: true,
+                        token,
+                        username,
+                        user_id: userid,
+                        expirationTime
+                    });
+                }).catch((err) => {
+                    return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
+                });
+            }).catch((err) => {
+                return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
             });
         }).catch((err) => {
             return res.status(500).json({ message: MyErrors2.INTERNAL_SERVER_ERROR });
