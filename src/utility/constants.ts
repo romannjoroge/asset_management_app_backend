@@ -221,7 +221,8 @@ export enum Success2 {
     "ADD_VALUATION" = "Valuation Added Succesfully",
     "ADD_INSURANCE" = "Insurance Added Succesfully",
     "GEN_REPORT" = "Generated Report Stored Successfully",
-    "DISPOSE_ASSET" = "Disposed Asset Successfully"
+    "DISPOSE_ASSET" = "Disposed Asset Successfully",
+    "SET_TIMEOUT" = "Timeout Updated Successfully"
 }
 
 export const Succes = {
