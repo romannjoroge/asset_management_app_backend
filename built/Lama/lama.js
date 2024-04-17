@@ -32,7 +32,6 @@ export class Lama {
     }
     put(key, value) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("Putting", key, value);
             const txn = this.env.beginTxn();
             const bufferValue = Buffer.from(value);
             txn.putBinary(this.dbi, key, bufferValue);
