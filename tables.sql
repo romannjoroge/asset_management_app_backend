@@ -502,4 +502,4 @@ SET datestyle TO MDY;
 ALTER USER asset_management WITH PASSWORD 'the password';
 
 -- Commands to do on server
-ALTER TABLE Asset ADD COLUMN isdisposed BOOLEAN DEFAULT FALSE;
+

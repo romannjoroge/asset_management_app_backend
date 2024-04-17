@@ -8,6 +8,7 @@ import Auth from '../Auth/auth.js';
 import JWT from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import Mail from '../Mail/mail.js';
+import { Lama } from '../Lama/lama.js';
 dotenv.config();
 
 router.post('/sendDetails', (req, res) => {
@@ -83,13 +84,30 @@ router.post('/verifyOTP', (req, res) => {
         // Get username of user to be returned in webtoken
         User.getUsername(userid).then(username => {
             // Send JWT token
-            const token = JWT.sign({id: userid}, process.env.TOKEN_SECRET ?? "", {expiresIn:3600});
-            return res.json({
-                isCorrect: true,
-                token, 
-                username,
-                user_id: userid
-            });
+            Lama.init("settings").then(settingsStore => {
+                settingsStore.get("timeout").then(timeout => {
+                    let expirationTime;
+
+                    if (timeout) {
+                        expirationTime = Number.parseInt(timeout) * 60
+                    } else {
+                        expirationTime = 3600
+                    }
+
+                    const token = JWT.sign({id: userid}, process.env.TOKEN_SECRET ?? "", {expiresIn:expirationTime});
+                    return res.json({
+                        isCorrect: true,
+                        token, 
+                        username,
+                        user_id: userid,
+                        expirationTime
+                    });
+                }).catch((err: any) => {
+                    return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+                })
+            }).catch((err: any) => {
+                return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+            })
         }).catch((err: MyError) => {
             return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
         })

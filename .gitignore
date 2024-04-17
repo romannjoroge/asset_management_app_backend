@@ -8,5 +8,6 @@ oldCode
 routes/tags.log
 attachments
 .env
+**/store/**
 
 
