@@ -163,14 +163,7 @@ CREATE TABLE Asset (
   CONSTRAINT "FK_Asset.locationID" FOREIGN KEY (locationid) REFERENCES location(id)
 );
 
-CREATE TABLE Asset_File (
-  assetTag varchar(50),
-  attachment varchar(100),
-  PRIMARY KEY (assetTag, attachment),
-  CONSTRAINT "FK_Asset File.assetTag"
-    FOREIGN KEY (assetTag)
-      REFERENCES Asset(assetTag)
-);
+
 
 CREATE TABLE GatePassAuthorizers (
   userid varchar(50),
@@ -513,5 +506,25 @@ SET datestyle TO MDY;
 ALTER USER asset_management WITH PASSWORD 'the password';
 
 -- Commands to do on server
-INSERT INTO Events(id, type, description) VALUES (45, 'CREATE_ASSET_REMARK', 'Creating an asset remark')
+DROP TABLE Asset_File;
+CREATE TABLE IF NOT EXISTS AssetAttachments (
+  id SERIAL,
+  assetID INTEGER NOT NULL,
+  userID INTEGER NOT NULL,
+  storagelocation TEXT NOT NULL,
+  originalfilename TEXT NOT NULL,
+  filetype TEXT NOT NULL,
+  timeAdded TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted BOOLEAN NOT NULL DEFAULT FALSE,
+  size BIGINT NOT NULL,
+  CONSTRAINT "FK_AssetAttachments.assetID"
+    FOREIGN KEY (assetID)
+      REFERENCES Asset(assetID),
+  CONSTRAINT "FK_AssetAttachments.userID"
+    FOREIGN KEY (userID)
+      REFERENCES User2(id),
+  PRIMARY KEY(id)
+);
+INSERT INTO Events(id, type, description) VALUES (46, 'ATTACH_ASSET_FILE', 'Attached New File To Asset');
+
 

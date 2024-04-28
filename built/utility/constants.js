@@ -123,6 +123,7 @@ export var Logs;
     Logs[Logs["UNTAGGED_ASSETS"] = 43] = "UNTAGGED_ASSETS";
     Logs[Logs["ASSET_CATEGORY_DEPRECIATION_REPORT"] = 44] = "ASSET_CATEGORY_DEPRECIATION_REPORT";
     Logs[Logs["CREATE_ASSET_REMARK"] = 45] = "CREATE_ASSET_REMARK";
+    Logs[Logs["ATTACH_ASSET_FILE"] = 46] = "ATTACH_ASSET_FILE";
 })(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {
@@ -212,6 +213,7 @@ export var MyErrors2;
     MyErrors2["NOT_ADD_REMARK"] = "Could Not Create Asset Remark";
     MyErrors2["NOT_GET_REMARKS"] = "Could Not Get Asset Remarks";
     MyErrors2["NOT_GET_GENERATED_REPORTS"] = "Could Not Get Generated Reports";
+    MyErrors2["FILE_NOT_EXISTS"] = "File Does Not Exist";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {
@@ -228,6 +230,7 @@ export var Success2;
     Success2["DISPOSE_ASSET"] = "Disposed Asset Successfully";
     Success2["SET_TIMEOUT"] = "Timeout Updated Successfully";
     Success2["CREATED_REMARK"] = "Created Asset Remark";
+    Success2["FILES_UPLOADED"] = "Files Have Been Attached Succesfuly";
 })(Success2 || (Success2 = {}));
 export const Succes = {
     '1': 'Asset Created Successfuly',

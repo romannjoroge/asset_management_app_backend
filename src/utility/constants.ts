@@ -123,6 +123,7 @@ export enum Logs {
     "UNTAGGED_ASSETS" = 43,
     "ASSET_CATEGORY_DEPRECIATION_REPORT" = 44,
     "CREATE_ASSET_REMARK" = 45,
+    "ATTACH_ASSET_FILE" = 46
 }
 
 export enum MyErrors2 {
@@ -211,7 +212,8 @@ export enum MyErrors2 {
     "NOT_DISPOSE_ASSET" = "Could Not Dispose Asset",
     "NOT_ADD_REMARK" = "Could Not Create Asset Remark",
     "NOT_GET_REMARKS" = "Could Not Get Asset Remarks",
-    "NOT_GET_GENERATED_REPORTS" = "Could Not Get Generated Reports"
+    "NOT_GET_GENERATED_REPORTS" = "Could Not Get Generated Reports",
+    "FILE_NOT_EXISTS" = "File Does Not Exist",
 }
 
 export enum Success2 {
@@ -227,7 +229,8 @@ export enum Success2 {
     "GEN_REPORT" = "Generated Report Stored Successfully",
     "DISPOSE_ASSET" = "Disposed Asset Successfully",
     "SET_TIMEOUT" = "Timeout Updated Successfully",
-    "CREATED_REMARK" = "Created Asset Remark"
+    "CREATED_REMARK" = "Created Asset Remark",
+    "FILES_UPLOADED" = "Files Have Been Attached Succesfuly"
 }
 
 export const Succes = {
