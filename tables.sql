@@ -507,6 +507,7 @@ CREATE TABLE IF NOT EXISTS AssetRemarks (
   assetID INTEGER NOT NULL,
   remark TEXT,
   userID INTEGER NOT NULL,
+  date timestamp NOT NULL DEFAULT NOW(),
   PRIMARY KEY (id),
   CONSTRAINT "FK_AssetRemarks.userID" FOREIGN KEY (userID) REFERENCES User2(id),
   CONSTRAINT "FK_AssetRemarks.assetID" FOREIGN KEY (assetID) REFERENCES Asset(assetID)

@@ -21,7 +21,7 @@ import { addValuation } from '../AssetValuation/addValuation.js';
 import { getInsurances } from '../AssetInsurance/getInsurance.js';
 import { addInsurance } from '../AssetInsurance/addInsurance.js';
 import { disposeAsset } from '../Allocation/Asset/disposeAsset.js';
-import { createAssetRemark } from '../Allocation/Asset/remarks.js';
+import { createAssetRemark, getAssetRemarks } from '../Allocation/Asset/remarks.js';
 const upload = multer({ dest: './attachments' });
 router.get('/valuations/:barcode', (req, res) => {
     const barcode = req.params.barcode;
@@ -48,6 +48,17 @@ router.post("/remark", (req, res) => {
         const { errorMessage, errorCode } = handleError(err);
         return res.status(errorCode).json({ message: errorMessage });
     }));
+});
+router.get("/remark/:assetid", (req, res) => {
+    // Get params
+    let assetID = Number.parseInt(req.params.assetid);
+    // Get remarks
+    getAssetRemarks(assetID).then(remarks => {
+        return res.json(remarks);
+    }).catch((err) => {
+        const { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    });
 });
 router.post("/valuation", (req, res) => {
     const { barcode, valuer_id, date, value } = req.body;

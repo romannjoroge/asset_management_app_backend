@@ -208,7 +208,8 @@ export enum MyErrors2 {
     "INVALID_DEPRECIATION_DETAILS" = "Invalid Depreciation Details",
     "NOT_GET_CURRENT_MARKET_VALUE" = "Could Not Get Current Market Value",
     "NOT_DISPOSE_ASSET" = "Could Not Dispose Asset",
-    "NOT_ADD_REMARK" = "Could Not Create Asset Remark"
+    "NOT_ADD_REMARK" = "Could Not Create Asset Remark",
+    "NOT_GET_REMARKS" = "Could Not Get Asset Remarks"
 }
 
 export enum Success2 {
