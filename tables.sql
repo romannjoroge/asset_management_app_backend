@@ -492,16 +492,6 @@ CREATE TABLE AssetStatus (
   PRIMARY KEY (name)
 );
 
--- Creates the home folder when the database is created. This is the topmost folder in the system
-INSERT INTO Folder(name) VALUES('home');
-
--- Set dates to be in format mm-dd-yyyy
-SET datestyle TO MDY;
-
--- Gives asset_management the right password
-ALTER USER asset_management WITH PASSWORD 'the password';
-
--- Commands to do on server
 CREATE TABLE IF NOT EXISTS AssetRemarks (
   id SERIAL,
   assetID INTEGER NOT NULL,
@@ -512,4 +502,16 @@ CREATE TABLE IF NOT EXISTS AssetRemarks (
   CONSTRAINT "FK_AssetRemarks.userID" FOREIGN KEY (userID) REFERENCES User2(id),
   CONSTRAINT "FK_AssetRemarks.assetID" FOREIGN KEY (assetID) REFERENCES Asset(assetID)
 );
+
+-- Creates the home folder when the database is created. This is the topmost folder in the system
+INSERT INTO Folder(name) VALUES('home');
+
+-- Set dates to be in format mm-dd-yyyy
+SET datestyle TO MDY;
+
+-- Gives asset_management the right password
+ALTER USER asset_management WITH PASSWORD 'the password';
+
+-- Commands to do on server
+INSERT INTO Events(id, type, description) VALUES (45, 'CREATE_ASSET_REMARK', 'Creating an asset remark')
 

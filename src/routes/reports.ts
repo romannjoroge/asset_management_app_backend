@@ -37,6 +37,7 @@ import { storeGenerateReportStatement } from '../Reports/generateReport.js';
 import handleError from '../utility/handleError.js';
 import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 import createMailSubscription from '../Mail/createMailSubscription.js';
+import { getGeneratedReports } from '../Reports/get_generated_reports.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -82,6 +83,16 @@ router.get('/test', async (req, res) => {
         console.log(err);
         return res.status(500).send("Shit Went Down!")
     }
+});
+
+router.get("/genertedReports", (req, res) => {
+    // Return generated reports
+    getGeneratedReports().then(reports => {
+        return res.json(reports);
+    }).catch((err: MyError) => {
+        let {errorMessage, errorCode} = handleError(err);
+        return res.status(errorCode).json({message: errorMessage});
+    })
 })
 
 // Route to store generate report stuff

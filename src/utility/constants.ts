@@ -121,7 +121,8 @@ export enum Logs {
     "STATE_PHYSICAL_VERIFICATION_PRESENT" = 41,
     "TAGGED_ASSETS" = 42,
     "UNTAGGED_ASSETS" = 43,
-    "ASSET_CATEGORY_DEPRECIATION_REPORT" = 44
+    "ASSET_CATEGORY_DEPRECIATION_REPORT" = 44,
+    "CREATE_ASSET_REMARK" = 45,
 }
 
 export enum MyErrors2 {
@@ -209,7 +210,8 @@ export enum MyErrors2 {
     "NOT_GET_CURRENT_MARKET_VALUE" = "Could Not Get Current Market Value",
     "NOT_DISPOSE_ASSET" = "Could Not Dispose Asset",
     "NOT_ADD_REMARK" = "Could Not Create Asset Remark",
-    "NOT_GET_REMARKS" = "Could Not Get Asset Remarks"
+    "NOT_GET_REMARKS" = "Could Not Get Asset Remarks",
+    "NOT_GET_GENERATED_REPORTS" = "Could Not Get Generated Reports"
 }
 
 export enum Success2 {
