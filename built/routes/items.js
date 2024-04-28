@@ -22,7 +22,31 @@ import { getInsurances } from '../AssetInsurance/getInsurance.js';
 import { addInsurance } from '../AssetInsurance/addInsurance.js';
 import { disposeAsset } from '../Allocation/Asset/disposeAsset.js';
 import { createAssetRemark, getAssetRemarks } from '../Allocation/Asset/remarks.js';
+import { storeAttachmentDetails } from '../Allocation/Asset/storeAttachmentDetails.js';
+import path from "path";
 const upload = multer({ dest: './attachments' });
+// Add attachments to asset
+router.post('/attachments', upload.array('attachments', 12), (req, res) => {
+    // Assume that by this point the files have been stored on machine
+    // Store details of the stored files in the DB
+    let assetID = Number.parseInt(req.body.assetID);
+    let promises = [];
+    if (req.files === undefined) {
+        return res.status(201).json({ message: Success2.FILES_UPLOADED });
+    }
+    req.files.forEach((file) => {
+        var _a;
+        promises.push(storeAttachmentDetails((_a = file.originalname) !== null && _a !== void 0 ? _a : "", path.join(file.destination, file.filename), file.size, req.id, assetID, file.mimetype));
+    });
+    Promise.all(promises).then((_) => {
+        Log.createLog(req.ip, req.id, Logs.ATTACH_ASSET_FILE, assetID).then((_) => {
+            return res.status(201).json({ message: Success2.FILES_UPLOADED });
+        }).catch((_err) => {
+            const { errorMessage, errorCode } = handleError(_err);
+            return res.status(errorCode).json({ message: errorMessage });
+        });
+    });
+});
 router.get('/valuations/:barcode', (req, res) => {
     const barcode = req.params.barcode;
     getValuations(barcode).then(data => {
