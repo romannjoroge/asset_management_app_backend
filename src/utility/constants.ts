@@ -208,6 +208,7 @@ export enum MyErrors2 {
     "INVALID_DEPRECIATION_DETAILS" = "Invalid Depreciation Details",
     "NOT_GET_CURRENT_MARKET_VALUE" = "Could Not Get Current Market Value",
     "NOT_DISPOSE_ASSET" = "Could Not Dispose Asset",
+    "NOT_ADD_REMARK" = "Could Not Create Asset Remark"
 }
 
 export enum Success2 {
@@ -222,7 +223,8 @@ export enum Success2 {
     "ADD_INSURANCE" = "Insurance Added Succesfully",
     "GEN_REPORT" = "Generated Report Stored Successfully",
     "DISPOSE_ASSET" = "Disposed Asset Successfully",
-    "SET_TIMEOUT" = "Timeout Updated Successfully"
+    "SET_TIMEOUT" = "Timeout Updated Successfully",
+    "CREATED_REMARK" = "Created Asset Remark"
 }
 
 export const Succes = {

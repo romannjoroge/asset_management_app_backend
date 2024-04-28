@@ -52,7 +52,7 @@ class Asset {
 
     constructor(assetLifeSpan: number, acquisitionDate: string | Date, locationID: number, condition: string, custodian_id: number,
         acquisitionCost: number, categoryName: string, attachments: string[], serialNumber: string, description: string, 
-        residualValue?: number, depreciaitionType?: DepreciationTypes, depreciationPercent?: number, make: string, modelnumber: string) {
+        make: string, modelnumber: string, residualValue?: number, depreciaitionType?: DepreciationTypes,  depreciationPercent?: number ) {
 
         utility.checkIfNumberisPositive(assetLifeSpan, "Invalid asset life span");
         this.assetLifeSpan = assetLifeSpan;

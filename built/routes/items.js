@@ -21,6 +21,7 @@ import { addValuation } from '../AssetValuation/addValuation.js';
 import { getInsurances } from '../AssetInsurance/getInsurance.js';
 import { addInsurance } from '../AssetInsurance/addInsurance.js';
 import { disposeAsset } from '../Allocation/Asset/disposeAsset.js';
+import { createAssetRemark } from '../Allocation/Asset/remarks.js';
 const upload = multer({ dest: './attachments' });
 router.get('/valuations/:barcode', (req, res) => {
     const barcode = req.params.barcode;
@@ -30,6 +31,23 @@ router.get('/valuations/:barcode', (req, res) => {
         const { errorMessage, errorCode } = handleError(err);
         return res.status(errorCode).json({ message: errorMessage });
     });
+});
+// Create a remark for an asset
+router.post("/remark", (req, res) => {
+    // Get parameters
+    const { assetID, remark } = req.body;
+    let assetid = Number.parseInt(assetID);
+    //@ts-ignore
+    let userid = req.id;
+    // Add remark
+    createAssetRemark(remark, userid, assetid)
+        .then((_) => {
+        return res.status(201).json({ message: Success2.CREATED_REMARK });
+    })
+        .catch(((err) => {
+        const { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    }));
 });
 router.post("/valuation", (req, res) => {
     const { barcode, valuer_id, date, value } = req.body;
@@ -89,7 +107,7 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
     if (depreciationPercent) {
         depreciationPercent = Number.parseFloat(depreciationPercent);
     }
-    let asset = new Asset(usefulLife, acquisitionDate, locationID, condition, responsibleuserid, acquisitionCost, categoryName, attachments, serialNumber, description, residualValue, depreciationType, depreciationPercent, make, modelnumber);
+    let asset = new Asset(usefulLife, acquisitionDate, locationID, condition, responsibleuserid, acquisitionCost, categoryName, attachments, serialNumber, description, make, modelnumber, residualValue, depreciationType, depreciationPercent);
     asset.initialize().then(_ => {
         // Add log
         Log.createLog(req.ip, req.id, Logs.CREATE_ASSET).then((_) => {
