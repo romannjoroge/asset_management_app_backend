@@ -28,7 +28,7 @@ export var DepreciationTypes;
     DepreciationTypes["WrittenDownValue"] = "Written Down Value";
 })(DepreciationTypes || (DepreciationTypes = {}));
 class Asset {
-    constructor(assetLifeSpan, acquisitionDate, locationID, condition, custodian_id, acquisitionCost, categoryName, attachments, serialNumber, description, residualValue, depreciaitionType, depreciationPercent, make, modelnumber) {
+    constructor(assetLifeSpan, acquisitionDate, locationID, condition, custodian_id, acquisitionCost, categoryName, attachments, serialNumber, description, make, modelnumber, residualValue, depreciaitionType, depreciationPercent) {
         utility.checkIfNumberisPositive(assetLifeSpan, "Invalid asset life span");
         this.assetLifeSpan = assetLifeSpan;
         this.condition = condition;

@@ -1,4 +1,4 @@
-const doesAssetIDExist = "SELECT barcode FROM Asset WHERE assetID = $1";
+const doesAssetIDExist = "SELECT barcode FROM Asset WHERE assetID = $1 and deleted = false";
 const addAssetToAssetRegister =`INSERT INTO Asset (barcode, description, serialNumber, acquisitionDate, locationID, residualValue,
     condition, responsibleuserid, acquisitionCost, categoryID, usefulLife, depreciationType, depreciationPercent, make, modelnumber) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`;
 const addAssetFileAttachment = "INSERT INTO Asset_File (assetTag, attachment) VALUES ($1, $2)";

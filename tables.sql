@@ -502,4 +502,14 @@ SET datestyle TO MDY;
 ALTER USER asset_management WITH PASSWORD 'the password';
 
 -- Commands to do on server
+CREATE TABLE IF NOT EXISTS AssetRemarks (
+  id SERIAL,
+  assetID INTEGER NOT NULL,
+  remark TEXT,
+  userID INTEGER NOT NULL,
+  date timestamp NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (id),
+  CONSTRAINT "FK_AssetRemarks.userID" FOREIGN KEY (userID) REFERENCES User2(id),
+  CONSTRAINT "FK_AssetRemarks.assetID" FOREIGN KEY (assetID) REFERENCES Asset(assetID)
+);
 
