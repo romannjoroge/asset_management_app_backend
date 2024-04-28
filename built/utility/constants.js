@@ -122,6 +122,7 @@ export var Logs;
     Logs[Logs["TAGGED_ASSETS"] = 42] = "TAGGED_ASSETS";
     Logs[Logs["UNTAGGED_ASSETS"] = 43] = "UNTAGGED_ASSETS";
     Logs[Logs["ASSET_CATEGORY_DEPRECIATION_REPORT"] = 44] = "ASSET_CATEGORY_DEPRECIATION_REPORT";
+    Logs[Logs["CREATE_ASSET_REMARK"] = 45] = "CREATE_ASSET_REMARK";
 })(Logs || (Logs = {}));
 export var MyErrors2;
 (function (MyErrors2) {
@@ -210,6 +211,7 @@ export var MyErrors2;
     MyErrors2["NOT_DISPOSE_ASSET"] = "Could Not Dispose Asset";
     MyErrors2["NOT_ADD_REMARK"] = "Could Not Create Asset Remark";
     MyErrors2["NOT_GET_REMARKS"] = "Could Not Get Asset Remarks";
+    MyErrors2["NOT_GET_GENERATED_REPORTS"] = "Could Not Get Generated Reports";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

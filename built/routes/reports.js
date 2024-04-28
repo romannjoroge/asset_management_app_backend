@@ -43,6 +43,7 @@ import { storeGenerateReportStatement } from '../Reports/generateReport.js';
 import handleError from '../utility/handleError.js';
 import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 import createMailSubscription from '../Mail/createMailSubscription.js';
+import { getGeneratedReports } from '../Reports/get_generated_reports.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 var rule = new schedule.RecurrenceRule();
@@ -81,6 +82,15 @@ router.get('/test', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         return res.status(500).send("Shit Went Down!");
     }
 }));
+router.get("/genertedReports", (req, res) => {
+    // Return generated reports
+    getGeneratedReports().then(reports => {
+        return res.json(reports);
+    }).catch((err) => {
+        let { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    });
+});
 // Route to store generate report stuff
 router.post('/storeGen', (req, res) => {
     let { items, name, period, } = req.body;

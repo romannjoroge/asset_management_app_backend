@@ -49,7 +49,12 @@ router.post("/remark", (req, res) => {
     // Add remark
     createAssetRemark(remark, userid, assetid)
     .then((_: any) => {
-        return res.status(201).json({message: Success2.CREATED_REMARK});
+        //@ts-ignore
+        Log.createLog(req.ip, req.id, Logs.CREATE_ASSET_REMARK, assetID).then((_: void) => {
+            return res.status(201).json({message: Success2.CREATED_REMARK});
+        }).catch((err: MyError) => {
+            return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
+        })
     })
     .catch(((err: any) => {
         const {errorMessage, errorCode} = handleError(err);
