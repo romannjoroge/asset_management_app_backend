@@ -4,11 +4,11 @@ import utility from "../utility/utility.js";
 import { FilterFields, SupportedGenerateAssetReportFields, WaysToFilterBy, ItemsThatDontNeedJoin, ItemsThatNeedJoin } from "./generated_report_types.js";
 import _ from "lodash";
 const { isNull } = _;
-export function getGenerateReportStruct(items) {
+export function getGenerateReportStruct(struct) {
     try {
-        let generateReportStruct = { fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: [] };
+        let generateReportStruct = { fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: [], filterFields: struct.where };
         // For items that do not need joins just add to select statement
-        for (let i of items) {
+        for (let i of struct.items) {
             //@ts-ignore
             if (ItemsThatDontNeedJoin.includes(i)) {
                 generateReportStruct.fieldsThatDontNeedJoin.push(i);

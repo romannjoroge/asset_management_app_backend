@@ -3,14 +3,15 @@ import MyError from "../utility/myError.js";
 import utility from "../utility/utility.js";
 import { FilterFields, GenerateReportStruct, SupportedGenerateAssetReportFields, WaysToFilterBy, ItemsThatDontNeedJoin, ItemsThatNeedJoin } from "./generated_report_types.js";
 import _ from "lodash";
+import { StoreGenReportItem } from "./generateReport.js";
 const {isNull} = _;
 
-export function getGenerateReportStruct(items: string[]): GenerateReportStruct {
+export function getGenerateReportStruct(struct: StoreGenReportItem): GenerateReportStruct {
     try {
-        let generateReportStruct: GenerateReportStruct = {fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: []};
+        let generateReportStruct: GenerateReportStruct = {fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: [], filterFields: struct.where};
 
         // For items that do not need joins just add to select statement
-        for (let i of items) {
+        for (let i of struct.items) {
             //@ts-ignore
             if (ItemsThatDontNeedJoin.includes(i)) {
                 generateReportStruct.fieldsThatDontNeedJoin.push(i);

@@ -27,7 +27,7 @@ function test() {
     return __awaiter(this, void 0, void 0, function* () {
         let listWithUnsupportedField = ['height', 'barcode'];
         try {
-            let result = getGenerateReportStruct(listWithUnsupportedField);
+            let result = getGenerateReportStruct({ items: listWithUnsupportedField, where: {} });
             console.log("Test Failed Error Meant To Be Thrown");
         }
         catch (err) {
@@ -40,10 +40,11 @@ function test() {
         }
         let listWithItemsThatDontNeedJoin = ItemsThatDontNeedJoin;
         try {
-            let result = getGenerateReportStruct(listWithItemsThatDontNeedJoin);
+            let result = getGenerateReportStruct({ items: listWithItemsThatDontNeedJoin, where: {} });
             assert.deepEqual(result, {
                 fieldsThatDontNeedJoin: ItemsThatDontNeedJoin,
-                fieldsThatNeedJoin: []
+                fieldsThatNeedJoin: [],
+                filterFields: {}
             }, "Wrong item returned");
             console.log("TEST 2: PASSED");
         }
@@ -52,10 +53,11 @@ function test() {
         }
         let emptylistWithItemsThatDontNeedJoin = [];
         try {
-            let result = getGenerateReportStruct(emptylistWithItemsThatDontNeedJoin);
+            let result = getGenerateReportStruct({ items: emptylistWithItemsThatDontNeedJoin, where: {} });
             assert.deepEqual(result, {
                 fieldsThatDontNeedJoin: [],
-                fieldsThatNeedJoin: []
+                fieldsThatNeedJoin: [],
+                filterFields: {}
             }, "Wrong item returned");
             console.log("TEST 3: PASSED");
         }
@@ -64,10 +66,11 @@ function test() {
         }
         let listWithItemsThatNeedJoin = ItemsThatNeedJoin;
         try {
-            let result = getGenerateReportStruct(listWithItemsThatNeedJoin);
+            let result = getGenerateReportStruct({ items: listWithItemsThatNeedJoin, where: {} });
             assert.deepEqual(result, {
                 fieldsThatDontNeedJoin: [],
-                fieldsThatNeedJoin: ItemsThatNeedJoin
+                fieldsThatNeedJoin: ItemsThatNeedJoin,
+                filterFields: {}
             }, "Wrong item returned");
             console.log("TEST 4: PASSED");
         }
@@ -76,10 +79,11 @@ function test() {
         }
         let emptylistWithItemsThatNeedJoin = [];
         try {
-            let result = getGenerateReportStruct(emptylistWithItemsThatNeedJoin);
+            let result = getGenerateReportStruct({ items: emptylistWithItemsThatNeedJoin, where: {} });
             assert.deepEqual(result, {
                 fieldsThatDontNeedJoin: [],
-                fieldsThatNeedJoin: []
+                fieldsThatNeedJoin: [],
+                filterFields: {}
             }, "Wrong item returned");
             console.log("TEST 5: PASSED");
         }
@@ -90,17 +94,18 @@ function test() {
         listWithBothNeedAndNotNeedJoin = listWithBothNeedAndNotNeedJoin.concat(ItemsThatDontNeedJoin);
         listWithBothNeedAndNotNeedJoin = listWithBothNeedAndNotNeedJoin.concat(ItemsThatNeedJoin);
         try {
-            let result = getGenerateReportStruct(listWithBothNeedAndNotNeedJoin);
+            let result = getGenerateReportStruct({ items: listWithBothNeedAndNotNeedJoin, where: {} });
             assert.deepEqual(result, {
                 fieldsThatDontNeedJoin: ItemsThatDontNeedJoin,
-                fieldsThatNeedJoin: ItemsThatNeedJoin
+                fieldsThatNeedJoin: ItemsThatNeedJoin,
+                filterFields: {}
             }, "Wrong item returned");
             console.log("TEST 6: PASSED");
         }
         catch (err) {
             console.log("TEST 6: FAILED", err);
         }
-        let generateReportStruct = { fieldsThatDontNeedJoin: [SupportedGenerateAssetReportFields.ACQUISITION_COST], fieldsThatNeedJoin: [] };
+        let generateReportStruct = { fieldsThatDontNeedJoin: [SupportedGenerateAssetReportFields.ACQUISITION_COST], fieldsThatNeedJoin: [], filterFields: {} };
         try {
             let result = generateSelectStatementFromGenerateReportStruct(generateReportStruct).statement;
             assert.equal(result, `SELECT a.${SupportedGenerateAssetReportFields.ACQUISITION_COST} FROM Asset a`, "Wrong Statement Returned");
@@ -109,7 +114,7 @@ function test() {
         catch (err) {
             console.log("TEST 7: FAILED", err);
         }
-        let generateReportStruct2 = { fieldsThatDontNeedJoin: ItemsThatDontNeedJoin, fieldsThatNeedJoin: [] };
+        let generateReportStruct2 = { fieldsThatDontNeedJoin: ItemsThatDontNeedJoin, fieldsThatNeedJoin: [], filterFields: {} };
         try {
             let result = generateSelectStatementFromGenerateReportStruct(generateReportStruct2).statement;
             assert.equal(result, `SELECT a.${SupportedGenerateAssetReportFields.SERIAL_NUMBER}, a.${SupportedGenerateAssetReportFields.ACQUISITION_DATE}, a.${SupportedGenerateAssetReportFields.ACQUISITION_COST}, a.${SupportedGenerateAssetReportFields.RESIDUAL_VALUE}, a.${SupportedGenerateAssetReportFields.USEFUL_LIFE}, a.${SupportedGenerateAssetReportFields.BARCODE}, a.${SupportedGenerateAssetReportFields.DESCRIPTION}, a.${SupportedGenerateAssetReportFields.DISPOSAL_DATE}, a.${SupportedGenerateAssetReportFields.ISCONVERTED}, a.${SupportedGenerateAssetReportFields.CONDITION} FROM Asset a`, "Wrong Statement Returned");
@@ -118,7 +123,7 @@ function test() {
         catch (err) {
             console.log("TEST 8: FAILED", err);
         }
-        let generateReportStruct3 = { fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: [SupportedGenerateAssetReportFields.CATEGORY] };
+        let generateReportStruct3 = { fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: [SupportedGenerateAssetReportFields.CATEGORY], filterFields: {} };
         try {
             let result = generateSelectStatementFromGenerateReportStruct(generateReportStruct3).statement;
             assert.equal(result, `SELECT c.name AS category FROM Asset a INNER JOIN Category c ON c.id = a.categoryid`, "Wrong Statement Returned");
@@ -127,7 +132,7 @@ function test() {
         catch (err) {
             console.log("TEST 9: FAILED", err);
         }
-        let generateReportStruct4 = { fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: ItemsThatNeedJoin };
+        let generateReportStruct4 = { fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: ItemsThatNeedJoin, filterFields: {} };
         try {
             let result = generateSelectStatementFromGenerateReportStruct(generateReportStruct4).statement;
             assert(result === `SELECT c.name AS category, l.name AS location_name, u.username AS responsible_user, c.depreciationtype AS depreciationtype FROM Asset a INNER JOIN Category c ON c.id = a.categoryid INNER JOIN Location l ON l.id = a.locationid INNER JOIN User2 u ON u.id = a.responsibleuserid` || result === `SELECT c.name AS category, l.name AS location_name, u.username AS responsible_user, c.depreciationtype AS depreciationtype FROM Asset a INNER JOIN Category c ON c.id = a.categoryid INNER JOIN Location l ON l.id = a.locationid INNER JOIN User2 u ON u.id = a.responsibleuserid `, "Wrong Statement Returned");
@@ -136,7 +141,7 @@ function test() {
         catch (err) {
             console.log("TEST 10: FAILED", err);
         }
-        let generateReportStruct5 = { fieldsThatDontNeedJoin: ItemsThatDontNeedJoin, fieldsThatNeedJoin: ItemsThatNeedJoin };
+        let generateReportStruct5 = { fieldsThatDontNeedJoin: ItemsThatDontNeedJoin, fieldsThatNeedJoin: ItemsThatNeedJoin, filterFields: {} };
         try {
             let result = generateSelectStatementFromGenerateReportStruct(generateReportStruct5).statement;
             assert(result === `SELECT a.${SupportedGenerateAssetReportFields.SERIAL_NUMBER}, a.${SupportedGenerateAssetReportFields.ACQUISITION_DATE}, a.${SupportedGenerateAssetReportFields.ACQUISITION_COST}, a.${SupportedGenerateAssetReportFields.RESIDUAL_VALUE}, a.${SupportedGenerateAssetReportFields.USEFUL_LIFE}, a.${SupportedGenerateAssetReportFields.BARCODE}, a.${SupportedGenerateAssetReportFields.DESCRIPTION}, a.${SupportedGenerateAssetReportFields.DISPOSAL_DATE}, a.${SupportedGenerateAssetReportFields.ISCONVERTED}, a.${SupportedGenerateAssetReportFields.CONDITION}, c.name AS category, l.name AS location_name, u.username AS responsible_user, c.depreciationtype AS depreciationtype FROM Asset a INNER JOIN Category c ON c.id = a.categoryid INNER JOIN Location l ON l.id = a.locationid INNER JOIN User2 u ON u.id = a.responsibleuserid` || result === `SELECT a.${SupportedGenerateAssetReportFields.SERIAL_NUMBER}, a.${SupportedGenerateAssetReportFields.ACQUISITION_DATE}, a.${SupportedGenerateAssetReportFields.ACQUISITION_COST}, a.${SupportedGenerateAssetReportFields.RESIDUAL_VALUE}, a.${SupportedGenerateAssetReportFields.USEFUL_LIFE}, a.${SupportedGenerateAssetReportFields.BARCODE}, a.${SupportedGenerateAssetReportFields.DESCRIPTION}, a.${SupportedGenerateAssetReportFields.DISPOSAL_DATE}, a.${SupportedGenerateAssetReportFields.ISCONVERTED}, a.${SupportedGenerateAssetReportFields.CONDITION}, c.name AS category, l.name AS location_name, u.username AS responsible_user, c.depreciationtype AS depreciationtype FROM Asset a INNER JOIN Category c ON c.id = a.categoryid INNER JOIN Location l ON l.id = a.locationid INNER JOIN User2 u ON u.id = a.responsibleuserid `, "Wrong Statement Returned");

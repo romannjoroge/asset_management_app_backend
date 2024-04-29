@@ -21,7 +21,7 @@ async function test() {
     let listWithUnsupportedField = ['height', 'barcode'];
 
     try {
-        let result = getGenerateReportStruct(listWithUnsupportedField);
+        let result = getGenerateReportStruct({items: listWithUnsupportedField, where: {}});
         console.log("Test Failed Error Meant To Be Thrown");
     } catch(err) {
         if (err instanceof MyError && err.message === MyErrors2.NOT_GET_GENERATE_REPORT_STRUCT) {
@@ -34,10 +34,11 @@ async function test() {
     let listWithItemsThatDontNeedJoin = ItemsThatDontNeedJoin
 
     try {
-        let result = getGenerateReportStruct(listWithItemsThatDontNeedJoin);
+        let result = getGenerateReportStruct({items: listWithItemsThatDontNeedJoin, where: {}});
         assert.deepEqual(result, {
             fieldsThatDontNeedJoin: ItemsThatDontNeedJoin,
-            fieldsThatNeedJoin: []
+            fieldsThatNeedJoin: [],
+            filterFields: {}
         }, "Wrong item returned");
         console.log("TEST 2: PASSED")
     } catch(err) {
@@ -46,10 +47,11 @@ async function test() {
 
     let emptylistWithItemsThatDontNeedJoin: string[] = [];
     try {
-        let result = getGenerateReportStruct(emptylistWithItemsThatDontNeedJoin);
+        let result = getGenerateReportStruct({items: emptylistWithItemsThatDontNeedJoin, where: {}});
         assert.deepEqual(result, {
             fieldsThatDontNeedJoin: [],
-            fieldsThatNeedJoin: []
+            fieldsThatNeedJoin: [],
+            filterFields: {}
         }, "Wrong item returned");
         console.log("TEST 3: PASSED")
     } catch(err) {
@@ -59,10 +61,11 @@ async function test() {
     let listWithItemsThatNeedJoin = ItemsThatNeedJoin
 
     try {
-        let result = getGenerateReportStruct(listWithItemsThatNeedJoin);
+        let result = getGenerateReportStruct({items: listWithItemsThatNeedJoin, where: {}});
         assert.deepEqual(result, {
             fieldsThatDontNeedJoin: [],
-            fieldsThatNeedJoin: ItemsThatNeedJoin
+            fieldsThatNeedJoin: ItemsThatNeedJoin,
+            filterFields: {}
         }, "Wrong item returned");
         console.log("TEST 4: PASSED")
     } catch(err) {
@@ -71,10 +74,11 @@ async function test() {
 
     let emptylistWithItemsThatNeedJoin: string[] = [];
     try {
-        let result = getGenerateReportStruct(emptylistWithItemsThatNeedJoin);
+        let result = getGenerateReportStruct({items: emptylistWithItemsThatNeedJoin, where: {}});
         assert.deepEqual(result, {
             fieldsThatDontNeedJoin: [],
-            fieldsThatNeedJoin: []
+            fieldsThatNeedJoin: [],
+            filterFields: {}
         }, "Wrong item returned");
         console.log("TEST 5: PASSED")
     } catch(err) {
@@ -86,17 +90,18 @@ async function test() {
     listWithBothNeedAndNotNeedJoin = listWithBothNeedAndNotNeedJoin.concat(ItemsThatNeedJoin);
 
     try {
-        let result = getGenerateReportStruct(listWithBothNeedAndNotNeedJoin);
+        let result = getGenerateReportStruct({items: listWithBothNeedAndNotNeedJoin, where: {}});
         assert.deepEqual(result, {
             fieldsThatDontNeedJoin: ItemsThatDontNeedJoin,
-            fieldsThatNeedJoin: ItemsThatNeedJoin
+            fieldsThatNeedJoin: ItemsThatNeedJoin,
+            filterFields: {}
         }, "Wrong item returned");
         console.log("TEST 6: PASSED")
     } catch(err) {
         console.log("TEST 6: FAILED", err);
     }
 
-    let generateReportStruct: GenerateReportStruct = {fieldsThatDontNeedJoin: [SupportedGenerateAssetReportFields.ACQUISITION_COST], fieldsThatNeedJoin: []};
+    let generateReportStruct: GenerateReportStruct = {fieldsThatDontNeedJoin: [SupportedGenerateAssetReportFields.ACQUISITION_COST], fieldsThatNeedJoin: [], filterFields: {}};
     try {
         let result = generateSelectStatementFromGenerateReportStruct(generateReportStruct).statement;
         assert.equal(
@@ -109,7 +114,7 @@ async function test() {
         console.log("TEST 7: FAILED", err);
     }
 
-    let generateReportStruct2: GenerateReportStruct = {fieldsThatDontNeedJoin: ItemsThatDontNeedJoin, fieldsThatNeedJoin: []};
+    let generateReportStruct2: GenerateReportStruct = {fieldsThatDontNeedJoin: ItemsThatDontNeedJoin, fieldsThatNeedJoin: [], filterFields: {}};
     try {
         let result = generateSelectStatementFromGenerateReportStruct(generateReportStruct2).statement;
         assert.equal(
@@ -122,7 +127,7 @@ async function test() {
         console.log("TEST 8: FAILED", err);
     }
 
-    let generateReportStruct3: GenerateReportStruct = {fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: [SupportedGenerateAssetReportFields.CATEGORY]};
+    let generateReportStruct3: GenerateReportStruct = {fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: [SupportedGenerateAssetReportFields.CATEGORY], filterFields: {}};
     try {
         let result = generateSelectStatementFromGenerateReportStruct(generateReportStruct3).statement;
         assert.equal(
@@ -135,7 +140,7 @@ async function test() {
         console.log("TEST 9: FAILED", err);
     }
 
-    let generateReportStruct4: GenerateReportStruct = {fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: ItemsThatNeedJoin};
+    let generateReportStruct4: GenerateReportStruct = {fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: ItemsThatNeedJoin, filterFields: {}};
     try {
         let result = generateSelectStatementFromGenerateReportStruct(generateReportStruct4).statement;
         assert(
@@ -147,7 +152,7 @@ async function test() {
         console.log("TEST 10: FAILED", err);
     }
 
-    let generateReportStruct5: GenerateReportStruct = {fieldsThatDontNeedJoin: ItemsThatDontNeedJoin, fieldsThatNeedJoin: ItemsThatNeedJoin};
+    let generateReportStruct5: GenerateReportStruct = {fieldsThatDontNeedJoin: ItemsThatDontNeedJoin, fieldsThatNeedJoin: ItemsThatNeedJoin, filterFields: {}};
     try {
         let result = generateSelectStatementFromGenerateReportStruct(generateReportStruct5).statement;
         assert(

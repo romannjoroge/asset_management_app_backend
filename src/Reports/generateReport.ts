@@ -8,7 +8,12 @@ import { appendArguementsToArgs, checkIfWayItemIsFilteredIsValid, getGenerateRep
 import _ from "lodash";
 const {isNull} = _;
 
-export function storeGenerateReportStatement(items: string[], name: string, period: string, creator_id: number): Promise<void> {
+export interface StoreGenReportItem {
+    items: string[],
+    where?: Record<any, any>
+}
+
+export function storeGenerateReportStatement(struct: StoreGenReportItem, name: string, period: string, creator_id: number): Promise<void> {
     return new Promise((res, rej) => {
         // If time period not supported throw error
         //@ts-ignore
@@ -17,7 +22,7 @@ export function storeGenerateReportStatement(items: string[], name: string, peri
         }
 
         // If items contains an item that is not in supported types return error
-        for (let i of items) {
+        for (let i of struct.items) {
             //@ts-ignore
             if (Object.values(SupportedGenerateAssetReportFields).includes(i) == false) {
                 return rej(new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED));
@@ -29,7 +34,7 @@ export function storeGenerateReportStatement(items: string[], name: string, peri
                 return rej(new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED));
             }
 
-            let generateReportStruct = getGenerateReportStruct(items);
+            let generateReportStruct = getGenerateReportStruct(struct);
 
             let query = "INSERT INTO GenerateReports (name, period, creator_id, report) VALUES ($1, $2, $3, $4)"
             pool.query(query, [name, period, creator_id, generateReportStruct]).then(() => {

@@ -6,7 +6,7 @@ import { SupportedGenerateAssetReportFields } from "./generated_report_types.js"
 import { appendArguementsToArgs, getGenerateReportStruct, getSelectFromField, getSelectInnerJoinFromField, getWhereField, isFilterFieldValid } from "./generated_report_helpers.js";
 import _ from "lodash";
 const { isNull } = _;
-export function storeGenerateReportStatement(items, name, period, creator_id) {
+export function storeGenerateReportStatement(struct, name, period, creator_id) {
     return new Promise((res, rej) => {
         // If time period not supported throw error
         //@ts-ignore
@@ -14,7 +14,7 @@ export function storeGenerateReportStatement(items, name, period, creator_id) {
             return rej(new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED));
         }
         // If items contains an item that is not in supported types return error
-        for (let i of items) {
+        for (let i of struct.items) {
             //@ts-ignore
             if (Object.values(SupportedGenerateAssetReportFields).includes(i) == false) {
                 return rej(new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED));
@@ -24,7 +24,7 @@ export function storeGenerateReportStatement(items, name, period, creator_id) {
             if (!creator_exists) {
                 return rej(new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED));
             }
-            let generateReportStruct = getGenerateReportStruct(items);
+            let generateReportStruct = getGenerateReportStruct(struct);
             let query = "INSERT INTO GenerateReports (name, period, creator_id, report) VALUES ($1, $2, $3, $4)";
             pool.query(query, [name, period, creator_id, generateReportStruct]).then(() => {
                 return res();
