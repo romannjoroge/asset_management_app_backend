@@ -93,6 +93,26 @@ CREATE TABLE IF NOT EXISTS Category (
 --     FOREIGN KEY (childID) REFERENCES Category(ID)
 -- );
 
+
+CREATE TABLE IF NOT EXISTS AssetAttachments (
+  id SERIAL,
+  assetID INTEGER NOT NULL,
+  userID INTEGER NOT NULL,
+  storagelocation TEXT NOT NULL,
+  originalfilename TEXT NOT NULL,
+  filetype TEXT NOT NULL,
+  timeAdded TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted BOOLEAN NOT NULL DEFAULT FALSE,
+  size BIGINT NOT NULL,
+  CONSTRAINT "FK_AssetAttachments.assetID"
+    FOREIGN KEY (assetID)
+      REFERENCES Asset(assetID),
+  CONSTRAINT "FK_AssetAttachments.userID"
+    FOREIGN KEY (userID)
+      REFERENCES User2(id),
+  PRIMARY KEY(id)
+);
+
 CREATE TABLE depreciationpercent (
   categoryid INTEGER NOT NULL,
   percentage double precision NOT NULL,
@@ -506,25 +526,6 @@ SET datestyle TO MDY;
 ALTER USER asset_management WITH PASSWORD 'the password';
 
 -- Commands to do on server
-DROP TABLE Asset_File;
-CREATE TABLE IF NOT EXISTS AssetAttachments (
-  id SERIAL,
-  assetID INTEGER NOT NULL,
-  userID INTEGER NOT NULL,
-  storagelocation TEXT NOT NULL,
-  originalfilename TEXT NOT NULL,
-  filetype TEXT NOT NULL,
-  timeAdded TIMESTAMP NOT NULL DEFAULT NOW(),
-  deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  size BIGINT NOT NULL,
-  CONSTRAINT "FK_AssetAttachments.assetID"
-    FOREIGN KEY (assetID)
-      REFERENCES Asset(assetID),
-  CONSTRAINT "FK_AssetAttachments.userID"
-    FOREIGN KEY (userID)
-      REFERENCES User2(id),
-  PRIMARY KEY(id)
-);
-INSERT INTO Events(id, type, description) VALUES (46, 'ATTACH_ASSET_FILE', 'Attached New File To Asset');
+
 
 
