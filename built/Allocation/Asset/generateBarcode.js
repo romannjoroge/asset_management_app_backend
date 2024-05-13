@@ -39,8 +39,7 @@ export default function generateBarcode(categoryid, locationid, assetid, assetSt
                             const paddedCategoryID = utility.padStringWithCharacter(categoryid.toString(), '0', 2);
                             const paddedSiteID = utility.padStringWithCharacter(siteID.toString(), '0', 2);
                             const paddedAssetID = utility.padStringWithCharacter(assetid.toString(), '0', 7);
-                            console.log("category => ", paddedCategoryID, "Site ID => ", paddedSiteID, "Asset ID => ", paddedAssetID);
-                            const barcode = paddedCategoryID + paddedSiteID + paddedAssetID + '0';
+                            const barcode = paddedCategoryID + paddedSiteID[0] + paddedSiteID[1] + paddedAssetID + '0';
                             console.log(`Barcode ${barcode}`);
                             if (barcode.length > 12) {
                                 throw new MyError(MyErrors2.INVALID_BARCODE);
