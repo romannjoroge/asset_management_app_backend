@@ -516,6 +516,8 @@ CREATE TABLE IF NOT EXISTS AssetRemarks (
   CONSTRAINT "FK_AssetRemarks.assetID" FOREIGN KEY (assetID) REFERENCES Asset(assetID)
 );
 
+
+
 -- Creates the home folder when the database is created. This is the topmost folder in the system
 INSERT INTO Folder(name) VALUES('home');
 
@@ -526,6 +528,16 @@ SET datestyle TO MDY;
 ALTER USER asset_management WITH PASSWORD 'the password';
 
 -- Commands to do on server
-
+CREATE TABLE IF NOT EXISTS DisposedAssetDetails (
+  id SERIAL,
+  assetID INTEGER NOT NULL, 
+  userID INTEGER NOT NULL,
+  date timestamp NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (id),
+  CONSTRAINT "FK_DisposedAssetDetails.userID" FOREIGN KEY (userID) REFERENCES User2(id),
+  CONSTRAINT "FK_DisposedAssetDetails.assetID" FOREIGN KEY (assetID) REFERENCES Asset(assetID)
+);
+ALTER TABLE Asset ADD COLUMN make TEXT;
+ALTER TABLE Asset ADD COLUMN modelnumber TEXT
 
 
