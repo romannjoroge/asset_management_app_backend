@@ -131,10 +131,16 @@ router.post("/valuation", (req, res) => {
     }
 });
 
-router.post("/dispose/:id", (req, res) => {
-    const assetID = Number.parseInt(req.params.id);
+router.post("/dispose", (req, res) => {
+    const {
+        asset_id,
+        user_id
+    } = req.body;
 
-    disposeAsset(assetID).then(_ => {
+    const assetID = Number.parseInt(asset_id);
+    const userID = Number.parseInt(user_id);
+
+    disposeAsset(assetID, userID).then(_ => {
         return res.status(201).json({message: Success2.DISPOSE_ASSET});
     }).catch((err: MyError) => {
         const {errorMessage, errorCode} = handleError(err);
