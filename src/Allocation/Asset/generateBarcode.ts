@@ -34,10 +34,8 @@ export default async function generateBarcode(categoryid: number, locationid: nu
                     const paddedCategoryID = utility.padStringWithCharacter(categoryid.toString(), '0', 2);
                     const paddedSiteID = utility.padStringWithCharacter(siteID.toString(), '0', 2);
                     const paddedAssetID = utility.padStringWithCharacter(assetid.toString(), '0', 7);
-                    const statusCode = Math.floor(Math.random() * 10).toString();
-                    console.log(statusCode)
 
-                    const barcode = paddedCategoryID + paddedSiteID + paddedAssetID + statusCode;
+                    const barcode = paddedCategoryID + paddedSiteID + paddedAssetID + '0';
                     console.log(`Barcode ${barcode}`);
 
                     if (barcode.length > 12) {
