@@ -1,37 +1,60 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import pool from "../../db2.js";
 import User from "../Users/users.js";
 import { MyErrors2 } from "../utility/constants.js";
 import MyError from "../utility/myError.js";
 import { SupportedGenerateAssetReportFields } from "./generated_report_types.js";
-import { appendArguementsToArgs, getGenerateReportStruct, getSelectFromField, getSelectInnerJoinFromField, getWhereField, isFilterFieldValid } from "./generated_report_helpers.js";
+import { appendArguementsToArgs, getSelectFromField, getSelectInnerJoinFromField, getWhereField, isFilterFieldValid } from "./generated_report_helpers.js";
 import _ from "lodash";
 const { isNull } = _;
-export function storeGenerateReportStatement(struct, name, period, creator_id) {
-    return new Promise((res, rej) => {
-        // If time period not supported throw error
-        //@ts-ignore
-        if (Object.values(GenerateAssetReportTimePeriods).includes(period) === false) {
-            return rej(new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED));
+export function storeGenerateReportStatement(struct) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            // If items contains an item that is not in supported types return error
+            for (let i of struct.fields) {
+                //@ts-ignore
+                if (Object.values(SupportedGenerateAssetReportFields).includes(i.jsonName) == false) {
+                    throw new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED);
+                }
+            }
+            // Check if user exists
+            let doesUserExist = yield User.checkIfUserIDExists(struct.creator);
+            if (!doesUserExist) {
+                throw new MyError(MyErrors2.USER_NOT_EXIST);
+            }
+            let cronJobstring = `${struct.frequency.minutes} ${struct.frequency.hours} ${struct.frequency.dayMonth} ${struct.frequency.month} ${struct.frequency.dayWeek}`;
+            pool.query("INSERT INTO GenerateReports (name, period, creator_id, report) VALUES ($1, $2, $3, $4)", [struct.name, cronJobstring, struct.creator, struct]);
         }
-        // If items contains an item that is not in supported types return error
-        for (let i of struct.items) {
-            //@ts-ignore
-            if (Object.values(SupportedGenerateAssetReportFields).includes(i) == false) {
-                return rej(new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED));
+        catch (err) {
+            if (err instanceof MyError) {
+                throw err;
+            }
+            else {
+                throw new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED);
             }
         }
-        User.checkIfUserIDExists(creator_id).then((creator_exists) => {
-            if (!creator_exists) {
-                return rej(new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED));
-            }
-            let generateReportStruct = getGenerateReportStruct(struct);
-            let query = "INSERT INTO GenerateReports (name, period, creator_id, report) VALUES ($1, $2, $3, $4)";
-            pool.query(query, [name, period, creator_id, generateReportStruct]).then(() => {
-                return res();
-            }).catch((err) => {
-                return rej(new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED));
-            });
-        });
+        // return new Promise((res, rej) => {
+        //     User.checkIfUserIDExists(creator_id).then((creator_exists) => {
+        //         if (!creator_exists) {
+        //             return rej(new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED));
+        //         }
+        //         let generateReportStruct = getGenerateReportStruct(struct);
+        //         let query = "INSERT INTO GenerateReports (name, period, creator_id, report) VALUES ($1, $2, $3, $4)"
+        //         pool.query(query, [name, period, creator_id, generateReportStruct]).then(() => {
+        //             return res();
+        //         }).catch((err: any) => {
+        //             return rej(new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED));
+        //         });
+        //     })
+        // });
     });
 }
 export function generateSelectStatementFromGenerateReportStruct(struct) {

@@ -1,34 +1,32 @@
 import { MyErrors2 } from "../utility/constants.js";
 import MyError from "../utility/myError.js";
 import utility from "../utility/utility.js";
-import { FilterFields, SupportedGenerateAssetReportFields, WaysToFilterBy, ItemsThatDontNeedJoin, ItemsThatNeedJoin } from "./generated_report_types.js";
+import { FilterFields, SupportedGenerateAssetReportFields, WaysToFilterBy } from "./generated_report_types.js";
 import _ from "lodash";
+// import { StoreGenReportItem } from "./generateReport.js";
 const { isNull } = _;
-export function getGenerateReportStruct(struct) {
-    try {
-        let generateReportStruct = { fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: [], filterFields: struct.where };
-        // For items that do not need joins just add to select statement
-        for (let i of struct.items) {
-            //@ts-ignore
-            if (ItemsThatDontNeedJoin.includes(i)) {
-                generateReportStruct.fieldsThatDontNeedJoin.push(i);
-            }
-            else {
-                //@ts-ignore
-                if (ItemsThatNeedJoin.includes(i)) {
-                    generateReportStruct.fieldsThatNeedJoin.push(i);
-                }
-                else {
-                    throw "Not Supported";
-                }
-            }
-        }
-        return generateReportStruct;
-    }
-    catch (err) {
-        throw new MyError(MyErrors2.NOT_GET_GENERATE_REPORT_STRUCT);
-    }
-}
+// export function getGenerateReportStruct(struct: StoreGenReportItem): GenerateReportStruct {
+//     try {
+//         let generateReportStruct: GenerateReportStruct = {fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: [], filterFields: struct.where};
+//         // For items that do not need joins just add to select statement
+//         for (let i of struct.items) {
+//             //@ts-ignore
+//             if (ItemsThatDontNeedJoin.includes(i)) {
+//                 generateReportStruct.fieldsThatDontNeedJoin.push(i);
+//             } else {
+//                 //@ts-ignore
+//                 if (ItemsThatNeedJoin.includes(i)) {
+//                     generateReportStruct.fieldsThatNeedJoin.push(i);
+//                 } else {
+//                     throw "Not Supported";
+//                 }
+//             }
+//         }
+//         return generateReportStruct;
+//     } catch(err) {
+//         throw new MyError(MyErrors2.NOT_GET_GENERATE_REPORT_STRUCT);
+//     }
+// }
 export function getSelectFromField(field) {
     try {
         if (field === SupportedGenerateAssetReportFields.LOCATION) {

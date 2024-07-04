@@ -14,6 +14,7 @@ export var SupportedGenerateAssetReportFields;
     SupportedGenerateAssetReportFields["DEPRECIATION_TYPE"] = "depreciationtype";
     SupportedGenerateAssetReportFields["RESPONSIBLE_USER"] = "responsible_user";
     SupportedGenerateAssetReportFields["ISCONVERTED"] = "isconverted";
+    SupportedGenerateAssetReportFields["ESTIMATEDVALUE"] = "estimatedvalue";
 })(SupportedGenerateAssetReportFields || (SupportedGenerateAssetReportFields = {}));
 export var GenerateAssetReportTimePeriods;
 (function (GenerateAssetReportTimePeriods) {

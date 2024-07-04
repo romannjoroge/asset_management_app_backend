@@ -96,28 +96,42 @@ router.get("/genertedReports", (req, res) => {
 })
 
 // Route to store generate report stuff
-router.post('/storeGen', (req, res) => {
+router.post('/storeGen', async (req, res) => {
     let {
-        items,
+        fields,
         name,
-        period,
+        frequency,
     } = req.body;
 
-    storeGenerateReportStatement(items, name, period, req.id).then(() => {
-        // Insert subscription
-        createMailSubscription(name, `Generate ${name} report ${period}`).then(() => {
-            return res.status(201).json({message: Success2.GEN_REPORT})
-        })
-        .catch((err: MyError) => {
-            console.log(err);
-            const {errorMessage, errorCode} = handleError(err);
-            return res.status(errorCode).json({message: errorMessage});
-        })
-    }).catch((err: MyError) => {
-        console.log(err);
+    try {
+        await storeGenerateReportStatement({
+            name,
+            frequency,
+            fields,
+            creator: req.id
+        });
+        return res.send("Done");
+    } catch(err) {
+        console.log(err, "Error Storting custom report");
         const {errorMessage, errorCode} = handleError(err);
         return res.status(errorCode).json({message: errorMessage});
-    })
+    }
+
+    // storeGenerateReportStatement(items, name, period, req.id).then(() => {
+    //     // Insert subscription
+    //     createMailSubscription(name, `Generate ${name} report ${period}`).then(() => {
+    //         return res.status(201).json({message: Success2.GEN_REPORT})
+    //     })
+    //     .catch((err: MyError) => {
+    //         console.log(err);
+    //         const {errorMessage, errorCode} = handleError(err);
+    //         return res.status(errorCode).json({message: errorMessage});
+    //     })
+    // }).catch((err: MyError) => {
+    //     console.log(err);
+    //     const {errorMessage, errorCode} = handleError(err);
+    //     return res.status(errorCode).json({message: errorMessage});
+    // })
 });
 
 interface StoredReports {

@@ -1,12 +1,7 @@
-// Importing exec to run functions on command line
-import { spawn } from 'child_process';
-
 // Creating a connection to the database
-import dotenv from 'dotenv';
-dotenv.config()
+import "dotenv/config";
 
 import pg from 'pg';
-import { stderr } from 'process';
 const { Pool } = pg;
 let pool;
 

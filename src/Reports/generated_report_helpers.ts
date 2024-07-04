@@ -3,33 +3,33 @@ import MyError from "../utility/myError.js";
 import utility from "../utility/utility.js";
 import { FilterFields, GenerateReportStruct, SupportedGenerateAssetReportFields, WaysToFilterBy, ItemsThatDontNeedJoin, ItemsThatNeedJoin } from "./generated_report_types.js";
 import _ from "lodash";
-import { StoreGenReportItem } from "./generateReport.js";
+// import { StoreGenReportItem } from "./generateReport.js";
 const {isNull} = _;
 
-export function getGenerateReportStruct(struct: StoreGenReportItem): GenerateReportStruct {
-    try {
-        let generateReportStruct: GenerateReportStruct = {fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: [], filterFields: struct.where};
+// export function getGenerateReportStruct(struct: StoreGenReportItem): GenerateReportStruct {
+//     try {
+//         let generateReportStruct: GenerateReportStruct = {fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: [], filterFields: struct.where};
 
-        // For items that do not need joins just add to select statement
-        for (let i of struct.items) {
-            //@ts-ignore
-            if (ItemsThatDontNeedJoin.includes(i)) {
-                generateReportStruct.fieldsThatDontNeedJoin.push(i);
-            } else {
-                //@ts-ignore
-                if (ItemsThatNeedJoin.includes(i)) {
-                    generateReportStruct.fieldsThatNeedJoin.push(i);
-                } else {
-                    throw "Not Supported";
-                }
-            }
-        }
+//         // For items that do not need joins just add to select statement
+//         for (let i of struct.items) {
+//             //@ts-ignore
+//             if (ItemsThatDontNeedJoin.includes(i)) {
+//                 generateReportStruct.fieldsThatDontNeedJoin.push(i);
+//             } else {
+//                 //@ts-ignore
+//                 if (ItemsThatNeedJoin.includes(i)) {
+//                     generateReportStruct.fieldsThatNeedJoin.push(i);
+//                 } else {
+//                     throw "Not Supported";
+//                 }
+//             }
+//         }
 
-        return generateReportStruct;
-    } catch(err) {
-        throw new MyError(MyErrors2.NOT_GET_GENERATE_REPORT_STRUCT);
-    }
-}
+//         return generateReportStruct;
+//     } catch(err) {
+//         throw new MyError(MyErrors2.NOT_GET_GENERATE_REPORT_STRUCT);
+//     }
+// }
 
 export function getSelectFromField(field: string): string {
     try {

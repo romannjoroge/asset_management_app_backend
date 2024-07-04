@@ -14,7 +14,8 @@ export enum SupportedGenerateAssetReportFields {
     DISPOSAL_DATE = "disposaldate",
     DEPRECIATION_TYPE = "depreciationtype",
     RESPONSIBLE_USER = "responsible_user",
-    ISCONVERTED = "isconverted"
+    ISCONVERTED = "isconverted",
+    ESTIMATEDVALUE = "estimatedvalue"
 }
 
 export enum GenerateAssetReportTimePeriods {

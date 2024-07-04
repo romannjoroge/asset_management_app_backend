@@ -11,7 +11,7 @@ import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
 import reportsTable from '../Reports/db_reports.js';
-import { Errors, Logs, MyErrors2, Success2 } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2 } from '../utility/constants.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import userTable from '../Users/db_users.js';
@@ -42,7 +42,6 @@ import generateDepreciatedAssetsInMonth from '../Mail/generateDepreciatedAssetsM
 import { storeGenerateReportStatement } from '../Reports/generateReport.js';
 import handleError from '../utility/handleError.js';
 import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
-import createMailSubscription from '../Mail/createMailSubscription.js';
 import { getGeneratedReports } from '../Reports/get_generated_reports.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -92,24 +91,38 @@ router.get("/genertedReports", (req, res) => {
     });
 });
 // Route to store generate report stuff
-router.post('/storeGen', (req, res) => {
-    let { items, name, period, } = req.body;
-    storeGenerateReportStatement(items, name, period, req.id).then(() => {
-        // Insert subscription
-        createMailSubscription(name, `Generate ${name} report ${period}`).then(() => {
-            return res.status(201).json({ message: Success2.GEN_REPORT });
-        })
-            .catch((err) => {
-            console.log(err);
-            const { errorMessage, errorCode } = handleError(err);
-            return res.status(errorCode).json({ message: errorMessage });
+router.post('/storeGen', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let { fields, name, frequency, } = req.body;
+    try {
+        yield storeGenerateReportStatement({
+            name,
+            frequency,
+            fields,
+            creator: req.id
         });
-    }).catch((err) => {
-        console.log(err);
+        return res.send("Done");
+    }
+    catch (err) {
+        console.log(err, "Error Storting custom report");
         const { errorMessage, errorCode } = handleError(err);
         return res.status(errorCode).json({ message: errorMessage });
-    });
-});
+    }
+    // storeGenerateReportStatement(items, name, period, req.id).then(() => {
+    //     // Insert subscription
+    //     createMailSubscription(name, `Generate ${name} report ${period}`).then(() => {
+    //         return res.status(201).json({message: Success2.GEN_REPORT})
+    //     })
+    //     .catch((err: MyError) => {
+    //         console.log(err);
+    //         const {errorMessage, errorCode} = handleError(err);
+    //         return res.status(errorCode).json({message: errorMessage});
+    //     })
+    // }).catch((err: MyError) => {
+    //     console.log(err);
+    //     const {errorMessage, errorCode} = handleError(err);
+    //     return res.status(errorCode).json({message: errorMessage});
+    // })
+}));
 // Get stored generated reports
 router.get('/storedReports', (req, res) => {
     let query = "SELECT g.name, u.username, period, report FROM GenerateReports g INNER JOIN User2 u ON u.id = g.creator_id WHERE g.deleted = false;";
