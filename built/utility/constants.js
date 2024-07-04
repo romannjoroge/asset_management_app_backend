@@ -231,6 +231,7 @@ export var Success2;
     Success2["SET_TIMEOUT"] = "Timeout Updated Successfully";
     Success2["CREATED_REMARK"] = "Created Asset Remark";
     Success2["FILES_UPLOADED"] = "Files Have Been Attached Succesfuly";
+    Success2["CUSTOM_REPORT"] = "Custom Report Created Succesfuly";
 })(Success2 || (Success2 = {}));
 export const Succes = {
     '1': 'Asset Created Successfuly',

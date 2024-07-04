@@ -109,7 +109,7 @@ router.post('/storeGen', async (req, res) => {
             fields,
             creator: req.id
         });
-        return res.send("Done");
+        return res.status(200).json({message: Success2.CUSTOM_REPORT});
     } catch(err) {
         const {errorMessage, errorCode} = handleError(err);
         return res.status(errorCode).json({message: errorMessage});

@@ -230,7 +230,8 @@ export enum Success2 {
     "DISPOSE_ASSET" = "Disposed Asset Successfully",
     "SET_TIMEOUT" = "Timeout Updated Successfully",
     "CREATED_REMARK" = "Created Asset Remark",
-    "FILES_UPLOADED" = "Files Have Been Attached Succesfuly"
+    "FILES_UPLOADED" = "Files Have Been Attached Succesfuly",
+    "CUSTOM_REPORT" = "Custom Report Created Succesfuly"
 }
 
 export const Succes = {

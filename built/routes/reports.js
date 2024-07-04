@@ -11,7 +11,7 @@ import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
 import reportsTable from '../Reports/db_reports.js';
-import { Errors, Logs, MyErrors2 } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2, Success2 } from '../utility/constants.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import userTable from '../Users/db_users.js';
@@ -100,7 +100,7 @@ router.post('/storeGen', (req, res) => __awaiter(void 0, void 0, void 0, functio
             fields,
             creator: req.id
         });
-        return res.send("Done");
+        return res.status(200).json({ message: Success2.CUSTOM_REPORT });
     }
     catch (err) {
         const { errorMessage, errorCode } = handleError(err);
