@@ -81,15 +81,15 @@ router.get('/test', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         return res.status(500).send("Shit Went Down!");
     }
 }));
-router.get("/genertedReports", (req, res) => {
-    // Return generated reports
-    getGeneratedReports().then(reports => {
-        return res.json(reports);
-    }).catch((err) => {
+router.get("/genertedReports", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return res.json(yield getGeneratedReports());
+    }
+    catch (err) {
         let { errorMessage, errorCode } = handleError(err);
         return res.status(errorCode).json({ message: errorMessage });
-    });
-});
+    }
+}));
 // Route to store generate report stuff
 router.post('/storeGen', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let { fields, name, frequency, } = req.body;
@@ -103,36 +103,40 @@ router.post('/storeGen', (req, res) => __awaiter(void 0, void 0, void 0, functio
         return res.send("Done");
     }
     catch (err) {
-        console.log(err, "Error Storting custom report");
         const { errorMessage, errorCode } = handleError(err);
         return res.status(errorCode).json({ message: errorMessage });
     }
-    // storeGenerateReportStatement(items, name, period, req.id).then(() => {
-    //     // Insert subscription
-    //     createMailSubscription(name, `Generate ${name} report ${period}`).then(() => {
-    //         return res.status(201).json({message: Success2.GEN_REPORT})
-    //     })
-    //     .catch((err: MyError) => {
-    //         console.log(err);
-    //         const {errorMessage, errorCode} = handleError(err);
-    //         return res.status(errorCode).json({message: errorMessage});
-    //     })
+}));
+// Get stored generated reports
+router.get('/storedReports', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let query = "SELECT g.name, u.username, report FROM GenerateReports g INNER JOIN User2 u ON u.id = g.creator_id WHERE g.deleted = false;";
+        let dbResutls = yield getResultsFromDatabase(query, []);
+        let resultsToReturn = [];
+        dbResutls.forEach((res) => {
+            var _a, _b;
+            resultsToReturn.push({
+                name: res.name,
+                creator: res.username,
+                fields: (_a = res.report['fields']) !== null && _a !== void 0 ? _a : [],
+                frequency: (_b = res.report['frequency']) !== null && _b !== void 0 ? _b : {},
+            });
+        });
+        return res.json(resultsToReturn);
+    }
+    catch (err) {
+        console.log(err);
+        let { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    }
+    // let query = "SELECT g.name, u.username, period, report FROM GenerateReports g INNER JOIN User2 u ON u.id = g.creator_id WHERE g.deleted = false;";
+    // getResultsFromDatabase<StoredReports>(query, []).then(data => {
+    //     return res.json(data);
     // }).catch((err: MyError) => {
-    //     console.log(err);
-    //     const {errorMessage, errorCode} = handleError(err);
+    //     let {errorMessage, errorCode} = handleError(err);
     //     return res.status(errorCode).json({message: errorMessage});
     // })
 }));
-// Get stored generated reports
-router.get('/storedReports', (req, res) => {
-    let query = "SELECT g.name, u.username, period, report FROM GenerateReports g INNER JOIN User2 u ON u.id = g.creator_id WHERE g.deleted = false;";
-    getResultsFromDatabase(query, []).then(data => {
-        return res.json(data);
-    }).catch((err) => {
-        let { errorMessage, errorCode } = handleError(err);
-        return res.status(errorCode).json({ message: errorMessage });
-    });
-});
 router.get('/inventory/:type', (req, res) => {
     let type = req.params.type;
     let inventoryID = Number.parseInt(req.query.inventoryID);

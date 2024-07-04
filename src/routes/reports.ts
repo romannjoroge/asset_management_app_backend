@@ -85,14 +85,13 @@ router.get('/test', async (req, res) => {
     }
 });
 
-router.get("/genertedReports", (req, res) => {
-    // Return generated reports
-    getGeneratedReports().then(reports => {
-        return res.json(reports);
-    }).catch((err: MyError) => {
+router.get("/genertedReports", async (req, res) => {
+    try {
+        return res.json(await getGeneratedReports());
+    } catch(err) {
         let {errorMessage, errorCode} = handleError(err);
         return res.status(errorCode).json({message: errorMessage});
-    })
+    }
 })
 
 // Route to store generate report stuff
@@ -112,44 +111,60 @@ router.post('/storeGen', async (req, res) => {
         });
         return res.send("Done");
     } catch(err) {
-        console.log(err, "Error Storting custom report");
         const {errorMessage, errorCode} = handleError(err);
         return res.status(errorCode).json({message: errorMessage});
     }
-
-    // storeGenerateReportStatement(items, name, period, req.id).then(() => {
-    //     // Insert subscription
-    //     createMailSubscription(name, `Generate ${name} report ${period}`).then(() => {
-    //         return res.status(201).json({message: Success2.GEN_REPORT})
-    //     })
-    //     .catch((err: MyError) => {
-    //         console.log(err);
-    //         const {errorMessage, errorCode} = handleError(err);
-    //         return res.status(errorCode).json({message: errorMessage});
-    //     })
-    // }).catch((err: MyError) => {
-    //     console.log(err);
-    //     const {errorMessage, errorCode} = handleError(err);
-    //     return res.status(errorCode).json({message: errorMessage});
-    // })
 });
 
 interface StoredReports {
     name: string,
-    period: string,
-    username: string,
-    report: string,
+    frequency: {
+        minutes: string,
+        hours: string,
+        dayMonth: string,
+        dayWeek: string,
+        month: string
+    },
+    creator: string,
+    fields: {
+        jsonName: string,
+        name: string,
+        description: string | undefined,
+        from: any,
+        to: any
+    }[],
 }
 
 // Get stored generated reports
-router.get('/storedReports', (req, res) => {
-    let query = "SELECT g.name, u.username, period, report FROM GenerateReports g INNER JOIN User2 u ON u.id = g.creator_id WHERE g.deleted = false;";
-    getResultsFromDatabase<StoredReports>(query, []).then(data => {
-        return res.json(data);
-    }).catch((err: MyError) => {
+router.get('/storedReports', async (req, res) => {
+    try {
+        let query = "SELECT g.name, u.username, report FROM GenerateReports g INNER JOIN User2 u ON u.id = g.creator_id WHERE g.deleted = false;";
+        let dbResutls = await getResultsFromDatabase<{name: string, username: string, report: Record<string, any>}>(query, []);
+        
+        let resultsToReturn: StoredReports[] = [];
+        dbResutls.forEach((res) => {
+            resultsToReturn.push({
+                name: res.name,
+                creator: res.username,
+                fields: res.report['fields'] ?? [],
+                frequency: res.report['frequency'] ?? {},
+            })
+        })
+        return res.json(resultsToReturn);
+    } catch(err) {
+        console.log(err);
         let {errorMessage, errorCode} = handleError(err);
         return res.status(errorCode).json({message: errorMessage});
-    })
+    }
+
+
+    // let query = "SELECT g.name, u.username, period, report FROM GenerateReports g INNER JOIN User2 u ON u.id = g.creator_id WHERE g.deleted = false;";
+    // getResultsFromDatabase<StoredReports>(query, []).then(data => {
+    //     return res.json(data);
+    // }).catch((err: MyError) => {
+    //     let {errorMessage, errorCode} = handleError(err);
+    //     return res.status(errorCode).json({message: errorMessage});
+    // })
 });
 
 router.get('/inventory/:type', (req, res) => {
