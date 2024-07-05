@@ -41,7 +41,8 @@ export const ItemsThatDontNeedJoin = [
     SupportedGenerateAssetReportFields.DESCRIPTION,
     SupportedGenerateAssetReportFields.DISPOSAL_DATE,
     SupportedGenerateAssetReportFields.ISCONVERTED,
-    SupportedGenerateAssetReportFields.CONDITION
+    SupportedGenerateAssetReportFields.CONDITION,
+    SupportedGenerateAssetReportFields.ESTIMATEDVALUE
 ];
 
 export interface GeneratedAssetReportType {
@@ -67,7 +68,7 @@ export interface GeneratedAssetReportType {
 export interface GenerateReportStruct {
     fieldsThatDontNeedJoin: string[],
     fieldsThatNeedJoin: string[]
-    filterFields?: Record<any, any>
+    filterFields?: Record<string, any>
 }
 
 // Items that you can filter results by 

@@ -156,15 +156,6 @@ router.get('/storedReports', async (req, res) => {
         let {errorMessage, errorCode} = handleError(err);
         return res.status(errorCode).json({message: errorMessage});
     }
-
-
-    // let query = "SELECT g.name, u.username, period, report FROM GenerateReports g INNER JOIN User2 u ON u.id = g.creator_id WHERE g.deleted = false;";
-    // getResultsFromDatabase<StoredReports>(query, []).then(data => {
-    //     return res.json(data);
-    // }).catch((err: MyError) => {
-    //     let {errorMessage, errorCode} = handleError(err);
-    //     return res.status(errorCode).json({message: errorMessage});
-    // })
 });
 
 router.get('/inventory/:type', (req, res) => {

@@ -41,20 +41,6 @@ export function storeGenerateReportStatement(struct) {
                 throw new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED);
             }
         }
-        // return new Promise((res, rej) => {
-        //     User.checkIfUserIDExists(creator_id).then((creator_exists) => {
-        //         if (!creator_exists) {
-        //             return rej(new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED));
-        //         }
-        //         let generateReportStruct = getGenerateReportStruct(struct);
-        //         let query = "INSERT INTO GenerateReports (name, period, creator_id, report) VALUES ($1, $2, $3, $4)"
-        //         pool.query(query, [name, period, creator_id, generateReportStruct]).then(() => {
-        //             return res();
-        //         }).catch((err: any) => {
-        //             return rej(new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED));
-        //         });
-        //     })
-        // });
     });
 }
 export function generateSelectStatementFromGenerateReportStruct(struct) {
