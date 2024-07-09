@@ -133,6 +133,7 @@ export function generateSelectStatementFromGenerateReportStruct(struct: Generate
                         innerJoinSegment = innerJoinSegment + `${getSelectInnerJoinFromField(struct.fieldsThatNeedJoin[i])} `;
                     }
                 }
+                dontAddInnerJoin = false;
             }
         }
 
@@ -173,6 +174,11 @@ export function generateSelectStatementFromGenerateReportStruct(struct: Generate
                         let result = getWhereField(keys[0] ,position);
                         whereclause = `WHERE ${result.where}`;
                         args = appendArguementsToArgs(keys[0], values[0], args);
+                        position = result.newPosition;
+                    } else if (i == keys.length - 1 && keys.length === 2) {
+                        let result = getWhereField(keys[i] ,position);
+                        whereclause = `${whereclause} AND ${result.where}`;
+                        args = appendArguementsToArgs(keys[i], values[i], args);
                         position = result.newPosition;
                     } else if (i == keys.length - 1) {
                         let result = getWhereField(keys[i] ,position);

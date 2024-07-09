@@ -24,6 +24,16 @@ export function convertStoredReportToGenerateStruct(input: StoreCustomReportItem
             // @ts-ignore
             if(Object.values(FilterFields).includes(i.jsonName)) {
                 if(isNil(i?.to)) {
+                    if (i.jsonName === SupportedGenerateAssetReportFields.DEPRECIATION_TYPE) {
+                        if(i.from === "double") {
+                            i.from = "Double Declining Balance"
+                        } else if (i.from === "straight") {
+                            i.from = "Straight Line"
+                        } else if (i.from === "written") {
+                            i.from = "Written Down Value"
+                        }
+                    } 
+
                     filterFields[`${i.jsonName}`] = {from: i.from}
                 } else {
                     // @ts-ignore
