@@ -5,28 +5,6 @@ import { FilterFields, SupportedGenerateAssetReportFields, WaysToFilterBy } from
 import _ from "lodash";
 // import { StoreGenReportItem } from "./generateReport.js";
 const { isNull } = _;
-// export function getGenerateReportStruct(struct: StoreGenReportItem): GenerateReportStruct {
-//     try {
-//         let generateReportStruct: GenerateReportStruct = {fieldsThatDontNeedJoin: [], fieldsThatNeedJoin: [], filterFields: struct.where};
-//         // For items that do not need joins just add to select statement
-//         for (let i of struct.items) {
-//             //@ts-ignore
-//             if (ItemsThatDontNeedJoin.includes(i)) {
-//                 generateReportStruct.fieldsThatDontNeedJoin.push(i);
-//             } else {
-//                 //@ts-ignore
-//                 if (ItemsThatNeedJoin.includes(i)) {
-//                     generateReportStruct.fieldsThatNeedJoin.push(i);
-//                 } else {
-//                     throw "Not Supported";
-//                 }
-//             }
-//         }
-//         return generateReportStruct;
-//     } catch(err) {
-//         throw new MyError(MyErrors2.NOT_GET_GENERATE_REPORT_STRUCT);
-//     }
-// }
 export function getSelectFromField(field) {
     try {
         if (field === SupportedGenerateAssetReportFields.LOCATION) {
@@ -46,43 +24,45 @@ export function getSelectFromField(field) {
         }
     }
     catch (err) {
+        console.log("Get select from field", err);
         throw new MyError(MyErrors2.NOT_GENERATE_SELECT_STATEMENT);
     }
 }
 export function getWhereField(field, position) {
     if (field === FilterFields.ACQUISITION_COST) {
-        return { where: `WHERE acquisitioncost BETWEEN $${position} AND $${position + 1}`, newPosition: position + 2 };
+        return { where: `acquisitioncost BETWEEN $${position} AND $${position + 1}`, newPosition: position + 2 };
     }
     else if (field === FilterFields.ACQUISITION_DATE) {
-        return { where: `WHERE acquisitiondate BETWEEN $${position} AND $${position + 1}`, newPosition: position + 2 };
+        return { where: `acquisitiondate BETWEEN $${position} AND $${position + 1}`, newPosition: position + 2 };
     }
     else if (field === FilterFields.CATEGORY) {
-        return { where: `WHERE c.id = $${position}`, newPosition: position + 1 };
+        return { where: `c.id = $${position}`, newPosition: position + 1 };
     }
     else if (field === FilterFields.CONDITION) {
-        return { where: `WHERE condition = $${position}`, newPosition: position + 1 };
+        return { where: `condition = $${position}`, newPosition: position + 1 };
     }
     else if (field === FilterFields.DEPRECIATION_TYPE) {
-        return { where: `WHERE c.depreciationtype = $${position}`, newPosition: position + 1 };
+        return { where: `c.depreciationtype = $${position}`, newPosition: position + 1 };
     }
     else if (field === FilterFields.DISPOSAL_DATE) {
-        return { where: `WHERE disposaldate BETWEEN $${position} AND $${position + 1}`, newPosition: position + 2 };
+        return { where: `disposaldate BETWEEN $${position} AND $${position + 1}`, newPosition: position + 2 };
     }
     else if (field === FilterFields.ISCONVERTED) {
-        return { where: `WHERE isconverted = $${position}`, newPosition: position + 1 };
+        return { where: `isconverted = $${position}`, newPosition: position + 1 };
     }
     else if (field === FilterFields.LOCATION) {
-        return { where: `WHERE l.id = $${position}`, newPosition: position + 1 };
+        return { where: `l.id = $${position}`, newPosition: position + 1 };
     }
     else if (field === FilterFields.RESIDUAL_VALUE) {
-        return { where: `WHERE residualvalue BETWEEN $${position} AND $${position + 1}`, newPosition: position + 2 };
+        return { where: `residualvalue BETWEEN $${position} AND $${position + 1}`, newPosition: position + 2 };
     }
     else if (field === FilterFields.RESPONSIBLE_USER) {
-        return { where: `WHERE u.id = $${position}`, newPosition: position + 1 };
+        return { where: `u.id = $${position}`, newPosition: position + 1 };
     }
     else if (field === FilterFields.USEFUL_LIFE) {
-        return { where: `WHERE usefullife BETWEEN $${position} AND $${position + 1}`, newPosition: position + 2 };
+        return { where: `usefullife BETWEEN $${position} AND $${position + 1}`, newPosition: position + 2 };
     }
+    console.log("Get Where field", field, position);
     throw new MyError(MyErrors2.GENERATE_ASSET_REPORT_NOT_SUPPORTED);
 }
 // Assumes that field and value are both correct
@@ -98,15 +78,15 @@ export function appendArguementsToArgs(field, value, args) {
         return args;
     }
     else if (field === FilterFields.CATEGORY) {
-        args.push(value);
+        args.push(value['from']);
         return args;
     }
     else if (field === FilterFields.CONDITION) {
-        args.push(value);
+        args.push(value['from']);
         return args;
     }
     else if (field === FilterFields.DEPRECIATION_TYPE) {
-        args.push(value);
+        args.push(value['from']);
         return args;
     }
     else if (field === FilterFields.DISPOSAL_DATE) {
@@ -115,11 +95,11 @@ export function appendArguementsToArgs(field, value, args) {
         return args;
     }
     else if (field === FilterFields.ISCONVERTED) {
-        args.push(value);
+        args.push(value['from']);
         return args;
     }
     else if (field === FilterFields.LOCATION) {
-        args.push(value);
+        args.push(value['from']);
         return args;
     }
     else if (field === FilterFields.RESIDUAL_VALUE) {
@@ -128,7 +108,7 @@ export function appendArguementsToArgs(field, value, args) {
         return args;
     }
     else if (field === FilterFields.RESPONSIBLE_USER) {
-        args.push(value);
+        args.push(value['from']);
         return args;
     }
     else if (field === FilterFields.USEFUL_LIFE) {
@@ -154,6 +134,7 @@ export function getSelectInnerJoinFromField(field) {
         }
     }
     catch (err) {
+        console.log("Get select inner join error", err);
         throw new MyError(MyErrors2.NOT_GENERATE_SELECT_STATEMENT);
     }
 }
@@ -203,10 +184,10 @@ export function checkIfWayItemIsFilteredIsValid(value, wayToBeFiltered) {
         }
     }
     else if (wayToBeFiltered === WaysToFilterBy.BOOLEAN) {
-        return value === true || value === false;
+        return value['from'] === true || value['from'] === false;
     }
     else if (wayToBeFiltered === WaysToFilterBy.ID) {
-        return Number.isInteger(value) && value > 0;
+        return Number.isInteger(value['from']) && value['from'] > 0;
     }
     else if (wayToBeFiltered === WaysToFilterBy.NUMBER_RANGE) {
         // Check if theres is a to and from value
@@ -219,7 +200,7 @@ export function checkIfWayItemIsFilteredIsValid(value, wayToBeFiltered) {
         }
     }
     else if (wayToBeFiltered === WaysToFilterBy.STRING) {
-        return typeof value === 'string';
+        return typeof value['from'] === 'string';
     }
     return false;
 }
@@ -233,11 +214,13 @@ export function isFilterFieldValid(filterFields) {
         // Check if key belongs to a valid filter field
         //@ts-ignore
         if (Object.values(FilterFields).includes(key) === false) {
+            console.log(entry, "Invalid key is: ", key);
             return false;
         }
         // Check if value is the correct way its meant to be filtered
         let isCorrect = checkIfWayItemIsFilteredIsValid(value, getWayToFilterField(key));
         if (isCorrect === false) {
+            console.log(entry, "Invalid value is: ", value);
             return false;
         }
     }

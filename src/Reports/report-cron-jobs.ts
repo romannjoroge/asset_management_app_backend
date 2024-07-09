@@ -4,6 +4,8 @@ import { convertStoredReportToGenerateStruct } from "./convert-report-struct-to-
 import { generateSelectStatementFromGenerateReportStruct } from "./generateReport.js";
 import pool from "../../db2.js";
 import "dotenv/config";
+import { loadDataToExcelFile } from "../Excel/createExcelFileForGeneralData.js";
+import Mail from "../Mail/mail.js";
 
 async function createCronJobs() {
     try {
@@ -11,33 +13,21 @@ async function createCronJobs() {
             "SELECT name, period, report FROM GenerateReports WHERE deleted = false",
             []
         );
-        for await (let report of reports) {
-            // @ts-ignore
-            let generateStruct = convertStoredReportToGenerateStruct(report.report);
-                
-            let selectStatement = generateSelectStatementFromGenerateReportStruct(generateStruct);
-            console.log("Statement => ", selectStatement.statement);
-            let results = await pool.query(selectStatement.statement, selectStatement.args);
-            for (let result of results) {
-                console.log(result);
-            }
-            console.log("Done");
-        }
 
-        // for (let report of reports) {
-        //     scheduleJob(report['name'] ,report['period'], async () => {
-        //         // @ts-ignore
-        //         let generateStruct = convertStoredReportToGenerateStruct(report.report);
+        for (let report of reports) {
+            scheduleJob(report['name'] ,report['period'], async () => {
+                // @ts-ignore
+                let generateStruct = convertStoredReportToGenerateStruct(report.report);
                 
-        //         let selectStatement = generateSelectStatementFromGenerateReportStruct(generateStruct);
-        //         console.log("Statement => ", selectStatement.statement);
-        //         let results = await pool.query(selectStatement.statement, selectStatement.args);
-        //         for (let result of results) {
-        //             console.log(result);
-        //         }
-        //         console.log("Done");
-        //     });
-        // }
+                let selectStatement = generateSelectStatementFromGenerateReportStruct(generateStruct);
+                console.log("Statement => ", selectStatement.statement);
+                let results = await pool.query(selectStatement.statement, selectStatement.args);
+                let buffer = loadDataToExcelFile(results.rows, "Test");
+                // Send an email
+
+                console.log("Done");
+            });
+        }
     } catch(err) {
         console.log(err, "Error In Cron Job")
     }
@@ -153,10 +143,18 @@ async function test() {
           });
 
           let selectStatement = generateSelectStatementFromGenerateReportStruct(struct);
-          console.log("Statement =>", selectStatement.statement)
-          console.log("Args => ", selectStatement.args);
           let results = await pool.query(selectStatement.statement, selectStatement.args ?? []);
-          console.log(results.rows);
+          let buffer = loadDataToExcelFile(results.rows, "Test");
+          Mail.sendMailWithAttachmentsToMultipleRecepients(
+            `
+              <h1>Test Mail</h1>
+            `,
+            "extremewireless@wireless.co.ke",
+            ["roman.njoroge@njuguna.com"],
+            "TEST EMAIL",
+            buffer,
+            "report.xlsx"
+          )
     } catch(err) {
         console.log("Error =>", err)
     }

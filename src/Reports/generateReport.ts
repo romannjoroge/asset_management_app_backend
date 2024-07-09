@@ -5,6 +5,7 @@ import MyError from "../utility/myError.js";
 import { FilterFields, GenerateReportStruct, ItemsThatDontNeedJoin, ItemsThatNeedJoin, SupportedGenerateAssetReportFields, WaysToFilterBy } from "./generated_report_types.js";
 import { appendArguementsToArgs, checkIfWayItemIsFilteredIsValid, getSelectFromField, getSelectInnerJoinFromField, getWhereField, isFilterFieldValid } from "./generated_report_helpers.js";
 import _ from "lodash";
+import getResultsFromDatabase from "../utility/getResultsFromDatabase.js";
 const {isNull} = _;
 
 // export interface StoreGenReportItem {
@@ -47,8 +48,12 @@ export async function storeGenerateReportStatement(struct: StoreCustomReportItem
             throw new MyError(MyErrors2.USER_NOT_EXIST);
         }
 
+        // Create a mail subscription for the report
+        let results = await getResultsFromDatabase<{id: number}>("INSERT INTO mailsubscriptions(name, description) VALUES ($1, $2) RETURNING id;", [struct.name, `${struct.name} custom report`])
+        let mailSubscriptionID = results[0].id;
+
         let cronJobstring = `${struct.frequency.minutes} ${struct.frequency.hours} ${struct.frequency.dayMonth} ${struct.frequency.month} ${struct.frequency.dayWeek}`;
-        pool.query("INSERT INTO GenerateReports (name, period, creator_id, report) VALUES ($1, $2, $3, $4)", [struct.name, cronJobstring, struct.creator, struct]);
+        pool.query("INSERT INTO GenerateReports (name, period, creator_id, report, mailSubscriptionID) VALUES ($1, $2, $3, $4, $5)", [struct.name, cronJobstring, struct.creator, struct, mailSubscriptionID]);
     } catch(err) {
         if (err instanceof MyError) {
             throw err;

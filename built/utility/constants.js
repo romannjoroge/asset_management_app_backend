@@ -214,6 +214,7 @@ export var MyErrors2;
     MyErrors2["NOT_GET_REMARKS"] = "Could Not Get Asset Remarks";
     MyErrors2["NOT_GET_GENERATED_REPORTS"] = "Could Not Get Generated Reports";
     MyErrors2["FILE_NOT_EXISTS"] = "File Does Not Exist";
+    MyErrors2["NOT_CREATE_EXCEL_FILE"] = "Could Not Create Excel File";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

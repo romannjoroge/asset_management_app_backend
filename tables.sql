@@ -540,4 +540,7 @@ CREATE TABLE IF NOT EXISTS DisposedAssetDetails (
 ALTER TABLE Asset ADD COLUMN make TEXT;
 ALTER TABLE Asset ADD COLUMN modelnumber TEXT
 
+ALTER TABLE generatereports ADD COLUMN mailSubscriptionID INT;
+ALTER TABLE generatereports ADD CONSTRAINT "fk_generatereports.mailsubscriptionid" FOREIGN KEY (mailsubscriptionid) REFERENCES mailsubscriptions(id);
+
 

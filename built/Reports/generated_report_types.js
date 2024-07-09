@@ -38,7 +38,8 @@ export const ItemsThatDontNeedJoin = [
     SupportedGenerateAssetReportFields.DESCRIPTION,
     SupportedGenerateAssetReportFields.DISPOSAL_DATE,
     SupportedGenerateAssetReportFields.ISCONVERTED,
-    SupportedGenerateAssetReportFields.CONDITION
+    SupportedGenerateAssetReportFields.CONDITION,
+    SupportedGenerateAssetReportFields.ESTIMATEDVALUE
 ];
 // Items that you can filter results by 
 export var FilterFields;

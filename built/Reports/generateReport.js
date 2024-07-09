@@ -14,6 +14,7 @@ import MyError from "../utility/myError.js";
 import { SupportedGenerateAssetReportFields } from "./generated_report_types.js";
 import { appendArguementsToArgs, getSelectFromField, getSelectInnerJoinFromField, getWhereField, isFilterFieldValid } from "./generated_report_helpers.js";
 import _ from "lodash";
+import getResultsFromDatabase from "../utility/getResultsFromDatabase.js";
 const { isNull } = _;
 export function storeGenerateReportStatement(struct) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -30,8 +31,11 @@ export function storeGenerateReportStatement(struct) {
             if (!doesUserExist) {
                 throw new MyError(MyErrors2.USER_NOT_EXIST);
             }
+            // Create a mail subscription for the report
+            let results = yield getResultsFromDatabase("INSERT INTO mailsubscriptions(name, description) VALUES ($1, $2) RETURNING id;", [struct.name, `${struct.name} custom report`]);
+            let mailSubscriptionID = results[0].id;
             let cronJobstring = `${struct.frequency.minutes} ${struct.frequency.hours} ${struct.frequency.dayMonth} ${struct.frequency.month} ${struct.frequency.dayWeek}`;
-            pool.query("INSERT INTO GenerateReports (name, period, creator_id, report) VALUES ($1, $2, $3, $4)", [struct.name, cronJobstring, struct.creator, struct]);
+            pool.query("INSERT INTO GenerateReports (name, period, creator_id, report, mailSubscriptionID) VALUES ($1, $2, $3, $4, $5)", [struct.name, cronJobstring, struct.creator, struct, mailSubscriptionID]);
         }
         catch (err) {
             if (err instanceof MyError) {
@@ -45,17 +49,27 @@ export function storeGenerateReportStatement(struct) {
 }
 export function generateSelectStatementFromGenerateReportStruct(struct) {
     try {
+        let estimatedvalue = false;
         // If struct is empty return empty string
         if (struct.fieldsThatDontNeedJoin.length === 0 && struct.fieldsThatNeedJoin.length === 0 && isNull(struct.filterFields)) {
-            return { statement: "" };
+            return { statement: "", isEstimatedValue: estimatedvalue };
         }
         // Items that don't need join segment
         let itemsThatDontNeedJoinSegment = "";
         if (struct.fieldsThatDontNeedJoin.length == 1) {
-            itemsThatDontNeedJoinSegment = itemsThatDontNeedJoinSegment + `a.${struct.fieldsThatDontNeedJoin[0]}`;
+            if (struct.fieldsThatDontNeedJoin[0] !== SupportedGenerateAssetReportFields.ESTIMATEDVALUE) {
+                itemsThatDontNeedJoinSegment = itemsThatDontNeedJoinSegment + `a.${struct.fieldsThatDontNeedJoin[0]}`;
+            }
         }
         else if (struct.fieldsThatDontNeedJoin.length > 1) {
             for (let i = 0; i < struct.fieldsThatDontNeedJoin.length; i++) {
+                if (struct.fieldsThatDontNeedJoin[i] === SupportedGenerateAssetReportFields.ESTIMATEDVALUE) {
+                    estimatedvalue = true;
+                    if (i == struct.fieldsThatDontNeedJoin.length - 1) {
+                        itemsThatDontNeedJoinSegment = itemsThatDontNeedJoinSegment.slice(0, itemsThatDontNeedJoinSegment.length - 2);
+                    }
+                    continue;
+                }
                 if (i == 0) {
                     itemsThatDontNeedJoinSegment = itemsThatDontNeedJoinSegment + `a.${struct.fieldsThatDontNeedJoin[i]}, `;
                 }
@@ -104,26 +118,28 @@ export function generateSelectStatementFromGenerateReportStruct(struct) {
                         innerJoinSegment = innerJoinSegment + `${getSelectInnerJoinFromField(struct.fieldsThatNeedJoin[i])} `;
                     }
                 }
+                dontAddInnerJoin = false;
             }
         }
         let selectStatement;
         if (struct.fieldsThatNeedJoin.length === 0) {
-            selectStatement = `SELECT ${itemsThatDontNeedJoinSegment} FROM Asset a`;
+            selectStatement = `SELECT a.assetID, ${itemsThatDontNeedJoinSegment} FROM Asset a`;
         }
         else if (struct.fieldsThatDontNeedJoin.length === 0) {
-            selectStatement = `SELECT ${itemsThatNeedJoinSegment} FROM Asset a ${innerJoinSegment}`;
+            selectStatement = `SELECT a.assetID, ${itemsThatNeedJoinSegment} FROM Asset a ${innerJoinSegment}`;
         }
         else {
-            selectStatement = `SELECT ${itemsThatDontNeedJoinSegment}, ${itemsThatNeedJoinSegment} FROM Asset a ${innerJoinSegment}`;
+            selectStatement = `SELECT a.assetID, ${itemsThatDontNeedJoinSegment}, ${itemsThatNeedJoinSegment} FROM Asset a ${innerJoinSegment}`;
         }
         let args = [];
         let whereclause = "";
         let position = 1;
         // Add WHERE clause if present
-        if (!isNull(struct.filterFields)) {
+        if (!isNull(struct === null || struct === void 0 ? void 0 : struct.filterFields)) {
             // Verify the fields
             let isValid = isFilterFieldValid(struct.filterFields);
             if (isValid === false) {
+                console.log("Invalid field: ", struct.filterFields);
                 throw new MyError(MyErrors2.NOT_GENERATE_SELECT_STATEMENT);
             }
             // If fields are correct we add the where statements
@@ -132,7 +148,7 @@ export function generateSelectStatementFromGenerateReportStruct(struct) {
             let values = Object.values(struct.filterFields);
             if (keys.length === 1) {
                 let result = getWhereField(keys[0], position);
-                whereclause = result.where;
+                whereclause = `WHERE ${result.where}`;
                 args = appendArguementsToArgs(keys[0], values[0], args);
                 position = result.newPosition;
             }
@@ -140,8 +156,14 @@ export function generateSelectStatementFromGenerateReportStruct(struct) {
                 for (let i = 0; i < keys.length; i++) {
                     if (i == 0) {
                         let result = getWhereField(keys[0], position);
-                        whereclause = result.where;
+                        whereclause = `WHERE ${result.where}`;
                         args = appendArguementsToArgs(keys[0], values[0], args);
+                        position = result.newPosition;
+                    }
+                    else if (i == keys.length - 1 && keys.length === 2) {
+                        let result = getWhereField(keys[i], position);
+                        whereclause = `${whereclause} AND ${result.where}`;
+                        args = appendArguementsToArgs(keys[i], values[i], args);
                         position = result.newPosition;
                     }
                     else if (i == keys.length - 1) {
@@ -150,9 +172,15 @@ export function generateSelectStatementFromGenerateReportStruct(struct) {
                         args = appendArguementsToArgs(keys[i], values[i], args);
                         position = result.newPosition;
                     }
-                    else {
+                    else if (i == 1) {
                         let result = getWhereField(keys[i], position);
                         whereclause = `${whereclause} AND ${result.where} AND`;
+                        args = appendArguementsToArgs(keys[i], values[i], args);
+                        position = result.newPosition;
+                    }
+                    else {
+                        let result = getWhereField(keys[i], position);
+                        whereclause = `${whereclause} ${result.where} AND`;
                         args = appendArguementsToArgs(keys[i], values[i], args);
                         position = result.newPosition;
                     }
@@ -160,10 +188,10 @@ export function generateSelectStatementFromGenerateReportStruct(struct) {
             }
         }
         if (!isNull(struct.filterFields)) {
-            return { statement: `${selectStatement}${whereclause}`, args: args };
+            return { statement: `${selectStatement} ${whereclause}`, args: args, isEstimatedValue: estimatedvalue };
         }
         else {
-            return { statement: selectStatement, args: args };
+            return { statement: selectStatement, args: args, isEstimatedValue: estimatedvalue };
         }
     }
     catch (err) {
