@@ -138,11 +138,11 @@ export function generateSelectStatementFromGenerateReportStruct(struct: Generate
 
         let selectStatement: string;
         if (struct.fieldsThatNeedJoin.length === 0) {
-            selectStatement = `SELECT ${itemsThatDontNeedJoinSegment} FROM Asset a`;
+            selectStatement = `SELECT a.assetID, ${itemsThatDontNeedJoinSegment} FROM Asset a`;
         } else if (struct.fieldsThatDontNeedJoin.length === 0) {
-            selectStatement = `SELECT ${itemsThatNeedJoinSegment} FROM Asset a ${innerJoinSegment}`
+            selectStatement = `SELECT a.assetID, ${itemsThatNeedJoinSegment} FROM Asset a ${innerJoinSegment}`
         } else {
-            selectStatement = `SELECT ${itemsThatDontNeedJoinSegment}, ${itemsThatNeedJoinSegment} FROM Asset a ${innerJoinSegment}`;
+            selectStatement = `SELECT a.assetID, ${itemsThatDontNeedJoinSegment}, ${itemsThatNeedJoinSegment} FROM Asset a ${innerJoinSegment}`;
         }
 
         let args: any[] = [];
@@ -163,7 +163,7 @@ export function generateSelectStatementFromGenerateReportStruct(struct: Generate
             let values = Object.values(struct.filterFields!);
             if (keys.length === 1) {
                 let result = getWhereField(keys[0] ,position);
-                whereclause = result.where;
+                whereclause = `WHERE ${result.where}`;
                 args = appendArguementsToArgs(keys[0], values[0], args);
                 position = result.newPosition;
             } 

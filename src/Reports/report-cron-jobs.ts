@@ -69,13 +69,13 @@ async function test() {
             //     "description":"Asset Condition To Be Installed",
             //     "from":"To Be Installed"
             //   },
-              {
-                "jsonName":"acquisitioncost",
-                "name":"Acquisition Cost",
-                "description":"Acquisition Cost between 100000 and 150000",
-                "from":1,
-                "to":150000
-              },
+            //   {
+            //     "jsonName":"acquisitioncost",
+            //     "name":"Acquisition Cost",
+            //     "description":"Acquisition Cost between 100000 and 150000",
+            //     "from":1,
+            //     "to":150000
+            //   },
             //   {
             //     "jsonName":"residualvalue",
             //     "name":"Residual Value",
@@ -89,13 +89,13 @@ async function test() {
             //     "description":"Furniture Category",
             //     "from":3
             //   },
-              {
-                "jsonName":"usefullife",
-                "name":"Useful Life",
-                "description":"Useful life between 1 and 5",
-                "from":1,
-                "to":100
-              },
+            //   {
+            //     "jsonName":"usefullife",
+            //     "name":"Useful Life",
+            //     "description":"Useful life between 1 and 5",
+            //     "from":1,
+            //     "to":100
+            //   },
               {
                 "jsonName":"barcode",
                 "name":"Barcode",
@@ -119,12 +119,12 @@ async function test() {
             //     "from": "07-01-2024",
             //     "to": "07-24-2024"
             //   },
-              {
-                "jsonName":"depreciationtype",
-                "name":"Depreciation Type",
-                "description":"double depreciation type",
-                "from":"double"
-              },
+            //   {
+            //     "jsonName":"depreciationtype",
+            //     "name":"Depreciation Type",
+            //     "description":"double depreciation type",
+            //     "from":"double"
+            //   },
             //   {
             //     "jsonName":"responsible_user",
             //     "name":"Responsible User",
