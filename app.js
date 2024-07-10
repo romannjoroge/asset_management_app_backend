@@ -12,6 +12,9 @@ import bcrypt from 'bcrypt';
 import userTable from './built/Users/db_users.js';
 import JWT from 'jsonwebtoken';
 import expressWs from 'express-ws'
+
+// Cron Jobs
+import "./built/Reports/report-cron-jobs.js";
 var ExpressWs = expressWs(app);
 
 // Reading JSON data from forms and JS respectively
