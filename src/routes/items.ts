@@ -456,6 +456,27 @@ router.post('/testUpload', upload.single('file'), (req, res) => {
     }
 });
 
+interface AssetDetails {
+    barcode: string,
+    description: string,
+    condition: string,
+    serialnumber: string,
+    acquisitiondate: string,
+    category: string
+}
+
+router.get('/detailsFromBarcode', async(req, res) => {
+    try {
+        let barcode = req.query.barcode;
+        const query = "SELECT barcode, description, condition, serialnumber, TO_CHAR(acquisitiondate, 'YYYY-MM-DD') AS acquisitiondate, c.name as category FROM Asset a INNER JOIN Category c ON c.id = a.categoryid WHERE barcode = $1 AND a.deleted = false";
+        let results = await getResultsFromDatabase<AssetDetails>(query, [barcode]);
+        return res.json(results);
+    } catch(err) {
+        let {errorMessage, errorCode} = handleError(err);
+        return res.status(errorCode).json({message: errorMessage});
+    }
+})
+
 router.route("*", (req, res) => {
     res.status(404).json({message: "Route not found"});
 });
