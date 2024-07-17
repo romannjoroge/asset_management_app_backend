@@ -130,12 +130,13 @@ router.post('/storeGen', (req, res) => __awaiter(void 0, void 0, void 0, functio
 // Get stored generated reports
 router.get('/storedReports', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let query = "SELECT g.name, u.username, report FROM GenerateReports g INNER JOIN User2 u ON u.id = g.creator_id WHERE g.deleted = false;";
+        let query = "SELECT g.id, g.name, u.username, report FROM GenerateReports g INNER JOIN User2 u ON u.id = g.creator_id WHERE g.deleted = false;";
         let dbResutls = yield getResultsFromDatabase(query, []);
         let resultsToReturn = [];
         dbResutls.forEach((res) => {
             var _a, _b;
             resultsToReturn.push({
+                id: res.id,
                 name: res.name,
                 creator: res.username,
                 fields: (_a = res.report['fields']) !== null && _a !== void 0 ? _a : [],

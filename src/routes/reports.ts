@@ -142,6 +142,7 @@ router.post('/storeGen', async (req, res) => {
 });
 
 interface StoredReports {
+    id: number,
     name: string,
     frequency: {
         minutes: string,
@@ -163,12 +164,13 @@ interface StoredReports {
 // Get stored generated reports
 router.get('/storedReports', async (req, res) => {
     try {
-        let query = "SELECT g.name, u.username, report FROM GenerateReports g INNER JOIN User2 u ON u.id = g.creator_id WHERE g.deleted = false;";
-        let dbResutls = await getResultsFromDatabase<{name: string, username: string, report: Record<string, any>}>(query, []);
+        let query = "SELECT g.id, g.name, u.username, report FROM GenerateReports g INNER JOIN User2 u ON u.id = g.creator_id WHERE g.deleted = false;";
+        let dbResutls = await getResultsFromDatabase<{id: number, name: string, username: string, report: Record<string, any>}>(query, []);
         
         let resultsToReturn: StoredReports[] = [];
         dbResutls.forEach((res) => {
             resultsToReturn.push({
+                id: res.id,
                 name: res.name,
                 creator: res.username,
                 fields: res.report['fields'] ?? [],
