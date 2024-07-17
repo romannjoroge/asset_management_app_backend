@@ -33,11 +33,12 @@ import depreciateAssetPerCategory from '../Reports/depreciation_per_category.js'
 import { getAdditionalAssetsInInventory, getAssetsMissingInInventory, getAssetsPresentInInventory } from '../Reports/inventory.js';
 import schedule from 'node-schedule';
 import generateDepreciatedAssetsInMonth from '../Mail/generateDepreciatedAssetsMail.js';
-import { storeGenerateReportStatement } from '../Reports/generateReport.js';
+import { generateSelectStatementFromGenerateReportStruct, storeGenerateReportStatement } from '../Reports/generateReport.js';
 import handleError from '../utility/handleError.js';
 import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 import createMailSubscription from '../Mail/createMailSubscription.js';
 import { getGeneratedReports } from '../Reports/get_generated_reports.js';
+import { convertStoredReportToGenerateStruct } from '../Reports/convert-report-struct-to-generate.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -84,6 +85,30 @@ router.get('/test', async (req, res) => {
         return res.status(500).send("Shit Went Down!")
     }
 });
+
+router.get("/generatedReport/:id", async(req, res) => {
+    try {
+        let reports = await getResultsFromDatabase<{report: Record<string, any>}>(
+            "SELECT report FROM generatereports WHERE id = $1",
+            [Number.parseInt(req.params.id)]
+        );
+
+        if (reports.length <= 0) {
+            throw new MyError(MyErrors2.REPORT_NOT_EXIST);
+        }
+
+        console.log(reports[0].report);
+        //@ts-ignore
+        let generateStruct = convertStoredReportToGenerateStruct(reports[0].report);
+                
+        let selectStatement = generateSelectStatementFromGenerateReportStruct(generateStruct);
+        let results = await pool.query(selectStatement.statement, selectStatement.args);
+        return res.json(results.rows);
+    } catch(err) {
+        let {errorMessage, errorCode} = handleError(err);
+        return res.status(errorCode).json({message: errorMessage});
+    }
+})
 
 router.get("/genertedReports", async (req, res) => {
     try {

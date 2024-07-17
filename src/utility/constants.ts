@@ -214,7 +214,8 @@ export enum MyErrors2 {
     "NOT_GET_REMARKS" = "Could Not Get Asset Remarks",
     "NOT_GET_GENERATED_REPORTS" = "Could Not Get Generated Reports",
     "FILE_NOT_EXISTS" = "File Does Not Exist",
-    "NOT_CREATE_EXCEL_FILE" = "Could Not Create Excel File"
+    "NOT_CREATE_EXCEL_FILE" = "Could Not Create Excel File",
+    "REPORT_NOT_EXIST" = "Report Does Not Exist"
 }
 
 export enum Success2 {

@@ -20,6 +20,7 @@ import checkifAuthorized from '../../middleware/checkifAuthorized.js';
 import utility from '../utility/utility.js';
 import locationTable from '../Tracking/db_location.js';
 import { getTaggedAssets } from '../Reports/tagged_assets.js';
+import MyError from '../utility/myError.js';
 import { createDeprecaitonScheduleEntries } from '../Allocation/Asset/depreciations.js';
 import { Log } from '../Log/log.js';
 import getAuditTrail from '../Reports/audit_trail.js';
@@ -39,10 +40,11 @@ import depreciateAssetPerCategory from '../Reports/depreciation_per_category.js'
 import { getAdditionalAssetsInInventory, getAssetsMissingInInventory, getAssetsPresentInInventory } from '../Reports/inventory.js';
 import schedule from 'node-schedule';
 import generateDepreciatedAssetsInMonth from '../Mail/generateDepreciatedAssetsMail.js';
-import { storeGenerateReportStatement } from '../Reports/generateReport.js';
+import { generateSelectStatementFromGenerateReportStruct, storeGenerateReportStatement } from '../Reports/generateReport.js';
 import handleError from '../utility/handleError.js';
 import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 import { getGeneratedReports } from '../Reports/get_generated_reports.js';
+import { convertStoredReportToGenerateStruct } from '../Reports/convert-report-struct-to-generate.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 var rule = new schedule.RecurrenceRule();
@@ -79,6 +81,24 @@ router.get('/test', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     catch (err) {
         console.log(err);
         return res.status(500).send("Shit Went Down!");
+    }
+}));
+router.get("/generatedReport/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let reports = yield getResultsFromDatabase("SELECT report FROM generatereports WHERE id = $1", [Number.parseInt(req.params.id)]);
+        if (reports.length <= 0) {
+            throw new MyError(MyErrors2.REPORT_NOT_EXIST);
+        }
+        console.log(reports[0].report);
+        //@ts-ignore
+        let generateStruct = convertStoredReportToGenerateStruct(reports[0].report);
+        let selectStatement = generateSelectStatementFromGenerateReportStruct(generateStruct);
+        let results = yield pool.query(selectStatement.statement, selectStatement.args);
+        return res.json(results.rows);
+    }
+    catch (err) {
+        let { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
     }
 }));
 router.get("/genertedReports", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
