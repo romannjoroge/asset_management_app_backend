@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
@@ -6,6 +15,20 @@ import { Errors, Logs, MyErrors2, Succes } from '../utility/constants.js';
 import categoryTable from '../Allocation/Category/db_category2.js';
 import updateCategory from '../Allocation/Category/updateCategory.js';
 import { Log } from '../Log/log.js';
+import handleError from '../utility/handleError.js';
+import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
+// Get subcategories
+router.get("/subcategory/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let id = Number.parseInt(req.params.id);
+        let subCategories = yield getResultsFromDatabase("SELECT id, name FROM Category WHERE parentcategoryid = $1", [id]);
+        return res.json(subCategories);
+    }
+    catch (err) {
+        let { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    }
+}));
 // View a specific category
 router.get('/view/:name', (req, res) => {
     let name = req.params.name;

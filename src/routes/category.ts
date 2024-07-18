@@ -8,6 +8,23 @@ import updateCategory from '../Allocation/Category/updateCategory.js';
 import { UpdateCategoryJSON } from '../Allocation/Category/updateCategory.js';
 import { Log } from '../Log/log.js';
 import MyError from '../utility/myError.js';
+import handleError from '../utility/handleError.js';
+import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
+
+// Get subcategories
+router.get("/subcategory/:id", async(req, res) => {
+    try {
+        let id = Number.parseInt(req.params.id);
+        let subCategories = await getResultsFromDatabase<{id: number, name: string}>(
+            "SELECT id, name FROM Category WHERE parentcategoryid = $1",
+            [id]
+        );
+        return res.json(subCategories);
+    } catch(err) {
+        let {errorMessage, errorCode} = handleError(err);
+        return res.status(errorCode).json({message: errorMessage});
+    }
+})
 
 // View a specific category
 router.get('/view/:name', (req, res) => {
