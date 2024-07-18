@@ -24,10 +24,46 @@ import { disposeAsset } from '../Allocation/Asset/disposeAsset.js';
 import { createAssetRemark, getAssetRemarks } from '../Allocation/Asset/remarks.js';
 import { storeAttachmentDetails } from '../Allocation/Asset/storeAttachmentDetails.js';
 import path from "path";
+import fs from "fs";
 
 const upload = multer({dest: './attachments'});
 
+interface AssetAttachment {
+    filetype: string,
+    storagelocation: string,
+    originalfilename: string
+}
 // Add attachments to asset
+router.get('/attachments/:id', async(req, res) => {
+    try {
+        let id = Number.parseInt(req.params.id);
+
+        let assetExists = await Asset._doesAssetIDExist(id);
+        if (assetExists === false) {
+            throw new MyError(MyErrors2.ASSET_NOT_EXIST);
+        }
+
+        let results = await getResultsFromDatabase<AssetAttachment>(
+            "SELECT storagelocation, originalfilename, filetype FROM AssetAttachments WHERE assetid = $1 AND deleted = false",
+            [id]
+        );
+
+        let resultsToSend = results.map((e) => {
+            let buffer = fs.readFileSync(e.storagelocation);
+            return {
+                file: buffer,
+                filename: e.originalfilename,
+                filetype: e.filetype
+            }
+        })
+        return res.json(resultsToSend);
+    } catch(err) {
+        console.log(err, "Error Getting file attachments");
+        let {errorMessage, errorCode} = handleError(err);
+        return res.status(errorCode).json({message: errorMessage})
+    }
+})
+
 router.post('/attachments', upload.array('attachments', 12), (req, res) => {
     // Assume that by this point the files have been stored on machine
     // Store details of the stored files in the DB
