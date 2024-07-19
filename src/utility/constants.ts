@@ -215,7 +215,9 @@ export enum MyErrors2 {
     "NOT_GET_GENERATED_REPORTS" = "Error 86: Could Not Get Generated Reports",
     "FILE_NOT_EXISTS" = "Error 87: File Does Not Exist",
     "NOT_CREATE_EXCEL_FILE" = "Error 88: Could Not Create Excel File",
-    "REPORT_NOT_EXIST" = "Error 89: Report Does Not Exist"
+    "REPORT_NOT_EXIST" = "Error 89: Report Does Not Exist",
+    "NOT_CREATE_USER" = "Error 90: Could Not Create User",
+    "USER_ALREADY_EXISTS" = "Error 91: User Already Exists"
 }
 
 export enum Success2 {
@@ -233,7 +235,8 @@ export enum Success2 {
     "SET_TIMEOUT" = "Timeout Updated Successfully",
     "CREATED_REMARK" = "Created Asset Remark",
     "FILES_UPLOADED" = "Files Have Been Attached Succesfuly",
-    "CUSTOM_REPORT" = "Custom Report Created Succesfuly"
+    "CUSTOM_REPORT" = "Custom Report Created Succesfuly",
+    "BULK_CREATE_USER" = "Created Users Successfully"
 }
 
 export const Succes = {

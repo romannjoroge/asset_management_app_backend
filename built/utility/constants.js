@@ -216,6 +216,8 @@ export var MyErrors2;
     MyErrors2["FILE_NOT_EXISTS"] = "Error 87: File Does Not Exist";
     MyErrors2["NOT_CREATE_EXCEL_FILE"] = "Error 88: Could Not Create Excel File";
     MyErrors2["REPORT_NOT_EXIST"] = "Error 89: Report Does Not Exist";
+    MyErrors2["NOT_CREATE_USER"] = "Error 90: Could Not Create User";
+    MyErrors2["USER_ALREADY_EXISTS"] = "Error 91: User Already Exists";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {
@@ -234,6 +236,7 @@ export var Success2;
     Success2["CREATED_REMARK"] = "Created Asset Remark";
     Success2["FILES_UPLOADED"] = "Files Have Been Attached Succesfuly";
     Success2["CUSTOM_REPORT"] = "Custom Report Created Succesfuly";
+    Success2["BULK_CREATE_USER"] = "Created Users Successfully";
 })(Success2 || (Success2 = {}));
 export const Succes = {
     '1': 'Asset Created Successfuly',

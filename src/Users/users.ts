@@ -5,6 +5,7 @@ import pool from '../../db2.js';
 import userTable from './db_users.js'
 import MyError from '../utility/myError.js';
 import { Errors, MyErrors2 } from '../utility/constants.js';
+import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 
 interface UserFromDB {
     fname: string;
@@ -80,6 +81,19 @@ class User {
                 res(false);
             });
         });
+    }
+
+    static async getCompanyName(userID: number): Promise<string> {
+        try {
+            let results = await getResultsFromDatabase<{companyname: string}>(
+                "SELECT companyname FROM User2 WHERE id = $1",
+                [userID]
+            )
+            return results[0].companyname;
+        } catch(err) {
+            console.log(err);
+            throw new MyError(MyErrors2.USER_NOT_EXIST);
+        }
     }
 
     static checkIfUserIDExists(userID: number): Promise<boolean> {

@@ -528,18 +528,6 @@ SET datestyle TO MDY;
 ALTER USER asset_management WITH PASSWORD 'the password';
 
 -- Commands to do on server
-CREATE TABLE IF NOT EXISTS DisposedAssetDetails (
-  id SERIAL,
-  assetID INTEGER NOT NULL, 
-  userID INTEGER NOT NULL,
-  date timestamp NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (id),
-  CONSTRAINT "FK_DisposedAssetDetails.userID" FOREIGN KEY (userID) REFERENCES User2(id),
-  CONSTRAINT "FK_DisposedAssetDetails.assetID" FOREIGN KEY (assetID) REFERENCES Asset(assetID)
-);
-
-ALTER TABLE disposedassetdetails ADD COLUMN disposalvalue double precision DEFAULT 0.0;
-ALTER TABLE disposedassetdetails ADD COLUMN deleted BOOLEAN DEFAULT false;
 
 
 

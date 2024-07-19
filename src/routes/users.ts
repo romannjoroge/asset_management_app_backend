@@ -13,6 +13,65 @@ import getEventsFromDatabase from '../Log/events.js';
 import generateDepreciatedAssetsInMonth from '../Mail/generateDepreciatedAssetsMail.js';
 import { Lama } from '../Lama/lama.js';
 import handleError from '../utility/handleError.js';
+import multer from 'multer';
+import { getDataFromExcel } from '../Excel/getDataFromExcelFile.js';
+import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
+import User from '../Users/users.js';
+const upload = multer({dest: './attachments'});
+
+router.post('/bulkAdd', upload.single("excel"), async(req, res) => {
+    try {
+        let file = req.file;
+        if(file) {
+            let data = getDataFromExcel(file.path);
+            let promises: Promise<void>[] = [];
+
+            //@ts-ignore
+            let company = await User.getCompanyName(req.id);
+
+            async function addUser(data: {name: string, email: string, password: string, username: string}) {
+                try {
+                    console.log(data);
+                    let hash = await bcrypt.hash(data.password, 10);
+                    let results = await getResultsFromDatabase<{name: string}>(
+                        userTable.doesUserExist,
+                        [data.email, data.username]
+                    );
+
+                    if (results.length > 0) {
+                        throw new MyError(MyErrors2.USER_ALREADY_EXISTS);
+                    }
+
+                    await pool.query(userTable.addUser, [data.name, data.email, hash, data.username, company]);
+                    let idResults = await getResultsFromDatabase<{id: number}>(
+                        userTable.getLatestUserID,
+                        [data.username]
+                    )
+                    let id = idResults[0].id;
+
+                    //@ts-ignore
+                    await Log.createLog(req.ip, req.id , Logs.CREATE_USER)                    
+                } catch(err) {
+                    console.log(err);
+                    throw new MyError(MyErrors2.NOT_CREATE_USER);
+                }
+            }
+
+            for (let d of data) {
+                //@ts-ignore
+                promises.push(addUser(d));
+            }
+
+            await Promise.all(promises);
+            return res.status(201).json({message: Success2.BULK_CREATE_USER});
+        } else {
+            res.status(500).json({message: MyErrors2.NOT_PROCESS_EXCEL_FILE});
+        }
+    } catch(err) {
+        let {errorMessage, errorCode} = handleError(err);
+        return res.status(errorCode).json({message: errorMessage});
+    }
+})
 
 router.get('/getUsers', (req, res) => {
     pool.query(userTable.getUsers, []).then(data => {
@@ -93,7 +152,7 @@ interface UserEmailFetchResult {
     rows: UserEmail[]
 }
 
-router.get('/user/:id', (req, res) => {
+router.get('/user/:id', upload.array('attachments', 12), (req, res) => {
     // Get id of user
     const id = req.params.id;
 

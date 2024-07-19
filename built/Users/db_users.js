@@ -5,7 +5,7 @@ const getUsers = "SELECT username FROM User2 WHERE deleted = false";
 const isUserAuthorized = "SELECT * FROM UserRole WHERE roleID=(SELECT id FROM Role WHERE name=$1 LIMIT 1) AND userid=$2";
 const nameEmail = "SELECT username, email, name, id FROM User2 WHERE deleted = false";
 const userRoles = "SELECT r.name FROM UserRole u JOIN Role r ON r.id = u.roleid WHERE u.userid = $1";
-const doesUserExist = "SELECT * FROM User2 WHERE email = $1 OR username = $2 AND deleted = false";
+const doesUserExist = "SELECT name FROM User2 WHERE email = $1 OR username = $2 AND deleted = false";
 const addUserRole = "INSERT INTO UserRole (userid, roleid) VALUES ($1, (SELECT id FROM Role WHERE name = $2 ORDER BY id DESC LIMIT 1));";
 const doesUsernameExist = "SELECT * FROM User2 WHERE username=$1 AND deleted = false";
 const getCompany = "SELECT companyName FROM User2 WHERE username=$1 AND deleted = false";
