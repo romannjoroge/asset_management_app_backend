@@ -537,12 +537,9 @@ CREATE TABLE IF NOT EXISTS DisposedAssetDetails (
   CONSTRAINT "FK_DisposedAssetDetails.userID" FOREIGN KEY (userID) REFERENCES User2(id),
   CONSTRAINT "FK_DisposedAssetDetails.assetID" FOREIGN KEY (assetID) REFERENCES Asset(assetID)
 );
-ALTER TABLE Asset ADD COLUMN make TEXT;
-ALTER TABLE Asset ADD COLUMN modelnumber TEXT
 
--- ALTER TABLE generatereports ADD COLUMN mailSubscriptionID INT;
--- ALTER TABLE generatereports ADD CONSTRAINT "fk_generatereports.mailsubscriptionid" FOREIGN KEY (mailsubscriptionid) REFERENCES mailsubscriptions(id);
-ALTER TABLE Asset ADD COLUMN oldBarcode TEXT;
+ALTER TABLE disposedassetdetails ADD COLUMN disposalvalue double precision DEFAULT 0.0;
+ALTER TABLE disposedassetdetails ADD COLUMN deleted BOOLEAN DEFAULT false;
 
 
 

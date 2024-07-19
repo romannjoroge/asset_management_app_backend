@@ -137,17 +137,21 @@ router.post("/valuation", (req, res) => {
         return res.status(errorCode).json({ message: errorMessage });
     }
 });
-router.post("/dispose", (req, res) => {
-    const { asset_id, user_id } = req.body;
-    const assetID = Number.parseInt(asset_id);
-    const userID = Number.parseInt(user_id);
-    disposeAsset(assetID, userID).then(_ => {
+router.post("/dispose", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { asset_id, user_id, date, disposal } = req.body;
+    try {
+        const disposalValue = Number.parseFloat(disposal);
+        const assetID = Number.parseInt(asset_id);
+        const userID = Number.parseInt(user_id);
+        const disposalDate = utility.checkIfValidDate(date, "Invalid Disposal Date");
+        yield disposeAsset(assetID, userID, disposalValue, disposalDate);
         return res.status(201).json({ message: Success2.DISPOSE_ASSET });
-    }).catch((err) => {
-        const { errorMessage, errorCode } = handleError(err);
+    }
+    catch (err) {
+        let { errorMessage, errorCode } = handleError(err);
         return res.status(errorCode).json({ message: errorMessage });
-    });
-});
+    }
+}));
 router.get('/insurance/:barcode', (req, res) => {
     const barcode = req.params.barcode;
     getInsurances(barcode).then(data => {
