@@ -33,6 +33,7 @@ interface GetNextAssetIDResult {
 
 class Asset {
     barcode: string;
+    oldBarcode?: string;
     make: string;
     modelnumber: string;
     assetLifeSpan: number;
@@ -52,7 +53,7 @@ class Asset {
 
     constructor(assetLifeSpan: number, acquisitionDate: string | Date, locationID: number, condition: string, custodian_id: number,
         acquisitionCost: number, categoryName: string, attachments: string[], serialNumber: string, description: string, 
-        make: string, modelnumber: string, residualValue?: number, depreciaitionType?: DepreciationTypes,  depreciationPercent?: number ) {
+        make: string, modelnumber: string, residualValue?: number, depreciaitionType?: DepreciationTypes,  depreciationPercent?: number, oldBarcode?: string ) {
 
         utility.checkIfNumberisPositive(assetLifeSpan, "Invalid asset life span");
         this.assetLifeSpan = assetLifeSpan;
@@ -73,6 +74,7 @@ class Asset {
 
         utility.checkIfString(description, "Invalid Description");
         this.description = description;
+        this.oldBarcode = oldBarcode;
 
         if (depreciaitionType) {
             if (Object.values(DepreciationTypes).includes(depreciaitionType) == true) {
@@ -221,10 +223,9 @@ class Asset {
 
     async _storeAssetInAssetRegister(): Promise<void> {
         return new Promise((res, rej) => {
-            console.log("Residual Value is", this.residualValue);
             pool.query(assetTable.addAssetToAssetRegister, [this.barcode, this.description,
                 this.serialNumber, this.acquisitionDate, this.locationID, this.residualValue, this.condition, this.custodian_id, this.acquisitionCost, this.categoryID,
-                this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent, this.make, this.modelnumber]).catch(err => {
+                this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent, this.make, this.modelnumber, this.oldBarcode]).catch(err => {
                     console.log(err);
                     return rej(new MyError(Errors[6]));
                 }).then(_ => {

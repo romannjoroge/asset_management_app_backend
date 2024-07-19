@@ -233,7 +233,8 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
         depreciationPercent,
         make,
         modelnumber,
-        attachments
+        attachments,
+        oldBarcode
     } = req.body;
 
     // Temporary attachements fix
@@ -250,7 +251,7 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
     }
 
     let asset = new Asset(usefulLife, acquisitionDate, locationID, condition, responsibleuserid, acquisitionCost, categoryName, 
-        attachments, serialNumber, description, make, modelnumber, residualValue, depreciationType, depreciationPercent );
+        attachments, serialNumber, description, make, modelnumber, residualValue, depreciationType, depreciationPercent, oldBarcode);
     asset.initialize().then(_ => {
         // Add log
         Log.createLog(req.ip, req.id, Logs.CREATE_ASSET).then((_: any) => {

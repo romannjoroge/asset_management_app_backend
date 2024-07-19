@@ -172,7 +172,7 @@ router.post("/insurance", (req, res) => {
     }
 });
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
-    let { locationID, description, categoryName, usefulLife, serialNumber, condition, responsibleuserid, acquisitionDate, acquisitionCost, residualValue, depreciationType, depreciationPercent, make, modelnumber, attachments } = req.body;
+    let { locationID, description, categoryName, usefulLife, serialNumber, condition, responsibleuserid, acquisitionDate, acquisitionCost, residualValue, depreciationType, depreciationPercent, make, modelnumber, attachments, oldBarcode } = req.body;
     // Temporary attachements fix
     attachments = [];
     // Convert values to right type
@@ -183,7 +183,7 @@ router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator
     if (depreciationPercent) {
         depreciationPercent = Number.parseFloat(depreciationPercent);
     }
-    let asset = new Asset(usefulLife, acquisitionDate, locationID, condition, responsibleuserid, acquisitionCost, categoryName, attachments, serialNumber, description, make, modelnumber, residualValue, depreciationType, depreciationPercent);
+    let asset = new Asset(usefulLife, acquisitionDate, locationID, condition, responsibleuserid, acquisitionCost, categoryName, attachments, serialNumber, description, make, modelnumber, residualValue, depreciationType, depreciationPercent, oldBarcode);
     asset.initialize().then(_ => {
         // Add log
         Log.createLog(req.ip, req.id, Logs.CREATE_ASSET).then((_) => {

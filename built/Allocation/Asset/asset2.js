@@ -28,7 +28,7 @@ export var DepreciationTypes;
     DepreciationTypes["WrittenDownValue"] = "Written Down Value";
 })(DepreciationTypes || (DepreciationTypes = {}));
 class Asset {
-    constructor(assetLifeSpan, acquisitionDate, locationID, condition, custodian_id, acquisitionCost, categoryName, attachments, serialNumber, description, make, modelnumber, residualValue, depreciaitionType, depreciationPercent) {
+    constructor(assetLifeSpan, acquisitionDate, locationID, condition, custodian_id, acquisitionCost, categoryName, attachments, serialNumber, description, make, modelnumber, residualValue, depreciaitionType, depreciationPercent, oldBarcode) {
         utility.checkIfNumberisPositive(assetLifeSpan, "Invalid asset life span");
         this.assetLifeSpan = assetLifeSpan;
         this.condition = condition;
@@ -42,6 +42,7 @@ class Asset {
         this.acquisitionCost = acquisitionCost;
         utility.checkIfString(description, "Invalid Description");
         this.description = description;
+        this.oldBarcode = oldBarcode;
         if (depreciaitionType) {
             if (Object.values(DepreciationTypes).includes(depreciaitionType) == true) {
                 this.depreciaitionType = depreciaitionType;
@@ -175,10 +176,9 @@ class Asset {
     _storeAssetInAssetRegister() {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((res, rej) => {
-                console.log("Residual Value is", this.residualValue);
                 pool.query(assetTable.addAssetToAssetRegister, [this.barcode, this.description,
                     this.serialNumber, this.acquisitionDate, this.locationID, this.residualValue, this.condition, this.custodian_id, this.acquisitionCost, this.categoryID,
-                    this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent, this.make, this.modelnumber]).catch(err => {
+                    this.assetLifeSpan, this.depreciaitionType, this.depreciationPercent, this.make, this.modelnumber, this.oldBarcode]).catch(err => {
                     console.log(err);
                     return rej(new MyError(Errors[6]));
                 }).then(_ => {
