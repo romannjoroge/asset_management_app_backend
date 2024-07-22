@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import express from 'express';
 const router = express.Router();
 import pool from '../../db2.js';
@@ -14,6 +23,8 @@ import { syncTags } from '../Tracking/tags.js';
 import { Log } from '../Log/log.js';
 import createLocation from '../Tracking/create_location.js';
 import handleError from '../utility/handleError.js';
+import multer from 'multer';
+const upload = multer({ dest: './attachments' });
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
     pool.query(locationTable.getLocations, []).then((data) => {
@@ -175,6 +186,15 @@ router.post('/reader', (req, res) => {
         }
     });
 });
+router.post('/bulkAdd', upload.single("excel"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return res.status(201).json({ message: Success2.CREATED_LOCATION });
+    }
+    catch (err) {
+        let { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    }
+}));
 // Route for creating locations or sites
 router.post('/create', (req, res) => {
     let { parentlocationid, name, companyName } = req.body;

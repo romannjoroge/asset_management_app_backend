@@ -97,6 +97,8 @@ router.post('/bulkAdd', upload.single("excel"), async(req, res) => {
 
                     let categ = new Category(data.name, parentCategoryID, data.depreciationtype, data.depreciationpercent);
                     await categ.initialize();
+
+                    // @ts-ignore
                     await Log.createLog(req.ip, req.id, Logs.CREATE_CATEGORY);
                 } catch(err) {
                     if(err instanceof MyError) {

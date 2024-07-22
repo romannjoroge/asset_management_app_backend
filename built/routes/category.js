@@ -88,6 +88,7 @@ router.post('/bulkAdd', upload.single("excel"), (req, res) => __awaiter(void 0, 
                         }
                         let categ = new Category(data.name, parentCategoryID, data.depreciationtype, data.depreciationpercent);
                         yield categ.initialize();
+                        // @ts-ignore
                         yield Log.createLog(req.ip, req.id, Logs.CREATE_CATEGORY);
                     }
                     catch (err) {
