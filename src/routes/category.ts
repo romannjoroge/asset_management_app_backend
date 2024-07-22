@@ -10,6 +10,8 @@ import { Log } from '../Log/log.js';
 import MyError from '../utility/myError.js';
 import handleError from '../utility/handleError.js';
 import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
+import multer from 'multer';
+const upload = multer({dest: './attachments'});
 
 // Get subcategories
 router.get("/subcategory/:id", async(req, res) => {
@@ -70,6 +72,15 @@ router.get('/get', (req, res) => {
         return res.json(fetchResult.rows)
     })
 })
+
+router.post('/bulkAdd', upload.single("excel"), async(req, res) => {
+    try {
+        return res.status(201).json({message: "Done"});
+    } catch(err) {
+        let {errorMessage, errorCode} = handleError(err);
+        return res.status(errorCode).json({message: errorMessage})
+    }
+});
 
 router.post('/add', (req, res) => {
     // Get Category details from request body

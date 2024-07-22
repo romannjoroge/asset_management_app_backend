@@ -17,6 +17,8 @@ import updateCategory from '../Allocation/Category/updateCategory.js';
 import { Log } from '../Log/log.js';
 import handleError from '../utility/handleError.js';
 import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
+import multer from 'multer';
+const upload = multer({ dest: './attachments' });
 // Get subcategories
 router.get("/subcategory/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -70,6 +72,15 @@ router.get('/get', (req, res) => {
         return res.json(fetchResult.rows);
     });
 });
+router.post('/bulkAdd', upload.single("excel"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return res.status(201).json({ message: "Done" });
+    }
+    catch (err) {
+        let { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    }
+}));
 router.post('/add', (req, res) => {
     // Get Category details from request body
     let { categoryName, parentCategoryID, depreciationType, depreciationPercentage } = req.body;
