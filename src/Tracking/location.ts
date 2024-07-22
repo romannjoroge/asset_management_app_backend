@@ -7,6 +7,7 @@ import locationTable from './db_location.js';
 import { Errors, MyErrors2 } from '../utility/constants.js';
 import reportsTable from '../Reports/db_reports.js';
 import { ResultFromDatabase } from '../utility/helper_types.js';
+import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 
 interface selectLocation {
     id: number;
@@ -241,10 +242,22 @@ class Location {
         });
     }
 
+    static async getLocationID(name: string): Promise<number | null> {
+        try {
+            const results = await getResultsFromDatabase<{id: number}>(
+                "SELECT id FROM Location WHERE name = $1 AND deleted = false",
+                [name]
+            )
+            return results[0]?.id ?? null;
+        } catch(err) {
+            throw new MyError(MyErrors2.NOT_FIND_LOCATION);
+        }
+    }
+
     static doesLocationExist(name: string, parentlocationid: number): Promise<boolean> {
         return new Promise((res, rej) => {
             if (parentlocationid === -1) {
-                let query = "SELECT name FROM Location WHERE name = $1 AND parentlocationid = null";
+                let query = "SELECT name FROM Location WHERE name = $1 AND parentlocationid IS NULL";
 
                 pool.query(query, [name]).then((result: ResultFromDatabase<{ name: string }>) => {
                     if (result.rowCount <= 0) {
@@ -253,6 +266,7 @@ class Location {
                         return res(true);
                     }
                 }).catch((err: any) => {
+                    console.log(err);
                     return rej(new MyError(MyErrors2.NOT_FIND_LOCATION))
                 })
 
@@ -266,6 +280,7 @@ class Location {
                         return res(true);
                     }
                 }).catch((err: any) => {
+                    console.log(err);
                     return rej(new MyError(MyErrors2.NOT_FIND_LOCATION))
                 })
             }

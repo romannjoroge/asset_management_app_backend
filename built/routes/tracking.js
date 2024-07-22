@@ -24,7 +24,10 @@ import { Log } from '../Log/log.js';
 import createLocation from '../Tracking/create_location.js';
 import handleError from '../utility/handleError.js';
 import multer from 'multer';
+import { getDataFromExcel } from '../Excel/getDataFromExcelFile.js';
+import Location from '../Tracking/location.js';
 const upload = multer({ dest: './attachments' });
+import User from '../Users/users.js';
 // Route to send all locations and their ids
 router.get('/getLocations', (req, res) => {
     pool.query(locationTable.getLocations, []).then((data) => {
@@ -188,9 +191,50 @@ router.post('/reader', (req, res) => {
 });
 router.post('/bulkAdd', upload.single("excel"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return res.status(201).json({ message: Success2.CREATED_LOCATION });
+        let file = req.file;
+        //@ts-ignore
+        let company = yield User.getCompanyName(req.id);
+        if (file) {
+            let data = getDataFromExcel(file.path);
+            console.log(data);
+            function addLocation(data) {
+                var _a;
+                return __awaiter(this, void 0, void 0, function* () {
+                    try {
+                        let parentlocationid;
+                        if (data.parentlocation) {
+                            parentlocationid = (_a = yield Location.getLocationID(data.parentlocation)) !== null && _a !== void 0 ? _a : undefined;
+                            if (!parentlocationid) {
+                                throw new MyError(MyErrors2.NOT_GET_PARENT_LOCATION);
+                            }
+                        }
+                        yield createLocation(data.name, company, parentlocationid);
+                    }
+                    catch (err) {
+                        console.log(err);
+                        if (err instanceof MyError) {
+                            throw err;
+                        }
+                        else {
+                            throw new MyError(MyErrors2.NOT_CREATE_LOCATION);
+                        }
+                    }
+                });
+            }
+            let promises = [];
+            for (let d of data) {
+                //@ts-ignore
+                promises.push(addLocation(d));
+            }
+            yield Promise.all(promises);
+            return res.status(201).json({ message: Success2.CREATED_LOCATION });
+        }
+        else {
+            return res.status(500).json({ message: MyErrors2.NOT_PROCESS_EXCEL_FILE });
+        }
     }
     catch (err) {
+        console.log(err);
         let { errorMessage, errorCode } = handleError(err);
         return res.status(errorCode).json({ message: errorMessage });
     }
@@ -200,92 +244,13 @@ router.post('/create', (req, res) => {
     let { parentlocationid, name, companyName } = req.body;
     parentlocationid = Number.parseInt(parentlocationid);
     // Create location
-    createLocation(name, parentlocationid, companyName).then(_ => {
+    createLocation(name, companyName, parentlocationid).then(_ => {
         return res.status(201).json({ message: Success2.CREATED_LOCATION });
     }).catch((err) => {
         const { errorMessage, errorCode } = handleError(err);
         return res.status(errorCode).json({ message: errorMessage });
     });
 });
-// router.post('/create/:item', (req, res) => {
-//     const item = req.params.item;
-//     let itemExistParams;
-//     let itemExistQuery;
-//     let ExistErrorMessage;
-//     let createItemQuery;
-//     let createItemParams;
-//     let successMessage;
-//     let eventid: number;
-//     /**
-//      * @description This handles creating a location.
-//      * @param name is the name of the location to create. It must be unique in its site / parent location (to be decided if useful)
-//      * @param companyName the name of the organization
-//      * @param site name of the parent location. This is optional
-//      */
-//     if(item == 'location') {
-//         let {
-//             name,
-//             site, 
-//             companyName
-//         } = req.body   
-//         eventid = Logs.CREATE_LOCATION;
-//         // Check if site is there
-//         if (!site) {
-//             itemExistParams = [name, companyName];
-//             itemExistQuery = locationTable.doesSiteExist;
-//             ExistErrorMessage = MyErrors2.EXISTS_LOCATION;
-//             createItemQuery = locationTable.createLocationWithNoParent,
-//             createItemParams = [name, companyName];
-//             successMessage = Success2.CREATED_LOCATION;
-//         } else {
-//             itemExistParams = [name, site, companyName]
-//             itemExistQuery = locationTable.doesLocationExist
-//             ExistErrorMessage = MyErrors2.EXISTS_LOCATION;
-//             createItemQuery = locationTable.createLocation
-//             createItemParams = [name, companyName, site, companyName]
-//             successMessage = Success2.CREATED_LOCATION;
-//         }
-//     } else if(item == 'site') {
-//         let {
-//             name,
-//             county,
-//             city,
-//             address,
-//             companyName
-//         } = req.body
-//         itemExistParams = [name, companyName]
-//         itemExistQuery = locationTable.doesSiteExist
-//         ExistErrorMessage = Errors[33]
-//         createItemQuery = locationTable.createSite
-//         createItemParams = [name, county, city, address, companyName]
-//         successMessage = Succes[6]
-//     } 
-//     else {
-//         return res.status(400).json({message: Errors[0]})
-//     }
-//     // Confirm if item exists
-//     pool.query(itemExistQuery, itemExistParams).then(fetchResult => {
-//         // If item exists return error
-//         if (fetchResult.rowCount > 0) {
-//             return res.status(400).json({message: ExistErrorMessage})
-//         }
-//         // Create item
-//         pool.query(createItemQuery, createItemParams).then(_ => {
-//             // Add log
-//             Log.createLog(req.ip, req.id, eventid).then((_: any) => {
-//                 return res.json({message: successMessage})
-//             }).catch((err: MyError) => {
-//                 return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
-//             })
-//         }).catch(err => {
-//             console.log(err);
-//             return res.status(400).json({message: MyErrors2.NOT_CREATE_LOCATION})
-//         })
-//     }).catch(err => {
-//         console.log(err)
-//         return res.status(500).json({message: Errors[9]})
-//     })
-// });
 // Route for creating an antenna
 router.post('/createAntennae', (req, res) => {
     // Get Data From Request

@@ -14,6 +14,7 @@ import MyError from '../utility/myError.js';
 import locationTable from './db_location.js';
 import { Errors, MyErrors2 } from '../utility/constants.js';
 import reportsTable from '../Reports/db_reports.js';
+import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 class Location {
     constructor() { }
     static verifyLocationID(id) {
@@ -214,10 +215,22 @@ class Location {
             });
         });
     }
+    static getLocationID(name) {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const results = yield getResultsFromDatabase("SELECT id FROM Location WHERE name = $1 AND deleted = false", [name]);
+                return (_b = (_a = results[0]) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : null;
+            }
+            catch (err) {
+                throw new MyError(MyErrors2.NOT_FIND_LOCATION);
+            }
+        });
+    }
     static doesLocationExist(name, parentlocationid) {
         return new Promise((res, rej) => {
             if (parentlocationid === -1) {
-                let query = "SELECT name FROM Location WHERE name = $1 AND parentlocationid = null";
+                let query = "SELECT name FROM Location WHERE name = $1 AND parentlocationid IS NULL";
                 pool.query(query, [name]).then((result) => {
                     if (result.rowCount <= 0) {
                         return res(false);
@@ -226,6 +239,7 @@ class Location {
                         return res(true);
                     }
                 }).catch((err) => {
+                    console.log(err);
                     return rej(new MyError(MyErrors2.NOT_FIND_LOCATION));
                 });
             }
@@ -239,6 +253,7 @@ class Location {
                         return res(true);
                     }
                 }).catch((err) => {
+                    console.log(err);
                     return rej(new MyError(MyErrors2.NOT_FIND_LOCATION));
                 });
             }
