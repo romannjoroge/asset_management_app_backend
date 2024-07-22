@@ -191,13 +191,14 @@ router.post('/bulkAdd', upload.single("excel"), (req, res) => __awaiter(void 0, 
         if (file) {
             let data = getDataFromExcel(file.path);
             function addAsset(data) {
+                var _a;
                 return __awaiter(this, void 0, void 0, function* () {
                     try {
                         let responsibleuserid = yield User.getUserID(data.responsibleuser);
                         let acquisitionDate = utility.checkIfValidDate(data.acquisitiondate, MyErrors2.INVALID_DATE);
                         let locationID = yield Location.getLocationID(data.location);
                         if (locationID) {
-                            let asset = new Asset(data.usefullife, acquisitionDate, locationID, data.condition, responsibleuserid, data.acquisitioncost, data.category, [], data.serialnumber, data.description, data === null || data === void 0 ? void 0 : data.make, data === null || data === void 0 ? void 0 : data.model, data === null || data === void 0 ? void 0 : data.residualvalue, undefined, undefined, data === null || data === void 0 ? void 0 : data.oldbarcode);
+                            let asset = new Asset(data.usefullife, acquisitionDate, locationID, data.condition, responsibleuserid, data.acquisitioncost, data.category, [], data.serialnumber, data.description, data === null || data === void 0 ? void 0 : data.make, data === null || data === void 0 ? void 0 : data.model, (_a = data === null || data === void 0 ? void 0 : data.residualvalue) !== null && _a !== void 0 ? _a : 0, undefined, undefined, data === null || data === void 0 ? void 0 : data.oldbarcode);
                             yield asset.initialize();
                             //@ts-ignore
                             yield Log.createLog(req.ip, req.id, Logs.CREATE_ASSET);

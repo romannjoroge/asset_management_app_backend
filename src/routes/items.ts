@@ -255,7 +255,7 @@ router.post('/bulkAdd', upload.single("excel"), async(req, res) => {
                     
                     if(locationID) {
                         let asset = new Asset(data.usefullife, acquisitionDate, locationID, data.condition, responsibleuserid, data.acquisitioncost, data.category, 
-                            [], data.serialnumber, data.description, data?.make, data?.model, data?.residualvalue, undefined, undefined, data?.oldbarcode);
+                            [], data.serialnumber, data.description, data?.make, data?.model, data?.residualvalue ?? 0, undefined, undefined, data?.oldbarcode);
                         await asset.initialize();
 
                         //@ts-ignore
