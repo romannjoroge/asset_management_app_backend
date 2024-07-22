@@ -34,8 +34,8 @@ interface GetNextAssetIDResult {
 class Asset {
     barcode: string;
     oldBarcode?: string;
-    make: string;
-    modelnumber: string;
+    make?: string;
+    modelnumber?: string;
     assetLifeSpan: number;
     acquisitionDate: Date;
     locationID: number;
@@ -53,7 +53,7 @@ class Asset {
 
     constructor(assetLifeSpan: number, acquisitionDate: string | Date, locationID: number, condition: string, custodian_id: number,
         acquisitionCost: number, categoryName: string, attachments: string[], serialNumber: string, description: string, 
-        make: string, modelnumber: string, residualValue?: number, depreciaitionType?: DepreciationTypes,  depreciationPercent?: number, oldBarcode?: string ) {
+        make?: string, modelnumber?: string, residualValue?: number, depreciaitionType?: DepreciationTypes,  depreciationPercent?: number, oldBarcode?: string ) {
 
         utility.checkIfNumberisPositive(assetLifeSpan, "Invalid asset life span");
         this.assetLifeSpan = assetLifeSpan;
@@ -126,12 +126,12 @@ class Asset {
                 // Check that location exists
                 Location.verifyLocationID(this.locationID).then(doesExist => {
                     if (!doesExist) {
-                        rej(new MyError(Errors[3]));
+                        rej(new MyError(MyErrors2.LOCATION_NOT_EXIST));
                     }
                     // Check if user exists
                     User.checkIfUserIDExists(this.custodian_id).then(doesUserExist => {
                         if (!doesUserExist) {
-                            rej(new MyError(Errors[30]));
+                            rej(new MyError(MyErrors2.USER_NOT_EXIST));
                         }
                         
                         // Get ID of next asset
@@ -164,16 +164,20 @@ class Asset {
                                 return rej(new MyError(MyErrors2.NOT_GENERATE_BARCODE));
                             })
                         }).catch((err: MyError) => {
+                            console.log(err);
                             return rej(new MyError(MyErrors2.NOT_GET_NEXT_ASSET_ID));
                         })
                         
                     }).catch(err => {
+                        console.log(err);
                         return rej(new MyError(MyErrors2.USER_NOT_EXIST));
                     });
                 }).catch(err => {
+                    console.log(err);
                     return rej(new MyError(MyErrors2.LOCATION_NOT_EXIST));
                 });
             }).catch(err => {
+                console.log(err);
                 return rej(new MyError(MyErrors2.CATEGORY_NOT_EXIST));
             });
         })

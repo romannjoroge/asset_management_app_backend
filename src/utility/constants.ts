@@ -218,7 +218,9 @@ export enum MyErrors2 {
     "REPORT_NOT_EXIST" = "Error 89: Report Does Not Exist",
     "NOT_CREATE_USER" = "Error 90: Could Not Create User",
     "USER_ALREADY_EXISTS" = "Error 91: User Already Exists",
-    "NOT_CREATE_CATEGORY" = "Error 92: Could Not Create Category"
+    "NOT_CREATE_CATEGORY" = "Error 92: Could Not Create Category",
+    "NOT_CREATE_ASSET" = "Error 93: Could Not Create Asset",
+    "INVALID_DATE" = "Error 94: Invalid Date"
 }
 
 export enum Success2 {

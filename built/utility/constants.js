@@ -219,6 +219,8 @@ export var MyErrors2;
     MyErrors2["NOT_CREATE_USER"] = "Error 90: Could Not Create User";
     MyErrors2["USER_ALREADY_EXISTS"] = "Error 91: User Already Exists";
     MyErrors2["NOT_CREATE_CATEGORY"] = "Error 92: Could Not Create Category";
+    MyErrors2["NOT_CREATE_ASSET"] = "Error 93: Could Not Create Asset";
+    MyErrors2["INVALID_DATE"] = "Error 94: Invalid Date";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

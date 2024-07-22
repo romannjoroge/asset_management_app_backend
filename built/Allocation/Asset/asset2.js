@@ -86,12 +86,12 @@ class Asset {
                 // Check that location exists
                 Location.verifyLocationID(this.locationID).then(doesExist => {
                     if (!doesExist) {
-                        rej(new MyError(Errors[3]));
+                        rej(new MyError(MyErrors2.LOCATION_NOT_EXIST));
                     }
                     // Check if user exists
                     User.checkIfUserIDExists(this.custodian_id).then(doesUserExist => {
                         if (!doesUserExist) {
-                            rej(new MyError(Errors[30]));
+                            rej(new MyError(MyErrors2.USER_NOT_EXIST));
                         }
                         // Get ID of next asset
                         Asset._getIDOfNextAsset().then(nextAssetID => {
@@ -118,15 +118,19 @@ class Asset {
                                 return rej(new MyError(MyErrors2.NOT_GENERATE_BARCODE));
                             });
                         }).catch((err) => {
+                            console.log(err);
                             return rej(new MyError(MyErrors2.NOT_GET_NEXT_ASSET_ID));
                         });
                     }).catch(err => {
+                        console.log(err);
                         return rej(new MyError(MyErrors2.USER_NOT_EXIST));
                     });
                 }).catch(err => {
+                    console.log(err);
                     return rej(new MyError(MyErrors2.LOCATION_NOT_EXIST));
                 });
             }).catch(err => {
+                console.log(err);
                 return rej(new MyError(MyErrors2.CATEGORY_NOT_EXIST));
             });
         });

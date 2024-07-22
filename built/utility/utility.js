@@ -51,6 +51,9 @@ function checkIfString(x, errorMessage) {
 }
 function checkIfValidDate(x, errorMessage) {
     let splitDate;
+    if (x instanceof Date) {
+        return x;
+    }
     if (x.includes('.')) {
         splitDate = x.split('.');
     }

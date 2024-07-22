@@ -11,7 +11,7 @@ import MyError from '../utility/myError.js';
 import { filterAssetByDetails } from '../Allocation/Asset/filter.js';
 import multer from 'multer';
 import { Log } from '../Log/log.js';
-import { UserRoles } from '../Users/users.js';
+import User, { UserRoles } from '../Users/users.js';
 import createAssetStatus from '../Allocation/Asset/addAssetStatus.js';
 import handleError from '../utility/handleError.js';
 import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
@@ -25,6 +25,8 @@ import { createAssetRemark, getAssetRemarks } from '../Allocation/Asset/remarks.
 import { storeAttachmentDetails } from '../Allocation/Asset/storeAttachmentDetails.js';
 import path from "path";
 import fs from "fs";
+import { getDataFromExcel } from '../Excel/getDataFromExcelFile.js';
+import Location from '../Tracking/location.js';
 
 const upload = multer({dest: './attachments'});
 
@@ -221,6 +223,66 @@ router.post("/insurance", (req, res) => {
     }
 
 });
+
+interface BulkAddAsset {
+    location: string,
+    description: string,
+    category: string,
+    usefullife: number,
+    serialnumber: string,
+    condition: string,
+    responsibleuser: string,
+    acquisitiondate: string,
+    acquisitioncost: number,
+    residualvalue?: number,
+    make?: string,
+    model?: string,
+    oldbarcode?: string
+}
+
+router.post('/bulkAdd', upload.single("excel"), async(req, res) => {
+    try {
+        let file = req.file
+
+        if(file) {
+            let data = getDataFromExcel(file.path);
+
+            async function addAsset(data: BulkAddAsset) {
+                try {
+                    let responsibleuserid = await User.getUserID(data.responsibleuser);
+                    let acquisitionDate = utility.checkIfValidDate(data.acquisitiondate, MyErrors2.INVALID_DATE);
+                    let locationID = await Location.getLocationID(data.location);
+                    
+                    if(locationID) {
+                        let asset = new Asset(data.usefullife, acquisitionDate, locationID, data.condition, responsibleuserid, data.acquisitioncost, data.category, 
+                            [], data.serialnumber, data.description, data?.make, data?.model, data?.residualvalue, undefined, undefined, data?.oldbarcode);
+                        await asset.initialize();
+
+                        //@ts-ignore
+                        await Log.createLog(req.ip, req.id, Logs.CREATE_ASSET)
+                    } else {
+                        throw new MyError(MyErrors2.LOCATION_NOT_EXIST);
+                    }
+                } catch(err) {
+                    console.log(err);
+                    throw new MyError(MyErrors2.NOT_CREATE_ASSET);
+                }
+            }
+
+            for await (let d of data) {
+                //@ts-ignore
+                await addAsset(d);
+            }
+            return res.status(201).json({message: Success2.CREATED_ASSET});
+        } else {
+            return res.status(500).json({message: MyErrors2.NOT_PROCESS_EXCEL_FILE});
+        }
+    } catch(err) {
+        console.log(err);
+        let {errorMessage, errorCode} = handleError(err);
+        return res.status(errorCode).json({message: errorMessage});
+    }
+})
 
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     let {
@@ -519,7 +581,7 @@ router.get('/detailsFromBarcode', async(req, res) => {
     }
 })
 
-router.route("*", (req, res) => {
+router.all("*", (req, res) => {
     res.status(404).json({message: "Route not found"});
 });
 

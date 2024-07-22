@@ -7,6 +7,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
 import express from 'express';
 const router = express.Router();
 import Asset from '../Allocation/Asset/asset2.js';
@@ -20,7 +27,7 @@ import MyError from '../utility/myError.js';
 import { filterAssetByDetails } from '../Allocation/Asset/filter.js';
 import multer from 'multer';
 import { Log } from '../Log/log.js';
-import { UserRoles } from '../Users/users.js';
+import User, { UserRoles } from '../Users/users.js';
 import createAssetStatus from '../Allocation/Asset/addAssetStatus.js';
 import handleError from '../utility/handleError.js';
 import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
@@ -34,6 +41,8 @@ import { createAssetRemark, getAssetRemarks } from '../Allocation/Asset/remarks.
 import { storeAttachmentDetails } from '../Allocation/Asset/storeAttachmentDetails.js';
 import path from "path";
 import fs from "fs";
+import { getDataFromExcel } from '../Excel/getDataFromExcelFile.js';
+import Location from '../Tracking/location.js';
 const upload = multer({ dest: './attachments' });
 // Add attachments to asset
 router.get('/attachments/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -175,6 +184,62 @@ router.post("/insurance", (req, res) => {
         return res.status(errorCode).json({ message: errorMessage });
     }
 });
+router.post('/bulkAdd', upload.single("excel"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, e_1, _b, _c;
+    try {
+        let file = req.file;
+        if (file) {
+            let data = getDataFromExcel(file.path);
+            function addAsset(data) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    try {
+                        let responsibleuserid = yield User.getUserID(data.responsibleuser);
+                        let acquisitionDate = utility.checkIfValidDate(data.acquisitiondate, MyErrors2.INVALID_DATE);
+                        let locationID = yield Location.getLocationID(data.location);
+                        if (locationID) {
+                            let asset = new Asset(data.usefullife, acquisitionDate, locationID, data.condition, responsibleuserid, data.acquisitioncost, data.category, [], data.serialnumber, data.description, data === null || data === void 0 ? void 0 : data.make, data === null || data === void 0 ? void 0 : data.model, data === null || data === void 0 ? void 0 : data.residualvalue, undefined, undefined, data === null || data === void 0 ? void 0 : data.oldbarcode);
+                            yield asset.initialize();
+                            //@ts-ignore
+                            yield Log.createLog(req.ip, req.id, Logs.CREATE_ASSET);
+                        }
+                        else {
+                            throw new MyError(MyErrors2.LOCATION_NOT_EXIST);
+                        }
+                    }
+                    catch (err) {
+                        console.log(err);
+                        throw new MyError(MyErrors2.NOT_CREATE_ASSET);
+                    }
+                });
+            }
+            try {
+                for (var _d = true, data_1 = __asyncValues(data), data_1_1; data_1_1 = yield data_1.next(), _a = data_1_1.done, !_a; _d = true) {
+                    _c = data_1_1.value;
+                    _d = false;
+                    let d = _c;
+                    //@ts-ignore
+                    yield addAsset(d);
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (!_d && !_a && (_b = data_1.return)) yield _b.call(data_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            return res.status(201).json({ message: Success2.CREATED_ASSET });
+        }
+        else {
+            return res.status(500).json({ message: MyErrors2.NOT_PROCESS_EXCEL_FILE });
+        }
+    }
+    catch (err) {
+        console.log(err);
+        let { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    }
+}));
 router.post('/add', checkifAuthenticated, checkifAuthorized('Asset Administrator'), (req, res) => {
     let { locationID, description, categoryName, usefulLife, serialNumber, condition, responsibleuserid, acquisitionDate, acquisitionCost, residualValue, depreciationType, depreciationPercent, make, modelnumber, attachments, oldBarcode } = req.body;
     // Temporary attachements fix
@@ -416,7 +481,7 @@ router.get('/detailsFromBarcode', (req, res) => __awaiter(void 0, void 0, void 0
         return res.status(errorCode).json({ message: errorMessage });
     }
 }));
-router.route("*", (req, res) => {
+router.all("*", (req, res) => {
     res.status(404).json({ message: "Route not found" });
 });
 export default router;
