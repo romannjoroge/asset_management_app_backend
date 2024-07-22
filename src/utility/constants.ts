@@ -217,7 +217,8 @@ export enum MyErrors2 {
     "NOT_CREATE_EXCEL_FILE" = "Error 88: Could Not Create Excel File",
     "REPORT_NOT_EXIST" = "Error 89: Report Does Not Exist",
     "NOT_CREATE_USER" = "Error 90: Could Not Create User",
-    "USER_ALREADY_EXISTS" = "Error 91: User Already Exists"
+    "USER_ALREADY_EXISTS" = "Error 91: User Already Exists",
+    "NOT_CREATE_CATEGORY" = "Error 92: Could Not Create Category"
 }
 
 export enum Success2 {
@@ -236,7 +237,8 @@ export enum Success2 {
     "CREATED_REMARK" = "Created Asset Remark",
     "FILES_UPLOADED" = "Files Have Been Attached Succesfuly",
     "CUSTOM_REPORT" = "Custom Report Created Succesfuly",
-    "BULK_CREATE_USER" = "Created Users Successfully"
+    "BULK_CREATE_USER" = "Created Users Successfully",
+    "CREATED_CATEGORY" = "Category Created",
 }
 
 export const Succes = {

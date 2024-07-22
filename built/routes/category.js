@@ -11,13 +11,15 @@ import express from 'express';
 import pool from '../../db2.js';
 const router = express.Router();
 import Category from '../Allocation/Category/category2.js';
-import { Errors, Logs, MyErrors2, Succes } from '../utility/constants.js';
+import { Errors, Logs, MyErrors2, Succes, Success2 } from '../utility/constants.js';
 import categoryTable from '../Allocation/Category/db_category2.js';
 import updateCategory from '../Allocation/Category/updateCategory.js';
 import { Log } from '../Log/log.js';
+import MyError from '../utility/myError.js';
 import handleError from '../utility/handleError.js';
 import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 import multer from 'multer';
+import { getDataFromExcel } from '../Excel/getDataFromExcelFile.js';
 const upload = multer({ dest: './attachments' });
 // Get subcategories
 router.get("/subcategory/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -74,7 +76,41 @@ router.get('/get', (req, res) => {
 });
 router.post('/bulkAdd', upload.single("excel"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return res.status(201).json({ message: "Done" });
+        let file = req.file;
+        if (file) {
+            let data = getDataFromExcel(file.path);
+            function addCategory(data) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    try {
+                        let parentCategoryID;
+                        if (data.parentcategory) {
+                            parentCategoryID = yield Category._getCategoryID(data.parentcategory);
+                        }
+                        let categ = new Category(data.name, parentCategoryID, data.depreciationtype, data.depreciationpercent);
+                        yield categ.initialize();
+                        yield Log.createLog(req.ip, req.id, Logs.CREATE_CATEGORY);
+                    }
+                    catch (err) {
+                        if (err instanceof MyError) {
+                            throw err;
+                        }
+                        else {
+                            throw new MyError(MyErrors2.NOT_CREATE_CATEGORY);
+                        }
+                    }
+                });
+            }
+            let promises = [];
+            for (let d of data) {
+                // @ts-ignore
+                promises.push(addCategory(d));
+            }
+            yield Promise.all(promises);
+            return res.status(201).json({ message: Success2.CREATED_CATEGORY });
+        }
+        else {
+            return res.status(500).json({ message: MyErrors2.NOT_PROCESS_EXCEL_FILE });
+        }
     }
     catch (err) {
         let { errorMessage, errorCode } = handleError(err);
