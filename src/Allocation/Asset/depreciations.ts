@@ -86,7 +86,24 @@ export function getAssetDepreciationDetails(assetID: number): Promise<AssetDepre
     })
 }
 
+export async function getAssetEstimatedValue(assetID: number): Promise<number | string> {
+    try {
+        if(!Asset._doesAssetIDExist(assetID)) {
+            throw new MyError(MyErrors2.ASSET_NOT_EXIST);
+        }
 
+        let entries = await createDeprecaitonScheduleEntries(assetID);
+        let estimatedValue = entries.find((e) => {
+            let currentYear = new Date().getFullYear()
+            if(e.year == currentYear) {
+                return e
+            }
+        })
+        return estimatedValue?.closingbookvalue ?? "N/A";
+    } catch(err) {
+        return "N/A"
+    }
+}
 
 export const createDeprecaitonScheduleEntries = (assetID: number): Promise<DepreciaitionScheduleEntry[] | never> => {
     return new Promise((res, rej) => {
@@ -151,15 +168,3 @@ async function insertDepreciationSchedule(props: DepreciaitionScheduleEntry): Pr
         });
     });
 }
-
-// async function test() {
-//     try {
-//         let depEntries = await createDeprecaitonScheduleEntries(12);
-//         console.log(depEntries);
-//     } catch(err) {
-//         console.log("OHH SHIT", err);
-//     }
-// }
-
-
-// test();

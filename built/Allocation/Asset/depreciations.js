@@ -80,6 +80,27 @@ export function getAssetDepreciationDetails(assetID) {
         });
     });
 }
+export function getAssetEstimatedValue(assetID) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            if (!Asset._doesAssetIDExist(assetID)) {
+                throw new MyError(MyErrors2.ASSET_NOT_EXIST);
+            }
+            let entries = yield createDeprecaitonScheduleEntries(assetID);
+            let estimatedValue = entries.find((e) => {
+                let currentYear = new Date().getFullYear();
+                if (e.year == currentYear) {
+                    return e;
+                }
+            });
+            return (_a = estimatedValue === null || estimatedValue === void 0 ? void 0 : estimatedValue.closingbookvalue) !== null && _a !== void 0 ? _a : "N/A";
+        }
+        catch (err) {
+            return "N/A";
+        }
+    });
+}
 export const createDeprecaitonScheduleEntries = (assetID) => {
     return new Promise((res, rej) => {
         // Reject if asset does not exist
@@ -137,13 +158,4 @@ function insertDepreciationSchedule(props) {
         });
     });
 }
-// async function test() {
-//     try {
-//         let depEntries = await createDeprecaitonScheduleEntries(12);
-//         console.log(depEntries);
-//     } catch(err) {
-//         console.log("OHH SHIT", err);
-//     }
-// }
-// test();
 //# sourceMappingURL=depreciations.js.map

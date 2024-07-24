@@ -15,6 +15,7 @@ import pool from "../../db2.js";
 import "dotenv/config";
 import { loadDataToExcelFile } from "../Excel/createExcelFileForGeneralData.js";
 import Mail from "../Mail/mail.js";
+import { getAssetEstimatedValue } from "../Allocation/Asset/depreciations.js";
 function createCronJobs() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -27,6 +28,12 @@ function createCronJobs() {
                     console.log("Statement => ", selectStatement.statement);
                     let results = yield pool.query(selectStatement.statement, selectStatement.args);
                     if (results.rows.length > 0) {
+                        if (selectStatement.isEstimatedValue) {
+                            for (let i = 0; i < results.rows.length; i++) {
+                                let estimatedvalue = yield getAssetEstimatedValue(results.rows[i]['assetid']);
+                                results.rows[i]['estimatedvalue'] = estimatedvalue;
+                            }
+                        }
                         let buffer = loadDataToExcelFile(results.rows, report['name']);
                         // Send an email
                         let usersToMailTo = yield getResultsFromDatabase("SELECT u.email AS email FROM User2 u INNER JOIN mailinglist m ON m.userid = u.id INNER JOIN mailsubscriptions ms ON ms.id = m.mailsubscriptionid WHERE u.deleted = false AND ms.id = (SELECT mailsubscriptionid FROM generatereports WHERE name = $1 LIMIT 1)", [report['name']]);
@@ -155,18 +162,25 @@ createCronJobs();
 //         let struct = convertStoredReportToGenerateStruct(json);
 //           let selectStatement = generateSelectStatementFromGenerateReportStruct(struct);
 //           let results = await pool.query(selectStatement.statement, selectStatement.args ?? []);
-//           let buffer = loadDataToExcelFile(results.rows, "Test");
-//           let usersToMailTo = await getResultsFromDatabase<{email: string}>("SELECT u.email AS email FROM User2 u INNER JOIN mailinglist m ON m.userid = u.id INNER JOIN mailsubscriptions ms ON ms.id = m.mailsubscriptionid WHERE u.deleted = false AND ms.id = (SELECT mailsubscriptionid FROM generatereports WHERE name = $1 LIMIT 1)", [json.name])
-//           Mail.sendMailWithAttachmentsToMultipleRecepients(
-//             `
-//               <h1>Test Mail</h1>
-//             `,
-//             "extremewireless@wireless.co.ke",
-//             usersToMailTo.map((e) => e.email),
-//             "TEST EMAIL",
-//             buffer,
-//             "report.xlsx"
-//           )
+//           if(selectStatement.isEstimatedValue) {
+//             for (let i = 0; i < results.rows.length; i++) {
+//               let estimatedvalue = await getAssetEstimatedValue(results.rows[i]['assetid'])
+//               results.rows[i]['estimatedvalue'] = estimatedvalue
+//             }
+//           }
+//           console.log(results.rows)
+//           // let buffer = loadDataToExcelFile(results.rows, "Test");
+//           // let usersToMailTo = await getResultsFromDatabase<{email: string}>("SELECT u.email AS email FROM User2 u INNER JOIN mailinglist m ON m.userid = u.id INNER JOIN mailsubscriptions ms ON ms.id = m.mailsubscriptionid WHERE u.deleted = false AND ms.id = (SELECT mailsubscriptionid FROM generatereports WHERE name = $1 LIMIT 1)", [json.name])
+//           // Mail.sendMailWithAttachmentsToMultipleRecepients(
+//           //   `
+//           //     <h1>Test Mail</h1>
+//           //   `,
+//           //   "extremewireless@wireless.co.ke",
+//           //   usersToMailTo.map((e) => e.email),
+//           //   "TEST EMAIL",
+//           //   buffer,
+//           //   "report.xlsx"
+//           // )
 //     } catch(err) {
 //         console.log("Error =>", err)
 //     }
