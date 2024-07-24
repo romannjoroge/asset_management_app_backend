@@ -184,6 +184,56 @@ router.post("/insurance", (req, res) => {
         return res.status(errorCode).json({ message: errorMessage });
     }
 });
+router.post('/bulkAction', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let { assets, responsibleuser } = req.body;
+    let responsibleUserID = Number.parseInt(responsibleuser);
+    try {
+        function addResponsibleUser(assetID, responsibleUser) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    let doesAssetExist = yield Asset._doesAssetIDExist(assetID);
+                    if (!doesAssetExist) {
+                        throw new MyError(MyErrors2.ASSET_NOT_EXIST);
+                    }
+                    yield client.query("UPDATE Asset SET responsibleuserid = $1 WHERE assetID = $2", [responsibleUserID, assetID]);
+                }
+                catch (err) {
+                    if (err instanceof MyError) {
+                        throw err;
+                    }
+                    else {
+                        throw new MyError(MyErrors2.NOT_BULK_ACTION_ASSET);
+                    }
+                }
+            });
+        }
+        const client = yield pool.connect();
+        let userExists = yield User.checkIfUserIDExists(responsibleUserID);
+        client.query("BEGIN");
+        if (!userExists) {
+            return res.status(500).json({ message: MyErrors2.USER_NOT_EXIST });
+        }
+        let promises = [];
+        for (let asset of assets) {
+            let assetID = Number.parseInt(asset);
+            promises.push(addResponsibleUser(assetID, responsibleUserID));
+        }
+        try {
+            yield Promise.all(promises);
+            yield client.query("COMMIT");
+            return res.status(201).json({ message: Success2.BULK_EDIT_COMPLETE });
+        }
+        catch (err) {
+            yield client.query('ROLLBACK');
+            let { errorMessage, errorCode } = handleError(err);
+            return res.status(errorCode).json({ message: errorMessage });
+        }
+    }
+    catch (err) {
+        let { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
+    }
+}));
 router.post('/bulkAdd', upload.single("excel"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
     try {

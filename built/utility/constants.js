@@ -221,6 +221,7 @@ export var MyErrors2;
     MyErrors2["NOT_CREATE_CATEGORY"] = "Error 92: Could Not Create Category";
     MyErrors2["NOT_CREATE_ASSET"] = "Error 93: Could Not Create Asset";
     MyErrors2["INVALID_DATE"] = "Error 94: Invalid Date";
+    MyErrors2["NOT_BULK_ACTION_ASSET"] = "Error 95: Could Not Perform Bulk Action on Asset";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {
@@ -241,6 +242,7 @@ export var Success2;
     Success2["CUSTOM_REPORT"] = "Custom Report Created Succesfuly";
     Success2["BULK_CREATE_USER"] = "Created Users Successfully";
     Success2["CREATED_CATEGORY"] = "Category Created";
+    Success2["BULK_EDIT_COMPLETE"] = "Bulk Updates Complete";
 })(Success2 || (Success2 = {}));
 export const Succes = {
     '1': 'Asset Created Successfuly',

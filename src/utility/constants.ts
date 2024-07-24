@@ -220,7 +220,8 @@ export enum MyErrors2 {
     "USER_ALREADY_EXISTS" = "Error 91: User Already Exists",
     "NOT_CREATE_CATEGORY" = "Error 92: Could Not Create Category",
     "NOT_CREATE_ASSET" = "Error 93: Could Not Create Asset",
-    "INVALID_DATE" = "Error 94: Invalid Date"
+    "INVALID_DATE" = "Error 94: Invalid Date",
+    "NOT_BULK_ACTION_ASSET" = "Error 95: Could Not Perform Bulk Action on Asset"
 }
 
 export enum Success2 {
@@ -241,6 +242,7 @@ export enum Success2 {
     "CUSTOM_REPORT" = "Custom Report Created Succesfuly",
     "BULK_CREATE_USER" = "Created Users Successfully",
     "CREATED_CATEGORY" = "Category Created",
+    "BULK_EDIT_COMPLETE" = "Bulk Updates Complete"
 }
 
 export const Succes = {

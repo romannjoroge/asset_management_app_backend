@@ -240,6 +240,64 @@ interface BulkAddAsset {
     oldbarcode?: string
 }
 
+router.post('/bulkAction', async(req, res) => {
+    let {
+        assets,
+        responsibleuser
+    } = req.body
+    
+
+    let responsibleUserID = Number.parseInt(responsibleuser);
+    try {
+        async function addResponsibleUser(assetID: number, responsibleUser: number) {
+            try {
+                let doesAssetExist = await Asset._doesAssetIDExist(assetID);
+                if(!doesAssetExist) {
+                    throw new MyError(MyErrors2.ASSET_NOT_EXIST);
+                }
+
+                await client.query(
+                    "UPDATE Asset SET responsibleuserid = $1 WHERE assetID = $2",
+                    [responsibleUserID, assetID]
+                )
+            } catch(err) {
+                if(err instanceof MyError) {
+                    throw err;
+                } else {
+                    throw new MyError(MyErrors2.NOT_BULK_ACTION_ASSET);
+                }
+            }
+        }
+
+        const client = await pool.connect()
+        let userExists = await User.checkIfUserIDExists(responsibleUserID);
+        client.query("BEGIN")
+        if (!userExists) {
+            return res.status(500).json({message: MyErrors2.USER_NOT_EXIST});
+        }
+
+        let promises: Promise<void>[] = [];
+
+        for (let asset of assets) {
+            let assetID = Number.parseInt(asset);
+            promises.push(addResponsibleUser(assetID, responsibleUserID))
+        }
+
+        try {
+            await Promise.all(promises);
+            await client.query("COMMIT");
+            return res.status(201).json({message: Success2.BULK_EDIT_COMPLETE})
+        } catch(err) {
+            await client.query('ROLLBACK')
+            let {errorMessage, errorCode} = handleError(err);
+            return res.status(errorCode).json({message: errorMessage})
+        }
+    } catch(err) {
+        let {errorMessage, errorCode} = handleError(err);
+        return res.status(errorCode).json({message: errorMessage});
+    }
+})
+
 router.post('/bulkAdd', upload.single("excel"), async(req, res) => {
     try {
         let file = req.file
