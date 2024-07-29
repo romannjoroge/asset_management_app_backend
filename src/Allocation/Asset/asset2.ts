@@ -40,7 +40,7 @@ class Asset {
     acquisitionDate: Date;
     locationID: number;
     condition: string;
-    custodian_id: number;
+    custodian_id?: number;
     acquisitionCost: number;
     categoryName: string;
     categoryID: number;
@@ -51,7 +51,7 @@ class Asset {
     depreciaitionType?: DepreciationTypes;
     depreciationPercent?: number;
 
-    constructor(assetLifeSpan: number, acquisitionDate: string | Date, locationID: number, condition: string, custodian_id: number,
+    constructor(assetLifeSpan: number, acquisitionDate: string | Date, locationID: number, condition: string, custodian_id: number | undefined,
         acquisitionCost: number, categoryName: string, attachments: string[], serialNumber: string, description: string, 
         make?: string, modelnumber?: string, residualValue?: number, depreciaitionType?: DepreciationTypes,  depreciationPercent?: number, oldBarcode?: string ) {
 
@@ -118,69 +118,37 @@ class Asset {
 
     // Since the constructor cannot make asynchronous calls a seprate initialize function is needed to initialize
     // asynchronous values
-    initialize(): Promise<void | never> {
-        return new Promise((res, rej) => {
-            // Get category ID
-            Category._getCategoryID(this.categoryName).then(categoryID => {
-                this.categoryID = categoryID;
-                // Check that location exists
-                Location.verifyLocationID(this.locationID).then(doesExist => {
-                    if (!doesExist) {
-                        rej(new MyError(MyErrors2.LOCATION_NOT_EXIST));
-                    }
-                    // Check if user exists
-                    User.checkIfUserIDExists(this.custodian_id).then(doesUserExist => {
-                        if (!doesUserExist) {
-                            rej(new MyError(MyErrors2.USER_NOT_EXIST));
-                        }
-                        
-                        // Get ID of next asset
-                        Asset._getIDOfNextAsset().then(nextAssetID => {
-                            // Generate barcode
-                            generateBarcode(categoryID, this.locationID, nextAssetID, this.condition).then(genBarcode => {
-                                this.barcode = genBarcode;
-                                
-                                // Check if status exists
-                                checkIfAssetStatusExists(this.condition).then(exists => {
-                                  if (!exists) {
-                                    return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
-                                  }
+    async initialize(): Promise<void | never> {
+        try {
+            let categID = await Category._getCategoryID(this.categoryName);
+            this.categoryID = categID;
 
-                                  this._storeAssetInAssetRegister().then(_ => {
-                                    res();
-                                  }).catch(err => {
-                                    console.log(err)
-                                    return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
-                                  });
+            if(!await Location.verifyLocationID(this.locationID)) {
+                throw new MyError(MyErrors2.LOCATION_NOT_EXIST)
+            }
 
-                                }).catch((err) => {
-                                  console.log(err)
-                                  return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
-                                })
+            if(this.custodian_id) {
+                if(!await User.checkIfUserIDExists(this.custodian_id)) {
+                    throw new MyError(MyErrors2.USER_NOT_EXIST)
+                }
+            }
 
-                                
-                            }).catch((err: MyError) => {
-                                console.log(err);
-                                return rej(new MyError(MyErrors2.NOT_GENERATE_BARCODE));
-                            })
-                        }).catch((err: MyError) => {
-                            console.log(err);
-                            return rej(new MyError(MyErrors2.NOT_GET_NEXT_ASSET_ID));
-                        })
-                        
-                    }).catch(err => {
-                        console.log(err);
-                        return rej(new MyError(MyErrors2.USER_NOT_EXIST));
-                    });
-                }).catch(err => {
-                    console.log(err);
-                    return rej(new MyError(MyErrors2.LOCATION_NOT_EXIST));
-                });
-            }).catch(err => {
-                console.log(err);
-                return rej(new MyError(MyErrors2.CATEGORY_NOT_EXIST));
-            });
-        })
+            let nextAssetID = await Asset._getIDOfNextAsset();
+            let genBarcode = await generateBarcode(categID, this.locationID, nextAssetID, this.condition);
+            this.barcode = genBarcode;
+
+            if(!await checkIfAssetStatusExists(this.condition)) {
+                throw new MyError(MyErrors2.NOT_STORE_ASSET);
+            }
+
+            this._storeAssetInAssetRegister();
+        } catch(err) {
+            if (err instanceof MyError) {
+                throw err;
+            } else {
+                throw new MyError(MyErrors2.NOT_STORE_ASSET);
+            }
+        }
     }
 
     static _getIDOfNextAsset(): Promise<number> {
