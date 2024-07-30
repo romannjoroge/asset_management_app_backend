@@ -170,13 +170,14 @@ app.post('/login', (req, res) => {
     let {username, password} = req.body;
 
     // Get User From Username
-    pool.query("SELECT password, id FROM User2 WHERE username=$1", [username]).then(data => {
+    pool.query("SELECT password, id, companyname FROM User2 WHERE username=$1", [username]).then(data => {
         // Return an error if user does not exist
         if(data.rowCount <= 0) {
             return res.status(400).json({message:Errors[26]});
         }
 
         const encryptedPassword = data.rows[0].password;
+        const companyName = data.rows[0].companyname;
         // Compare given password to that stored in database
         bcrypt.compare(password, encryptedPassword).then(isSame => {
             // Return an error if passwords are not the same
@@ -190,7 +191,8 @@ app.post('/login', (req, res) => {
             return res.json({
                 token, 
                 username,
-                user_id: id
+                user_id: id,
+                company: companyName
             });
         }).catch(err => {
             console.log(err);
