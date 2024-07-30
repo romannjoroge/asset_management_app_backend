@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { json } from 'express';
 let router = express.Router();
 import verifyAuthenticationDetails from '../Auth/verify_password.js';
 import MyError from '../utility/myError.js';
@@ -9,6 +9,7 @@ import JWT from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import Mail from '../Mail/mail.js';
 import { Lama } from '../Lama/lama.js';
+import handleError from '../utility/handleError.js';
 dotenv.config();
 
 router.post('/sendDetails', (req, res) => {
@@ -69,51 +70,42 @@ router.post('/generateOTP', (req, res) => {
     })
 });
 
-router.post('/verifyOTP', (req, res) => {
+router.post('/verifyOTP', async (req, res) => {
     // Get OTP entered by user and user id
     const userid = Number.parseInt(req.body.id);
     const otp = req.body.otp;
 
-    // Verify if OTP is correct
-    Auth.verifyOTP(userid, otp).then(isCorrect => {
-        // If not correct return not correct
+    try {
+        let isCorrect = await Auth.verifyOTP(userid, otp);
         if(!isCorrect) {
             return res.json({isCorrect: false});
         }
 
-        // Get username of user to be returned in webtoken
-        User.getUsername(userid).then(username => {
-            // Send JWT token
-            Lama.init("settings").then(settingsStore => {
-                settingsStore.get("timeout").then(timeout => {
-                    let expirationTime;
+        let username = await User.getUsername(userid);
+        let company = await User.getCompanyName(userid);
+        let settingsStore = await Lama.init("settings");
+        let timeout = await settingsStore.get("timeout");
 
-                    if (timeout) {
-                        expirationTime = Number.parseInt(timeout) * 60
-                    } else {
-                        expirationTime = 3600
-                    }
+        let expirationTime;
+        if(timeout) {
+            expirationTime = Number.parseInt(timeout) * 60;
+        } else {
+            expirationTime = 3600;
+        }
 
-                    const token = JWT.sign({id: userid}, process.env.TOKEN_SECRET ?? "", {expiresIn:expirationTime});
-                    return res.json({
-                        isCorrect: true,
-                        token, 
-                        username,
-                        user_id: userid,
-                        expirationTime
-                    });
-                }).catch((err: any) => {
-                    return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
-                })
-            }).catch((err: any) => {
-                return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
-            })
-        }).catch((err: MyError) => {
-            return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
-        })
-    }).catch((err: MyError) => {
-        return res.status(500).json({message: MyErrors2.INTERNAL_SERVER_ERROR});
-    })
+        const token = JWT.sign({id: userid}, process.env.TOKEN_SECRET ?? "", {expiresIn:expirationTime});
+        return res.json({
+            isCorrect: true,
+            token, 
+            username,
+            user_id: userid,
+            expirationTime,
+            company: company
+        });
+    } catch(err) {
+        let {errorCode, errorMessage} = handleError(err);
+        return res.status(errorCode).json({message: errorMessage});
+    }
 })
 
 export default router;

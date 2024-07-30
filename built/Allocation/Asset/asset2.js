@@ -79,60 +79,34 @@ class Asset {
     // Since the constructor cannot make asynchronous calls a seprate initialize function is needed to initialize
     // asynchronous values
     initialize() {
-        return new Promise((res, rej) => {
-            // Get category ID
-            Category._getCategoryID(this.categoryName).then(categoryID => {
-                this.categoryID = categoryID;
-                // Check that location exists
-                Location.verifyLocationID(this.locationID).then(doesExist => {
-                    if (!doesExist) {
-                        rej(new MyError(MyErrors2.LOCATION_NOT_EXIST));
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let categID = yield Category._getCategoryID(this.categoryName);
+                this.categoryID = categID;
+                if (!(yield Location.verifyLocationID(this.locationID))) {
+                    throw new MyError(MyErrors2.LOCATION_NOT_EXIST);
+                }
+                if (this.custodian_id) {
+                    if (!(yield User.checkIfUserIDExists(this.custodian_id))) {
+                        throw new MyError(MyErrors2.USER_NOT_EXIST);
                     }
-                    // Check if user exists
-                    User.checkIfUserIDExists(this.custodian_id).then(doesUserExist => {
-                        if (!doesUserExist) {
-                            rej(new MyError(MyErrors2.USER_NOT_EXIST));
-                        }
-                        // Get ID of next asset
-                        Asset._getIDOfNextAsset().then(nextAssetID => {
-                            // Generate barcode
-                            generateBarcode(categoryID, this.locationID, nextAssetID, this.condition).then(genBarcode => {
-                                this.barcode = genBarcode;
-                                // Check if status exists
-                                checkIfAssetStatusExists(this.condition).then(exists => {
-                                    if (!exists) {
-                                        return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
-                                    }
-                                    this._storeAssetInAssetRegister().then(_ => {
-                                        res();
-                                    }).catch(err => {
-                                        console.log(err);
-                                        return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
-                                    });
-                                }).catch((err) => {
-                                    console.log(err);
-                                    return rej(new MyError(MyErrors2.NOT_STORE_ASSET));
-                                });
-                            }).catch((err) => {
-                                console.log(err);
-                                return rej(new MyError(MyErrors2.NOT_GENERATE_BARCODE));
-                            });
-                        }).catch((err) => {
-                            console.log(err);
-                            return rej(new MyError(MyErrors2.NOT_GET_NEXT_ASSET_ID));
-                        });
-                    }).catch(err => {
-                        console.log(err);
-                        return rej(new MyError(MyErrors2.USER_NOT_EXIST));
-                    });
-                }).catch(err => {
-                    console.log(err);
-                    return rej(new MyError(MyErrors2.LOCATION_NOT_EXIST));
-                });
-            }).catch(err => {
-                console.log(err);
-                return rej(new MyError(MyErrors2.CATEGORY_NOT_EXIST));
-            });
+                }
+                let nextAssetID = yield Asset._getIDOfNextAsset();
+                let genBarcode = yield generateBarcode(categID, this.locationID, nextAssetID, this.condition);
+                this.barcode = genBarcode;
+                if (!(yield checkIfAssetStatusExists(this.condition))) {
+                    throw new MyError(MyErrors2.NOT_STORE_ASSET);
+                }
+                this._storeAssetInAssetRegister();
+            }
+            catch (err) {
+                if (err instanceof MyError) {
+                    throw err;
+                }
+                else {
+                    throw new MyError(MyErrors2.NOT_STORE_ASSET);
+                }
+            }
         });
     }
     static _getIDOfNextAsset() {
