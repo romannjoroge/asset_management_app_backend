@@ -43,6 +43,8 @@ router.post('/update', (req, res) => __awaiter(void 0, void 0, void 0, function*
         return res.status(201).json({ message: Success2.UPDATE_ACCOUNT });
     }
     catch (err) {
+        let { errorMessage, errorCode } = handleError(err);
+        return res.status(errorCode).json({ message: errorMessage });
     }
 }));
 router.post('/bulkAdd', checkifAuthorized('User Manager'), upload.single("excel"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {

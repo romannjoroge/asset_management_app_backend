@@ -43,7 +43,8 @@ router.post('/update', async(req, res) => {
         }
         return res.status(201).json({message: Success2.UPDATE_ACCOUNT})
     } catch(err) {
-
+        let {errorMessage, errorCode} = handleError(err);
+        return res.status(errorCode).json({message: errorMessage});
     }
 })
 
