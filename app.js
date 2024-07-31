@@ -50,7 +50,7 @@ app.use('/assets/category', checkifAuthenticated, checkifAuthorized('Asset Admin
 app.use('/tracking', checkifAuthenticated, tracking)
 app.use('/gatepass', checkifAuthenticated, gatepass)
 app.use('/reports',  checkifAuthenticated, reports)
-app.use('/users', checkifAuthenticated, checkifAuthorized('User Manager'), users)
+app.use('/users', checkifAuthenticated, users)
 app.use('/delete', checkifAuthenticated, deleteRoute);
 app.use('/mail', checkifAuthenticated, mail);
 

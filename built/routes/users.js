@@ -26,8 +26,26 @@ import multer from 'multer';
 import { getDataFromExcel } from '../Excel/getDataFromExcelFile.js';
 import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 import User from '../Users/users.js';
+import checkifAuthorized from '../../middleware/checkifAuthorized.js';
 const upload = multer({ dest: './attachments' });
-router.post('/bulkAdd', upload.single("excel"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/update', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let { username, password } = req.body;
+    try {
+        // @ts-ignore
+        let userID = req.id;
+        if (username) {
+            yield pool.query("UPDATE User2 SET username = $1 WHERE id = $2", [username, userID]);
+        }
+        if (password) {
+            let hashedPassword = yield bcrypt.hash(password, 10);
+            yield pool.query("UPDATE User2 SET password = $1 WHERE id = $2", [hashedPassword, userID]);
+        }
+        return res.status(201).json({ message: Success2.UPDATE_ACCOUNT });
+    }
+    catch (err) {
+    }
+}));
+router.post('/bulkAdd', checkifAuthorized('User Manager'), upload.single("excel"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let file = req.file;
         if (file) {
@@ -72,7 +90,7 @@ router.post('/bulkAdd', upload.single("excel"), (req, res) => __awaiter(void 0, 
         return res.status(errorCode).json({ message: errorMessage });
     }
 }));
-router.get('/getUsers', (req, res) => {
+router.get('/getUsers', checkifAuthorized('User Manager'), (req, res) => {
     pool.query(userTable.getUsers, []).then(data => {
         if (data.rowCount <= 0) {
             return res.status(404).json({
@@ -87,7 +105,7 @@ router.get('/getUsers', (req, res) => {
         });
     });
 });
-router.get('/getNames', (req, res) => {
+router.get('/getNames', checkifAuthorized('User Manager'), (req, res) => {
     // Send data from DB
     pool.query(userTable.getNames, []).then(data => {
         if (data.rowCount <= 0) {
@@ -103,7 +121,7 @@ router.get('/getNames', (req, res) => {
         });
     });
 });
-router.get('/userTable', (req, res) => {
+router.get('/userTable', checkifAuthorized('User Manager'), (req, res) => {
     // Get username, email, name and id
     pool.query(userTable.nameEmail, []).then((data) => {
         // If data is empty return an error
@@ -117,7 +135,7 @@ router.get('/userTable', (req, res) => {
         return res.status(500).json({ message: Errors[9] });
     });
 });
-router.get('/user/:id', upload.array('attachments', 12), (req, res) => {
+router.get('/user/:id', checkifAuthorized('User Manager'), upload.array('attachments', 12), (req, res) => {
     // Get id of user
     const id = req.params.id;
     // Get email of user
@@ -149,7 +167,7 @@ router.get('/user/:id', upload.array('attachments', 12), (req, res) => {
     });
 });
 // Route To Add A User To A Company
-router.post('/addUser', (req, res) => {
+router.post('/addUser', checkifAuthorized('User Manager'), (req, res) => {
     // Get User Details And Roles From Frontend
     let name = req.body.name;
     let email = req.body.email;
@@ -233,7 +251,7 @@ router.post('/addUser', (req, res) => {
         return res.status(501).json({ message: Errors[9] });
     });
 });
-router.post('/setTimeout', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/setTimeout', checkifAuthorized('User Manager'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const settingsStore = yield Lama.init("settings");
         const { newTimeoutInMinutes } = req.body;
@@ -250,7 +268,7 @@ router.get('/test', (req, res) => {
     generateDepreciatedAssetsInMonth();
     return res.send("Done");
 });
-router.get('/getRoles', (req, res) => {
+router.get('/getRoles', checkifAuthorized('User Manager'), (req, res) => {
     getRolesFromDB().then(roles => {
         return res.json(roles);
     }).catch((err) => {
@@ -262,7 +280,7 @@ router.get('/getRoles', (req, res) => {
         }
     });
 });
-router.get('/getEvents', (req, res) => {
+router.get('/getEvents', checkifAuthorized('User Manager'), (req, res) => {
     getEventsFromDatabase().then(events => {
         return res.json(events);
     }).catch((err) => {
@@ -274,7 +292,7 @@ router.get('/getEvents', (req, res) => {
         }
     });
 });
-router.get('/', (req, res) => {
+router.get('/', checkifAuthorized('User Manager'), (req, res) => {
     // Return id and username of all users
     pool.query(userTable.getUserDetails, []).then((fetchResult) => {
         // If result is empy return an error
@@ -286,7 +304,7 @@ router.get('/', (req, res) => {
         }
     });
 });
-router.get('/getCompany/:username', (req, res) => {
+router.get('/getCompany/:username', checkifAuthorized('User Manager'), (req, res) => {
     // Check if username exits
     pool.query(userTable.doesUsernameExist, [req.params.username]).then(fetchResult => {
         // If nothing is returned the user does not exist

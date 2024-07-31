@@ -243,6 +243,7 @@ export var Success2;
     Success2["BULK_CREATE_USER"] = "Created Users Successfully";
     Success2["CREATED_CATEGORY"] = "Category Created";
     Success2["BULK_EDIT_COMPLETE"] = "Bulk Updates Complete";
+    Success2["UPDATE_ACCOUNT"] = "Account Updated Succesfully";
 })(Success2 || (Success2 = {}));
 export const Succes = {
     '1': 'Asset Created Successfuly',

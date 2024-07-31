@@ -242,7 +242,8 @@ export enum Success2 {
     "CUSTOM_REPORT" = "Custom Report Created Succesfuly",
     "BULK_CREATE_USER" = "Created Users Successfully",
     "CREATED_CATEGORY" = "Category Created",
-    "BULK_EDIT_COMPLETE" = "Bulk Updates Complete"
+    "BULK_EDIT_COMPLETE" = "Bulk Updates Complete",
+    "UPDATE_ACCOUNT" = "Account Updated Succesfully"
 }
 
 export const Succes = {
