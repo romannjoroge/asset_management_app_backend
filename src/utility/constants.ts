@@ -221,7 +221,9 @@ export enum MyErrors2 {
     "NOT_CREATE_CATEGORY" = "Error 92: Could Not Create Category",
     "NOT_CREATE_ASSET" = "Error 93: Could Not Create Asset",
     "INVALID_DATE" = "Error 94: Invalid Date",
-    "NOT_BULK_ACTION_ASSET" = "Error 95: Could Not Perform Bulk Action on Asset"
+    "NOT_BULK_ACTION_ASSET" = "Error 95: Could Not Perform Bulk Action on Asset",
+    "MUST_PROVIDE_CURRENT_PASSWORD" = "Error 96: You must enter your current password",
+    "INVALID_CREDENTIALS" = "Error 97: Invalid Credentials"
 }
 
 export enum Success2 {
