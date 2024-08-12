@@ -81,10 +81,11 @@ function convertRawTagToProcessedTag(rawTag) {
             pool.query(db_gatepass.getReaderID, [readerDeviceID]).then((fetchResult) => {
                 return res({ scannedTime, assetID, readerDeviceID: fetchResult.rows[0].id, barcode: rawTag.epcID, pc: rawTag.pc });
             }).catch((err) => {
+                console.log("Reader ID does not exist");
                 return rej(new MyError(Errors[73]));
             });
         }).catch(err => {
-            console.log(err);
+            console.log(err, "EPC ID does not belong to an asset");
             return rej(new MyError(Errors[73]));
         });
     });
@@ -161,7 +162,7 @@ function addProcessedTagToDB(processedTag) {
         });
     });
 }
-function convertAndAddTag(rawTag, processedTags) {
+function convertAndAddTag(tags, rawTag, processedTags) {
     return new Promise((res, rej) => {
         convertRawTagToProcessedTag(rawTag).then(processedTag => {
             processedTags.push(processedTag);
@@ -173,6 +174,7 @@ function convertAndAddTag(rawTag, processedTags) {
             });
         }).catch(err => {
             console.log(err);
+            tags.delete(JSON.stringify(rawTag));
             return rej(err);
         });
     });
@@ -411,7 +413,7 @@ export function addProcessedTag(tags, eventEmitter) {
             tags.forEach(tag => {
                 console.log(tag);
                 let newTag = JSON.parse(tag);
-                promises.push(convertAndAddTag(newTag, processedTags));
+                promises.push(convertAndAddTag(tags, newTag, processedTags));
             });
             Promise.all(promises).then(_ => {
                 // Update event if entry of exit is detected
@@ -422,17 +424,13 @@ export function addProcessedTag(tags, eventEmitter) {
                 Promise.all(promises2).then(_ => {
                     return res();
                 }).catch(err => {
-                    console.log(err);
-                    if (err instanceof MyError) {
-                        return rej(err);
-                    }
-                    else {
-                        return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
-                    }
+                    var _a;
+                    eventEmitter.emit('error', { message: (_a = err.message) !== null && _a !== void 0 ? _a : MyErrors2.NOT_READ_TAG });
                 });
             }).catch(err => {
+                var _a;
                 console.log(err);
-                return rej(new MyError(Errors[73]));
+                eventEmitter.emit('error', { message: (_a = err.message) !== null && _a !== void 0 ? _a : MyErrors2.NOT_READ_TAG });
             });
         }
     });

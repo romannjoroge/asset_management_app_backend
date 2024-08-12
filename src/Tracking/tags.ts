@@ -146,10 +146,11 @@ function convertRawTagToProcessedTag(rawTag: rawTag): Promise<processedTag> {
             pool.query(db_gatepass.getReaderID, [readerDeviceID]).then((fetchResult: ReaderDeviceIDFetchResult) => {
                 return res({scannedTime, assetID, readerDeviceID: fetchResult.rows[0].id, barcode: rawTag.epcID, pc: rawTag.pc});
             }).catch((err: any) => {
+                console.log("Reader ID does not exist")
                 return rej(new MyError(Errors[73]))
             })
         }).catch(err => {
-            console.log(err);
+            console.log(err, "EPC ID does not belong to an asset");
             return rej(new MyError(Errors[73]));
         });
     });
@@ -244,7 +245,7 @@ function addProcessedTagToDB(processedTag: processedTag): Promise<void> {
     });
 }
 
-function convertAndAddTag(rawTag: rawTag, processedTags: processedTag[]): Promise<void> {
+function convertAndAddTag(tags: Set<string>, rawTag: rawTag, processedTags: processedTag[]): Promise<void> {
     return new Promise((res, rej) => {
         convertRawTagToProcessedTag(rawTag).then(processedTag => {
             processedTags.push(processedTag);
@@ -256,6 +257,7 @@ function convertAndAddTag(rawTag: rawTag, processedTags: processedTag[]): Promis
             });
         }).catch(err => {
             console.log(err);
+            tags.delete(JSON.stringify(rawTag));
             return rej(err);
         });
     });
@@ -525,7 +527,7 @@ export function addProcessedTag(tags: Set<string>, eventEmitter: events.EventEmi
             tags.forEach(tag => {
                 console.log(tag);
                 let newTag:rawTag = JSON.parse(tag);
-                promises.push(convertAndAddTag(newTag, processedTags));
+                promises.push(convertAndAddTag(tags, newTag, processedTags));
             });
             Promise.all(promises).then(_ => {
                 // Update event if entry of exit is detected
@@ -537,16 +539,11 @@ export function addProcessedTag(tags: Set<string>, eventEmitter: events.EventEmi
                 Promise.all(promises2).then(_ => {
                     return res();
                 }).catch(err => {
-                    console.log(err);
-                    if (err instanceof MyError) {
-                        return rej(err);
-                    } else {
-                        return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
-                    }
+                    eventEmitter.emit('error', {message: err.message ?? MyErrors2.NOT_READ_TAG})
                 });    
             }).catch(err => {
                 console.log(err);
-                return rej(new MyError(Errors[73]));
+                eventEmitter.emit('error', {message: err.message ?? MyErrors2.NOT_READ_TAG})
             });
         }
     });

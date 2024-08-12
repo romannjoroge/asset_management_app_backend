@@ -30,66 +30,24 @@ interface tagRecords {
 
 // Create set for tags
 let tags: Set<string> = new Set();
-
+let tagsBeenProcessed = false;
 // Create job for adding tags to database
-schedule.scheduleJob('*/1 * * * * *', () => {
-    addProcessedTag(tags, eventEmitter).then(_ => {
+schedule.scheduleJob('*/2 * * * * *', () => {
+    if(tagsBeenProcessed) {
+        console.log("Tags Currently been processed");
+    } else {
+        tagsBeenProcessed = true;
+        addProcessedTag(tags, eventEmitter);
+        tagsBeenProcessed = false;
+        eventEmitter.on('error', () => {
+            console.log("Oops something happened!");
+        })
         tags.clear();
-    }).catch(err => {
-        if (err instanceof MyError) {
-            eventEmitter.emit('error', {message: err.message});
-        } else {
-            eventEmitter.emit('error', {message: MyErrors2.NOT_PROCESS_TAG});
-        }
-        tags.clear();
-    });
-});
-
-router.ws('/test', (ws, req) => {
-    console.log("req.query is: ");
-    console.log(req.query);
-    let locationID = req.query.locationID;
-    ws.send(`Location ${locationID} connected`);
-
-    // React to an event
-    eventEmitter.on('location', (data) => {
-        if (data.location == locationID) {
-            ws.send(JSON.stringify(data.data));
-        } else {
-            ws.send("Not this location");
-        }
-    });
-
-    // React to an error
-    eventEmitter.on('error', (data) => {
-        ws.send(JSON.stringify(data));
-    });
-
-    ws.on('message', (data) => {
-        // Converts data to an object
-        let json = JSON.parse(data.toString());
-
-        // Logs the data
-        console.log(json.data);
-
-        // Sends data back to client
-        ws.send(JSON.stringify({data: "Hello from server"}));
-    });
-});
-
-router.post('/test2', (req, res) => {
-    // This route emits an event when it is reached
-    testEmitFromDifferentFile(eventEmitter).then(_ => {
-        res.send("Done");
-    }).catch(err => {
-        res.send(err.message);
-    })
-});
-
-router.ws('/test3', (ws, req) => {
-    setInterval(async () => {
-        ws.send(JSON.stringify({data: Math.random()}));
-    }, 1000);
+        eventEmitter.removeListener('error', () => {
+            console.log("Listener removed")
+        })
+        
+    }
 });
 
 router.ws('/locationDashboard', (ws, req) => {
@@ -143,7 +101,7 @@ router.post('/tags', (req, res) => {
     for (var i in tagRecords) {
         let antNo = tagRecords[i].antNo;
         let epcIDToAdd = convertHexToASCII(tagRecords[i].epcID);
-        let tag: rawTag = {commandCode, hardwareKey, tagRecNums, antNo: tagRecords[i].antNo, pc: tagRecords[i].pc, epcID: epcIDToAdd, crc: tagRecords[i].crc}
+        let tag: rawTag = {commandCode, hardwareKey, tagRecNums, antNo, pc: tagRecords[i].pc, epcID: epcIDToAdd, crc: tagRecords[i].crc}
         tags.add(JSON.stringify(tag));
         promises.push(addTag(commandCode, hardwareKey, tagRecNums, antNo, tagRecords[i].pc, epcIDToAdd, tagRecords[i].crc));
     }
