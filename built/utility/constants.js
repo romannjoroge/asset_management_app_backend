@@ -222,6 +222,8 @@ export var MyErrors2;
     MyErrors2["NOT_CREATE_ASSET"] = "Error 93: Could Not Create Asset";
     MyErrors2["INVALID_DATE"] = "Error 94: Invalid Date";
     MyErrors2["NOT_BULK_ACTION_ASSET"] = "Error 95: Could Not Perform Bulk Action on Asset";
+    MyErrors2["MUST_PROVIDE_CURRENT_PASSWORD"] = "Error 96: You must enter your current password";
+    MyErrors2["INVALID_CREDENTIALS"] = "Error 97: Invalid Credentials";
 })(MyErrors2 || (MyErrors2 = {}));
 export var Success2;
 (function (Success2) {

@@ -18,10 +18,11 @@ import { getDataFromExcel } from '../Excel/getDataFromExcelFile.js';
 import getResultsFromDatabase from '../utility/getResultsFromDatabase.js';
 import User from '../Users/users.js';
 import checkifAuthorized from '../../middleware/checkifAuthorized.js';
+import verifyAuthenticationDetails from '../Auth/verify_password.js';
 const upload = multer({dest: './attachments'});
 
 router.post('/update', async(req, res) => {
-    let {username, password} = req.body;
+    let {username, password, currentPassword} = req.body;
 
     try {
         // @ts-ignore
@@ -35,6 +36,18 @@ router.post('/update', async(req, res) => {
         }
 
         if(password) {
+            if(!currentPassword) {
+                return res.status(401).json({message: MyErrors2.MUST_PROVIDE_CURRENT_PASSWORD});
+            }
+
+            //@ts-ignore
+            let oldUsername = await User.getUsername(req.id);
+            console.log(oldUsername, currentPassword);
+            let areLoginCorrect = await verifyAuthenticationDetails(oldUsername, currentPassword);
+            if (!areLoginCorrect) {
+                return res.status(401).json({message: MyErrors2.INVALID_CREDENTIALS})
+            }
+            // Verify the provided password
             let hashedPassword = await bcrypt.hash(password, 10);
             await pool.query(
                 "UPDATE User2 SET password = $1 WHERE id = $2",
@@ -266,7 +279,6 @@ router.post('/addUser', checkifAuthorized('User Manager'), (req, res) => {
                     const id = data.rows[0]['id'];
                     // Add user roles
                     let promises: Promise<void | never>[] = [];
-                    roles.forEach(role => promises.push(addUserRole(id, role)));
                     Promise.all(promises).then(_ => {
                         if (gatepasslocation) {
                             // Add user as gatepass authorizer for location
