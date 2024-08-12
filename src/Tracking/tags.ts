@@ -8,6 +8,7 @@ import _ from 'lodash';
 import events from 'events';
 import { doesAssetHaveGatepass } from "../GatePass/hasGatepass.js";
 import db_gatepass from "../GatePass/db_gatepass.js";
+import getResultsFromDatabase from "../utility/getResultsFromDatabase.js";
 const eventEmitter = new events.EventEmitter();
 
 interface processedTag {
@@ -268,28 +269,22 @@ function convertAndAddTag(tags: Set<string>, rawTag: rawTag, processedTags: proc
  * @param processedTag A tag that has been read by a reader and processed by system
  * @returns true if the previous entry is different so the asset has entered or left the building. false if there is no difference
  */
-function isPreviousEntryInDBDifferent(processedTag: processedTag): Promise<boolean> {
-    return new Promise((res, rej) => {
-        // Get the previous entries of the asset in the processed tags table
-        pool.query(locationTable.getPreviousEntry, [processedTag.assetID, processedTag.scannedTime]).then((fetchResult: ProcessedTagQueryFetchResult) => {
-            // If nothing is returned then its not different
-            if (fetchResult.rowCount <= 0) {
-                return res(false);
-            }
-            let previousEntry: ProcessedTagQuery = fetchResult.rows[0];
-            // Check if previous entry has a different reader id
-            if (previousEntry.readerdeviceid !== processedTag.readerDeviceID) {
-                // If the previous entry has a different reader device id return true
-                return res(true);
-            } else {
-                // Else return false
-                return res(false);
-            }
-        }).catch(err => {
-            console.log(err);
-            return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
-        });
-    });
+async function isPreviousEntryInDBDifferent(processedTag: processedTag): Promise<boolean> {
+    try {
+        // Get past entry
+        let previousEntry = await getResultsFromDatabase<{readerdeviceid: number}>(
+            "SELECT readerdeviceid FROM ProcessedTags WHERE assetID = $1 AND scannedTime < $2 ORDER BY scannedTime DESC LIMIT 1",
+            [processedTag.assetID, processedTag.scannedTime]
+        )
+
+        if(previousEntry.length <= 0) {
+            return false
+        }
+        return previousEntry[0].readerdeviceid != processedTag.readerDeviceID;
+    } catch(err) {
+        console.log(err);
+        throw new MyError(MyErrors2.NOT_PROCESS_TAG);
+    }
 }
 
 interface PreviousReaderQuery {
@@ -432,52 +427,49 @@ function isAssetLeavingOrEntering(processedTag: processedTag): Promise<boolean> 
  * @returns Nothing. It just emits if the item has entered or left the building
  * @description This function takes a processed tag and checks if the item has entered or left the building. If it has, it emits an event to the location dashboard
  */
-function processPreviousEntries(processedTag: processedTag, eventEmitter: events.EventEmitter): Promise<void> {
-    return new Promise((res, rej) => {
-        // See if previous tag is different
-        isPreviousEntryInDBDifferent(processedTag).then(isDifferent => {
-            console.log("Is it different: ");
-            console.log(isDifferent);
-
-            // If they are different determine whether asset is entering or leaving
-            if (isDifferent == true) {
-                isAssetLeavingOrEntering(processedTag).then(isEntering => {
-                    console.log("Is it entering: ")
-                    console.log(isEntering);
-
-                    // Emit a signal
-                    emitSignal(isEntering, processedTag).then(signal => {
-                        eventEmitter.emit('location', signal);
-                        return res();
-                    }).catch(err => {
-                        console.log(err);
-                        if (err instanceof MyError) {
-                            return rej(err);
-                        } else {
-                            return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
-                        }
-                    });    
-                }).catch(err => {
-                    console.log(err);
-                    if (err instanceof MyError) {
-                        return rej(err);
-                    } else {
-                        return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
-                    }
-                });
-            } else {
-                // Else stop
-                return res();
+async function processPreviousEntries(processedTag: processedTag, eventEmitter: events.EventEmitter): Promise<void> {
+    try {
+        let isDifferent = await isPreviousEntryInDBDifferent(processedTag);
+        console.log("Is It Different: ", isDifferent)
+        if(isDifferent) {
+            // Get if asset is at entrance or not
+            let results = await getResultsFromDatabase<{entry: boolean, locationid: number}>(
+                "SELECT entry, locationid FROM ReaderDevice WHERE id = $1",
+                [processedTag.readerDeviceID]
+            );
+            if(results.length <= 0) {
+                console.log("I am here")
+                throw new MyError(MyErrors2.NOT_PROCESS_TAG);
             }
-        }).catch(err => {
-            console.log(err);
-            if (err instanceof MyError) {
-                return rej(err);
+            let currentPos = results[0];
+
+            // Get previous entry that was at the same location
+            let results2 = await getResultsFromDatabase<{entry: boolean}>(
+                "SELECT r.entry FROM ReaderDevice r INNER JOIN ProcessedTags p ON p.readerdeviceid = cast(r.id as varchar) WHERE p.scannedTime < $1 AND r.locationid = $2 ORDER BY p.scannedTime DESC LIMIT 1",
+                [processedTag.scannedTime, currentPos.locationid]
+            )
+            if(results2.length > 0) {
+                let previous = results2[0];
+
+                if (currentPos.entry !== previous.entry) {
+                    console.log("Is it entering: ", previous.entry)
+                    const tag = await emitSignal(previous.entry, processedTag);
+                    eventEmitter.emit('location', tag);
+                } else {
+                    console.log("Previous entry same")
+                }
             } else {
-                return rej(new MyError(MyErrors2.NOT_PROCESS_TAG));
+                console.log("No previous entries");
             }
-        });
-    });
+        }
+    } catch(err) {
+        console.log(err);
+        if(err instanceof MyError) {
+            throw err;
+        } else {
+            throw new MyError(MyErrors2.NOT_PROCESS_TAG)
+        }
+    }
 }
 
 export function testEmitFromDifferentFile(eventEmitter: events.EventEmitter): Promise<void> {
