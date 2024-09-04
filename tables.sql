@@ -528,6 +528,9 @@ SET datestyle TO MDY;
 ALTER USER asset_management WITH PASSWORD 'the password';
 
 -- Commands to do on server
+ALTER TABLE asset ADD COLUMN estimatedAcquisitionCost FLOAT NOT NULL DEFAULT -1.0;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX ON asset USING gin (description gin_trgm_ops);
 
 
 
