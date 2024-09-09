@@ -4,8 +4,7 @@ import { EventItemTypes, Log } from "../Log/log.js";
 import { AuditTrailEntry } from "./audit_trail.js";
 import MyError from "../utility/myError.js";
 import { Logs, MyErrors2 } from "../utility/constants.js";
-import { ResultFromDatabase } from "../utility/helper_types.js";
-import { AssetRegisterData, CategoryDepreciationConfig, ChainOfCustody, RawAssetMovement, RawAssetRegisterData, RawGatepassReport } from "./helpers.js";
+import { CategoryDepreciationConfig, ChainOfCustody, RawAssetMovement, RawAssetRegisterData, RawGatepassReport } from "./helpers.js";
 import getResultsFromDatabase from "../utility/getResultsFromDatabase.js";
 
 interface RawAuditTrailResults {
@@ -21,10 +20,10 @@ interface AuditTrailFetchResult {
     rowCount: number;
     rows: RawAuditTrailResults[]
 }
-const baseAssetRegister = `SELECT a.currentvaluationvalue AS current_market_value, a.latestvaluationdate, a.serialnumber AS serial_number, TO_CHAR(a.acquisitiondate, 'YYYY-MM-DD') AS acquisition_date, a.condition, (SELECT name AS responsible_users_name FROM User2                                                                                                                          
-    WHERE id = a.responsibleuserid LIMIT 1), a.acquisitioncost AS acquisition_cost, a.residualvalue AS residual_value, c.name AS category_name, 
+const baseAssetRegister = `SELECT a.currentvaluationvalue AS current_market_value, TO_CHAR(a.latestvaluationdate, 'YYYY-MM-DD') AS latestvaluationdate , a.serialnumber AS serial_number, TO_CHAR(a.acquisitiondate, 'YYYY-MM-DD') AS acquisition_date, a.condition, 
+    (SELECT name AS responsible_users_name FROM User2 WHERE id = a.responsibleuserid LIMIT 1), a.acquisitioncost AS acquisition_cost, a.residualvalue AS residual_value, c.name AS category_name, 
     a.usefullife AS useful_life, a.barcode, a.description, a.locationid AS locationid, TO_CHAR(a.disposaldate, 'YYYY-MM-DD') AS expected_depreciation_date, 
-    GREATEST(DATE_PART('day', disposaldate - NOW()), 0) AS days_to_disposal FROM Asset a FULL JOIN Category c ON c.id = a.categoryid`;
+    GREATEST(DATE_PART('day', disposaldate - NOW()), 0) AS days_to_disposal FROM Asset a FULL JOIN Category c ON c.id = a.categoryid;`;
 
 const baseAssetRegisterQueryWithDeletedAssets = baseAssetRegister + ' WHERE a.deleted = true ';
 
